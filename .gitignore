@@ -1,0 +1,8 @@
+# Dependencies
+/vendor
+/composer.lock
+/node_modules
+
+# Reports
+/reports
+/npm-debug.log
