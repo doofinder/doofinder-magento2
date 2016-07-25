@@ -32,7 +32,7 @@
             "@phpcpd",
             "@phpunit"
         ],
-        "phpcs": "php ./vendor/bin/phpcs --config-set installed_paths ../../magento-ecg/coding-standard && php ./vendor/bin/phpcs --standard=EcgM2 --report=checkstyle --report-file=./reports/phpcs.checkstyle.xml --ignore=vendor/* ./ || true",
+        "phpcs": "php ./vendor/bin/phpcs --config-set installed_paths ../../magento-ecg/coding-standard && php ./vendor/bin/phpcs --standard=EcgM2 --extensions=php,phtml --report=checkstyle --report-file=./reports/phpcs.checkstyle.xml --ignore=vendor/* ./ || true",
         "phpmd": "php ./vendor/bin/phpmd ./ xml cleancode,codesize,design,naming,unusedcode --reportfile ./reports/phpmd.pmd.xml --exclude=vendor/* || true",
         "phpcpd": "php ./vendor/bin/phpcpd --log-pmd=./reports/phpcpd.cpd.xml --min-tokens=50 --min-lines=5 --exclude=vendor -n -q ./ || true",
         "phpunit": "/bin/bash -c 'cd $MAGENTO_PATH && composer install' && php $MAGENTO_PATH/vendor/bin/phpunit -c $MAGENTO_PATH/dev/tests/unit/phpunit.xml.dist --coverage-clover ./reports/clover.xml --log-junit ./reports/phpunit.junit.xml Test/Unit"
