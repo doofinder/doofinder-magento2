@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Doofinder_Feed::backend"
+            title="Doofinder Feed"
+            module="Doofinder_Feed"
+            sortOrder="1"
+            resource="Doofinder_Feed::backend" />
+        <add id="Doofinder_Feed::main"
+            title="Main Configuration Page"
+            module="Doofinder_Feed"
+            sortOrder="1"
+            resource="Doofinder_Feed::main"
+            parent="Doofinder_Feed::backend"
+            action="doofinder/index" />
+    </menu>
+</config>
