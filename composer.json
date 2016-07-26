@@ -38,7 +38,7 @@
         "phpmd": "php ./vendor/bin/phpmd ./ xml cleancode,codesize,design,naming,unusedcode --exclude 'vendor/*' --reportfile ./reports/phpmd.pmd.xml || true",
         "phpcpd": "php ./vendor/bin/phpcpd --log-pmd=./reports/phpcpd.cpd.xml --min-tokens=50 --min-lines=5 --exclude=vendor -n -q ./ || true",
         "prephpunit": "/bin/bash -c 'cd $MAGENTO_PATH && composer install'",
-        "phpunit": "php $MAGENTO_PATH/vendor/bin/phpunit -c $MAGENTO_PATH/dev/tests/unit/phpunit.xml.dist --coverage-clover ./reports/clover.xml --log-junit ./reports/phpunit.junit.xml Test/Unit"
+        "phpunit": "php $MAGENTO_PATH/vendor/bin/phpunit --bootstrap $MAGENTO_PATH/dev/tests/unit/framework/bootstrap.php --coverage-clover ./reports/clover.xml --log-junit ./reports/phpunit.junit.xml"
     },
     "extra": {
         "magento-root-dir": "/var/www/html",
