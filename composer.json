@@ -9,7 +9,6 @@
         "squizlabs/php_codesniffer": "*",
         "eviweb/fuelphp-phpcs": "*",
         "phpmd/phpmd": "@stable",
-        "magento-ecg/coding-standard": "2.*",
         "sebastian/phpcpd": "^2.0"
     },
     "type": "magento2-module",
@@ -34,8 +33,8 @@
             "@prephpunit",
             "@phpunit"
         ],
-        "phpcs": "php ./vendor/bin/phpcs --config-set installed_paths ../../magento-ecg/coding-standard && php ./vendor/bin/phpcs --standard=EcgM2 --extensions=php,phtml --report=checkstyle --report-file=./reports/phpcs.checkstyle.xml --ignore=vendor/* ./ || true",
-        "phpmd": "php ./vendor/bin/phpmd ./ xml cleancode,codesize,design,naming,unusedcode --exclude 'vendor/*' --reportfile ./reports/phpmd.pmd.xml || true",
+        "phpcs": "php ./vendor/bin/phpcs --standard=phpcs.ruleset.xml --extensions=php,phtml --report=checkstyle --report-file=./reports/phpcs.checkstyle.xml --ignore=vendor/* ./ || true",
+        "phpmd": "php ./vendor/bin/phpmd ./ xml phpmd.ruleset.xml --exclude 'vendor/*' --reportfile ./reports/phpmd.pmd.xml || true",
         "phpcpd": "php ./vendor/bin/phpcpd --log-pmd=./reports/phpcpd.cpd.xml --min-tokens=50 --min-lines=5 --exclude=vendor -n -q ./ || true",
         "prephpunit": "/bin/bash -c 'cd $MAGENTO_PATH && composer install'",
         "phpunit": "php $MAGENTO_PATH/vendor/bin/phpunit --bootstrap $MAGENTO_PATH/dev/tests/unit/framework/bootstrap.php --coverage-clover ./reports/clover.xml --log-junit ./reports/phpunit.junit.xml"
