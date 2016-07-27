@@ -1,8 +1,87 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <tab id="feed" translate="label" sortOrder="500">
-            <label>Feed</label>
+        <tab id="doofinder_feed"
+            translate="label"
+            sortOrder="1000">
+            <label>Doofinder feed</label>
         </tab>
+        <section id="doofinder_feed_feed"
+            translate="label"
+            type="text"
+            sortOrder="1"
+            showInDefault="1"
+            showInWebsite="1"
+            showInStore="1">
+            <label>Product Data Feed</label>
+            <tab>doofinder_feed</tab>
+            <resource>Doofinder_Feed::config</resource>
+            <group id="feed_attributes"
+            translate="label"
+            type="text"
+            sortOrder="1"
+            showInDefault="1"
+            showInWebsite="1"
+            showInStore="1">
+                <label>Feed Attributes</label>
+                <field id="id"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>ID</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+            </group>
+            <group id="feed_settings"
+                translate="label"
+                type="text"
+                sortOrder="2"
+                showInDefault="1"
+                showInWebsite="1"
+                showInStore="1">
+                <label>Feed Settings</label>
+                <field id="export_proudct_prices"
+                    translate="label"
+                    type="select"
+                    sortOrder="2"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Export Product Prices</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="split_configurable_products"
+                    translate="label"
+                    type="select"
+                    sortOrder="2"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Split Configurable Products</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                        Export each component of a configurable product separately, instead of exporting them as a single product.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="image_size"
+                    translate="label"
+                    type="text"
+                    sortOrder="2"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Image size</label>
+                    <comment>
+                        <![CDATA[Export product image with given width. Leave empty to use original size.]]>
+                    </comment>
+                </field>
+            </group>
+        </section>
     </system>
 </config>

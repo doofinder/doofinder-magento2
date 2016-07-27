@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <doofinder_feed_feed>
+            <feed_settings>
+                <export_proudct_prices>1</export_proudct_prices>
+            </feed_settings>
+        </doofinder_feed_feed>
+    </default>
+</config>
