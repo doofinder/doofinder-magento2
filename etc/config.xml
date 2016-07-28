@@ -3,9 +3,36 @@
     xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <doofinder_feed_feed>
+            <feed_attributes>
+                <id>df_id</id>
+                <title>name</title>
+                <description>short_description</description>
+                <description>short_description</description>
+                <brand>manufacturer</brand>
+                <link>df_url</link>
+                <image_link>df_image_link</image_link>
+                <price>df_price</price>
+                <sale_price>df_sale_price</sale_price>
+                <mpn>sku</mpn>
+                <availability>df_availability</availability>
+                <currency>df_currency</currency>
+            </feed_attributes>
             <feed_settings>
                 <export_proudct_prices>1</export_proudct_prices>
             </feed_settings>
         </doofinder_feed_feed>
+
+        <directives>
+            <df_id><![CDATA[Product Id]]></df_id>
+            <df_url><![CDATA[Product URL]]></df_url>
+            <df_image_link><![CDATA[Product Image URL (Base)]]></df_image_link>
+            <df_image_link_thumbnail><![CDATA[Product Image URL (Thumbnail)]]></df_image_link_thumbnail>
+            <df_image_link_small><![CDATA[Product Image URL (Small Image)]]></df_image_link_small>
+            <df_sale_price><![CDATA[Sale Price]]></df_sale_price>
+            <df_price><![CDATA[Price]]></df_price>
+            <df_currency><![CDATA[Store Currency]]></df_currency>
+            <df_availability><![CDATA[Availability]]></df_availability>
+            <df_product_condition><![CDATA[Product Condition]]></df_product_condition>
+        </directives>
     </default>
 </config>
