@@ -135,6 +135,16 @@
                     <label>Currency</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
                 </field>
+                <field id="additional_attributes"
+                    translate="label"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Additional Attributes</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\Map\Additional</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
             </group>
             <group id="feed_settings"
                 translate="label"
