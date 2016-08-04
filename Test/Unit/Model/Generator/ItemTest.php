@@ -10,19 +10,28 @@ class ItemTest extends \PHPUnit_Framework_TestCase
     private $_model;
 
     /**
+     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
+     */
+    private $_objectManagerHelper;
+
+    /**
      * Prepares the environment before running a test.
      */
     protected function setUp()
     {
-        $this->objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
 
-        $this->_model = $this->objectManagerHelper->getObject(
+        $this->_model = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Model\Generator\Item',
             [
                 'data' => [
-                    'title' => 'Sample product',
+                    'name' => 'Sample product',
                     'price' => 20.99,
                     'description' => 'Lorem ipsum dolor sit amet',
+                    'nested' => [
+                        'cookie' => 'muffin',
+                        'juice' => 'apple',
+                    ],
                 ],
             ]
         );
@@ -40,9 +49,13 @@ class ItemTest extends \PHPUnit_Framework_TestCase
 <?xml version="1.0"?>
 <feed>
  <item>
-  <title>Sample product</title>
+  <name>Sample product</name>
   <price>20.99</price>
   <description>Lorem ipsum dolor sit amet</description>
+  <nested>
+   <cookie>muffin</cookie>
+   <juice>apple</juice>
+  </nested>
  </item>
 </feed>
 
