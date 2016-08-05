@@ -6,14 +6,7 @@
         "magento/magento-composer-installer": "*",
         "sabre/xml": "^1.4"
     },
-    "require-dev": {
-        "squizlabs/php_codesniffer": "*",
-        "eviweb/fuelphp-phpcs": "*",
-        "phpmd/phpmd": "@stable",
-        "sebastian/phpcpd": "^2.0"
-    },
     "type": "magento2-module",
-    "version": "1.0.0-beta",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
@@ -25,23 +18,5 @@
             "Magento\\Framework\\": "/var/www/html/lib/internal/Magento/Framework/",
             "Magento\\Setup\\": "/var/www/html/setup/src/Magento/Setup/"
         }
-    },
-    "scripts": {
-        "build": [
-            "@phpcs",
-            "@phpmd",
-            "@phpcpd",
-            "@prephpunit",
-            "@phpunit"
-        ],
-        "phpcs": "php ./vendor/bin/phpcs --standard=phpcs.ruleset.xml --extensions=php,phtml --report=checkstyle --report-file=./reports/phpcs.checkstyle.xml --ignore=vendor/* ./ || true",
-        "phpmd": "php ./vendor/bin/phpmd ./ xml phpmd.ruleset.xml --exclude 'vendor/*' --reportfile ./reports/phpmd.pmd.xml || true",
-        "phpcpd": "php ./vendor/bin/phpcpd --log-pmd=./reports/phpcpd.cpd.xml --min-tokens=50 --min-lines=5 --exclude=vendor -n -q ./ || true",
-        "prephpunit": "/bin/bash -c 'cd $MAGENTO_PATH && composer install'",
-        "phpunit": "php $MAGENTO_PATH/vendor/bin/phpunit --bootstrap $MAGENTO_PATH/dev/tests/unit/framework/bootstrap.php --coverage-clover ./reports/clover.xml --log-junit ./reports/phpunit.junit.xml"
-    },
-    "extra": {
-        "magento-root-dir": "/var/www/html",
-        "magento-deploystrategy": "copy"
     }
 }

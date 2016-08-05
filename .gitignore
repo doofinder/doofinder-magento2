@@ -1,8 +1,2 @@
-# Dependencies
-/vendor
+# Composer lockfile
 /composer.lock
-/node_modules
-
-# Reports
-/reports
-/npm-debug.log
