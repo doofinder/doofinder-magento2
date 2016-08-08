@@ -132,8 +132,8 @@ class AttributesTest extends \PHPUnit_Framework_TestCase
     public function testGetAllAttributes()
     {
         $expected = array(
-            0 => 'Doofinder: label',
-            1 => 'Attribute: attr code'
+            'code' => 'Doofinder: label',
+            'attr code' => 'Attribute: attr code'
         );
 
         $this->assertSame($expected, $this->_model->getAllAttributes());

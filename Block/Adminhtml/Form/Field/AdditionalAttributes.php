@@ -34,6 +34,15 @@ class AdditionalAttributes extends \Magento\Framework\View\Element\Html\Select
     }
 
     /**
+     * @param string $value
+     * @return Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes
+     */
+    public function setInputName($value)
+    {
+        return $this->setName($value);
+    }
+
+    /**
      * Return html code for select.
      *
      * @return mixed

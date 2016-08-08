@@ -74,8 +74,18 @@ class Attributes implements \Magento\Framework\Option\ArrayInterface
      */
     public function getAllAttributes()
     {
-        $doofinderOptions = $this->_escaper->escapeJsQuote($this->_getDoofinderDirectivesOptionArray());
-        $productAttributes = $this->_escaper->escapeJsQuote($this->_getCatalogProductAttributes());
+        $doofinderOptions = $this->_getDoofinderDirectivesOptionArray();
+        $productAttributes = $this->_getCatalogProductAttributes();
+
+        foreach($doofinderOptions as $code => $value) {
+            $value = $this->_escaper->escapeJsQuote(($value));
+            $doofinderOptions[$code] = $value;
+        }
+
+        foreach($productAttributes as $code => $value) {
+            $value = $this->_escaper->escapeJsQuote(($value));
+            $productAttributes[$code] = $value;
+        }
 
         return array_merge($doofinderOptions, $productAttributes);
     }
