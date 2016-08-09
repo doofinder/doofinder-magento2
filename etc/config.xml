@@ -24,15 +24,6 @@
 
         <directives>
             <df_id><![CDATA[Product Id]]></df_id>
-            <df_url><![CDATA[Product URL]]></df_url>
-            <df_image_link><![CDATA[Product Image URL (Base)]]></df_image_link>
-            <df_image_link_thumbnail><![CDATA[Product Image URL (Thumbnail)]]></df_image_link_thumbnail>
-            <df_image_link_small><![CDATA[Product Image URL (Small Image)]]></df_image_link_small>
-            <df_sale_price><![CDATA[Sale Price]]></df_sale_price>
-            <df_price><![CDATA[Price]]></df_price>
-            <df_currency><![CDATA[Store Currency]]></df_currency>
-            <df_availability><![CDATA[Availability]]></df_availability>
-            <df_product_condition><![CDATA[Product Condition]]></df_product_condition>
         </directives>
     </default>
 </config>

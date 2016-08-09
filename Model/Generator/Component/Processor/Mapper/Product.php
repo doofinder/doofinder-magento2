@@ -44,6 +44,9 @@ class Product extends Mapper
     protected function processDefinition(array $definition)
     {
         switch ($definition['field']) {
+            case 'df_id':
+                return $this->getProductId($this->_context);
+
             case 'url_key':
                 return $this->getProductUrl($this->_context);
 
@@ -58,6 +61,17 @@ class Product extends Mapper
         }
 
         return parent::processDefinition($definition);
+    }
+
+    /**
+     * Get product id
+     *
+     * @param \Magento\Catalog\Model\Product
+     * @return int
+     */
+    protected function getProductId(\Magento\Catalog\Model\Product $product)
+    {
+        return $this->_helper->getProductId($product);
     }
 
     /**

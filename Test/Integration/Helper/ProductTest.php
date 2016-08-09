@@ -43,6 +43,22 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test getProductId
+     *
+     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+     * @magentoAppIsolation enabled
+     */
+    public function testGetProductId()
+    {
+        $product = $this->_productRepository->get('simple');
+
+        $this->assertEquals(
+            1,
+            $this->_helper->getProductId($product)
+        );
+    }
+
+    /**
      * Test getProductUrl
      *
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php

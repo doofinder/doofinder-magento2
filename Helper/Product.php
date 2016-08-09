@@ -25,6 +25,17 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get product id
+     *
+     * @param \Magento\Catalog\Model\Product
+     * @return int
+     */
+    public function getProductId(\Magento\Catalog\Model\Product $product)
+    {
+        return $product->getId();
+    }
+
+    /**
      * Get product url
      *
      * @todo Use store config
