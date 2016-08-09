@@ -5,7 +5,8 @@ namespace Doofinder\Feed\Test\Integration\Model;
 /**
  * Test class for \Doofinder\Feed\Model\Generator
  *
- * @magentoDataFixture Magento/Catalog/_files/product_with_options.php
+ * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+ * @magentoDataFixture Magento/Catalog/_files/product_virtual.php
  * @magentoDbIsolation enabled
  * @magentoAppIsolation enabled
  */
@@ -22,12 +23,12 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
                             'Product' => []
                         ],
                         'processors' => [
-                            'Mapper' => [
+                            'Mapper\Product' => [
                                 'map' => [
-                                    'id' => 'sku',
-                                    'name' => 'name',
+                                    'title' => 'name',
+                                    'description' => 'short_description',
                                     'price' => 'price',
-                                    'url' => 'url_key',
+                                    'mpn' => 'sku',
                                 ]
                             ],
                             'Cleaner' => [],
@@ -44,10 +45,15 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
 <?xml version="1.0"?>
 <feed>
  <item>
-  <id>simple</id>
-  <name>Simple Product With Custom Options</name>
-  <price>10.0000</price>
-  <url>simple-product-with-custom-options</url>
+  <title>Simple Product</title>
+  <description>Short description</description>
+  <price>10.00</price>
+  <mpn>simple</mpn>
+ </item>
+ <item>
+  <title>Virtual Product</title>
+  <price>10.00</price>
+  <mpn>virtual-product</mpn>
  </item>
 </feed>
 
