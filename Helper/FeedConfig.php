@@ -35,7 +35,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getFeedConfig()
     {
-        if(!$this->_feedConfig) {
+        if (!$this->_feedConfig) {
             $this->_setFeedConfig();
         }
 
@@ -104,12 +104,12 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $attributes = $this->_scopeConfig->getValue('doofinder_feed_feed/feed_attributes');
 
-        if(array_key_exists('additional_attributes', $attributes)) {
+        if (array_key_exists('additional_attributes', $attributes)) {
             $additionalKeys = unserialize($attributes['additional_attributes']);
             unset($attributes['additional_attributes']);
 
             $additionalAttributes = array();
-            foreach($additionalKeys as $key) {
+            foreach ($additionalKeys as $key) {
                 $additionalAttributes[$key['field']] = $key['additional_attribute'];
             }
 

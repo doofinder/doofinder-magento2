@@ -77,12 +77,12 @@ class Attributes implements \Magento\Framework\Option\ArrayInterface
         $doofinderOptions = $this->_getDoofinderDirectivesOptionArray();
         $productAttributes = $this->_getCatalogProductAttributes();
 
-        foreach($doofinderOptions as $code => $value) {
+        foreach ($doofinderOptions as $code => $value) {
             $value = $this->_escaper->escapeJsQuote(($value));
             $doofinderOptions[$code] = $value;
         }
 
-        foreach($productAttributes as $code => $value) {
+        foreach ($productAttributes as $code => $value) {
             $value = $this->_escaper->escapeJsQuote(($value));
             $productAttributes[$code] = $value;
         }
