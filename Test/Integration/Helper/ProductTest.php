@@ -148,4 +148,67 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             $this->_helper->getProductPrice($product)
         );
     }
+    /**
+     * Test getProductAvailability
+     *
+     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+     * @magentoAppIsolation enabled
+     */
+    public function testGetProductAvailability()
+    {
+        $product = $this->_productRepository->get('simple');
+
+        $this->assertEquals(
+            'IN STOCK',
+            $this->_helper->getProductAvailability($product)
+        );
+    }
+
+    /**
+     * Test getAttributeText
+     *
+     * @todo write test
+     *
+     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+     * @magentoAppIsolation enabled
+     */
+
+    public function testGetAttributeText()
+    {
+        /*$product = $this->_productRepository->get('simple');
+
+        $this->assertEquals(
+            'ATTRIBUTE VALUE',
+            $this->_helper->getAttributeText($product, 'ATTRIBUTE CODE')
+        );*/
+    }
+
+    /**
+     * Test getQuantityAndStockStatus
+     *
+     * @todo write test
+     *
+     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+     * @magentoAppIsolation enabled
+     */
+    public function testGetQuantityAndStockStatus()
+    {
+        /*$product = $this->_productRepository->get('simple');
+
+        $this->assertEquals(
+            '10 - In stock',
+            $this->_helper->getQuantityAndStockStatus($product)
+        );*/
+
+    }
+
+    /**
+     * @todo write test if necessary
+     */
+    public function testGetCurrencyCode()
+    {
+
+    }
+
+
 }

@@ -58,6 +58,27 @@ class Product extends Mapper
 
             case 'price':
                 return $this->getProductPrice($this->_context);
+            
+            case 'availability':
+                return $this->getProductAvailability($this->_context);
+
+            case 'currency':
+                return $this->getCurrencyCode();
+
+            case 'color':
+                return $this->getProductColor($this->_context);
+
+            case 'tax_class_id':
+                return $this->getTaxName($this->_context);
+
+            case 'manufacturer':
+                return $this->getManufacturer($this->_context);
+
+            case 'weight_type':
+                return $this->getWeightType($this->_context);
+
+            case 'quantity_and_stock_status':
+                return $this->getQuantityAndStockStatus($this->_context);
         }
 
         return parent::processDefinition($definition);
@@ -133,5 +154,68 @@ class Product extends Mapper
     protected function getProductPrice(\Magento\Catalog\Model\Product $product)
     {
         return number_format($this->_helper->getProductPrice($product), 2, '.', '');
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     *
+     * @return string
+     */
+    protected function getProductAvailability(\Magento\Catalog\Model\Product $product)
+    {
+        return $this->_helper->getProductAvailability($product);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getCurrencyCode()
+    {
+        return $this->_helper->getCurrencyCode();
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     * @return mixed
+     */
+    protected function getProductColor(\Magento\Catalog\Model\Product $product)
+    {
+        return $this->_helper->getAttributeText($product, 'color');
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     * @return mixed
+     */
+    protected function getTaxName(\Magento\Catalog\Model\Product $product)
+    {
+        return $this->_helper->getAttributeText($product, 'tax_class_id');
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     * @return mixed
+     */
+    protected function getManufacturer(\Magento\Catalog\Model\Product $product)
+    {
+        return $this->_helper->getAttributeText($product, 'manufacturer');
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     * @return mixed
+     */
+    protected function getWeightType(\Magento\Catalog\Model\Product $product)
+    {
+        return $this->_helper->getAttributeText($product, 'weight_type');
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     * @return string
+     */
+    protected function getQuantityAndStockStatus(\Magento\Catalog\Model\Product $product)
+    {
+        return $this->_helper->getQuantityAndStockStatus($product);
     }
 }

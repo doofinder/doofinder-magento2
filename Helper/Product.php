@@ -13,14 +13,17 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Catalog\Helper\Image
      */
     protected $_imageHelper = null;
+    protected $_stockItemRepository;
 
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory,
         \Magento\Catalog\Helper\Image $imageHelper,
-        \Magento\Framework\App\Helper\Context $context
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository
     ) {
         $this->_categoryCollectionFactory = $categoryCollectionFactory;
         $this->_imageHelper = $imageHelper;
+        $this->_stockItemRepository = $stockItemRepository;
         parent::__construct($context);
     }
 
@@ -108,5 +111,61 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     public function getProductPrice(\Magento\Catalog\Model\Product $product)
     {
         return round($product->getPrice(), 2);
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     * @return string
+     */
+    public function getProductAvailability(\Magento\Catalog\Model\Product $product)
+    {
+        if ($product->isInStock()) {
+            return 'IN STOCK';
+        }
+
+        return 'OUT OF STOCK';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrencyCode()
+    {
+        return $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     * @param $attributeName
+     * @return mixed
+     */
+    public function getAttributeText(\Magento\Catalog\Model\Product $product, $attributeName)
+    {
+        return $product->getAttributeText($attributeName);
+    }
+
+    /**
+     * @todo - we need this?
+     *
+     * @param \Magento\Catalog\Model\Product $product
+     * @return string
+     */
+    public function getQuantityAndStockStatus(\Magento\Catalog\Model\Product $product)
+    {
+        $productId = $product->getId();
+
+        $qty = $this->_getStockItem($productId)->getQty();
+        $inStock = $this->_getStockItem($productId)->getIsInStock() ? 'In Stock' : 'Out of stock';
+
+        return $qty . ' - ' . $inStock;
+    }
+
+    /**
+     * @param $productId
+     * @return mixed
+     */
+    protected function _getStockItem($productId)
+    {
+        return $this->_stockItemRepository->get($productId);
     }
 }
