@@ -5,19 +5,24 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Processor;
 class MapperTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Doofinder\Feed\Model\Generator\Component\Processor\Map
+     * @var \Doofinder\Feed\Model\Generator\Component\Processor\Mapper
      */
-    private $_model;
+    protected $_model;
+
+    /**
+     * @var \Magento\Catalog\Model\Product
+     */
+    protected $_product;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    protected $_item;
 
     /**
      * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
      */
-    private $_objectManagerHelper;
+    protected $_objectManagerHelper;
 
     /**
      * Prepares the environment before running a test.
@@ -26,16 +31,27 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     {
         $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
 
+        $this->_product = $this->getMock(
+            '\Magento\Catalog\Model\Product',
+            [],
+            [],
+            '',
+            false
+        );
+        $map = [
+            ['title', null, 'Sample title'],
+            ['description', null, 'Sample description'],
+        ];
+        $this->_product->method('getData')->will($this->returnValueMap($map));
+
         $this->_item = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Item',
-            null,
-            [
-                'data' => [
-                    'title' => 'Sample title',
-                    'description' => 'Sample description',
-                ],
-            ]
+            ['getContext'],
+            [],
+            '',
+            false
         );
+        $this->_item->method('getContext')->willReturn($this->_product);
 
         $this->_model = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Processor\Mapper',

@@ -8,11 +8,14 @@ use \Doofinder\Feed\Model\Generator\Component\Processor;
 class Mapper extends Component implements Processor
 {
     /**
-     * Item data
-     *
-     * @var array
+     * @var \Doofinder\Feed\Model\Generator\Item
      */
-    protected $_itemData = [];
+    protected $_item = null;
+
+    /**
+     * @var \Magento\Framework\DataObject
+     */
+    protected $_context = null;
 
     /**
      * Process items
@@ -33,10 +36,8 @@ class Mapper extends Component implements Processor
      */
     protected function processItem(\Doofinder\Feed\Model\Generator\Item $item)
     {
-        $this->_itemData = $item->getData();
-
-        // Purge item data
-        $item->setData([]);
+        $this->_item = $item;
+        $this->_context = $this->_item->getContext();
 
         // Set mapped fields on item
         foreach ((array) $this->getMap() as $field => $definition) {
@@ -46,7 +47,7 @@ class Mapper extends Component implements Processor
                 ];
             }
 
-            $item->setData($field, $this->getMappedFieldValue($definition));
+            $item->setData($field, $this->processDefinition($definition));
         }
     }
 
@@ -56,11 +57,9 @@ class Mapper extends Component implements Processor
      * @param array
      * @return mixed
      */
-    protected function getMappedFieldValue(array $definition)
+    protected function processDefinition(array $definition)
     {
         $field = $definition['field'];
-        $value = isset($this->_itemData[$field]) ? $this->_itemData[$field] : null;
-
-        return $value;
+        return $this->_context->getData($field);
     }
 }

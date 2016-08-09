@@ -59,12 +59,13 @@ class Product extends Component implements Fetcher
     /**
      * Create item from product
      *
+     * @todo Make sure if loading the full product is necessary
      * @param \Magento\Catalog\Model\Product
      */
     protected function createItem(\Magento\Catalog\Model\Product $product)
     {
         $item = $this->_generatorItemFactory->create();
-        $item->setData($product->getData());
+        $item->setContext($product);
 
         return $item;
     }
