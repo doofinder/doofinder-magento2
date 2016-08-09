@@ -58,7 +58,10 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $categories = array();
 
         foreach ($categoryCollection as $category) {
-            $categories[] = $category->getParentCategories();
+            $parents = $category->getParentCategories();
+            $parents[$category->getId()] = $category;
+
+            $categories[] = $parents;
         }
 
         return $categories;

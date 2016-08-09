@@ -66,18 +66,23 @@ class ProductTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetProductCategoriesWithParents()
     {
-        $product = $this->_productRepository->get('12345');
+        $product = $this->_productRepository->get('simple');
 
         $this->assertEquals(
             [
+                [
+                    2 => '1/2',
+                ],
+                [
+                    3 => '1/2/3',
+                ],
                 [
                     3 => '1/2/3',
                     4 => '1/2/3/4',
                 ],
                 [
                     3 => '1/2/3',
-                    4 => '1/2/3/4',
-                    5 => '1/2/3/4/5',
+                    13 => '1/2/3/13',
                 ],
             ],
             array_map(
