@@ -63,7 +63,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                         'Product' => []
                     ],
                     'processors' => [
-                        'Mapper' => [
+                        'Mapper\Product' => [
                             'map' => $feedAttributes
                         ],
                         'Cleaner' => [],

@@ -77,7 +77,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     protected function _getProcessors()
     {
         return [
-            'Mapper' => $this->_getMapper(),
+            'Mapper\Product' => $this->_getMapper(),
             'Cleaner' => [],
             'Xml' => []
         ];
