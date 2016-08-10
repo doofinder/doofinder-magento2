@@ -182,6 +182,94 @@
                     </comment>
                 </field>
             </group>
+            <group id="feed_cron"
+                   translate="label"
+                   type="text"
+                   sortOrder="3"
+                   showInDefault="1"
+                   showInStore="1"
+                   showInWebsite="1">
+                <label>Feed Cron</label>
+                <field id="enabled"
+                       translate="label"
+                       type="select"
+                       sortOrder="1"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[ Activate/deactivate the feed for this store ]]>
+                    </comment>
+                </field>
+                <field id="start_time"
+                       translate="label"
+                       type="time"
+                       sortOrder="2"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Feed generation start time</label>
+                    <comment>
+                        <![CDATA[ The time at which the feed generation starts.]]>
+                    </comment>
+                </field>
+                <field id="frequency"
+                       translate="label"
+                       type="select"
+                       sortOrder="3"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Frequency</label>
+                    <source_model>Magento\Cron\Model\Config\Source\Frequency</source_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\Cron</backend_model>
+                    <comment>
+                        <![CDATA[
+                        Feed generating frequency (e.g. "monthly" means that the feed will be generated on the first day of each month at a given hour).
+                        ]]>
+                    </comment>
+                </field>
+                <field id="step_size"
+                       translate="label"
+                       type="text"
+                       sortOrder="4"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Step size</label>
+                    <comment>
+                        <![CDATA[
+                        The maximum number of products added to the feed on each iteration of the generation process (maximum recommended value: 1000)
+                        ]]>
+                    </comment>
+                </field>
+                <field id="step_delay"
+                       translate="label"
+                       type="text"
+                       sortOrder="3"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Step delay</label>
+                    <comment>
+                        <![CDATA[
+                         The interval (in minutes) between subsequent stages of the feed generation process.
+                         It should not be smaller than the frequency of execution of your cron.sh file.
+                         ]]>
+                    </comment>
+                </field>
+                <field id="generate"
+                       translate="button_label"
+                       sortOrder="62"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="0">
+                    <button_label>Start Feed Generation Now</button_label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\GenerateButton</frontend_model>
+                </field>
+            </group>
         </section>
     </system>
 </config>

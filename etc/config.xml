@@ -20,6 +20,13 @@
                 <image_size></image_size>
                 <split_grouped_products>0</split_grouped_products>
             </feed_settings>
+            <feed_cron>
+                <enabled>1</enabled>
+                <start_time>0</start_time>
+                <frequency>D</frequency>
+                <step_size>1000</step_size>
+                <step_delay>5</step_delay>
+            </feed_cron>
         </doofinder_feed_feed>
 
         <directives>
