@@ -24,6 +24,17 @@ class DataTest extends \PHPUnit_Framework_TestCase
      * @var \Magento\Store\Api\Data\StoreInterface
      */
     protected $_storeInterfaceMock;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $_storeConfigMock;
+
+    /**
+     * @var \Magento\Framework\Module\ModuleListInterface
+     */
+    protected $_moduleMock;
+
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
@@ -60,11 +71,28 @@ class DataTest extends \PHPUnit_Framework_TestCase
             false
         );
 
+        $this->_storeConfigMock = $this->getMock(
+            'Magento\Store\Api\Data\StoreConfigInterface',
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->_moduleMock = $this->getMock(
+            '\Magento\Framework\Module\ModuleListInterface',
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->_helper = $this->_objectManager->getObject(
             '\Doofinder\Feed\Helper\Data',
             [
                 'scopeConfig'   => $this->_scopeInterfaceMock,
                 'storeManager'  => $this->_storeManagerMock,
+                'moduleList'    => $this->_moduleMock
             ]
         );
     }
@@ -154,5 +182,34 @@ class DataTest extends \PHPUnit_Framework_TestCase
             [true, false, true],
             [false, true, true]
         ];
+    }
+
+    public function testGetBaseUrl()
+    {
+        $this->_storeManagerMock->expects($this->once())
+            ->method('getStore')
+            ->willReturn($this->_storeConfigMock);
+
+        $this->_storeConfigMock->expects($this->once())
+            ->method('getBaseUrl')
+            ->will($this->returnValue('localhost'));
+
+        $this->assertSame('localhost', $this->_helper->getBaseUrl());
+    }
+
+    public function testGetModuleVersion()
+    {
+        $moduleInfo = [
+            'name' => 'Doofinder_Feed',
+            'setup_version' => '0.1.0',
+            'sequence' => []
+        ];
+
+        $this->_moduleMock->expects($this->once())
+            ->method('getOne')
+            ->with(\Doofinder\Feed\Helper\Data::MODULE_NAME)
+            ->willReturn($moduleInfo);
+
+        $this->assertSame($moduleInfo['setup_version'], $this->_helper->getModuleVersion());
     }
 }

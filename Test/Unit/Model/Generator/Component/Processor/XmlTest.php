@@ -10,6 +10,11 @@ class XmlTest extends \PHPUnit_Framework_TestCase
     private $_model;
 
     /**
+     * @var \Sabre\Xml\Writer
+     */
+    private $_xmlWriter;
+
+    /**
      * @var \Sabre\Xml\Service
      */
     private $_xmlService;
@@ -18,6 +23,11 @@ class XmlTest extends \PHPUnit_Framework_TestCase
      * @var \Doofinder\Feed\Model\Generator\Item
      */
     private $_item;
+
+    /**
+     * @var \Doofinder\Feed\Helper\Data
+     */
+    private $_helper;
 
     /**
      * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
@@ -39,9 +49,26 @@ class XmlTest extends \PHPUnit_Framework_TestCase
             false
         );
 
+        $this->_xmlWriter = $this->getMock(
+            '\Sabre\Xml\Writer',
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->_xmlService = $this->getMock(
             '\Sabre\Xml\Service',
-            ['write'],
+            ['getWriter'],
+            [],
+            '',
+            false
+        );
+        $this->_xmlService->method('getWriter')->willReturn($this->_xmlWriter);
+
+        $this->_helper = $this->getMock(
+            '\Doofinder\Feed\Helper\Data',
+            ['getBaseUrl', 'getModuleVersion'],
             [],
             '',
             false
@@ -50,18 +77,21 @@ class XmlTest extends \PHPUnit_Framework_TestCase
         $this->_model = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
             [
-                'xmlService' => $this->_xmlService
+                'xmlService' => $this->_xmlService,
+                'helper' => $this->_helper,
             ]
         );
     }
 
     /**
      * Test process
+     *
+     * @notice This test does is testing nothing concrete
      */
     public function testProcess()
     {
-        $this->_xmlService->expects($this->once())->method('write')
-            ->with('feed', [$this->_item]);
+        $this->_xmlWriter->expects($this->once())->method('openMemory');
+        $this->_xmlWriter->expects($this->once())->method('outputMemory');
 
         $this->_model->process([$this->_item]);
     }

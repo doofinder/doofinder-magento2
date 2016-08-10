@@ -48,11 +48,40 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
     private $_item;
 
     /**
+     * @var \Sabre\Xml\Writer
+     */
+    private $_xmlWriter;
+
+    /**
+     * @var \Sabre\Xml\Service
+     */
+    private $_xmlService;
+
+    /**
      * Prepares the environment before running a test.
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function setUp()
     {
         $helper = new ObjectManager($this);
+
+        $this->_xmlWriter = $this->getMock(
+            '\Sabre\Xml\Writer',
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->_xmlService = $this->getMock(
+            '\Sabre\Xml\Service',
+            ['getWriter'],
+            [],
+            '',
+            false
+        );
+        $this->_xmlService->method('getWriter')->willReturn($this->_xmlWriter);
 
         $this->_item = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Item',
@@ -96,7 +125,7 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
         $this->_xmlProcessor = $helper->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
             [
-                $this->getMock('\Sabre\Xml\Service')
+                'xmlService' => $this->_xmlService,
             ]
         );
 

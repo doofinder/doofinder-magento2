@@ -42,23 +42,30 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
         $generator->run();
 
         $expected = <<<EOT
-<?xml version="1.0"?>
-<feed>
- <item>
-  <title>Simple Product</title>
-  <description>Short description</description>
-  <price>10.00</price>
-  <mpn>simple</mpn>
- </item>
- <item>
-  <title>Virtual Product</title>
-  <price>10.00</price>
-  <mpn>virtual-product</mpn>
- </item>
-</feed>
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+ <channel>
+  <title>Product feed</title>
+  <link>http://localhost/index.php/doofinder/feed</link>
+  <pubDate>%s, %d %s %d %d:%d:%d UTC</pubDate>
+  <generator>Doofinder/%d.%d.%d</generator>
+  <description>Magento Product feed for Doofinder</description>
+  <item>
+   <title>Simple Product</title>
+   <description>Short description</description>
+   <price>10.00</price>
+   <mpn>simple</mpn>
+  </item>
+  <item>
+   <title>Virtual Product</title>
+   <price>10.00</price>
+   <mpn>virtual-product</mpn>
+  </item>
+ </channel>
+</rss>
 
 EOT;
 
-        $this->assertEquals($expected, $generator->getProcessor('Xml')->getFeed());
+        $this->assertStringMatchesFormat($expected, $generator->getProcessor('Xml')->getFeed());
     }
 }

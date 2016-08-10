@@ -8,6 +8,7 @@ namespace Doofinder\Feed\Helper;
  */
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
+    const MODULE_NAME = "Doofinder_Feed";
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -21,6 +22,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $_storeConfig;
 
+    protected $_moduleList;
+
     /**
      * Data constructor.
      *
@@ -29,10 +32,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Module\ModuleListInterface $moduleList
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
+        $this->_moduleList = $moduleList;
     }
 
     /**
@@ -150,5 +155,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected function _getScopeStore()
     {
         return \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+    }
+
+    public function getBaseUrl()
+    {
+        return $this->_storeManager->getStore()->getBaseUrl();
+    }
+
+    public function getModuleVersion()
+    {
+        return $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
     }
 }
