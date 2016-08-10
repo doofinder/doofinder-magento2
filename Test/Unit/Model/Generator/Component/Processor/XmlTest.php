@@ -73,6 +73,7 @@ class XmlTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
+        $this->_xmlService->method('getWriter')->willReturn($this->_xmlWriter);
 
         $this->_model = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
