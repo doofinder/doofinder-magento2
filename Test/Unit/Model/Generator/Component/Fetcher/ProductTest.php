@@ -56,7 +56,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->_productCollection = $this->getMock(
             '\Magento\Catalog\Model\ResourceModel\Product\Collection',
-            ['load', 'addAttributeToSelect', 'addStoreFilter'],
+            ['load', 'addAttributeToSelect', 'addStoreFilter', 'setPageSize', 'setCurPage', 'addAttributeToSort'],
             [],
             '',
             false
@@ -64,6 +64,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->_productCollection->expects($this->any())->method('addAttributeToSelect')
             ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('addStoreFilter')
+            ->willReturn($this->_productCollection);
+        $this->_productCollection->expects($this->any())->method('addAttributeToSort')
             ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('load')
             ->willReturn(array($this->_product));
@@ -113,5 +115,23 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $items = $this->_model->fetch();
 
         $this->assertEquals([$this->_item], $items);
+    }
+
+    /**
+     * Test fetch with pagination
+     */
+    public function testFetchWithPagination()
+    {
+        $this->_model->setPageSize(1);
+        $this->_model->setCurPage(2);
+
+        $this->_productCollection->expects($this->once())->method('setPageSize')
+            ->with(1)
+            ->willReturn(array($this->_product));
+        $this->_productCollection->expects($this->once())->method('setCurPage')
+            ->with(2)
+            ->willReturn($this->_productCollection);
+
+        $this->_model->fetch();
     }
 }

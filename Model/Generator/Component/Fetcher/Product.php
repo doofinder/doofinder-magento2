@@ -22,10 +22,13 @@ class Product extends Component implements Fetcher
      */
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
-        \Doofinder\Feed\Model\Generator\ItemFactory $generatorItemFactory
+        \Doofinder\Feed\Model\Generator\ItemFactory $generatorItemFactory,
+        \Psr\Log\LoggerInterface $logger,
+        array $data = []
     ) {
         $this->_productCollectionFactory = $productCollectionFactory;
         $this->_generatorItemFactory = $generatorItemFactory;
+        parent::__construct($logger, $data);
     }
 
     /**
@@ -52,9 +55,21 @@ class Product extends Component implements Fetcher
      */
     protected function getProductCollection()
     {
-        return $this->_productCollectionFactory->create()
+        $collection = $this->_productCollectionFactory->create()
             ->addAttributeToSelect('*')
-            ->addStoreFilter();
+            ->addStoreFilter()
+            ->addAttributeToSelect('*')
+            ->addAttributeToSort('id', 'asc');
+
+        if ($pageSize = $this->getPageSize()) {
+            $collection->setPageSize($pageSize);
+        }
+
+        if ($pageNum = $this->getCurPage()) {
+            $collection->setCurPage($pageNum);
+        }
+
+        return $collection;
     }
 
     /**
