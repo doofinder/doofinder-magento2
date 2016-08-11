@@ -53,13 +53,13 @@ class Product extends Component implements Fetcher
     protected function getProductCollection()
     {
         return $this->_productCollectionFactory->create()
-            ->addAttributeToSelect('*');
+            ->addAttributeToSelect('*')
+            ->addStoreFilter();
     }
 
     /**
      * Create item from product
      *
-     * @todo Make sure if loading the full product is necessary
      * @param \Magento\Catalog\Model\Product
      */
     protected function createItem(\Magento\Catalog\Model\Product $product)

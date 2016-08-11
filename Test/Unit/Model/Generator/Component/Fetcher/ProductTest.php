@@ -56,12 +56,14 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->_productCollection = $this->getMock(
             '\Magento\Catalog\Model\ResourceModel\Product\Collection',
-            ['load', 'addAttributeToSelect'],
+            ['load', 'addAttributeToSelect', 'addStoreFilter'],
             [],
             '',
             false
         );
         $this->_productCollection->expects($this->any())->method('addAttributeToSelect')
+            ->willReturn($this->_productCollection);
+        $this->_productCollection->expects($this->any())->method('addStoreFilter')
             ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('load')
             ->willReturn(array($this->_product));
