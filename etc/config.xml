@@ -8,13 +8,12 @@
                 <title>name</title>
                 <description>short_description</description>
                 <brand>manufacturer</brand>
-                <link>df_url</link>
-                <image_link>df_image_link</image_link>
-                <price>df_price</price>
-                <sale_price>df_sale_price</sale_price>
+                <link>url_key</link>
+                <image_link>image_link</image_link>
+                <price>price</price>
                 <mpn>sku</mpn>
-                <availability>df_availability</availability>
-                <currency>df_currency</currency>
+                <availability>availability</availability>
+                <currency>currency</currency>
             </feed_attributes>
             <feed_settings>
                 <export_proudct_prices>1</export_proudct_prices>
