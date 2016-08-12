@@ -45,7 +45,15 @@ class IndexTest extends \PHPUnit_Framework_TestCase
      */
     protected $_controller;
 
+    /**
+     * @var \Doofinder\Feed\Helper\FeedConfig
+     */
     protected $_feedConfigMock;
+
+    /**
+     * @var \Magento\Framework\App\RequestInterface
+     */
+    protected $_requestMock;
 
     /**
      * Prepares the environment before running a test.
@@ -110,6 +118,13 @@ class IndexTest extends \PHPUnit_Framework_TestCase
             false
         );
 
+        $this->_requestMock = $this->getMock(
+            '\Magento\Framework\App\RequestInterface',
+            [],
+            [],
+            ''
+        );
+
         $this->_feedConfigMock = $this->getMock(
             '\Doofinder\Feed\Helper\FeedConfig',
             [],
@@ -125,6 +140,10 @@ class IndexTest extends \PHPUnit_Framework_TestCase
         $this->_contextMock->expects($this->any())
             ->method('getResponse')
             ->willReturn($this->_responseMock);
+
+        $this->_contextMock->expects($this->any())
+            ->method('getRequest')
+            ->willReturn($this->_requestMock);
 
         $this->_generatorFactoryMock->expects($this->once())
             ->method('create')
@@ -154,10 +173,32 @@ class IndexTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test execute() method.
+     * Test execute() with custom feed params method.
      */
-    public function testExecute()
+    public function testExecuteWithCustomParams()
     {
+        $this->_requestMock->expects($this->any())
+            ->method('getParam')
+            ->will($this->onConsecutiveCalls(1, 1, '20'));
+
+        $this->_feedConfigMock->expects($this->once())
+            ->method('setCustomParams')
+            ->willReturnSelf();
+
+        $this->_controller->execute();
+    }
+
+    /**
+     * Test execute() without custom params.
+     */
+    public function testExecuteWithoutCustomParams()
+    {
+        $this->_feedConfigMock->expects($this->never())
+            ->method('setCustomParams');
+
+        $this->_requestMock->expects($this->any())
+            ->method('getParam');
+
         $this->_controller->execute();
     }
 }

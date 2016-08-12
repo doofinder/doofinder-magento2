@@ -36,16 +36,6 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_helper = $this->_objectManager->getObject(
-            '\Doofinder\Feed\Helper\FeedConfig',
-            [
-                'scopeConfig'   => $this->_scopeInterfaceMock,
-            ]
-        );
-    }
-
-    public function testGetFeedConfig()
-    {
         $feedAttributes = [
             'attr1' => 'value1',
             'attr2' => 'value2'
@@ -56,22 +46,86 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
             ->with('doofinder_feed_feed/feed_attributes')
             ->will($this->returnValue($feedAttributes));
 
+        $this->_helper = $this->_objectManager->getObject(
+            '\Doofinder\Feed\Helper\FeedConfig',
+            [
+                'scopeConfig'   => $this->_scopeInterfaceMock,
+            ]
+        );
+    }
+
+    /**
+     * Test get feed config.
+     */
+    public function testGetFeedConfig()
+    {
         $expected = [
             'data' => [
                 'config' => [
                     'fetchers' => [
-                        'Product' => []
+                        'Product' => [
+                            'data' => [],
+                        ],
                     ],
                     'processors' => [
                         'Mapper\Product' => [
-                            'map' => $feedAttributes
+                            'map' => [
+                                'attr1' => 'value1',
+                                'attr2' => 'value2',
+                            ],
                         ],
                         'Cleaner' => [],
-                        'Xml' => []
-                    ]
-                ]
-            ]
+                        'Xml' => [],
+                    ],
+                ],
+            ],
         ];
+
+        $result = $this->_helper->getFeedConfig();
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test set custom params.
+     */
+    public function testSetCustomParams()
+    {
+        $customParams = [
+            'offset' => 1,
+            'store' => 1,
+            'minimal_price' => 20,
+            'limit' => 10
+        ];
+
+        $expected = [
+            'data' => [
+                'config' => [
+                    'fetchers' => [
+                        'Product' => [
+                            'data' => [
+                                'offset' => 1,
+                                'limit' => 10,
+                            ],
+                        ],
+                    ],
+                    'processors' => [
+                        'Mapper\Product' => [
+                            'map' => [
+                                'store' => 1,
+                                'minimal_price' => 20,
+                                'attr1' => 'value1',
+                                'attr2' => 'value2',
+                            ],
+                        ],
+                        'Cleaner' => [],
+                        'Xml' => [],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->_helper->setCustomParams($customParams);
 
         $result = $this->_helper->getFeedConfig();
 

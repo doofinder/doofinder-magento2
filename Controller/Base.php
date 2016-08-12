@@ -50,4 +50,26 @@ abstract class Base extends \Magento\Framework\App\Action\Action
         return $this->_jsonResultFactory->create()
             ->setData($data);
     }
+
+    /**
+     * Get string param.
+     *
+     * @param $paramName
+     * @return string|null
+     */
+    protected function getParamString($paramName)
+    {
+        return is_string($param = $this->getRequest()->getParam($paramName)) ? $param : null;
+    }
+
+    /**
+     * Get int param.
+     *
+     * @param $paramName
+     * @return int|null
+     */
+    protected function getParamInt($paramName)
+    {
+        return is_numeric($param = $this->getRequest()->getParam($paramName)) ? (int) $param : null;
+    }
 }

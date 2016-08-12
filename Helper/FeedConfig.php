@@ -18,6 +18,16 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_scopeConfig;
 
     /**
+     * @var array Custom data for feed
+     */
+    protected $_customFeedData = [];
+
+    /**
+     * @var array Custom data for fetcher
+     */
+    protected $_customFetcherData = [];
+
+    /**
      * FeedConfig constructor.
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -43,6 +53,31 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Set custom params for generator.
+     *
+     * @param array $customParams
+     *
+     * @return \Doofinder\Feed\Helper\FeedConfig
+     */
+    public function setCustomParams(array $customParams = [])
+    {
+        $map = ['store', 'minimal_price'];
+        $fetcher = ['limit', 'offset'];
+
+        foreach ($customParams as $param => $value) {
+            if (in_array($param, $map)) {
+                $this->_customFeedData[$param] = $value;
+            }
+
+            if (in_array($param, $fetcher)) {
+                $this->_customFetcherData[$param] = $value;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Set feed config
      */
     protected function _setFeedConfig()
@@ -65,7 +100,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     protected function _getFetchers()
     {
         return [
-            'Product' => []
+            'Product' => ['data' => $this->_customFetcherData]
         ];
     }
 
@@ -103,6 +138,8 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     protected function _getFeedAttributes()
     {
         $attributes = $this->_scopeConfig->getValue('doofinder_feed_feed/feed_attributes');
+
+        $attributes = array_merge($this->_customFeedData, $attributes);
 
         if (array_key_exists('additional_attributes', $attributes)) {
             $additionalKeys = unserialize($attributes['additional_attributes']);

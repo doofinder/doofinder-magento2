@@ -44,21 +44,43 @@ class Index extends \Doofinder\Feed\Controller\Base
     }
 
     /**
-     * Exexute. Return feed with xml content type.
+     * Execute. Return feed with xml content type.
      *
      */
     public function execute()
     {
-        $this->_setXmlHeaders();
+        $customParams = $this->getFeedCustomParams();
+        if ($customParams) {
+            $this->_feedConfig->setCustomParams($customParams);
+        }
 
         $feedConfig = $this->_feedConfig->getFeedConfig();
 
         $generator = $this->_generatorFactory->create($feedConfig);
-
         $generator->run();
 
         $feed = $generator->getProcessor('Xml')->getFeed();
 
+        $this->_setXmlHeaders();
         $this->getResponse()->setBody($feed);
+    }
+
+    /**
+     * Get custom params for generator.
+     *
+     * @return array
+     */
+    protected function getFeedCustomParams()
+    {
+        $params = [
+            'store' => $this->getParamString('store'),
+            'minimal_price' => $this->getParamInt('minimal_price'),
+            'offset' => $this->getParamInt('offset'),
+            'limit' => $this->getParamInt('limit'),
+        ];
+
+        return array_filter($params, function ($value) {
+            return !is_null($value);
+        });
     }
 }
