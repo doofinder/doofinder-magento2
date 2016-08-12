@@ -1,0 +1,5 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="doofinder_feed_generator_items_fetched">
+        <observer name="doofinder_feed_processor_xml_items_fetched" instance="Doofinder\Feed\Observer\Processor\Xml\ItemsFetched" />
+    </event>
+</config>
