@@ -58,6 +58,11 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
     private $_xmlService;
 
     /**
+     * @var \Magento\Framework\Event\ManagerInterface
+     */
+    private $_eventManager;
+
+    /**
      * Prepares the environment before running a test.
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -146,11 +151,20 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
             ->with($this->anything(), 'Xml')
             ->willReturn($this->_xmlProcessor);
 
+        $this->_eventManager = $this->getMock(
+            '\Magento\Framework\Event\ManagerInterface',
+            ['dispatch'],
+            [],
+            '',
+            false
+        );
+
         $this->_model = $helper->getObject(
             'Doofinder\Feed\Model\Generator',
             [
                 'fetcherFactory' => $this->_fetcherFactory,
                 'processorFactory' => $this->_processorFactory,
+                'eventManager' => $this->_eventManager,
                 'data' => [
                     'config' => [
                         'fetchers' => [
@@ -176,6 +190,14 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testRun()
     {
+        $this->_eventManager->expects($this->exactly(3))
+            ->method('dispatch')
+            ->withConsecutive(
+                ['doofinder_feed_generator_initialized'],
+                ['doofinder_feed_generator_items_fetched'],
+                ['doofinder_feed_generator_items_processed']
+            );
+
         $this->_model->run();
     }
 }

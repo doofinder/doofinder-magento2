@@ -33,6 +33,11 @@ class Generator extends \Magento\Framework\DataObject
     protected $_processors = array();
 
     /**
+     * @var \Magento\Framework\Event\ManagerInteface
+     */
+    protected $_eventManager = null;
+
+    /**
      * Generator items
      *
      * @var Generator\Item[]
@@ -47,10 +52,12 @@ class Generator extends \Magento\Framework\DataObject
     public function __construct(
         Generator\Component\FetcherFactory $fetcherFactory,
         Generator\Component\ProcessorFactory $processorFactory,
+        \Magento\Framework\Event\ManagerInterface $eventManager,
         array $data = []
     ) {
         $this->_fetcherFactory = $fetcherFactory;
         $this->_processorFactory = $processorFactory;
+        $this->_eventManager = $eventManager;
         parent::__construct($data);
     }
 
@@ -86,6 +93,9 @@ class Generator extends \Magento\Framework\DataObject
             $this->_processors[$class] = $this->_processorFactory->create(['data' => $data], $class);
         }
 
+        // Dispatch event doofinder_feed_generator_initialized
+        $this->dispatch('initialized');
+
         return $this;
     }
 
@@ -103,6 +113,9 @@ class Generator extends \Magento\Framework\DataObject
             $this->_items = array_merge($this->_items, $fetcher->fetch());
         }
 
+        // Dispatch event doofinder_feed_generator_items_fetched
+        $this->dispatch('items_fetched');
+
         return $this;
     }
 
@@ -117,17 +130,50 @@ class Generator extends \Magento\Framework\DataObject
             $processor->process($this->_items);
         }
 
+        // Dispatch event doofinder_feed_generator_items_processed
+        $this->dispatch('items_processed');
+
         return $this;
+    }
+
+    /**
+     * Get fetchers
+     *
+     * @return \Doofinder\Feed\Model\Generator\Component\Fetcher|array
+     */
+    public function getFetcher($class = null)
+    {
+        if ($class === null) {
+            return $this->_fetchers;
+        }
+
+        return isset($this->_fetchers[$class]) ? $this->_fetchers[$class] : null;
     }
 
     /**
      * Get processor
      *
      * @param string
-     * @return \Doofinder\Feed\Model\Generator\Component\Processor
+     * @return \Doofinder\Feed\Model\Generator\Component\Processor|array
      */
-    public function getProcessor($class)
+    public function getProcessor($class = null)
     {
+        if ($class === null) {
+            return $this->_processors;
+        }
+
         return isset($this->_processors[$class]) ? $this->_processors[$class] : null;
+    }
+
+    /**
+     * Dispatch an event
+     *
+     * @param string
+     */
+    protected function dispatch($eventName)
+    {
+        $this->_eventManager->dispatch('doofinder_feed_generator_' . $eventName, [
+            'generator' => $this,
+        ]);
     }
 }
