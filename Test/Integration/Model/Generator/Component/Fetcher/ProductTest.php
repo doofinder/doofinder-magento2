@@ -39,20 +39,37 @@ class ProductTest extends \PHPUnit_Framework_TestCase
                 return $item->getContext()->getSku();
             }, $items)
         );
+
+        $this->assertEquals(true, $this->_model->isStarted());
+        $this->assertEquals(true, $this->_model->isDone());
     }
 
     /**
      * Test fetch() method with pagination
+     *
+     * @dataProvider testFetchWithPaginationProvider
      */
-    public function testFetchWithPagination()
+    public function testFetchWithPagination($page, $sku, $isStarted, $isDone)
     {
-        $this->_model->setCurPage(2);
+        $this->_model->setCurPage($page);
         $this->_model->setPageSize(1);
 
         $items = $this->_model->fetch();
 
         $this->assertEquals(1, count($items));
-        $this->assertEquals('simple2', $items[0]->getContext()->getSku());
+        $this->assertEquals($sku, $items[0]->getContext()->getSku());
+
+        $this->assertEquals($isStarted, $this->_model->isStarted());
+        $this->assertEquals($isDone, $this->_model->isDone());
+    }
+
+    public function testFetchWithPaginationProvider()
+    {
+        return [
+            [1, 'simple1', true, false],
+            [2, 'simple2', false, false],
+            [3, 'simple3', false, true],
+        ];
     }
 
     /**
@@ -92,5 +109,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
                 return $item->getContext()->getSku();
             }, $items)
         );
+
+        $this->assertEquals(true, $this->_model->isStarted());
+        $this->assertEquals(true, $this->_model->isDone());
     }
 }

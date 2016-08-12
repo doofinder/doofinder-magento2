@@ -56,7 +56,15 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->_productCollection = $this->getMock(
             '\Magento\Catalog\Model\ResourceModel\Product\Collection',
-            ['load', 'addAttributeToSelect', 'addStoreFilter', 'setPageSize', 'setCurPage', 'addAttributeToSort'],
+            [
+                'load',
+                'addAttributeToSelect',
+                'addStoreFilter',
+                'setPageSize',
+                'setCurPage',
+                'addAttributeToSort',
+                'getLastPageNumber',
+            ],
             [],
             '',
             false
@@ -69,6 +77,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('load')
             ->willReturn(array($this->_product));
+        $this->_productCollection->expects($this->any())->method('getLastPageNumber')
+            ->willReturn(3);
 
         $this->_productCollectionFactory = $this->getMock(
             '\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory',
@@ -115,6 +125,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $items = $this->_model->fetch();
 
         $this->assertEquals([$this->_item], $items);
+        $this->assertEquals(true, $this->_model->isStarted());
+        $this->assertEquals(true, $this->_model->isDone());
     }
 
     /**
@@ -133,5 +145,30 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->_productCollection);
 
         $this->_model->fetch();
+    }
+
+    /**
+     * Test isStarted() and isDone() methods
+     *
+     * @dataProvider testStartedDoneProvider
+     */
+    public function testStartedDone($page, $isStarted, $isDone)
+    {
+        $this->_model->setPageSize(1);
+        $this->_model->setCurPage($page);
+
+        $this->_model->fetch();
+
+        $this->assertEquals($isStarted, $this->_model->isStarted());
+        $this->assertEquals($isDone, $this->_model->isDone());
+    }
+
+    public function testStartedDoneProvider()
+    {
+        return [
+            [1, true, false],
+            [2, false, false],
+            [3, false, true],
+        ];
     }
 }

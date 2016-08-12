@@ -18,6 +18,16 @@ class Product extends Component implements Fetcher
     protected $_generatorItemFactory = null;
 
     /**
+     * @var boolean
+     */
+    protected $_isStarted = null;
+
+    /**
+     * @var boolean
+     */
+    protected $_isDone = null;
+
+    /**
      * Constructor
      */
     public function __construct(
@@ -38,7 +48,12 @@ class Product extends Component implements Fetcher
      */
     public function fetch()
     {
-        $products = $this->getProductCollection()->load();
+        $collection = $this->getProductCollection();
+        $products = $collection->load();
+
+        // Check if fetcher is started and done
+        $this->_isStarted = $this->getCurPage() === null || $this->getCurPage() === 1;
+        $this->_isDone = $this->getCurPage() === null || $this->getCurPage() >= $collection->getLastPageNumber();
 
         $items = array();
         foreach ($products as $product) {
@@ -83,5 +98,25 @@ class Product extends Component implements Fetcher
         $item->setContext($product);
 
         return $item;
+    }
+
+    /**
+     * Check if the first item has been fetched
+     *
+     * @return boolean
+     */
+    public function isStarted()
+    {
+        return $this->_isStarted;
+    }
+
+    /**
+     * Check if the last item has been fetched
+     *
+     * @return boolean
+     */
+    public function isDone()
+    {
+        return $this->_isDone;
     }
 }
