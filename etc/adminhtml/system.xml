@@ -95,16 +95,6 @@
                     <label>Price</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
                 </field>
-                <field id="sale_price"
-                    translate="label"
-                    type="select"
-                    sortOrder="1"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Sale price</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
                 <field id="mpn"
                     translate="label"
                     type="select"
