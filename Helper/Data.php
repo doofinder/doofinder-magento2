@@ -9,35 +9,51 @@ namespace Doofinder\Feed\Helper;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const MODULE_NAME = "Doofinder_Feed";
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
+
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
+
     /**
      * @var array Store config for feed.
      */
     protected $_storeConfig;
 
+    /**
+     * @var \Magento\Framework\Module\ModuleListInterface
+     */
     protected $_moduleList;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $_logger;
+
 
     /**
      * Data constructor.
      *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Module\ModuleListInterface $moduleList
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Module\ModuleListInterface $moduleList
+        \Magento\Framework\Module\ModuleListInterface $moduleList,
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
         $this->_moduleList = $moduleList;
+        $this->_logger = $logger;
     }
 
     /**
@@ -165,5 +181,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getModuleVersion()
     {
         return $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
+    }
+
+    /**
+     * Set store view for generator.
+     *
+     * @param int $storeID
+     */
+    public function setCurrentStore($storeID)
+    {
+        try {
+            if ($this->_storeManager->getStore($storeID)) {
+                $this->_storeManager->setCurrentStore($storeID);
+            }
+        } catch (\Exception $e) {
+            $this->_logger->error('Store ID: '.$storeID.' - '.$e->getMessage());
+        }
     }
 }

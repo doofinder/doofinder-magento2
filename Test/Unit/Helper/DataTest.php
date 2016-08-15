@@ -36,6 +36,11 @@ class DataTest extends \PHPUnit_Framework_TestCase
     protected $_moduleMock;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $_logger;
+
+    /**
      * @var \Doofinder\Feed\Helper\Data
      */
     protected $_helper;
@@ -87,12 +92,21 @@ class DataTest extends \PHPUnit_Framework_TestCase
             false
         );
 
+        $this->_logger = $this->getMock(
+            '\Psr\Log\LoggerInterface',
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->_helper = $this->_objectManager->getObject(
             '\Doofinder\Feed\Helper\Data',
             [
                 'scopeConfig'   => $this->_scopeInterfaceMock,
                 'storeManager'  => $this->_storeManagerMock,
-                'moduleList'    => $this->_moduleMock
+                'moduleList'    => $this->_moduleMock,
+                'logger'        => $this->_logger,
             ]
         );
     }
