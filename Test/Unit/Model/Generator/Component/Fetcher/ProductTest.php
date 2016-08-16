@@ -48,7 +48,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->_product = $this->getMock(
             '\Magento\Catalog\Model\Product',
-            [],
+            ['getEntityId'],
             [],
             '',
             false
@@ -61,9 +61,10 @@ class ProductTest extends \PHPUnit_Framework_TestCase
                 'addAttributeToSelect',
                 'addStoreFilter',
                 'setPageSize',
-                'setCurPage',
+                'addAttributeToFilter',
                 'addAttributeToSort',
-                'getLastPageNumber',
+                'getSize',
+                'getLastItem',
             ],
             [],
             '',
@@ -77,8 +78,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('load')
             ->willReturn(array($this->_product));
-        $this->_productCollection->expects($this->any())->method('getLastPageNumber')
-            ->willReturn(3);
+        $this->_productCollection->expects($this->any())->method('getLastItem')
+            ->willReturn($this->_product);
 
         $this->_productCollectionFactory = $this->getMock(
             '\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory',
@@ -134,14 +135,14 @@ class ProductTest extends \PHPUnit_Framework_TestCase
      */
     public function testFetchWithPagination()
     {
-        $this->_model->setPageSize(1);
-        $this->_model->setCurPage(2);
+        $this->_model->setLimit(1);
+        $this->_model->setOffset(2);
 
         $this->_productCollection->expects($this->once())->method('setPageSize')
             ->with(1)
             ->willReturn(array($this->_product));
-        $this->_productCollection->expects($this->once())->method('setCurPage')
-            ->with(2)
+        $this->_productCollection->expects($this->once())->method('addAttributeToFilter')
+            ->with('entity_id', ['gt' => 2])
             ->willReturn($this->_productCollection);
 
         $this->_model->fetch();
@@ -152,10 +153,12 @@ class ProductTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider testStartedDoneProvider
      */
-    public function testStartedDone($page, $isStarted, $isDone)
+    public function testStartedDone($offset, $size, $isStarted, $isDone)
     {
-        $this->_model->setPageSize(1);
-        $this->_model->setCurPage($page);
+        $this->_productCollection->method('getSize')->willReturn($size);
+
+        $this->_model->setLimit(1);
+        $this->_model->setOffset($offset);
 
         $this->_model->fetch();
 
@@ -166,9 +169,22 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     public function testStartedDoneProvider()
     {
         return [
-            [1, true, false],
-            [2, false, false],
-            [3, false, true],
+            [0, 3, true, false],
+            [1, 2, false, false],
+            [2, 1, false, true],
         ];
+    }
+
+    /**
+     * Test getLastProcessedEntityId() method
+     */
+    public function testGetLastProcessedEntityId()
+    {
+        $this->_product->method('getEntityId')->willReturn(11);
+        $this->_productCollection->method('getSize')->willReturn(1);
+
+        $this->_model->fetch();
+
+        $this->assertEquals(11, $this->_model->getLastProcessedEntityId());
     }
 }

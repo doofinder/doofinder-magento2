@@ -49,10 +49,14 @@ class ProductTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider testFetchWithPaginationProvider
      */
-    public function testFetchWithPagination($page, $sku, $isStarted, $isDone)
+    public function testFetchWithPagination($useOffset, $sku, $isStarted, $isDone)
     {
-        $this->_model->setCurPage($page);
-        $this->_model->setPageSize(1);
+        $entityId = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            '\Magento\Catalog\Api\ProductRepositoryInterface'
+        )->get($sku)->getEntityId();
+
+        $this->_model->setOffset($useOffset ? $entityId - 1 : null);
+        $this->_model->setLimit(1);
 
         $items = $this->_model->fetch();
 
@@ -66,9 +70,9 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     public function testFetchWithPaginationProvider()
     {
         return [
-            [1, 'simple1', true, false],
-            [2, 'simple2', false, false],
-            [3, 'simple3', false, true],
+            [false, 'simple1', true, false],
+            [true, 'simple2', false, false],
+            [true, 'simple3', false, true],
         ];
     }
 
@@ -112,5 +116,22 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(true, $this->_model->isStarted());
         $this->assertEquals(true, $this->_model->isDone());
+    }
+
+    /**
+     * Test getLastProcessedEntityId() method
+     */
+    public function testGetLastProcessedEntityId()
+    {
+        /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryFactory */
+        $productRepositoryFactory = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            '\Magento\Catalog\Api\ProductRepositoryInterface'
+        );
+
+        $product = $productRepositoryFactory->get('simple3');
+
+        $this->_model->fetch();
+
+        $this->assertEquals($product->getEntityId(), $this->_model->getLastProcessedEntityId());
     }
 }

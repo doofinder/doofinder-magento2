@@ -28,6 +28,11 @@ class Product extends Component implements Fetcher
     protected $_isDone = null;
 
     /**
+     * @var int
+     */
+    protected $_lastProcessedEntityId = null;
+
+    /**
      * Constructor
      */
     public function __construct(
@@ -52,12 +57,18 @@ class Product extends Component implements Fetcher
         $products = $collection->load();
 
         // Check if fetcher is started and done
-        $this->_isStarted = $this->getCurPage() === null || $this->getCurPage() === 1;
-        $this->_isDone = $this->getCurPage() === null || $this->getCurPage() >= $collection->getLastPageNumber();
+        $this->_isStarted = !$this->getOffset();
+        $this->_isDone = !$this->getLimit() || $this->getLimit() >= $collection->getSize();
 
         $items = array();
         foreach ($products as $product) {
             $items[] = $this->createItem($product);
+        }
+
+        // Set the last processed entity id
+        $this->_lastProcessedEntityId = $this->getOffset();
+        if ($collection->getSize()) {
+            $this->_lastProcessedEntityId = $collection->getLastItem()->getEntityId();
         }
 
         return $items;
@@ -73,15 +84,14 @@ class Product extends Component implements Fetcher
         $collection = $this->_productCollectionFactory->create()
             ->addAttributeToSelect('*')
             ->addStoreFilter()
-            ->addAttributeToSelect('*')
             ->addAttributeToSort('id', 'asc');
 
-        if ($pageSize = $this->getPageSize()) {
-            $collection->setPageSize($pageSize);
+        if ($limit = $this->getLimit()) {
+            $collection->setPageSize($limit);
         }
 
-        if ($pageNum = $this->getCurPage()) {
-            $collection->setCurPage($pageNum);
+        if ($offset = $this->getOffset()) {
+            $collection->addAttributeToFilter('entity_id', ['gt' => $offset]);
         }
 
         return $collection;
@@ -118,5 +128,15 @@ class Product extends Component implements Fetcher
     public function isDone()
     {
         return $this->_isDone;
+    }
+
+    /**
+     * Get last processed entity id
+     *
+     * @return int
+     */
+    public function getLastProcessedEntityId()
+    {
+        return $this->_lastProcessedEntityId;
     }
 }
