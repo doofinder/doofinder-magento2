@@ -8,22 +8,15 @@ namespace Doofinder\Feed\Helper;
  */
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const MODULE_NAME = "Doofinder_Feed";
-
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     * Module name
      */
-    protected $_scopeConfig;
+    const MODULE_NAME = "Doofinder_Feed";
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
-
-    /**
-     * @var array Store config for feed.
-     */
-    protected $_storeConfig;
 
     /**
      * @var \Magento\Framework\Module\ModuleListInterface
@@ -35,61 +28,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $_logger;
 
-
     /**
      * Data constructor.
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\Module\ModuleListInterface $moduleList
      * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Psr\Log\LoggerInterface $logger
     ) {
-        $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
         $this->_moduleList = $moduleList;
         $this->_logger = $logger;
-    }
-
-    /**
-     * Return array with store config.
-     *
-     * @return array
-     */
-    public function getStoreConfig()
-    {
-        if (!$this->_storeConfig) {
-            $this->_setStoreConfig();
-        }
-
-        return $this->_storeConfig;
-    }
-
-    /**
-     * Set store config.
-     *
-     * @return \Doofinder\Feed\Helper\Data;
-     */
-    protected function _setStoreConfig()
-    {
-        $scopeStore = $this->_getScopeStore();
-        $storeCode = $this->_getStoreCode();
-
-        $this->_storeConfig = array(
-            'grouped'
-                => $this->_scopeConfig->getValue('doofinder_feed_feed/feed_settings/grouped', $scopeStore),
-            'image_size'
-                => $this->_scopeConfig->getValue('doofinder_feed_feed/feed_settings/image_size', $scopeStore),
-            'store_code'
-                => $storeCode,
-        );
-
-        return $this;
     }
 
     /**
@@ -154,48 +107,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get store code
+     * Get magento base url.
      *
-     * @return string Store code
+     * @return string
      */
-    protected function _getStoreCode()
-    {
-        return $this->_storeManager->getStore()->getCode();
-    }
-
-    /**
-     * get Scope store
-     *
-     * @return string Scope store
-     */
-    protected function _getScopeStore()
-    {
-        return \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-    }
-
     public function getBaseUrl()
     {
         return $this->_storeManager->getStore()->getBaseUrl();
     }
 
+    /**
+     * Get module setup version.
+     *
+     * @return string
+     */
     public function getModuleVersion()
     {
         return $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
-    }
-
-    /**
-     * Set store view for generator.
-     *
-     * @param int $storeID
-     */
-    public function setCurrentStore($storeID)
-    {
-        try {
-            if ($this->_storeManager->getStore($storeID)) {
-                $this->_storeManager->setCurrentStore($storeID);
-            }
-        } catch (\Exception $e) {
-            $this->_logger->error('Store ID: '.$storeID.' - '.$e->getMessage());
-        }
     }
 }

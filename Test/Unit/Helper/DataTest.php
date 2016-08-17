@@ -13,17 +13,9 @@ class DataTest extends \PHPUnit_Framework_TestCase
      */
     protected $_objectManager;
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $_scopeInterfaceMock;
-    /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManagerMock;
-    /**
-     * @var \Magento\Store\Api\Data\StoreInterface
-     */
-    protected $_storeInterfaceMock;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
@@ -52,24 +44,8 @@ class DataTest extends \PHPUnit_Framework_TestCase
     {
         $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
 
-        $this->_scopeInterfaceMock = $this->getMock(
-            '\Magento\Framework\App\Config\ScopeConfigInterface',
-            [],
-            [],
-            '',
-            false
-        );
-
         $this->_storeManagerMock = $this->getMock(
             '\Magento\Store\Model\StoreManagerInterface',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_storeInterfaceMock = $this->getMock(
-            '\Magento\Store\Api\Data\StoreInterface',
             [],
             [],
             '',
@@ -103,47 +79,11 @@ class DataTest extends \PHPUnit_Framework_TestCase
         $this->_helper = $this->_objectManager->getObject(
             '\Doofinder\Feed\Helper\Data',
             [
-                'scopeConfig'   => $this->_scopeInterfaceMock,
                 'storeManager'  => $this->_storeManagerMock,
                 'moduleList'    => $this->_moduleMock,
                 'logger'        => $this->_logger,
             ]
         );
-    }
-
-    /**
-     * Test getStoreConfig() method.
-     */
-    public function testGetStoreConfig()
-    {
-        $this->_storeManagerMock->expects($this->once())
-            ->method('getStore')
-            ->willReturn($this->_storeInterfaceMock);
-
-        $this->_storeInterfaceMock->expects($this->once())
-            ->method('getCode')
-            ->willReturn('default');
-
-        $this->_scopeInterfaceMock->expects($this->at(0))
-            ->method('getValue')
-            ->with('doofinder_feed_feed/feed_settings/grouped')
-            ->will($this->returnValue(0));
-
-        $this->_scopeInterfaceMock->expects($this->at(1))
-            ->method('getValue')
-            ->with('doofinder_feed_feed/feed_settings/image_size')
-            ->will($this->returnValue('100x100'));
-
-        $expected = array(
-            'grouped'       =>  0,
-            'image_size'     => '100x100',
-            'store_code'     => 'default',
-        );
-
-        $result = $this->_helper->getStoreConfig();
-
-        $this->assertSame($result, $expected);
-        $this->assertSame($expected, $result);
     }
 
     /**
