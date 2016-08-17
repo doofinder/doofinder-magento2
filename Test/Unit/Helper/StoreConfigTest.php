@@ -103,7 +103,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
         $this->_scopeConfigMock->expects($this->at(0))
             ->method('getValue')
             ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_CRON_CONFIG)
-            ->willReturn(['enabled' => 1]);
+            ->willReturn(['enabled' => 1, 'start_time' => '10,30,0']);
 
         $this->_scopeConfigMock->expects($this->at(1))
             ->method('getValue')
@@ -114,11 +114,12 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
             'store_code'    => 'default',
             'enabled'       => 1,
             'grouped'       =>  0,
+            'start_time'    => ['10', '30', '0'],
         );
 
         $result = $this->_helper->getStoreConfig();
 
-        $this->assertSame($expected, $result);
+        $this->assertEquals($expected, $result);
     }
 
     /**

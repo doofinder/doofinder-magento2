@@ -265,7 +265,7 @@
                        sortOrder="62"
                        showInDefault="1"
                        showInWebsite="1"
-                       showInStore="0">
+                       showInStore="1">
                     <button_label>Start Feed Generation Now</button_label>
                     <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\GenerateButton</frontend_model>
                 </field>

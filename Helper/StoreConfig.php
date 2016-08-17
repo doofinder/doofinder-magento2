@@ -61,11 +61,15 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         $scopeStore = $this->getScopeStore();
         $storeCode['store_code'] = $this->getStoreCode();
 
-        return array_merge(
+        $config = array_merge(
             $storeCode,
             $this->_scopeConfig->getValue(self::FEED_CRON_CONFIG, $scopeStore),
             $this->_scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore)
         );
+
+        $config['start_time'] = explode(',', $config['start_time']);
+
+        return $config;
     }
 
     /**

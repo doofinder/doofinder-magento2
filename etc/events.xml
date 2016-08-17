@@ -3,6 +3,6 @@
         <observer name="doofinder_feed_processor_xml_items_fetched" instance="Doofinder\Feed\Observer\Processor\Xml\ItemsFetched" />
     </event>
     <event name="admin_system_config_changed_section_doofinder_feed_feed">
-        <observer name="doofinder_feed_update_schedule" instance="Doofinder\Feed\Observer\Cron\Schedule" />
+        <observer name="doofinder_feed_update_schedule" instance="Doofinder\Feed\Observer\Schedule" />
     </event>
 </config>

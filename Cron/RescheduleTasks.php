@@ -3,39 +3,37 @@
 namespace Doofinder\Feed\Cron;
 
 /**
- * Class GenerateFeed
+ * Class RescheduleTasks
  *
  * @package Doofinder\Feed\Cron
  */
-class GenerateFeed
+class RescheduleTasks
 {
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_logger;
+    protected $_schedule;
 
     /**
      * GenerateFeed constructor.
      *
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Doofinder\Feed\Helper\Schedule $schedule
      */
     public function __construct(
-        \Psr\Log\LoggerInterface $logger
+        \Doofinder\Feed\Helper\Schedule $schedule
     ) {
-        $this->_logger = $logger;
+        $this->_schedule = $schedule;
     }
 
     /**
      * Execute this cron job.
      *
-     * @todo implement this method
-     *
      * @return $this
      */
     public function execute()
     {
-        $this->_logger->info('Doofinder cron execute');
+        $this->_schedule->regenerateSchedule();
+
         return $this;
     }
-
 }

@@ -17,24 +17,24 @@ class Generate extends \Magento\Backend\App\Action
     protected $_resultJsonFactory;
 
     /**
-     * @var \Doofinder\Feed\Model\Cron\ScheduleFactory
+     * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_scheduleFactory;
+    protected $_schedule;
 
     /**
      * Generate constructor.
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-     * @param \Doofinder\Feed\Model\Cron\ScheduleFactory $scheduleFactory
+     * @param \Doofinder\Feed\Helper\Scheduler $scheduler
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
-        \Doofinder\Feed\Model\Cron\ScheduleFactory $scheduleFactory
+        \Doofinder\Feed\Helper\Schedule $schedule
     ) {
         $this->_resultJsonFactory = $resultJsonFactory;
-        $this->_scheduleFactory = $scheduleFactory;
+        $this->_schedule = $schedule;
 
         parent::__construct($context);
     }
@@ -46,7 +46,7 @@ class Generate extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $this->_scheduleFactory->create()->generateScheduleNow();
+        $this->_schedule->regenerateSchedule(true, true, true);
 
         return $this->_resultJsonFactory->create()->setData(
             ['message' => self::FEED_GENERATION_MESSAGE]

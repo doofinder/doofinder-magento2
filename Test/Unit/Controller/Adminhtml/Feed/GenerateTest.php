@@ -34,7 +34,7 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
     protected $_scheduleFactoryMock;
 
     /**
-     * @var \Doofinder\Feed\Model\Cron\Schedule
+     * @var \Doofinder\Feed\Helper\Schedule
      */
     protected $_scheduleMock;
 
@@ -74,17 +74,9 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_scheduleFactoryMock = $this->getMock(
-            '\Doofinder\Feed\Model\Cron\ScheduleFactory',
-            ['create'],
-            [],
-            '',
-            false
-        );
-
         $this->_scheduleMock = $this->getMock(
-            '\Doofinder\Feed\Model\Cron\ScheduleFactory',
-            ['generateScheduleNow'],
+            '\Doofinder\Feed\Helper\Schedule',
+            ['regenerateSchedule'],
             [],
             '',
             false
@@ -94,12 +86,8 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
             ->method('create')
             ->willReturn($this->_resultJsonMock);
 
-        $this->_scheduleFactoryMock->expects($this->once())
-            ->method('create')
-            ->willReturn($this->_scheduleMock);
-
         $this->_scheduleMock->expects($this->once())
-            ->method('generateScheduleNow');
+            ->method('regenerateSchedule');
 
         $this->_resultJsonMock->expects($this->once())
             ->method('setData')
@@ -110,7 +98,7 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
             [
                 'context'       => $this->_contextMock,
                 'resultJsonFactory'   => $this->_resultJsonFactoryMock,
-                'scheduleFactory' => $this->_scheduleFactoryMock
+                'schedule' => $this->_scheduleMock,
             ]
         );
     }
