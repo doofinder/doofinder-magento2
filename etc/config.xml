@@ -28,7 +28,17 @@
                 <step_delay>5</step_delay>
             </feed_cron>
         </doofinder_feed_feed>
-
+        <doofinder_feed_search>
+            <doofinder_layer>
+                <enabled>0</enabled>
+            </doofinder_layer>
+            <doofinder_internal_search>
+                <enabled>0</enabled>
+                <apikey></apikey>
+                <hash_id></hash_id>
+                <total_limit>500</total_limit>
+            </doofinder_internal_search>
+        </doofinder_feed_search>
         <directives>
             <df_id><![CDATA[Product Id]]></df_id>
             <df_availability><![CDATA[Product Availability]]></df_availability>

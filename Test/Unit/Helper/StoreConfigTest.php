@@ -201,4 +201,37 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
             [true, 'sample', $stores, ['sample']],
         ];
     }
+
+    /**
+     * Test getApiKey() method.
+     */
+    public function testGetApiKey()
+    {
+        $expected = 'sample_api_key';
+
+        $this->_scopeConfigMock
+            ->expects($this->once())
+            ->method('getValue')
+            ->with('doofinder_feed_search/doofinder_internal_search/api_key', 'default', null)
+            ->willReturn($expected);
+
+        $this->assertSame($expected, $this->_helper->getApiKey());
+    }
+
+    /**
+     * Test getHashId() method.
+     */
+    public function testGetHashId()
+    {
+        $storeCode = 'sample';
+        $expected = 'sample_hash_id';
+
+        $this->_scopeConfigMock
+            ->expects($this->once())
+            ->method('getValue')
+            ->with('doofinder_feed_search/doofinder_internal_search/hash_id', 'store', $storeCode)
+            ->willReturn($expected);
+
+        $this->assertSame($expected, $this->_helper->getHashId($storeCode));
+    }
 }

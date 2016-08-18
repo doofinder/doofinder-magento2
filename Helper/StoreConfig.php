@@ -135,4 +135,29 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
     }
+
+    /**
+     * Get API key.
+     *
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->_scopeConfig->getValue(self::INTERNAL_SEARCH_CONFIG . '/api_key');
+    }
+
+    /**
+     * Get Hash ID.
+     *
+     * @param string $storeCode
+     * @return string
+     */
+    public function getHashId($storeCode = null)
+    {
+        return $this->_scopeConfig->getValue(
+            self::INTERNAL_SEARCH_CONFIG . '/hash_id',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
 }
