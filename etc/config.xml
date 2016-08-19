@@ -22,7 +22,7 @@
             </feed_settings>
             <feed_cron>
                 <enabled>1</enabled>
-                <start_time>0</start_time>
+                <start_time>0,0,0</start_time>
                 <frequency>D</frequency>
                 <step_size>1000</step_size>
                 <step_delay>5</step_delay>
