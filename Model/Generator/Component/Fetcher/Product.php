@@ -84,6 +84,11 @@ class Product extends Component implements Fetcher
         $collection = $this->_productCollectionFactory->create()
             ->addAttributeToSelect('*')
             ->addStoreFilter()
+            ->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
+            ->addAttributeToFilter('visibility', [
+                \Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH,
+                \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH
+            ])
             ->addAttributeToSort('id', 'asc');
 
         if ($limit = $this->getLimit()) {

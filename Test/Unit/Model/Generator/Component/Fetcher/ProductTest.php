@@ -74,6 +74,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('addStoreFilter')
             ->willReturn($this->_productCollection);
+        $this->_productCollection->expects($this->any())->method('addAttributeToFilter')
+            ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('addAttributeToSort')
             ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('load')
@@ -141,8 +143,15 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->_productCollection->expects($this->once())->method('setPageSize')
             ->with(1)
             ->willReturn(array($this->_product));
-        $this->_productCollection->expects($this->once())->method('addAttributeToFilter')
-            ->with('entity_id', ['gt' => 2])
+        $this->_productCollection->expects($this->any())->method('addAttributeToFilter')
+            ->withConsecutive(
+                ['status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED],
+                ['visibility', [
+                    \Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH,
+                    \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH
+                ]],
+                ['entity_id', ['gt' => 2]]
+             )
             ->willReturn($this->_productCollection);
 
         $this->_model->fetch();

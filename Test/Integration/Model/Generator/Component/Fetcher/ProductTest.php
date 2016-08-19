@@ -22,10 +22,50 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Set products visible and in catalog
+     */
+    protected function makeProductsFetchable()
+    {
+        $collection = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            '\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory'
+        )->create();
+
+        foreach ($collection->load() as $product) {
+            $product
+                ->setVisibility(\Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH)
+                ->setStatus(\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
+                ->save();
+        }
+    }
+
+    /**
+     * Test fetch() method filtering
+     */
+    public function testFetchFilters()
+    {
+        $items = $this->_model->fetch();
+
+        $this->assertEquals(1, count($items));
+        $this->assertEquals(
+            [
+                'simple1',
+            ],
+            array_map(function ($item) {
+                return $item->getContext()->getSku();
+            }, $items)
+        );
+
+        $this->assertEquals(true, $this->_model->isStarted());
+        $this->assertEquals(true, $this->_model->isDone());
+    }
+
+    /**
      * Test fetch() method
      */
     public function testFetch()
     {
+        $this->makeProductsFetchable();
+
         $items = $this->_model->fetch();
 
         $this->assertEquals(3, count($items));
@@ -51,6 +91,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
      */
     public function testFetchWithPagination($useOffset, $sku, $isStarted, $isDone)
     {
+        $this->makeProductsFetchable();
+
         $entityId = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
             '\Magento\Catalog\Api\ProductRepositoryInterface'
         )->get($sku)->getEntityId();
@@ -85,6 +127,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
      */
     public function testFetchMultiwebsite()
     {
+        $this->makeProductsFetchable();
+
         /** @var \Magento\Store\Api\WebsiteRepositoryInterface $websiteRepositoryFactory */
         $websiteRepositoryFactory = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
             '\Magento\Store\Api\WebsiteRepositoryInterface'
@@ -123,6 +167,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLastProcessedEntityId()
     {
+        $this->makeProductsFetchable();
+
         /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryFactory */
         $productRepositoryFactory = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
             '\Magento\Catalog\Api\ProductRepositoryInterface'
