@@ -16,7 +16,7 @@
                 <currency>currency</currency>
             </feed_attributes>
             <feed_settings>
-                <export_proudct_prices>1</export_proudct_prices>
+                <export_product_prices>1</export_product_prices>
                 <image_size></image_size>
                 <split_grouped_products>0</split_grouped_products>
             </feed_settings>
