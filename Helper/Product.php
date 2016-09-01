@@ -15,15 +15,22 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_imageHelper = null;
     protected $_stockItemRepository;
 
+    /**
+     * \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $_storeManager;
+
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory,
         \Magento\Catalog\Helper\Image $imageHelper,
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository
+        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository,
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->_categoryCollectionFactory = $categoryCollectionFactory;
         $this->_imageHelper = $imageHelper;
         $this->_stockItemRepository = $stockItemRepository;
+        $this->_storeManager = $storeManager;
         parent::__construct($context);
     }
 

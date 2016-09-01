@@ -203,11 +203,14 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @todo write test if necessary
+     * Test getCurrencyCode() method.
      */
     public function testGetCurrencyCode()
     {
-
+        $this->assertEquals(
+            'USD',
+            $this->_helper->getCurrencyCode()
+        );
     }
 
 
