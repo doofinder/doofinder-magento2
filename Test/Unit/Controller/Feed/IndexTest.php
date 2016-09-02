@@ -179,25 +179,16 @@ class IndexTest extends \PHPUnit_Framework_TestCase
     {
         $this->_requestMock->expects($this->any())
             ->method('getParam')
-            ->will($this->onConsecutiveCalls(1, 1, '20'));
+            ->will($this->onConsecutiveCalls('default', 10, '20', 1));
 
         $this->_feedConfigMock->expects($this->once())
-            ->method('setCustomParams')
+            ->method('getFeedConfig')
+            ->with('default', [
+                'limit' => 1,
+                'minimal_price' => 10,
+                'offset' => 20,
+            ])
             ->willReturnSelf();
-
-        $this->_controller->execute();
-    }
-
-    /**
-     * Test execute() without custom params.
-     */
-    public function testExecuteWithoutCustomParams()
-    {
-        $this->_feedConfigMock->expects($this->never())
-            ->method('setCustomParams');
-
-        $this->_requestMock->expects($this->any())
-            ->method('getParam');
 
         $this->_controller->execute();
     }

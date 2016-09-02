@@ -10,6 +10,11 @@ namespace Doofinder\Feed\Helper;
 class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
+     * Path to attributes config in config.xml/core_config_data
+     */
+    const FEED_ATTRIBUTES_CONFIG = 'doofinder_feed_feed/feed_attributes';
+
+    /**
      * Path to cron config in config.xml/core_config_data
      */
     const FEED_CRON_CONFIG = 'doofinder_feed_feed/feed_cron';
@@ -54,17 +59,22 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Return array with store config.
      *
+     * @param string|null $storeCode
      * @return array
      */
-    public function getStoreConfig()
+    public function getStoreConfig($storeCode = null)
     {
+        if (!$storeCode) {
+            $storeCode = $this->getStoreCode();
+        }
+
         $scopeStore = $this->getScopeStore();
-        $storeCode['store_code'] = $this->getStoreCode();
 
         $config = array_merge(
-            $storeCode,
-            $this->_scopeConfig->getValue(self::FEED_CRON_CONFIG, $scopeStore),
-            $this->_scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore)
+            ['store_code' => $storeCode],
+            ['attributes' => $this->_scopeConfig->getValue(self::FEED_ATTRIBUTES_CONFIG, $scopeStore, $storeCode)],
+            $this->_scopeConfig->getValue(self::FEED_CRON_CONFIG, $scopeStore, $storeCode),
+            $this->_scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode)
         );
 
         $config['start_time'] = explode(',', $config['start_time']);
@@ -90,21 +100,5 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getScopeStore()
     {
         return \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-    }
-
-    /**
-     * Set store view for generator.
-     *
-     * @param int $storeID
-     */
-    public function setCurrentStore($storeID)
-    {
-        try {
-            if ($this->_storeManager->getStore($storeID)) {
-                $this->_storeManager->setCurrentStore($storeID);
-            }
-        } catch (\Exception $e) {
-            $this->_logger->error('Store ID: '.$storeID.' - '.$e->getMessage());
-        }
     }
 }

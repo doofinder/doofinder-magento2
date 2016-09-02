@@ -13,9 +13,9 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
      */
     protected $_objectManager;
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_scopeInterfaceMock;
+    protected $_storeConfig;
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
@@ -28,28 +28,29 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
     {
         $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
 
-        $this->_scopeInterfaceMock = $this->getMock(
-            '\Magento\Framework\App\Config\ScopeConfigInterface',
+        $this->_storeConfig = $this->getMock(
+            '\Doofinder\Feed\Helper\StoreConfig',
             [],
             [],
             '',
             false
         );
 
-        $feedAttributes = [
-            'attr1' => 'value1',
-            'attr2' => 'value2'
-        ];
-
-        $this->_scopeInterfaceMock->expects($this->once())
-            ->method('getValue')
-            ->with('doofinder_feed_feed/feed_attributes')
-            ->will($this->returnValue($feedAttributes));
+        $this->_storeConfig->method('getStoreConfig')->willReturn([
+            'store_code' => 'default',
+            'attributes' => [
+                'attr1' => 'value1',
+                'attr2' => 'value2',
+            ],
+            'image_size' => 'small',
+            'split_configurable_products' => 1,
+            'export_product_prices' => 0,
+        ]);
 
         $this->_helper = $this->_objectManager->getObject(
             '\Doofinder\Feed\Helper\FeedConfig',
             [
-                'scopeConfig'   => $this->_scopeInterfaceMock,
+                'storeConfig'   => $this->_storeConfig,
             ]
         );
     }
@@ -64,7 +65,8 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'fetchers' => [
                         'Product' => [
-                            'data' => [],
+                            'offset' => null,
+                            'limit' => null,
                         ],
                     ],
                     'processors' => [
@@ -73,6 +75,10 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                                 'attr1' => 'value1',
                                 'attr2' => 'value2',
                             ],
+                            'minimal_price' => null,
+                            'split_configurable_products' => 1,
+                            'export_product_prices' => 0,
+                            'image_size' => 'small',
                         ],
                         'Cleaner' => [],
                         'Xml' => [],
@@ -83,13 +89,13 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->_helper->getFeedConfig();
 
-        $this->assertSame($expected, $result);
+        $this->assertEquals($expected, $result);
     }
 
     /**
      * Test set custom params.
      */
-    public function testSetCustomParams()
+    public function testGetFeedConfigWithCustomParams()
     {
         $customParams = [
             'offset' => 1,
@@ -103,20 +109,20 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'fetchers' => [
                         'Product' => [
-                            'data' => [
-                                'offset' => 1,
-                                'limit' => 10,
-                            ],
+                            'offset' => 1,
+                            'limit' => 10,
                         ],
                     ],
                     'processors' => [
                         'Mapper\Product' => [
                             'map' => [
-                                'store' => 1,
-                                'minimal_price' => 20,
                                 'attr1' => 'value1',
                                 'attr2' => 'value2',
                             ],
+                            'minimal_price' => 20,
+                            'split_configurable_products' => 1,
+                            'export_product_prices' => 0,
+                            'image_size' => 'small',
                         ],
                         'Cleaner' => [],
                         'Xml' => [],
@@ -125,10 +131,8 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->_helper->setCustomParams($customParams);
+        $result = $this->_helper->getFeedConfig(null, $customParams);
 
-        $result = $this->_helper->getFeedConfig();
-
-        $this->assertSame($expected, $result);
+        $this->assertEquals($expected, $result);
     }
 }

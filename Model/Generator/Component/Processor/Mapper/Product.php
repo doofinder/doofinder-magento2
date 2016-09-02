@@ -136,11 +136,13 @@ class Product extends Mapper
      */
     protected function getProductImage(\Magento\Catalog\Model\Product $product)
     {
-        return $this->_helper->getProductImageUrl($product);
+        return $this->_helper->getProductImageUrl($product, $this->getImageSize());
     }
 
     /**
      * Get product price
+     *
+     * @todo Include minimal_price, split_configurable_products and export_product_prices params
      *
      * @param \Magento\Catalog\Model\Product
      * @return string|null

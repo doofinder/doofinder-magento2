@@ -104,16 +104,14 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get store config.
      *
-     * @param null $store
+     * @notice This should not change current store
+     *
+     * @param null|string $storeCode
      * @return array
      */
-    public function getStoreConfig($store = null)
+    public function getStoreConfig($storeCode = null)
     {
-        if ($store) {
-            $this->_storeConfig->setCurrentStore($store);
-        }
-
-        return $this->_storeConfig->getStoreConfig();
+        return $this->_storeConfig->getStoreConfig($storeCode);
     }
 
     /**

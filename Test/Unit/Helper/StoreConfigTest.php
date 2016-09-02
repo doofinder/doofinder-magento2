@@ -102,20 +102,28 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->_scopeConfigMock->expects($this->at(0))
             ->method('getValue')
-            ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_CRON_CONFIG)
-            ->willReturn(['enabled' => 1, 'start_time' => '10,30,0']);
+            ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_ATTRIBUTES_CONFIG)
+            ->willReturn(['attr1' => 'value1', 'attr2' => 'value2']);
 
         $this->_scopeConfigMock->expects($this->at(1))
             ->method('getValue')
-            ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_SETTINGS_CONFIG)
-            ->willReturn(['grouped' => 0]);
+            ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_CRON_CONFIG)
+            ->willReturn(['enabled' => 1, 'start_time' => '10,30,0']);
 
-        $expected = array(
-            'store_code'    => 'default',
-            'enabled'       => 1,
-            'grouped'       =>  0,
-            'start_time'    => ['10', '30', '0'],
-        );
+        $this->_scopeConfigMock->expects($this->at(2))
+            ->method('getValue')
+            ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_SETTINGS_CONFIG)
+            ->willReturn(['split_configurable_products' => 0, 'image_size' => 'small', 'export_product_prices' => 1]);
+
+        $expected = [
+            'store_code'                    => 'default',
+            'enabled'                       => 1,
+            'split_configurable_products'   => 0,
+            'export_product_prices'         => 1,
+            'image_size'                    => 'small',
+            'start_time'                    => ['10', '30', '0'],
+            'attributes'                    => ['attr1' => 'value1', 'attr2' => 'value2'],
+        ];
 
         $result = $this->_helper->getStoreConfig();
 
@@ -138,53 +146,5 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
         $expected = 'default';
 
         $this->assertSame($expected, $this->_helper->getStoreCode());
-    }
-
-    /**
-     * Test setCurrentStore() method with valid data.
-     */
-    public function testSetCurrentStoreWithRealStoreId()
-    {
-        $storeId = 1;
-
-        $mock = $this->getMock(
-            '\Magento\Store\Api\Data\StoreInterface',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_storeManagerMock->expects($this->once())
-            ->method('getStore')
-            ->with($storeId)
-            ->willReturn($mock);
-
-        $this->_storeManagerMock->expects($this->once())
-            ->method('setCurrentStore')
-            ->with($storeId);
-
-        $this->_helper->setCurrentStore($storeId);
-    }
-
-    /**
-     * Test setCurrentStore() method with invalid data.
-     *
-     * @todo throws exception
-     */
-    public function testSetCurrentStoreWithWrongStoreId()
-    {
-        $storeId = 30;
-
-        $this->_storeManagerMock->expects($this->once())
-            ->method('getStore')
-            ->with($storeId)
-            ->willReturn(false);
-
-        $this->_storeManagerMock->expects($this->never())
-            ->method('setCurrentStore')
-            ->with($storeId);
-
-        $this->_helper->setCurrentStore($storeId);
     }
 }

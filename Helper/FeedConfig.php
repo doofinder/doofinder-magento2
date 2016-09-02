@@ -12,81 +12,64 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * @var array Feed attribute config
      */
     protected $_feedConfig;
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $_scopeConfig;
 
     /**
-     * @var array Custom data for feed
+     * @var array Config for given store code
      */
-    protected $_customFeedData = [];
+    protected $_config;
 
     /**
-     * @var array Custom data for fetcher
+     * @var array Config parameters
      */
-    protected $_customFetcherData = [];
+    protected $_params;
+
+    /**
+     * @var \Doofinder\Feed\Helper\StoreConfig
+     */
+    protected $_storeConfig;
 
     /**
      * FeedConfig constructor.
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Doofinder\Feed\Helper\StoreConfig $storeConfig
     ) {
-        $this->_scopeConfig = $scopeConfig;
+        $this->_storeConfig = $storeConfig;
     }
 
     /**
      * Get feed attribute config.
      *
+     * @param string $storeCode
+     * @param array $params = []
      * @return array
      */
-    public function getFeedConfig()
+    public function getFeedConfig($storeCode = null, array $params = [])
     {
-        if (!$this->_feedConfig) {
-            $this->_setFeedConfig();
+        if (!isset($this->_feedConfig[$storeCode])) {
+            $this->_params = $params;
+            $this->setFeedConfig($storeCode);
         }
 
-        return $this->_feedConfig;
-    }
-
-    /**
-     * Set custom params for generator.
-     *
-     * @param array $customParams
-     *
-     * @return \Doofinder\Feed\Helper\FeedConfig
-     */
-    public function setCustomParams(array $customParams = [])
-    {
-        $map = ['store', 'minimal_price'];
-        $fetcher = ['limit', 'offset'];
-
-        foreach ($customParams as $param => $value) {
-            if (in_array($param, $map)) {
-                $this->_customFeedData[$param] = $value;
-            }
-
-            if (in_array($param, $fetcher)) {
-                $this->_customFetcherData[$param] = $value;
-            }
-        }
-
-        return $this;
+        return $this->_feedConfig[$storeCode];
     }
 
     /**
      * Set feed config
+     *
+     * @param string $storeCode
      */
-    protected function _setFeedConfig()
+    protected function setFeedConfig($storeCode)
     {
-        $this->_feedConfig = [
+        $this->_config = $this->_storeConfig->getStoreConfig($storeCode);
+
+        $this->_feedConfig[$storeCode] = [
             'data' => [
                 'config' => [
-                    'fetchers' => $this->_getFetchers(),
-                    'processors' => $this->_getProcessors()
+                    'fetchers' => $this->getFetchers(),
+                    'processors' => $this->getProcessors()
                 ]
             ]
         ];
@@ -97,10 +80,13 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function _getFetchers()
+    protected function getFetchers()
     {
         return [
-            'Product' => ['data' => $this->_customFetcherData]
+            'Product' => [
+                'offset' => $this->getParam('offset'),
+                'limit' => $this->getParam('limit'),
+            ],
         ];
     }
 
@@ -109,10 +95,10 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function _getProcessors()
+    protected function getProcessors()
     {
         return [
-            'Mapper\Product' => $this->_getMapper(),
+            'Mapper\Product' => $this->getMapper(),
             'Cleaner' => [],
             'Xml' => []
         ];
@@ -123,10 +109,14 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function _getMapper()
+    protected function getMapper()
     {
         return [
-            'map' => $this->_getFeedAttributes()
+            'minimal_price' => $this->getParam('minimal_price'),
+            'image_size' => $this->_config['image_size'],
+            'split_configurable_products' => $this->_config['split_configurable_products'],
+            'export_product_prices' => $this->_config['export_product_prices'],
+            'map' => $this->getFeedAttributes()
         ];
     }
 
@@ -135,11 +125,9 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function _getFeedAttributes()
+    protected function getFeedAttributes()
     {
-        $attributes = $this->_scopeConfig->getValue('doofinder_feed_feed/feed_attributes');
-
-        $attributes = array_merge($this->_customFeedData, $attributes);
+        $attributes = $this->_config['attributes'];
 
         if (array_key_exists('additional_attributes', $attributes)) {
             $additionalKeys = unserialize($attributes['additional_attributes']);
@@ -154,5 +142,16 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $attributes;
+    }
+
+    /**
+     * Get param
+     *
+     * @param string $key
+     * @return mixed
+     */
+    protected function getParam($key)
+    {
+        return isset($this->_params[$key]) ? $this->_params[$key] : null;
     }
 }

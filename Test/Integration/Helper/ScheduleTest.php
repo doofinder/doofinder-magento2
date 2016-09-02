@@ -90,6 +90,18 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 'image_size' => null,
                 'split_grouped_products' => '0',
                 'export_product_prices' => '1',
+                'attributes' => [
+                    'id' => 'df_id',
+                    'title' => 'name',
+                    'description' => 'short_description',
+                    'brand' => 'manufacturer',
+                    'link' => 'url_key',
+                    'image_link' => 'image_link',
+                    'price' => 'price',
+                    'mpn' => 'sku',
+                    'availability' => 'availability',
+                    'currency' => 'currency',
+                ],
             ],
             $this->_helper->getStoreConfig()
         );
