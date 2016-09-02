@@ -351,6 +351,21 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test getActiveProcess() method
+     *
+     * @magentoDbIsolation enabled
+     */
+    public function testGetActiveProcess()
+    {
+        $process = $this->_helper->updateProcess($this->_defaultStore, true, true);
+
+        $this->assertEquals(
+            $process->getId(),
+            $this->_helper->getActiveProcess()->getId()
+        );
+    }
+
+    /**
      * Get default timezone
      *
      * @return \DateTimeZone

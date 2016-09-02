@@ -20,6 +20,11 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_cronFactory;
 
     /**
+     * @var \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory
+     */
+    protected $_cronCollectionFactory;
+
+    /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
@@ -52,6 +57,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Doofinder\Feed\Model\CronFactory $cronFactory,
+        \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory $cronCollectionFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
@@ -61,6 +67,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     ) {
         $this->_messageManager = $messageManager;
         $this->_cronFactory = $cronFactory;
+        $this->_cronCollectionFactory = $cronCollectionFactory;
         $this->_storeManager = $storeManager;
         $this->_timezone = $timezone;
         $this->_storeConfig = $storeConfig;
@@ -422,5 +429,45 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             ->save();
 
         $this->_logger->info('Process has been scheduled');
+    }
+
+    /**
+     * Get active process
+     *
+     * @return \Doofinder\Feed\Model\Cron
+     */
+    public function getActiveProcess()
+    {
+        $collection = $this->_cronCollectionFactory->create();
+
+        $collection
+            ->addFieldToFilter('status', [
+                'in' => [
+                    \Doofinder\Feed\Model\Cron::STATUS_PENDING,
+                    \Doofinder\Feed\Model\Cron::STATUS_RUNNING,
+                ]
+            ])
+            ->addFieldToFilter('next_iteration', [
+                'lteq' => $this->_dateTime->formatDate($this->getNowDate())
+            ])
+            ->setOrder('next_iteration', 'asc')
+            ->setPageSize(1);
+
+        return $collection->fetchItem();
+    }
+
+    /**
+     * Get current date in default timezone
+     *
+     * @return \DateTime
+     */
+    protected function getNowDate()
+    {
+        $date = new \DateTime();
+        $date->setTimezone(
+            new \DateTimeZone($this->_timezone->getDefaultTimezone())
+        );
+
+        return $date;
     }
 }
