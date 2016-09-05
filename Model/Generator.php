@@ -47,6 +47,7 @@ class Generator extends \Magento\Framework\DataObject
     /**
      * @param Generator\Component\FetcherFactory $itemsFetcherFactory
      * @param Generator\Component\ProcessorFactory $itemsProcessorFactory
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
      * @param array $data
      */
     public function __construct(
