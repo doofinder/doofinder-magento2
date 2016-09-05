@@ -24,4 +24,18 @@ interface Fetcher
      * @return boolean
      */
     public function isDone();
+
+    /**
+     * Get last processed entity id
+     *
+     * @return int
+     */
+    public function getLastProcessedEntityId();
+
+    /**
+     * Get progress
+     *
+     * @return float
+     */
+    public function getProgress();
 }

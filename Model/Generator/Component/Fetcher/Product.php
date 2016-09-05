@@ -33,6 +33,13 @@ class Product extends Component implements Fetcher
     protected $_lastProcessedEntityId = null;
 
     /**
+     * Amount of all products left in current fetch
+     *
+     * @var int
+     */
+    protected $_itemsLeftCount = null;
+
+    /**
      * Constructor
      */
     public function __construct(
@@ -53,7 +60,7 @@ class Product extends Component implements Fetcher
      */
     public function fetch()
     {
-        $collection = $this->getProductCollection();
+        $collection = $this->getProductCollection($this->getLimit(), $this->getOffset());
         $products = $collection->load();
 
         // Check if fetcher is started and done
@@ -71,6 +78,9 @@ class Product extends Component implements Fetcher
             $this->_lastProcessedEntityId = $collection->getLastItem()->getEntityId();
         }
 
+        // Set fetched size
+        $this->_itemsLeftCount = $this->getLimit() ? max(0, $collection->getSize() - $this->getLimit()) : 0;
+
         return $items;
     }
 
@@ -79,7 +89,7 @@ class Product extends Component implements Fetcher
      *
      * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
      */
-    protected function getProductCollection()
+    protected function getProductCollection($limit = null, $offset = null)
     {
         $collection = $this->_productCollectionFactory->create()
             ->addAttributeToSelect('*')
@@ -91,11 +101,11 @@ class Product extends Component implements Fetcher
             ])
             ->addAttributeToSort('id', 'asc');
 
-        if ($limit = $this->getLimit()) {
+        if ($limit) {
             $collection->setPageSize($limit);
         }
 
-        if ($offset = $this->getOffset()) {
+        if ($offset) {
             $collection->addAttributeToFilter('entity_id', ['gt' => $offset]);
         }
 
@@ -143,5 +153,18 @@ class Product extends Component implements Fetcher
     public function getLastProcessedEntityId()
     {
         return $this->_lastProcessedEntityId;
+    }
+
+    /**
+     * Get progress
+     *
+     * @return float
+     */
+    public function getProgress()
+    {
+        $collection = $this->getProductCollection();
+        $total = $collection->getSize();
+
+        return $total ? (1 - round(1.0 * $this->_itemsLeftCount / $total, 2)) : 1.0;
     }
 }

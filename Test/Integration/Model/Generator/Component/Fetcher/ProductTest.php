@@ -180,4 +180,17 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($product->getEntityId(), $this->_model->getLastProcessedEntityId());
     }
+
+    /**
+     * Test getProgress() method
+     */
+    public function testGetProgress()
+    {
+        $this->makeProductsFetchable();
+
+        $this->_model->setLimit(2);
+        $this->_model->fetch();
+
+        $this->assertEquals(0.67, $this->_model->getProgress());
+    }
 }
