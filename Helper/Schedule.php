@@ -342,7 +342,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function getFeedFilename($storeCode)
     {
-        return 'doofinder-' . $storeCode;
+        return 'doofinder-' . $storeCode . '.xml';
     }
 
     /**
@@ -427,6 +427,43 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             ->save();
 
         $this->_logger->info('Process has been scheduled');
+    }
+
+    /**
+     * Schedule the running process.
+     *
+     * @param \Doofinder\Feed\Model\Cron $process
+     */
+    protected function scheduleProcess(\Doofinder\Feed\Model\Cron $process)
+    {
+        $config = $this->_storeConfig->getStoreConfig($process->getStoreCode());
+
+        // Set new schedule time
+        $delayInMin = intval($config['step_delay']);
+        $timeScheduled = $this->timeArrayToDate([date('H'), date('i') + $delayInMin, date('s')]);
+
+        // Set process data and save
+        $process
+            ->setStatus($process::STATUS_RUNNING)
+            ->setNextRun('-')
+            ->setNextIteration($this->_dateTime->formatDate($timeScheduled))
+            ->save();
+
+        $this->_logger->info(__('Scheduling the next step for %1', $this->_dateTime->formatDate($timeScheduled)));
+    }
+
+    /**
+     * Concludes process.
+     *
+     * @param \Doofinder\Feed\Model\Cron $process
+     */
+    protected function endProcess(\Doofinder\Feed\Model\Cron $process)
+    {
+        $process
+            ->setStatus($process::STATUS_WAITING)
+            ->setNextRun('-')
+            ->setNextIteration('-')
+            ->save();
     }
 
     /**
