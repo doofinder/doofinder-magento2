@@ -15,6 +15,11 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_messageManager;
 
     /**
+     * @var \Doofinder\Feed\Model\GeneratorFactory
+     */
+    protected $_generatorFactory;
+
+    /**
      * @var \Doofinder\Feed\Model\CronFactory
      */
     protected $_cronFactory;
@@ -40,6 +45,11 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_storeConfig;
 
     /**
+     * @var \Doofinder\Feed\Helper\FeedConfig
+     */
+    protected $_feedConfig;
+
+    /**
      * @var \Magento\Framework\Stdlib\DateTime
      */
     protected $_dateTime;
@@ -56,21 +66,25 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function __construct(
         \Magento\Framework\Message\ManagerInterface $messageManager,
+        \Doofinder\Feed\Model\GeneratorFactory $generatorFactory,
         \Doofinder\Feed\Model\CronFactory $cronFactory,
         \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory $cronCollectionFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
+        \Doofinder\Feed\Helper\FeedConfig $feedConfig,
         \Magento\Framework\Stdlib\DateTime $dateTime,
         \Psr\Log\LoggerInterface $logger,
         \Magento\Framework\Filesystem $filesystem
     ) {
         $this->_messageManager = $messageManager;
+        $this->_generatorFactory = $generatorFactory;
         $this->_cronFactory = $cronFactory;
         $this->_cronCollectionFactory = $cronCollectionFactory;
         $this->_storeManager = $storeManager;
         $this->_timezone = $timezone;
         $this->_storeConfig = $storeConfig;
+        $this->_feedConfig = $feedConfig;
         $this->_dateTime = $dateTime;
         $this->_logger = $logger;
         $this->_filesystem = $filesystem;
@@ -504,5 +518,72 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         );
 
         return $date;
+    }
+
+    /**
+     * Run process
+     *
+     * @param \Doofinder\Feed\Model\Cron
+     */
+    public function runProcess(\Doofinder\Feed\Model\Cron $process)
+    {
+        $storeCode = $process->getStoreCode();
+
+        // Set current store for generator
+        $this->_storeManager->setCurrentStore($storeCode);
+
+        $config = $this->_storeConfig->getStoreConfig($storeCode);
+
+        $feedConfig = $this->_feedConfig->getFeedConfig($storeCode, [
+            'offset' => $process->getOffset(),
+            'limit' => $config['step_size'],
+        ]);
+
+        // Set destination file
+        $tmpDir = $this->_filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::TMP);
+        $tmpFilename = $this->getFeedTmpFilename($storeCode);
+        $feedConfig['data']['config']['processors']['Xml']['destination_file'] =
+            $tmpDir->getAbsolutePath($tmpFilename);
+
+        // Create generator
+        $generator = $this->_generatorFactory->create($feedConfig);
+
+        try {
+            // Run generator
+            $generator->run();
+
+            $fetcher = $generator->getFetcher('Product');
+
+            // Set process offset and progress
+            $process->setOffset($fetcher->getLastProcessedEntityId());
+            $process->setComplete(sprintf('%0.1f%%', $fetcher->getProgress() * 100));
+
+            if (!$fetcher->isDone()) {
+                $this->scheduleProcess($process);
+            } else {
+                $this->_logger->info(__('Feed generation completed'));
+
+                $filename = $this->getFeedFilename($storeCode);
+                $dir = $this->_filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::MEDIA);
+                $tmpDir = $this->_filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::TMP);
+
+                if (!$tmpDir->getDriver()->rename(
+                    $tmpDir->getAbsolutePath($tmpFilename),
+                    $dir->getAbsolutePath($filename),
+                    $dir->getDriver()
+                )) {
+                    throw new \Exception(__('Cannot rename %1 to %2', $tmpFilename, $filename));
+                }
+                $process->setLastFeedName($filename);
+
+                $process->setMessage(__('Last process successfully completed. Now waiting for new schedule.'));
+                $this->endProcess($process);
+            }
+        } catch (\Exception $e) {
+            $this->_logger->error($e->getMessage());
+            $process->setErrorStack($process->getErrorStack() + 1);
+            $process->setMessage('#error#' . $e->getMessage());
+            $this->scheduleProcess($process);
+        }
     }
 }
