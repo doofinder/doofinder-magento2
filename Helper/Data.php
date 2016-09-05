@@ -46,22 +46,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get new xml file name.
-     *
-     * @param string $name XML file name
-     * @param string $code Store code
-     *
-     * @return string New xml file name
-     */
-    protected function _processXmlName($name = 'doofinder-{store_code}.xml', $code = 'default')
-    {
-        $pattern = '/\{\s*store_code\s*\}/';
-
-        $newName = preg_replace($pattern, $code, $name);
-        return $newName;
-    }
-
-    /**
      * Get value as int
      *
      * @param string|int $value Value
