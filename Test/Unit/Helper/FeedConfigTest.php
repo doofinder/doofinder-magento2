@@ -1,10 +1,10 @@
 <?php
 
-namespace Doofinder\Feed\Test\Unit\Helper\Data;
+namespace Doofinder\Feed\Test\Unit\Helper;
 
 /**
- * Class DataTest
- * @package Doofinder\Feed\Test\Unit\Helper\Data
+ * Class FeedConfigTest
+ * @package Doofinder\Feed\Test\Unit\Helper
  */
 class FeedConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,12 +12,14 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
      * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
      */
     protected $_objectManager;
+
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
     protected $_storeConfig;
+
     /**
-     * @var \Doofinder\Feed\Helper\Data
+     * @var \Doofinder\Feed\Helper\FeedConfig
      */
     protected $_helper;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Doofinder\Feed\Test\Unit\Helper\Data;
+namespace Doofinder\Feed\Test\Unit\Helper;
 
 /**
  * Class DataTest
- * @package Doofinder\Feed\Test\Unit\Helper\Data
+ * @package Doofinder\Feed\Test\Unit\Helper
  */
 class DataTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,6 +12,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
      * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
      */
     protected $_objectManager;
+
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
