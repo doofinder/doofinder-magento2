@@ -31,11 +31,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Data constructor.
      *
+     * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\Module\ModuleListInterface $moduleList
      * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
+        \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Psr\Log\LoggerInterface $logger
@@ -43,6 +45,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_storeManager = $storeManager;
         $this->_moduleList = $moduleList;
         $this->_logger = $logger;
+        parent::__construct($context);
     }
 
     /**

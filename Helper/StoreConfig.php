@@ -42,11 +42,13 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * StoreConfig constructor.
      *
+     * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
+        \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Psr\Log\LoggerInterface $logger
@@ -54,6 +56,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
         $this->_logger = $logger;
+        parent::__construct($context);
     }
 
     /**

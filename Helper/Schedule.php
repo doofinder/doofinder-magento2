@@ -65,6 +65,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_filesystem;
 
     public function __construct(
+        \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Doofinder\Feed\Model\GeneratorFactory $generatorFactory,
         \Doofinder\Feed\Model\CronFactory $cronFactory,
@@ -88,6 +89,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_dateTime = $dateTime;
         $this->_logger = $logger;
         $this->_filesystem = $filesystem;
+        parent::__construct($context);
     }
 
     /**
