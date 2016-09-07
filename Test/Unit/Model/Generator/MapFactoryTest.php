@@ -73,25 +73,25 @@ class MapFactoryTest extends \PHPUnit_Framework_TestCase
                 '\Magento\Framework\DataObject',
                 null,
                 false,
-                '\Doofinder\Feed\Model\Generator\Map'
+                '\Doofinder\Feed\Model\Generator\Map',
             ],
             [
-                '\Magento\Catalog\Model\Product'
+                '\Magento\Catalog\Model\Product',
                  'simple',
                  true,
-                 '\Doofinder\Feed\Model\Generator\Map\Product\Simple'
+                 '\Doofinder\Feed\Model\Generator\Map\Product\Simple',
             ],
             [
-                '\Magento\Catalog\Model\Product'
+                '\Magento\Catalog\Model\Product',
                  'configurable',
                  true,
-                 '\Doofinder\Feed\Model\Generator\Map\Product\Configurable'
+                 '\Doofinder\Feed\Model\Generator\Map\Product\Configurable',
             ],
             [
-                '\Magento\Catalog\Model\Product'
+                '\Magento\Catalog\Model\Product',
                  'configurable',
                  false,
-                 '\Doofinder\Feed\Model\Generator\Map\Product\Configurable'
+                 '\Doofinder\Feed\Model\Generator\Map\Product\Configurable',
             ],
         ];
     }
