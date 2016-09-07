@@ -69,7 +69,15 @@ class Product extends Component implements Fetcher
 
         $items = array();
         foreach ($products as $product) {
-            $items[] = $this->createItem($product);
+            $item = $this->createItem($product);
+            $items[] = $item;
+
+            // Add all item associates inline with other products
+            if ($item->hasAssociates()) {
+                foreach ($item->getAssociates() as $associate) {
+                    $items[] = $associate;
+                }
+            }
         }
 
         // Set the last processed entity id
@@ -82,6 +90,23 @@ class Product extends Component implements Fetcher
         $this->_itemsLeftCount = $this->getLimit() ? max(0, $collection->getSize() - $this->getLimit()) : 0;
 
         return $items;
+    }
+
+    /**
+     * Fetch product associates
+     *
+     * @param \Magento\Catalog\Model\Product
+     * @return \Doofinder\Feed\Model\Generator\Item[]
+     */
+    protected function fetchProductAssociates(\Magento\Catalog\Model\Product $product)
+    {
+        $associates = [];
+
+        foreach ($product->getTypeInstance()->getUsedProducts($product) as $subproduct) {
+            $associates[] = $this->createItem($subproduct);
+        }
+
+        return $associates;
     }
 
     /**
@@ -121,6 +146,10 @@ class Product extends Component implements Fetcher
     {
         $item = $this->_generatorItemFactory->create();
         $item->setContext($product);
+
+        if ($product->getTypeId() == \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+            $item->setAssociates($this->fetchProductAssociates($product));
+        }
 
         return $item;
     }

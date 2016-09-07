@@ -10,6 +10,11 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
     protected $_context = null;
 
     /**
+     * @var \Doofinder\Feed\Model\Generator\Item[]
+     */
+    protected $_associates = [];
+
+    /**
      * Serialize item to an XML
      *
      * @param \Sabre\Xml\Writer
@@ -68,6 +73,38 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
     public function getContext()
     {
         return $this->_context;
+    }
+
+    /**
+     * Set item context
+     *
+     * @param \Doofinder\Feed\Model\Generator\Item[]
+     * @return Item
+     */
+    public function setAssociates(array $items)
+    {
+        $this->_associates = $items;
+        return $this;
+    }
+
+    /**
+     * Get item associates
+     *
+     * @return \Doofinder\Feed\Model\Generator\Item[]
+     */
+    public function getAssociates()
+    {
+        return $this->_associates;
+    }
+
+    /**
+     * Has item associates
+     *
+     * @return boolean
+     */
+    public function hasAssociates()
+    {
+        return !empty($this->_associates);
     }
 
     /**

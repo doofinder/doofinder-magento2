@@ -163,6 +163,41 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test fetch() method with configurable product
+     *
+     * @magentoDataFixture Magento/ConfigurableProduct/_files/product_configurable.php
+     */
+    public function testFetchConfigurable()
+    {
+        $items = $this->_model->fetch();
+
+        $this->assertEquals(3, count($items));
+        $this->assertEquals(
+            [
+                'configurable',
+                'simple_10',
+                'simple_20',
+            ],
+            array_map(function ($item) {
+                return $item->getContext()->getSku();
+            }, $items)
+        );
+
+        $this->assertEquals(
+            [
+                'simple_10',
+                'simple_20',
+            ],
+            array_map(function ($item) {
+                return $item->getContext()->getSku();
+            }, $items[0]->getAssociates())
+        );
+
+        $this->assertEquals(true, $this->_model->isStarted());
+        $this->assertEquals(true, $this->_model->isDone());
+    }
+
+    /**
      * Test getLastProcessedEntityId() method
      */
     public function testGetLastProcessedEntityId()
