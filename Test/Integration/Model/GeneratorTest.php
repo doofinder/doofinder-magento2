@@ -23,7 +23,7 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
                             'Product' => []
                         ],
                         'processors' => [
-                            'Mapper\Product' => [
+                            'Mapper' => [
                                 'map' => [
                                     'title' => 'name',
                                     'description' => 'short_description',

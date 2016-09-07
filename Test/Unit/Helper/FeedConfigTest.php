@@ -72,7 +72,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                     'processors' => [
-                        'Mapper\Product' => [
+                        'Mapper' => [
                             'map' => [
                                 'attr1' => 'value1',
                                 'attr2' => 'value2',
@@ -116,7 +116,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                     'processors' => [
-                        'Mapper\Product' => [
+                        'Mapper' => [
                             'map' => [
                                 'attr1' => 'value1',
                                 'attr2' => 'value2',

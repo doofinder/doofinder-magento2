@@ -20,6 +20,16 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     protected $_item;
 
     /**
+     * @var \Doofinder\Feed\Model\Generator\Map
+     */
+    protected $_map;
+
+    /**
+     * @var \Doofinder\Feed\Model\Generator\MapFactory
+     */
+    protected $_mapFactory;
+
+    /**
      * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
      */
     protected $_objectManagerHelper;
@@ -38,11 +48,6 @@ class MapperTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
-        $map = [
-            ['title', null, 'Sample title'],
-            ['description', null, 'Sample description'],
-        ];
-        $this->_product->method('getData')->will($this->returnValueMap($map));
 
         $this->_item = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Item',
@@ -53,9 +58,32 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         );
         $this->_item->method('getContext')->willReturn($this->_product);
 
+        $this->_map = $this->getMock(
+            '\Doofinder\Feed\Model\Generator\Map',
+            [],
+            [],
+            '',
+            false
+        );
+        $map = [
+            ['title', 'Sample title'],
+            ['description', 'Sample description'],
+        ];
+        $this->_map->method('get')->will($this->returnValueMap($map));
+
+        $this->_mapFactory = $this->getMock(
+            '\Doofinder\Feed\Model\Generator\MapFactory',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_mapFactory->method('create')->willReturn($this->_map);
+
         $this->_model = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Processor\Mapper',
             [
+                'mapFactory' => $this->_mapFactory,
                 'data' => [
                     'map' => [
                         'name' => 'title',

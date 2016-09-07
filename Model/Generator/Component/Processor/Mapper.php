@@ -18,6 +18,20 @@ class Mapper extends Component implements Processor
     protected $_context = null;
 
     /**
+     * @var \Doofinder\Feed\Model\Generator\MapFactory
+     */
+    protected $_mapFactory = null;
+
+    public function __construct(
+        \Doofinder\Feed\Model\Generator\MapFactory $mapFactory,
+        \Psr\Log\LoggerInterface $logger,
+        array $data = []
+    ) {
+        $this->_mapFactory = $mapFactory;
+        parent::__construct($logger, $data);
+    }
+
+    /**
      * Process items
      *
      * @param \Doofinder\Feed\Model\Generator\Item[]
@@ -60,6 +74,17 @@ class Mapper extends Component implements Processor
     protected function processDefinition(array $definition)
     {
         $field = $definition['field'];
-        return $this->_context->getData($field);
+        return $this->getMapInstance($this->_context)->get($field);
+    }
+
+    /**
+     * Get map instance
+     *
+     * @param \Magento\Framework\DataObject
+     * @return \Doofinder\Feed\Generator\Map
+     */
+    protected function getMapInstance(\Magento\Framework\DataObject $context)
+    {
+        return $this->_mapFactory->create($context, $this->getData());
     }
 }

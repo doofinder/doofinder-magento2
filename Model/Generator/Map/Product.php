@@ -1,49 +1,46 @@
 <?php
 
-namespace Doofinder\Feed\Model\Generator\Component\Processor\Mapper;
+namespace Doofinder\Feed\Model\Generator\Map;
 
-use \Doofinder\Feed\Model\Generator\Component\Processor\Mapper;
+use \Doofinder\Feed\Model\Generator\Map;
 
-class Product extends Mapper
+class Product extends Map
 {
+    /**
+     * @var \Magento\Catalog\Model\Product
+     */
+    protected $_context;
+
     /**
      * @var \Doofinder\Feed\Helper\Product
      */
     protected $_helper = null;
 
+    /**
+     * Class constructor
+     *
+     * @param \Doofinder\Feed\Helper\Product $helper
+     * @param \Magento\Catalog\Model\Product $context
+     * @param array $data = []
+     */
     public function __construct(
         \Doofinder\Feed\Helper\Product $helper,
-        \Psr\Log\LoggerInterface $logger,
+        \Magento\Catalog\Model\Product $context,
         array $data = []
     ) {
         $this->_helper = $helper;
-        parent::__construct($logger, $data);
+        parent::__construct($context, $data);
     }
 
     /**
-     * Process item
+     * Get value
      *
-     * @param \Doofinder\Feed\Model\Generator\Item
-     */
-    protected function processItem(\Doofinder\Feed\Model\Generator\Item $item)
-    {
-        if (!is_a($item->getContext(), '\Magento\Catalog\Model\Product')) {
-            $this->_logger->warning('Item context is not a product');
-            return;
-        }
-
-        parent::processItem($item);
-    }
-
-    /**
-     * Get mapped field value
-     *
-     * @param array
+     * @param string $field
      * @return mixed
      */
-    protected function processDefinition(array $definition)
+    public function get($field)
     {
-        switch ($definition['field']) {
+        switch ($field) {
             case 'df_id':
                 return $this->getProductId($this->_context);
 
@@ -54,7 +51,7 @@ class Product extends Mapper
                 return $this->getProductCategories($this->_context);
 
             case 'image':
-                return $this->getProductImage($this->_context);
+                return $this->getProductImage($this->_context, $this->getImageSize());
 
             case 'price':
                 return $this->getProductPrice($this->_context);
@@ -72,10 +69,10 @@ class Product extends Mapper
             case 'tax_class_id':
             case 'manufacturer':
             case 'weight_type':
-                return $this->getAttributeText($this->_context, $definition['field']);
+                return $this->getAttributeText($this->_context, $field);
         }
 
-        return parent::processDefinition($definition);
+        return parent::get($field);
     }
 
     /**
@@ -132,11 +129,12 @@ class Product extends Mapper
      * @todo Use store config
      *
      * @param \Magento\Catalog\Model\Product
+     * @param string
      * @return string|null
      */
-    protected function getProductImage(\Magento\Catalog\Model\Product $product)
+    protected function getProductImage(\Magento\Catalog\Model\Product $product, $imageSize)
     {
-        return $this->_helper->getProductImageUrl($product, $this->getImageSize());
+        return $this->_helper->getProductImageUrl($product, $imageSize);
     }
 
     /**
