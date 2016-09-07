@@ -18,7 +18,7 @@
             <feed_settings>
                 <export_product_prices>1</export_product_prices>
                 <image_size></image_size>
-                <split_grouped_products>0</split_grouped_products>
+                <split_configurable_products>0</split_configurable_products>
             </feed_settings>
             <feed_cron>
                 <enabled>1</enabled>

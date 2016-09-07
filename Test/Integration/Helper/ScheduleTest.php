@@ -88,7 +88,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 'step_size' => '1000',
                 'step_delay' => '5',
                 'image_size' => null,
-                'split_grouped_products' => '0',
+                'split_configurable_products' => '0',
                 'export_product_prices' => '1',
                 'attributes' => [
                     'id' => 'df_id',
