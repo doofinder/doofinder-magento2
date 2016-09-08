@@ -46,7 +46,11 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
             if (!$value) {
                 continue;
             } else if (is_array($value)) {
-                $value = $this->isAssocArray($value) ? $this->convertDataToXmlProperty($value) : implode(',', $value);
+                if ($this->isAssocArray($value)) {
+                    $value = $this->convertDataToXmlProperty($value);
+                } else {
+                    $value = implode(\Doofinder\Feed\Model\Generator::VALUE_SEPARATOR, $value);
+                }
             }
 
             $properties[] = [

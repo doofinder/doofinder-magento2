@@ -4,6 +4,10 @@ namespace Doofinder\Feed\Model;
 
 class Generator extends \Magento\Framework\DataObject
 {
+    const CATEGORY_SEPARATOR = '%%';
+    const CATEGORY_TREE_SEPARATOR = '>';
+    const VALUE_SEPARATOR = '/';
+
     /**
      * Gernerator fetcher factory
      *

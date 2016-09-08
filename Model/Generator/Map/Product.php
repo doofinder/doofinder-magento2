@@ -117,10 +117,10 @@ class Product extends Map
                 $names[] = $category->getName();
             }
 
-            $entries[] = implode(' > ', $names);
+            $entries[] = implode(\Doofinder\Feed\Model\Generator::CATEGORY_TREE_SEPARATOR, $names);
         }
 
-        return implode(' %% ', $entries);
+        return implode(\Doofinder\Feed\Model\Generator::CATEGORY_SEPARATOR, $entries);
     }
 
     /**

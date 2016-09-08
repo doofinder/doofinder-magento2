@@ -104,7 +104,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('Sample title', $this->_model->get('title'));
         $this->assertEquals('Sample description', $this->_model->get('description'));
-        $this->assertEquals('Category 1 > Category 1.1 %% Category 2', $this->_model->get('category_ids'));
+        $this->assertEquals('Category 1>Category 1.1%%Category 2', $this->_model->get('category_ids'));
         $this->assertEquals('http://example.com/path/to/image.jpg', $this->_model->get('image'));
         $this->assertEquals('http://example.com/simple-product.html', $this->_model->get('url_key'));
         $this->assertEquals('10.12', $this->_model->get('price'));
