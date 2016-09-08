@@ -15,6 +15,11 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     private $_category;
 
     /**
+     * @var \Doofinder\Feed\Model\Generator\Item
+     */
+    private $_item;
+
+    /**
      * @var \Magento\Catalog\Model\Product
      */
     private $_product;
@@ -88,11 +93,20 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         ];
         $this->_product->method('getData')->will($this->returnValueMap($map));
 
+        $this->_item = $this->getMock(
+            '\Doofinder\Feed\Model\Generator\Item',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_item->method('getContext')->willReturn($this->_product);
+
         $this->_model = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Model\Generator\Map\Product',
             [
                 'helper' => $this->_helper,
-                'context' => $this->_product,
+                'item' => $this->_item,
             ]
         );
     }

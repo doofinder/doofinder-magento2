@@ -32,13 +32,14 @@ class MapFactory
     /**
      * Create class instance with specified parameters
      *
-     * @param \Magento\Framework\DataObject $context
+     * @param \Doofinder\Feed\Model\Generator\Item $item
      * @param array $data
      * @return \Doofinder\Feed\Model\Generator\Map
      */
-    public function create(\Magento\Framework\DataObject $context, array $data = [])
+    public function create(\Doofinder\Feed\Model\Generator\Item $item, array $data = [])
     {
         $class = $this->_instanceName;
+        $context = $item->getContext();
 
         if (is_a($context, '\Magento\Catalog\Model\Product')) {
             $class .= '\\Product';
@@ -49,7 +50,7 @@ class MapFactory
         }
 
         return $this->_objectManager->create($class, [
-            'context' => $context,
+            'item' => $item,
             'data' => $data,
         ]);
     }

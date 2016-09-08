@@ -10,6 +10,11 @@ class MapTest extends \PHPUnit_Framework_TestCase
     protected $_model;
 
     /**
+     * @var \Doofinder\Feed\Model\Generator\Item
+     */
+    protected $_item;
+
+    /**
      * @var \Magento\Framework\DataObject
      */
     protected $_context;
@@ -39,10 +44,19 @@ class MapTest extends \PHPUnit_Framework_TestCase
         ];
         $this->_context->method('getData')->will($this->returnValueMap($map));
 
+        $this->_item = $this->getMock(
+            '\Doofinder\Feed\Model\Generator\Item',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_item->method('getContext')->willReturn($this->_context);
+
         $this->_model = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Model\Generator\Map',
             [
-                'context' => $this->_context,
+                'item' => $this->_item,
             ]
         );
     }

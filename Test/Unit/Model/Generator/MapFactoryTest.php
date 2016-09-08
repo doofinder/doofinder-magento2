@@ -60,10 +60,19 @@ class MapFactoryTest extends \PHPUnit_Framework_TestCase
         );
         $context->method('getTypeId')->willReturn($type);
 
-        $this->_objectManager->expects($this->once())->method('create')
-            ->with($expected, ['context' => $context, 'data' => ['sample' => 'data']]);
+        $item = $this->getMock(
+            '\Doofinder\Feed\Model\Generator\Item',
+            [],
+            [],
+            '',
+            false
+        );
+        $item->method('getContext')->willReturn($context);
 
-        $this->_model->create($context, ['sample' => 'data']);
+        $this->_objectManager->expects($this->once())->method('create')
+            ->with($expected, ['item' => $item, 'data' => ['sample' => 'data']]);
+
+        $this->_model->create($item, ['sample' => 'data']);
     }
 
     public function testCreateProvider()

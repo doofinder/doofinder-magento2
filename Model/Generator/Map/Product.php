@@ -7,11 +7,6 @@ use \Doofinder\Feed\Model\Generator\Map;
 class Product extends Map
 {
     /**
-     * @var \Magento\Catalog\Model\Product
-     */
-    protected $_context;
-
-    /**
      * @var \Doofinder\Feed\Helper\Product
      */
     protected $_helper = null;
@@ -20,16 +15,23 @@ class Product extends Map
      * Class constructor
      *
      * @param \Doofinder\Feed\Helper\Product $helper
-     * @param \Magento\Catalog\Model\Product $context
+     * @param \Doofinder\Feed\Model\Generator\Item $item
      * @param array $data = []
      */
     public function __construct(
         \Doofinder\Feed\Helper\Product $helper,
-        \Magento\Catalog\Model\Product $context,
+        \Doofinder\Feed\Model\Generator\Item $item,
         array $data = []
     ) {
         $this->_helper = $helper;
-        parent::__construct($context, $data);
+
+        if (!is_a($item->getContext(), '\Magento\Catalog\Model\Product')) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Item context is not a product')
+            );
+        }
+
+        parent::__construct($item, $data);
     }
 
     /**

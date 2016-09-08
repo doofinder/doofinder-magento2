@@ -5,6 +5,11 @@ namespace Doofinder\Feed\Model\Generator;
 class Map extends \Magento\Framework\DataObject
 {
     /**
+     * @var \Doofinder\Feed\Model\Generator\Item
+     */
+    protected $_item;
+
+    /**
      * @var \Magento\Framework\DataObject
      */
     protected $_context;
@@ -12,14 +17,15 @@ class Map extends \Magento\Framework\DataObject
     /**
      * Class constructor
      *
-     * @param \Magento\Catalog\Model\Product $context
+     * @param \Doofinder\Feed\Model\Generator\Item $context
      * @param array $data = []
      */
     public function __construct(
-        \Magento\Framework\DataObject $context,
+        \Doofinder\Feed\Model\Generator\Item $item,
         array $data = []
     ) {
-        $this->_context = $context;
+        $this->_item = $item;
+        $this->_context = $this->_item->getContext();
         parent::__construct($data);
     }
 

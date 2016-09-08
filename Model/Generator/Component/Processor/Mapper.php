@@ -57,7 +57,7 @@ class Mapper extends Component implements Processor
     {
         $this->_item = $item;
         $this->_context = $this->_item->getContext();
-        $this->_map = $this->getMapInstance($this->_context);
+        $this->_map = $this->getMapInstance($this->_item);
 
         // Before
         $this->_map->before();
@@ -92,11 +92,11 @@ class Mapper extends Component implements Processor
     /**
      * Get map instance
      *
-     * @param \Magento\Framework\DataObject
-     * @return \Doofinder\Feed\Generator\Map
+     * @param \Doofinder\Feed\Model\Generator\Item
+     * @return \Doofinder\Feed\Model\Generator\Map
      */
-    protected function getMapInstance(\Magento\Framework\DataObject $context)
+    protected function getMapInstance(\Doofinder\Feed\Model\Generator\Item $item)
     {
-        return $this->_mapFactory->create($context, $this->getData());
+        return $this->_mapFactory->create($item, $this->getData());
     }
 }
