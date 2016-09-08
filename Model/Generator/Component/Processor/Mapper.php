@@ -18,6 +18,11 @@ class Mapper extends Component implements Processor
     protected $_context = null;
 
     /**
+     * @var \Doofinder\Feed\Model\Generator\Map
+     */
+    protected $_map = null;
+
+    /**
      * @var \Doofinder\Feed\Model\Generator\MapFactory
      */
     protected $_mapFactory = null;
@@ -52,6 +57,10 @@ class Mapper extends Component implements Processor
     {
         $this->_item = $item;
         $this->_context = $this->_item->getContext();
+        $this->_map = $this->getMapInstance($this->_context);
+
+        // Before
+        $this->_map->before();
 
         // Set mapped fields on item
         foreach ((array) $this->getMap() as $field => $definition) {
@@ -63,6 +72,9 @@ class Mapper extends Component implements Processor
 
             $item->setData($field, $this->processDefinition($definition));
         }
+
+        // After
+        $this->_map->after();
     }
 
     /**
@@ -74,7 +86,7 @@ class Mapper extends Component implements Processor
     protected function processDefinition(array $definition)
     {
         $field = $definition['field'];
-        return $this->getMapInstance($this->_context)->get($field);
+        return $this->_map->get($field);
     }
 
     /**

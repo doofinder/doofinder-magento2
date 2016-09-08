@@ -33,4 +33,18 @@ class Map extends \Magento\Framework\DataObject
     {
         return $this->_context->getData($field);
     }
+
+    /**
+     * Before map
+     */
+    public function before()
+    {
+    }
+
+    /**
+     * After map
+     */
+    public function after()
+    {
+    }
 }

@@ -70,6 +70,8 @@ class MapperTest extends \PHPUnit_Framework_TestCase
             ['description', 'Sample description'],
         ];
         $this->_map->method('get')->will($this->returnValueMap($map));
+        $this->_map->expects($this->once())->method('before');
+        $this->_map->expects($this->once())->method('after');
 
         $this->_mapFactory = $this->getMock(
             '\Doofinder\Feed\Model\Generator\MapFactory',
