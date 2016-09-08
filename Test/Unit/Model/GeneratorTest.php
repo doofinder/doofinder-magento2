@@ -43,6 +43,11 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
     private $_processorFactory;
 
     /**
+     * @var \Magento\Catalog\Model\Product
+     */
+    private $_product;
+
+    /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
     private $_item;
@@ -88,6 +93,14 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
         );
         $this->_xmlService->method('getWriter')->willReturn($this->_xmlWriter);
 
+        $this->_product = $this->getMock(
+            '\Magento\Catalog\Model\Product',
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->_item = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Item',
             [],
@@ -100,6 +113,10 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
                 'name' => 'Sample product name',
                 'description' => 'Sample product description'
             ]);
+        $this->_item->method('getContext')->willReturn($this->_product);
+        $this->_item->method('isSkip')->will($this->onConsecutiveCalls(
+            false, true, false, false, false, true
+        ));
 
         $this->_fetcher = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Component\Fetcher',
@@ -109,7 +126,7 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
             false
         );
         $this->_fetcher->method('fetch')
-            ->willReturn([$this->_item]);
+            ->willReturn([$this->_item, $this->_item]);
 
         $this->_fetcherFactory = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Component\FetcherFactory',
@@ -121,18 +138,30 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
         $this->_fetcherFactory->method('create')
             ->willReturn($this->_fetcher);
 
-        $this->_mapperProcessor = $helper->getObject(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Mapper'
+        $this->_mapperProcessor = $this->getMock(
+            '\Doofinder\Feed\Model\Generator\Component\Processor\Mapper',
+            [],
+            [],
+            '',
+            false
         );
-        $this->_cleanerProcessor = $helper->getObject(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Cleaner'
+        $this->_mapperProcessor->expects($this->once())->method('process')->with([$this->_item]);
+        $this->_cleanerProcessor = $this->getMock(
+            '\Doofinder\Feed\Model\Generator\Component\Processor\Cleaner',
+            [],
+            [],
+            '',
+            false
         );
-        $this->_xmlProcessor = $helper->getObject(
+        $this->_cleanerProcessor->expects($this->once())->method('process')->with([$this->_item, $this->_item]);
+        $this->_xmlProcessor = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
-            [
-                'xmlService' => $this->_xmlService,
-            ]
+            [],
+            [],
+            '',
+            false
         );
+        $this->_xmlProcessor->expects($this->once())->method('process')->with([$this->_item]);
 
         $this->_processorFactory = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Component\ProcessorFactory',

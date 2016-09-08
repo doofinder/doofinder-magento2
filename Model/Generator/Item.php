@@ -15,6 +15,11 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
     protected $_associates = [];
 
     /**
+     * @var boolean
+     */
+    protected $_skip = false;
+
+    /**
      * Serialize item to an XML
      *
      * @param \Sabre\Xml\Writer
@@ -105,6 +110,27 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
     public function hasAssociates()
     {
         return !empty($this->_associates);
+    }
+
+    /**
+     * Skip item
+     *
+     * @return \Doofinder\Feed\Model\Generator\Item
+     */
+    public function skip()
+    {
+        $this->_skip = true;
+        return $this;
+    }
+
+    /**
+     * Check if item should be skipped
+     *
+     * @return boolean
+     */
+    public function isSkip()
+    {
+        return $this->_skip;
     }
 
     /**

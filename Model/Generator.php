@@ -128,7 +128,15 @@ class Generator extends \Magento\Framework\DataObject
     protected function processItems()
     {
         foreach ($this->_processors as $processor) {
-            $processor->process($this->_items);
+            /**
+             * Run processor only on not skipped items
+             * @notice Compatible with PHP5.3+
+             */
+            $items = array_filter($this->_items, function ($item) {
+                return !$item->isSkip();
+            });
+
+            $processor->process($items);
         }
 
         // Dispatch event doofinder_feed_generator_items_processed
