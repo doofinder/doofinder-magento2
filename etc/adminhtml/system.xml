@@ -144,7 +144,7 @@
                 showInWebsite="1"
                 showInStore="1">
                 <label>Feed Settings</label>
-                <field id="export_proudct_prices"
+                <field id="export_product_prices"
                     translate="label"
                     type="select"
                     sortOrder="2"
