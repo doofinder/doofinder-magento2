@@ -29,7 +29,8 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
                                     'description' => 'short_description',
                                     'price' => 'price',
                                     'mpn' => 'sku',
-                                ]
+                                ],
+                                'export_product_prices' => 1,
                             ],
                             'Cleaner' => [],
                             'Xml' => []

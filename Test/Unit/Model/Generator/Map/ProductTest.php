@@ -109,6 +109,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
                 'item' => $this->_item,
             ]
         );
+        $this->_model->setExportProductPrices(true);
     }
 
     /**
@@ -122,6 +123,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://example.com/path/to/image.jpg', $this->_model->get('image'));
         $this->assertEquals('http://example.com/simple-product.html', $this->_model->get('url_key'));
         $this->assertEquals('10.12', $this->_model->get('price'));
+        $this->assertEquals(null, $this->_model->setExportProductPrices(false)->get('price'));
         $this->assertEquals('IN STOCK', $this->_model->get('availability'));
         $this->assertEquals('USD', $this->_model->get('currency'));
         $this->assertEquals('blue', $this->_model->get('color'));

@@ -56,6 +56,10 @@ class Product extends Map
                 return $this->getProductImage($this->_context, $this->getImageSize());
 
             case 'price':
+                if (!$this->getExportProductPrices()) {
+                    return null;
+                }
+
                 return $this->getProductPrice($this->_context);
 
             case 'availability':
@@ -142,7 +146,7 @@ class Product extends Map
     /**
      * Get product price
      *
-     * @todo Include minimal_price, split_configurable_products and export_product_prices params
+     * @todo Include minimal_price
      *
      * @param \Magento\Catalog\Model\Product
      * @return string|null
