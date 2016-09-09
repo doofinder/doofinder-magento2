@@ -72,4 +72,15 @@ abstract class Base extends \Magento\Framework\App\Action\Action
     {
         return is_numeric($param = $this->getRequest()->getParam($paramName)) ? (int) $param : null;
     }
+
+    /**
+     * Get boolean param.
+     *
+     * @param $paramName
+     * @return boolean|null
+     */
+    protected function getParamBoolean($paramName)
+    {
+        return is_null($param = $this->getRequest()->getParam($paramName)) ? null : (boolean) $param;
+    }
 }

@@ -102,7 +102,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
         $customParams = [
             'offset' => 1,
             'store' => 1,
-            'minimal_price' => 20,
+            'minimal_price' => 0,
             'limit' => 10
         ];
 
@@ -121,7 +121,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                                 'attr1' => 'value1',
                                 'attr2' => 'value2',
                             ],
-                            'minimal_price' => 20,
+                            'minimal_price' => 0,
                             'split_configurable_products' => 1,
                             'export_product_prices' => 0,
                             'image_size' => 'small',

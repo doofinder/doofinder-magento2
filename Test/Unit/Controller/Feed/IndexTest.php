@@ -179,13 +179,13 @@ class IndexTest extends \PHPUnit_Framework_TestCase
     {
         $this->_requestMock->expects($this->any())
             ->method('getParam')
-            ->will($this->onConsecutiveCalls('default', 10, '20', 1));
+            ->will($this->onConsecutiveCalls('default', 0, '20', 1));
 
         $this->_feedConfigMock->expects($this->once())
             ->method('getFeedConfig')
             ->with('default', [
                 'limit' => 1,
-                'minimal_price' => 10,
+                'minimal_price' => 0,
                 'offset' => 20,
             ])
             ->willReturnSelf();
