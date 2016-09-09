@@ -356,7 +356,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $storeCode
      * @return string
      */
-    protected function getFeedFilename($storeCode)
+    public function getFeedFilename($storeCode)
     {
         return 'doofinder-' . $storeCode . '.xml';
     }
@@ -397,6 +397,37 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return false;
+    }
+
+    /**
+     * Check if feed file exists.
+     *
+     * @param string $storeCode
+     * @return boolean
+     */
+    public function isFeedFileExist($storeCode)
+    {
+        $filename = $this->getFeedFilename($storeCode);
+        $directory = $this->_filesystem->getDirectoryRead(
+            \Magento\Framework\App\Filesystem\DirectoryList::MEDIA
+        );
+
+        return $directory->isExist($filename);
+    }
+
+    /**
+     * Get feed file url.
+     *
+     * @param string $storeCode
+     * @return string
+     */
+    public function getFeedFileUrl($storeCode)
+    {
+        $filename = $this->getFeedFilename($storeCode);
+        $baseUrl = $this->_storeManager->getStore($storeCode)->getBaseUrl(
+            \Magento\Framework\UrlInterface::URL_TYPE_MEDIA
+        );
+        return $baseUrl . '/' . $filename;
     }
 
     /**

@@ -57,6 +57,16 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      */
     protected $_timezone;
 
+    /**
+     * @var \Magento\Store\Model\Store
+     */
+    protected $_store;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $_storeManager;
+
     public function setUp()
     {
         $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
@@ -138,12 +148,32 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         );
         $this->_timezone->method('getConfigTimezone')->willReturn('America/Los_Angeles');
 
+        $this->_store = $this->getMock(
+            'Magento\Store\Model\Store',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_store->method('getBaseUrl')->with(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
+            ->willReturn('http://example.com/media');
+
+        $this->_storeManager = $this->getMock(
+            '\Magento\Store\Model\StoreManagerInterface',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_storeManager->method('getStore')->with('default')->willReturn($this->_store);
+
         $this->_helper = $this->_objectManager->getObject(
             '\Doofinder\Feed\Helper\Schedule',
             [
                 'filesystem' => $this->_filesystem,
                 'generatorFactory' => $this->_generatorFactory,
                 'timezone' => $this->_timezone,
+                'storeManager' => $this->_storeManager,
             ]
         );
     }
@@ -225,5 +255,40 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->_process->expects($this->once())->method('save');
 
         $this->_helper->runProcess($this->_process);
+    }
+
+    /**
+     * Test isFeedFileExist() method
+     *
+     * @dataProvider testIsFeedFileExistProvider
+     */
+    public function testIsFeedFileExist($expected)
+    {
+        $this->_directory->expects($this->once())->method('isExist')
+            ->with('doofinder-default.xml')->willReturn($expected);
+
+        $this->assertEquals(
+            $expected,
+            $this->_helper->isFeedFileExist('default')
+        );
+    }
+
+    public function testIsFeedFileExistProvider()
+    {
+        return [
+            [true],
+            [false],
+        ];
+    }
+
+    /**
+     * Test getFeedFileUrl() method
+     */
+    public function testGetFeedFileUrl()
+    {
+        $this->assertEquals(
+            'http://example.com/media/doofinder-default.xml',
+            $this->_helper->getFeedFileUrl('default')
+        );
     }
 }
