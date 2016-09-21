@@ -117,7 +117,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getProductPrice(\Magento\Catalog\Model\Product $product)
     {
-        return round($product->getPrice(), 2);
+        return round($product->getPriceInfo()->getPrice('final_price')->getAmount()->getValue(), 2);
     }
 
     /**
