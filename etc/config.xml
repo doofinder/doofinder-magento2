@@ -9,7 +9,7 @@
                 <description>short_description</description>
                 <brand>manufacturer</brand>
                 <link>url_key</link>
-                <image_link>image_link</image_link>
+                <image_link>image</image_link>
                 <price>price</price>
                 <mpn>sku</mpn>
                 <availability>availability</availability>

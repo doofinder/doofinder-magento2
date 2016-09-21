@@ -96,7 +96,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                     'description' => 'short_description',
                     'brand' => 'manufacturer',
                     'link' => 'url_key',
-                    'image_link' => 'image_link',
+                    'image_link' => 'image',
                     'price' => 'price',
                     'mpn' => 'sku',
                     'availability' => 'availability',
