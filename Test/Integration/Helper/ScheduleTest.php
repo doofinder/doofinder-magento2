@@ -100,7 +100,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                     'price' => 'price',
                     'mpn' => 'sku',
                     'availability' => 'df_availability',
-                    'currency' => 'currency',
+                    'currency' => 'df_currency',
                 ],
             ],
             $this->_helper->getStoreConfig()

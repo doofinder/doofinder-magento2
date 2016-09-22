@@ -125,7 +125,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('10.12', $this->_model->get('price'));
         $this->assertEquals(null, $this->_model->setExportProductPrices(false)->get('price'));
         $this->assertEquals('in stock', $this->_model->get('df_availability'));
-        $this->assertEquals('USD', $this->_model->get('currency'));
+        $this->assertEquals('USD', $this->_model->get('df_currency'));
         $this->assertEquals('blue', $this->_model->get('color'));
         $this->assertEquals('Taxable', $this->_model->get('tax_class_id'));
         $this->assertEquals('Company', $this->_model->get('manufacturer'));
