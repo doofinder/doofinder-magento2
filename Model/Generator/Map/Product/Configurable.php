@@ -74,13 +74,18 @@ class Configurable extends Product
             $associatesValues = $this->getAssociatesValues($field);
 
             if (is_array($value)) {
-                $value = array_unique(array_merge($value, $associatesValues));
+                $value = array_merge($value, $associatesValues);
             } else {
-                $value = array_unique(array_merge([$value], $associatesValues));
+                $value = array_merge([$value], $associatesValues);
 
                 if (count($value) == 1) {
                     $value = $value[0];
                 }
+            }
+
+            // Clean up
+            if (is_array($value)) {
+                $value = array_values(array_unique($value));
             }
         }
 
