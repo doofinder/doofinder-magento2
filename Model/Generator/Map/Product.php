@@ -62,7 +62,7 @@ class Product extends Map
 
                 return $this->getProductPrice($this->_context);
 
-            case 'availability':
+            case 'df_availability':
                 return $this->getProductAvailability($this->_context);
 
             case 'currency':

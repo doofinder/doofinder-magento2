@@ -75,10 +75,10 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         ]);
         $this->_helper->method('getProductImageUrl')->willReturn('http://example.com/path/to/image.jpg');
         $this->_helper->method('getProductPrice')->willReturn(10.1234);
-        $this->_helper->method('getProductAvailability')->willReturn('IN STOCK');
+        $this->_helper->method('getProductAvailability')->willReturn('in stock');
         $this->_helper->method('getCurrencyCode')->willReturn('USD');
         $this->_helper->method('getAttributeText')->will($this->onConsecutiveCalls('blue', 'Taxable', 'Company'));
-        $this->_helper->method('getQuantityAndStockStatus')->willReturn('5 - In stock');
+        $this->_helper->method('getQuantityAndStockStatus')->willReturn('5 - in stock');
 
         $this->_product = $this->getMock(
             '\Magento\Catalog\Model\Product',
@@ -124,11 +124,11 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://example.com/simple-product.html', $this->_model->get('url_key'));
         $this->assertEquals('10.12', $this->_model->get('price'));
         $this->assertEquals(null, $this->_model->setExportProductPrices(false)->get('price'));
-        $this->assertEquals('IN STOCK', $this->_model->get('availability'));
+        $this->assertEquals('in stock', $this->_model->get('df_availability'));
         $this->assertEquals('USD', $this->_model->get('currency'));
         $this->assertEquals('blue', $this->_model->get('color'));
         $this->assertEquals('Taxable', $this->_model->get('tax_class_id'));
         $this->assertEquals('Company', $this->_model->get('manufacturer'));
-        $this->assertEquals('5 - In stock', $this->_model->get('quantity_and_stock_status'));
+        $this->assertEquals('5 - in stock', $this->_model->get('quantity_and_stock_status'));
     }
 }

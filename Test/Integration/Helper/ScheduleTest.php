@@ -99,7 +99,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                     'image_link' => 'image',
                     'price' => 'price',
                     'mpn' => 'sku',
-                    'availability' => 'availability',
+                    'availability' => 'df_availability',
                     'currency' => 'currency',
                 ],
             ],

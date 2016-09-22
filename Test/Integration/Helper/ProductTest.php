@@ -148,18 +148,18 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             $this->_helper->getProductPrice($product)
         );
     }
+
     /**
      * Test getProductAvailability
      *
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
-     * @magentoAppIsolation enabled
      */
     public function testGetProductAvailability()
     {
         $product = $this->_productRepository->get('simple');
 
         $this->assertEquals(
-            'IN STOCK',
+            'in stock',
             $this->_helper->getProductAvailability($product)
         );
     }

@@ -13,24 +13,28 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Catalog\Helper\Image
      */
     protected $_imageHelper = null;
-    protected $_stockItemRepository;
 
     /**
-     * \Magento\Store\Model\StoreManagerInterface
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $_storeManager;
+
+    /**
+     * @var \Magento\CatalogInventory\Api\StockRegistryInterface
+     */
+    protected $_stockRegistry;
 
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory,
         \Magento\Catalog\Helper\Image $imageHelper,
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
     ) {
         $this->_categoryCollectionFactory = $categoryCollectionFactory;
         $this->_imageHelper = $imageHelper;
-        $this->_stockItemRepository = $stockItemRepository;
         $this->_storeManager = $storeManager;
+        $this->_stockRegistry = $stockRegistry;
         parent::__construct($context);
     }
 
@@ -126,11 +130,11 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getProductAvailability(\Magento\Catalog\Model\Product $product)
     {
-        if ($product->isInStock()) {
-            return 'IN STOCK';
+        if ($this->_getStockItem($product->getId())->getIsInStock()) {
+            return 'in stock';
         }
 
-        return 'OUT OF STOCK';
+        return 'out of stock';
     }
 
     /**
@@ -159,20 +163,20 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getQuantityAndStockStatus(\Magento\Catalog\Model\Product $product)
     {
-        $productId = $product->getId();
+        $qty = $this->_getStockItem($product->getId())->getQty();
+        $availability = $this->getProductAvailability($product);
 
-        $qty = $this->_getStockItem($productId)->getQty();
-        $inStock = $this->_getStockItem($productId)->getIsInStock() ? 'In Stock' : 'Out of stock';
-
-        return $qty . ' - ' . $inStock;
+        return implode(' - ', array_filter([$qty, $availability], function ($item) {
+            return $item !== null;
+        }));
     }
 
     /**
-     * @param $productId
+     * @param int $productId
      * @return mixed
      */
     protected function _getStockItem($productId)
     {
-        return $this->_stockItemRepository->get($productId);
+        return $this->_stockRegistry->getStockItem($productId);
     }
 }
