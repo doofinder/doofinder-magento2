@@ -93,31 +93,6 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get current store or all active stores.
-     *
-     * @return string[]
-     */
-    public function getStores()
-    {
-        $currentStore = $this->_storeConfig->getStoreCode();
-
-        $storeCodes = [];
-        if ($currentStore) {
-            $storeCodes[] = $currentStore;
-        } else {
-            $stores = $this->_storeManager->getStores();
-
-            foreach ($stores as $store) {
-                if ($store->getIsActive()) {
-                    $storeCodes[] = $store->getCode();
-                }
-            }
-        }
-
-        return $storeCodes;
-    }
-
-    /**
      * Get store config.
      *
      * @notice This should not change current store
@@ -192,7 +167,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function regenerateSchedule($reset = false, $now = false, $force = false)
     {
-        foreach ($this->getStores() as $storeCode) {
+        foreach ($this->_storeConfig->getStoreCodes() as $storeCode) {
             $store = $this->_storeManager->getStore($storeCode);
             $this->updateProcess($store, $reset, $now, $force);
         }

@@ -46,26 +46,6 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * Test for getStores() method.
-     *
-     * @dataProvider testGetStoreProvider
-     * @magentoDataFixture Magento/Store/_files/store.php
-     * @magentoAppIsolation enabled
-     */
-    public function testGetStores($store, $expected)
-    {
-        $storeManager = $this->_objectManager->get(
-            '\Magento\Store\Model\StoreManagerInterface'
-        );
-
-        $storeManager->setCurrentStore($store);
-        $stores = $this->_helper->getStores();
-        //$storeManager->setCurrentStore('default');
-
-        $this->assertEquals($expected, $stores);
-    }
-
     public function testGetStoreProvider()
     {
         return [

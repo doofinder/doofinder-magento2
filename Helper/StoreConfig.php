@@ -25,6 +25,11 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const FEED_SETTINGS_CONFIG = 'doofinder_feed_feed/feed_settings';
 
     /**
+     * Path to internal search settings in config.xml/core_config_data
+     */
+    const INTERNAL_SEARCH_CONFIG = 'doofinder_feed_search/doofinder_internal_search';
+
+    /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
@@ -93,6 +98,30 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getStoreCode()
     {
         return $this->_storeManager->getStore()->getCode();
+    }
+
+    /**
+     * Get store/stores in current context
+     *
+     * @return string[]
+     */
+    public function getStoreCodes()
+    {
+        $currentStoreCode = $this->getStoreCode();
+
+        if ($currentStoreCode == 'admin') {
+            $stores = $this->_storeManager->getStores();
+
+            foreach ($stores as $store) {
+                if ($store->getIsActive()) {
+                    $storeCodes[] = $store->getCode();
+                }
+            }
+        } else {
+            return [$currentStoreCode];
+        }
+
+        return $storeCodes;
     }
 
     /**
