@@ -43,6 +43,26 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get feed minimal config.
+     *
+     * @param string $storeCode
+     * @return array
+     */
+    public function getLeanFeedConfig($storeCode = null)
+    {
+        $this->_config = $this->_storeConfig->getStoreConfig($storeCode);
+
+        return [
+            'data' => [
+                'config' => [
+                    'fetchers' => [],
+                    'processors' => $this->getProcessors(),
+                ],
+            ],
+        ];
+    }
+
+    /**
      * Get feed attribute config.
      *
      * @param string $storeCode
@@ -66,16 +86,15 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function setFeedConfig($storeCode)
     {
-        $this->_config = $this->_storeConfig->getStoreConfig($storeCode);
+        $config = $this->getLeanFeedConfig($storeCode);
 
-        $this->_feedConfig[$storeCode] = [
-            'data' => [
-                'config' => [
-                    'fetchers' => $this->getFetchers(),
-                    'processors' => $this->getProcessors()
-                ]
-            ]
-        ];
+        // Add basic product fetcher
+        $config['data']['config']['fetchers'] = $this->getFetchers();
+
+        // Add basic xml processor
+        $config['data']['config']['processors']['Xml'] = [];
+
+        $this->_feedConfig[$storeCode] = $config;
     }
 
     /**
@@ -103,7 +122,6 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
         return [
             'Mapper' => $this->getMapper(),
             'Cleaner' => [],
-            'Xml' => []
         ];
     }
 

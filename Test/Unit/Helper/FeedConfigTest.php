@@ -58,6 +58,37 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test get lean feed config.
+     */
+    public function testGetLeanFeedConfig()
+    {
+        $expected = [
+            'data' => [
+                'config' => [
+                    'fetchers' => [],
+                    'processors' => [
+                        'Mapper' => [
+                            'map' => [
+                                'attr1' => 'value1',
+                                'attr2' => 'value2',
+                            ],
+                            'minimal_price' => null,
+                            'split_configurable_products' => 1,
+                            'export_product_prices' => 0,
+                            'image_size' => 'small',
+                        ],
+                        'Cleaner' => [],
+                    ],
+                ],
+            ],
+        ];
+
+        $result = $this->_helper->getLeanFeedConfig();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * Test get feed config.
      */
     public function testGetFeedConfig()
