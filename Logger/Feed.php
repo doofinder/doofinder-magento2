@@ -55,4 +55,9 @@ class Feed extends \Monolog\Logger
             parent::addRecord($level, $message, $context);
         }
     }
+
+    public function getLevelOptions()
+    {
+        return static::getLevels();
+    }
 }
