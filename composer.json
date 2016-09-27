@@ -12,7 +12,10 @@
         "AFL-3.0"
     ],
     "autoload": {
-        "files": [ "registration.php" ],
+        "files": [
+            "registration.php",
+            "lib/Doofinder/doofinder_management_api.php"
+        ],
         "psr-4": {
             "Doofinder\\Feed\\": "",
             "Magento\\Framework\\": "/var/www/html/lib/internal/Magento/Framework/",
