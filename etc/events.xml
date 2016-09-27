@@ -5,4 +5,7 @@
     <event name="admin_system_config_changed_section_doofinder_feed_feed">
         <observer name="doofinder_feed_update_schedule" instance="Doofinder\Feed\Observer\Schedule" />
     </event>
+    <event name="catalog_product_save_after">
+        <observer name="doofinder_feed_product_atomic_update" instance="Doofinder\Feed\Observer\ProductAtomicUpdate" />
+    </event>
 </config>

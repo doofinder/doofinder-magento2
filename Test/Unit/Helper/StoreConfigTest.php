@@ -234,4 +234,31 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($expected, $this->_helper->getHashId($storeCode));
     }
+
+    /**
+     * Test isAtomicUpdatesEnabled() method.
+     *
+     * @dataProvider testIsAtomicUpdatesEnabledProvider
+     */
+    public function testIsAtomicUpdatesEnabled($engine, $atomic, $expected)
+    {
+        $storeCode = 'sample';
+
+        $this->_scopeConfigMock->method('getValue')->will($this->returnValueMap([
+            ['doofinder_feed_search/doofinder_internal_search/enable', 'store', $storeCode, $engine],
+            ['doofinder_feed_feed/feed_settings/atomic_updates_enabled', 'store', $storeCode, $atomic],
+        ]));
+
+        $this->assertEquals($expected, $this->_helper->isAtomicUpdatesEnabled($storeCode));
+    }
+
+    public function testIsAtomicUpdatesEnabledProvider()
+    {
+        return [
+            [true, true, true],
+            [false, false, false],
+            [true, false, false],
+            [false, true, false],
+        ];
+    }
 }

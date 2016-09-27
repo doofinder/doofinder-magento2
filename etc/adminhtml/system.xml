@@ -181,6 +181,19 @@
                         <![CDATA[Export product image with given width. Leave empty to use original size.]]>
                     </comment>
                 </field>
+                <field id="atomic_updates_enabled"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="0"
+                    showInStore="1">
+                    <label>Use Doofinder API to update products on save</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Requires a Management API key configured in Search Configuration.]]>
+                    </comment>
+                </field>
             </group>
             <group id="feed_cron"
                    translate="label"

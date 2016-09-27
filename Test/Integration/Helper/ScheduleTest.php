@@ -46,14 +46,6 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetStoreProvider()
-    {
-        return [
-            ['default', ['default']],
-            ['test', ['test']],
-        ];
-    }
-
     /**
      * Test for getStoreConfig() method.
      */
@@ -82,6 +74,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                     'availability' => 'df_availability',
                     'currency' => 'df_currency',
                 ],
+                'atomic_updates_enabled' => 0,
             ],
             $this->_helper->getStoreConfig()
         );

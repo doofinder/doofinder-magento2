@@ -27,9 +27,9 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test for getStores() method.
+     * Test for getStoreCodes() method.
      *
-     * @dataProvider testGetStoreProvider
+     * @dataProvider testGetStoreCodesProvider
      * @magentoDataFixture Magento/Store/_files/store.php
      * @magentoAppIsolation enabled
      */
@@ -40,9 +40,17 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
         );
 
         $storeManager->setCurrentStore($store);
-        $stores = $this->_helper->getStores();
+        $stores = $this->_helper->getStoreCodes();
         //$storeManager->setCurrentStore('default');
 
         $this->assertEquals($expected, $stores);
+    }
+
+    public function testGetStoreCodesProvider()
+    {
+        return [
+            ['default', ['default']],
+            ['test', ['test']],
+        ];
     }
 }

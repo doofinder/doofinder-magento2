@@ -19,6 +19,7 @@
                 <export_product_prices>1</export_product_prices>
                 <image_size></image_size>
                 <split_configurable_products>0</split_configurable_products>
+                <atomic_updates_enabled>0</atomic_updates_enabled>
             </feed_settings>
             <feed_cron>
                 <enabled>1</enabled>

@@ -160,4 +160,27 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             $storeCode
         );
     }
+
+    /**
+     * Check if atomic updates are enabled.
+     *
+     * @param string $storeCode
+     * @return boolean
+     */
+    public function isAtomicUpdatesEnabled($storeCode = null)
+    {
+        $engineEnabled = $this->_scopeConfig->getValue(
+            self::INTERNAL_SEARCH_CONFIG . '/enable',
+            $this->getScopeStore(),
+            $storeCode
+        );
+
+        $atomicUpdatesEnabled = $this->_scopeConfig->getValue(
+            self::FEED_SETTINGS_CONFIG . '/atomic_updates_enabled',
+            $this->getScopeStore(),
+            $storeCode
+        );
+
+        return $engineEnabled && $atomicUpdatesEnabled;
+    }
 }
