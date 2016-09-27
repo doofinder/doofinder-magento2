@@ -54,18 +54,39 @@ class Product extends Component implements Fetcher
     }
 
     /**
+     * Fetch products using collection
+     *
+     * @return \Magento\Catalog\Model\Product[]
+     */
+    protected function fetchProducts()
+    {
+        $collection = $this->getProductCollection($this->getLimit(), $this->getOffset());
+        $collection->load();
+
+        // Check if fetcher is started and done
+        $this->_isStarted = !$this->getOffset();
+        $this->_isDone = !$this->getLimit() || $this->getLimit() >= $collection->getSize();
+
+        // Set the last processed entity id
+        $this->_lastProcessedEntityId = $this->getOffset();
+        if ($collection->getSize()) {
+            $this->_lastProcessedEntityId = $collection->getLastItem()->getEntityId();
+        }
+
+        // Set fetched size
+        $this->_itemsLeftCount = $this->getLimit() ? max(0, $collection->getSize() - $this->getLimit()) : 0;
+
+        return $collection->getItems();
+    }
+
+    /**
      * Fetch products
      *
      * @return Item[]
      */
     public function fetch()
     {
-        $collection = $this->getProductCollection($this->getLimit(), $this->getOffset());
-        $products = $collection->load();
-
-        // Check if fetcher is started and done
-        $this->_isStarted = !$this->getOffset();
-        $this->_isDone = !$this->getLimit() || $this->getLimit() >= $collection->getSize();
+        $products = $this->fetchProducts();
 
         $items = array();
         foreach ($products as $product) {
@@ -79,15 +100,6 @@ class Product extends Component implements Fetcher
                 }
             }
         }
-
-        // Set the last processed entity id
-        $this->_lastProcessedEntityId = $this->getOffset();
-        if ($collection->getSize()) {
-            $this->_lastProcessedEntityId = $collection->getLastItem()->getEntityId();
-        }
-
-        // Set fetched size
-        $this->_itemsLeftCount = $this->getLimit() ? max(0, $collection->getSize() - $this->getLimit()) : 0;
 
         return $items;
     }

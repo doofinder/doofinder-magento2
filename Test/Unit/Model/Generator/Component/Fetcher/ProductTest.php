@@ -56,16 +56,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->_productCollection = $this->getMock(
             '\Magento\Catalog\Model\ResourceModel\Product\Collection',
-            [
-                'load',
-                'addAttributeToSelect',
-                'addStoreFilter',
-                'setPageSize',
-                'addAttributeToFilter',
-                'addAttributeToSort',
-                'getSize',
-                'getLastItem',
-            ],
+            [],
             [],
             '',
             false
@@ -78,7 +69,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('addAttributeToSort')
             ->willReturn($this->_productCollection);
-        $this->_productCollection->expects($this->any())->method('load')
+        $this->_productCollection->expects($this->any())->method('getItems')
             ->willReturn(array($this->_product));
         $this->_productCollection->expects($this->any())->method('getLastItem')
             ->willReturn($this->_product);
