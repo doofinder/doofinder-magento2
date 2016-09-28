@@ -95,30 +95,32 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string Store code
      */
-    public function getStoreCode()
+    public function getStoreCode($store = null)
     {
-        return $this->_storeManager->getStore()->getCode();
+        return $this->_storeManager->getStore($store)->getCode();
     }
 
     /**
-     * Get store/stores in current context
+     * Get active/all store codes
      *
+     * @param boolean $onlyActive = true
      * @return string[]
      */
-    public function getStoreCodes()
+    public function getStoreCodes($onlyActive = true)
     {
         $currentStoreCode = $this->getStoreCode();
+        $storeCodes = [];
 
         if ($currentStoreCode == 'admin') {
             $stores = $this->_storeManager->getStores();
 
             foreach ($stores as $store) {
-                if ($store->getIsActive()) {
+                if (!$onlyActive || $store->isActive()) {
                     $storeCodes[] = $store->getCode();
                 }
             }
         } else {
-            return [$currentStoreCode];
+            $storeCodes = [$currentStoreCode];
         }
 
         return $storeCodes;

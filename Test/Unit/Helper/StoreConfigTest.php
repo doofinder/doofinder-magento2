@@ -147,4 +147,58 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($expected, $this->_helper->getStoreCode());
     }
+
+    /**
+     * Test getStoreCodes() method.
+     *
+     * @dataProvider testGetStoreCodesProvider
+     */
+    public function testGetStoreCodes($onlyActive, $current, $stores, $expected)
+    {
+        $store = $this->getMock(
+            '\Magento\Store\Model\Store',
+            [],
+            [],
+            '',
+            false
+        );
+        $store->method('getCode')->willReturn($current);
+        $this->_storeManagerMock->method('getStore')->willReturn($store);
+        $this->_storeManagerMock->method('getStores')->willReturn($stores);
+
+        $this->assertEquals($expected, $this->_helper->getStoreCodes($onlyActive));
+    }
+
+    public function testGetStoreCodesProvider()
+    {
+        $stores = [];
+
+        $store = $this->getMock(
+            '\Magento\Store\Model\Store',
+            [],
+            [],
+            '',
+            false
+        );
+        $store->method('isActive')->willReturn(true);
+        $store->method('getCode')->willReturn('active');
+        $stores[] = $store;
+
+        $store = $this->getMock(
+            '\Magento\Store\Model\Store',
+            [],
+            [],
+            '',
+            false
+        );
+        $store->method('isActive')->willReturn(false);
+        $store->method('getCode')->willReturn('inactive');
+        $stores[] = $store;
+
+        return [
+            [true, 'admin', $stores, ['active']],
+            [false, 'admin', $stores, ['active', 'inactive']],
+            [true, 'sample', $stores, ['sample']],
+        ];
+    }
 }
