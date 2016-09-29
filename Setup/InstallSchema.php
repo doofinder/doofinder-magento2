@@ -6,10 +6,12 @@ use \Magento\Framework\Setup\InstallSchemaInterface;
 use \Magento\Framework\Setup\ModuleContextInterface;
 use \Magento\Framework\Setup\SchemaSetupInterface;
 use \Magento\Framework\DB\Ddl\Table;
+use \Magento\Framework\DB\Adapter\AdapterInterface;
 
 class InstallSchema implements InstallSchemaInterface
 {
     const CRON_TABLE_NAME = 'doofinder_feed_cron';
+    const LOG_TABLE_NAME = 'doofinder_feed_log';
 
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
@@ -102,6 +104,87 @@ class InstallSchema implements InstallSchemaInterface
             )
             ->setOption('type', 'InnoDB')
             ->setOption('charset', 'utf8');
+
+        $installer->getConnection()->createTable($table);
+
+        // Add log table
+        $table = $installer->getConnection()
+            ->newTable(self::LOG_TABLE_NAME)
+            ->addColumn(
+                'id',
+                Table::TYPE_INTEGER,
+                null,
+                [
+                    'identity'  => true,
+                    'unsigned'  => true,
+                    'nullable'  => false,
+                    'primary'   => true,
+                ],
+                'ID'
+            )
+            ->addColumn(
+                'process_id',
+                Table::TYPE_INTEGER,
+                null,
+                ['unsigned'  => true, 'nullable'  => false],
+                'Doofinder Feed Process ID'
+            )
+            ->addColumn(
+                'type',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable'  => false],
+                'Type'
+            )
+            ->addColumn(
+                'time',
+                Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable'  => false, 'default' => Table::TIMESTAMP_INIT],
+                'Time'
+            )
+            ->addColumn(
+                'message',
+                Table::TYPE_TEXT,
+                null,
+                ['nullable'  => false],
+                'Message'
+            );
+
+        // Add indexes to log table
+        $table->addIndex(
+            $installer->getIdxName(
+                self::LOG_TABLE_NAME,
+                ['process_id', 'type'],
+                AdapterInterface::INDEX_TYPE_INDEX
+            ),
+            ['process_id', 'type'],
+            ['type' => AdapterInterface::INDEX_TYPE_INDEX]
+        );
+        $table->addIndex(
+            $installer->getIdxName(
+                self::LOG_TABLE_NAME,
+                ['time'],
+                AdapterInterface::INDEX_TYPE_INDEX
+            ),
+            ['time'],
+            ['type' => AdapterInterface::INDEX_TYPE_INDEX]
+        );
+
+        // Add foreign keys
+        $table->addForeignKey(
+            $installer->getFkName(
+                self::LOG_TABLE_NAME,
+                'process_id',
+                self::CRON_TABLE_NAME,
+                'id'
+            ),
+            'process_id',
+            $installer->getTable(self::CRON_TABLE_NAME),
+            'id',
+            Table::ACTION_CASCADE,
+            Table::ACTION_CASCADE
+        );
 
         $installer->getConnection()->createTable($table);
 
