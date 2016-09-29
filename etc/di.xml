@@ -14,4 +14,13 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Doofinder\Feed\Logger\Feed">
+        <arguments>
+            <argument name="name" xsi:type="string">feed</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="feed" xsi:type="object">Doofinder\Feed\Logger\Handler\Feed</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
