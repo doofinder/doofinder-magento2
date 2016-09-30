@@ -67,6 +67,16 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      */
     protected $_storeManager;
 
+    /**
+     * @var \Doofinder\Feed\Logger\Feed
+     */
+    protected $_feedLogger;
+
+    /**
+     * @var \Doofinder\Feed\Logger\FeedFactory
+     */
+    protected $_feedLoggerFactory;
+
     public function setUp()
     {
         $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
@@ -167,6 +177,23 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         );
         $this->_storeManager->method('getStore')->with('default')->willReturn($this->_store);
 
+        $this->_feedLogger = $this->getMock(
+            '\Doofinder\Feed\Logger\Feed',
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->_feedLoggerFactory = $this->getMock(
+            '\Doofinder\Feed\Logger\FeedFactory',
+            ['create'],
+            [],
+            '',
+            false
+        );
+        $this->_feedLoggerFactory->method('create')->willReturn($this->_feedLogger);
+
         $this->_helper = $this->_objectManager->getObject(
             '\Doofinder\Feed\Helper\Schedule',
             [
@@ -174,6 +201,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 'generatorFactory' => $this->_generatorFactory,
                 'timezone' => $this->_timezone,
                 'storeManager' => $this->_storeManager,
+                'feedLoggerFactory' => $this->_feedLoggerFactory,
             ]
         );
     }

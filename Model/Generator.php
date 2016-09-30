@@ -42,6 +42,11 @@ class Generator extends \Magento\Framework\DataObject
     protected $_eventManager = null;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $_logger = null;
+
+    /**
      * Generator items
      *
      * @var Generator\Item[]
@@ -52,17 +57,20 @@ class Generator extends \Magento\Framework\DataObject
      * @param Generator\Component\FetcherFactory $itemsFetcherFactory
      * @param Generator\Component\ProcessorFactory $itemsProcessorFactory
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param \Psr\Log\LoggerInterface $logger
      * @param array $data
      */
     public function __construct(
         Generator\Component\FetcherFactory $fetcherFactory,
         Generator\Component\ProcessorFactory $processorFactory,
         \Magento\Framework\Event\ManagerInterface $eventManager,
+        \Psr\Log\LoggerInterface $logger,
         array $data = []
     ) {
         $this->_fetcherFactory = $fetcherFactory;
         $this->_processorFactory = $processorFactory;
         $this->_eventManager = $eventManager;
+        $this->_logger = $logger;
         parent::__construct($data);
     }
 
@@ -72,6 +80,8 @@ class Generator extends \Magento\Framework\DataObject
      */
     public function run()
     {
+        $this->_logger->debug(__('Generator run started'));
+
         $this->initialize();
 
         // Fetch items
@@ -79,6 +89,8 @@ class Generator extends \Magento\Framework\DataObject
 
         // Process items
         $this->processItems();
+
+        $this->_logger->debug(__('Generator run finished'));
     }
 
     /**
@@ -90,12 +102,18 @@ class Generator extends \Magento\Framework\DataObject
     {
         // Create fetchers
         foreach ($this->getData('config/fetchers') as $class => $data) {
-            $this->_fetchers[$class] = $this->_fetcherFactory->create(['data' => $data], $class);
+            $this->_fetchers[$class] = $this->_fetcherFactory->create([
+                'data' => $data,
+                'logger' => $this->_logger,
+            ], $class);
         }
 
         // Create processors
         foreach ($this->getData('config/processors') as $class => $data) {
-            $this->_processors[$class] = $this->_processorFactory->create(['data' => $data], $class);
+            $this->_processors[$class] = $this->_processorFactory->create([
+                'data' => $data,
+                'logger' => $this->_logger,
+            ], $class);
         }
 
         // Dispatch event doofinder_feed_generator_initialized
@@ -115,6 +133,7 @@ class Generator extends \Magento\Framework\DataObject
         $this->_items = array();
 
         foreach ($this->_fetchers as $fetcher) {
+            $this->_logger->debug(__('Fetching items with %1', get_class($fetcher)));
             $this->_items = array_merge($this->_items, $fetcher->fetch());
         }
 
@@ -132,6 +151,8 @@ class Generator extends \Magento\Framework\DataObject
     protected function processItems()
     {
         foreach ($this->_processors as $processor) {
+            $this->_logger->debug(__('Processing items with %1', get_class($processor)));
+
             /**
              * Run processor only on not skipped items
              * @notice Compatible with PHP5.3+

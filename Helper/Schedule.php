@@ -55,9 +55,14 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_dateTime;
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var \Doofinder\Feed\Logger\Feed
      */
     protected $_logger;
+
+    /**
+     * @var \Doofinder\Feed\Logger\FeedFactory
+     */
+    protected $_feedLoggerFactory;
 
     /**
      * @var \Magento\Framework\Filesystem
@@ -75,7 +80,8 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Doofinder\Feed\Helper\FeedConfig $feedConfig,
         \Magento\Framework\Stdlib\DateTime $dateTime,
-        \Psr\Log\LoggerInterface $logger,
+        \Doofinder\Feed\Logger\Feed $logger,
+        \Doofinder\Feed\Logger\FeedFactory $feedLoggerFactory,
         \Magento\Framework\Filesystem $filesystem
     ) {
         $this->_messageManager = $messageManager;
@@ -87,9 +93,12 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_storeConfig = $storeConfig;
         $this->_feedConfig = $feedConfig;
         $this->_dateTime = $dateTime;
-        $this->_logger = $logger;
+        $this->_feedLoggerFactory = $feedLoggerFactory;
         $this->_filesystem = $filesystem;
         parent::__construct($context);
+
+        // Override AbstractHelper's logger
+        $this->_logger = $logger;
     }
 
     /**
@@ -298,7 +307,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             ->setData($data)
             ->save();
 
-        $this->_logger->info('Process has been registered');
+        $this->_logger->info('Process has been registered', ['process' => $process]);
 
         return $process;
     }
@@ -311,7 +320,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     protected function enableProcess(\Doofinder\Feed\Model\Cron $process)
     {
         $process->enable();
-        $this->_logger->info('Process has been enabled');
+        $this->_logger->info('Process has been enabled', ['process' => $process]);
     }
 
     /**
@@ -322,7 +331,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     protected function disableProcess(\Doofinder\Feed\Model\Cron $process)
     {
         $process->disable();
-        $this->_logger->info('Process has been disabled');
+        $this->_logger->info('Process has been disabled', ['process' => $process]);
     }
 
     /**
@@ -448,7 +457,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             ->setCreatedAt($this->_dateTime->formatDate(time()))
             ->save();
 
-        $this->_logger->info('Process has been scheduled');
+        $this->_logger->info('Process has been scheduled', ['process' => $process]);
     }
 
     /**
@@ -471,7 +480,10 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             ->setNextIteration($this->_dateTime->formatDate($timeScheduled))
             ->save();
 
-        $this->_logger->info(__('Scheduling the next step for %1', $this->_dateTime->formatDate($timeScheduled)));
+        $this->_logger->info(
+            __('Scheduling the next step for %1', $this->_dateTime->formatDate($timeScheduled)),
+            ['process' => $process]
+        );
     }
 
     /**
@@ -553,8 +565,13 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         $feedConfig['data']['config']['processors']['Xml']['destination_file'] =
             $tmpDir->getAbsolutePath($tmpFilename);
 
+        // Prepare logger with process context
+        $logger = $this->_feedLoggerFactory->create(['process' => $process]);
+
         // Create generator
-        $generator = $this->_generatorFactory->create($feedConfig);
+        $generator = $this->_generatorFactory->create($feedConfig, [
+            'logger' => $logger,
+        ]);
 
         try {
             // Run generator
@@ -569,7 +586,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             if (!$fetcher->isDone()) {
                 $this->scheduleProcess($process);
             } else {
-                $this->_logger->info(__('Feed generation completed'));
+                $this->_logger->info(__('Feed generation completed'), ['process' => $process]);
 
                 $filename = $this->getFeedFilename($storeCode);
                 $dir = $this->_filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::MEDIA);
@@ -588,7 +605,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
                 $this->endProcess($process);
             }
         } catch (\Exception $e) {
-            $this->_logger->error($e->getMessage());
+            $this->_logger->error($e->getMessage(), ['process' => $process]);
             $process->setErrorStack($process->getErrorStack() + 1);
             $process->setMessage('#error#' . $e->getMessage());
             $this->scheduleProcess($process);
