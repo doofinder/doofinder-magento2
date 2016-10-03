@@ -298,6 +298,18 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test getProcessByStoreCode() method
+     *
+     * @magentoDataFixture process_success
+     */
+    public function testGetProcessByStoreCode()
+    {
+        $process = $this->_helper->getProcessByStoreCode($this->_defaultStore->getCode());
+
+        $this->assertEquals($this->_defaultStore->getCode(), $process->getStoreCode());
+    }
+
+    /**
      * Test updateProcess() method rescheduling
      *
      * @magentoDataFixture process_success
