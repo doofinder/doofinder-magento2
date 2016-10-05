@@ -1,0 +1,6 @@
+<div class="actions actions-view-log">
+    <button class="action-view-log" type="button" id="<?php echo $block->getHtmlId() ?>"
+        onclick="setLocation('<?php print $block->getRedirectUrl(); ?>'); return false;">
+        <span><?php echo $block->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+</div>

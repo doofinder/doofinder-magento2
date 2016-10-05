@@ -283,6 +283,116 @@
                     <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\GenerateButton</frontend_model>
                 </field>
             </group>
+            <group id="feed_status"
+                translate="label"
+                type="text"
+                sortOrder="20"
+                showInDefault="1"
+                showInWebsite="0"
+                showInStore="1">
+                <label>Feed Status</label>
+                <field id="cron_issue"
+                       translate="label"
+                       type="note"
+                       sortOrder="5"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Cron Issues</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\Cron</frontend_model>
+                </field>
+                <field id="status"
+                       translate="label"
+                       type="note"
+                       sortOrder="10"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Status</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="message"
+                       translate="label"
+                       type="note"
+                       sortOrder="15"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Message</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="complete"
+                       translate="label"
+                       type="note"
+                       sortOrder="20"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Complete</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="next_run"
+                       translate="label"
+                       type="note"
+                       sortOrder="25"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Next Run</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="next_iteration"
+                       translate="label"
+                       type="note"
+                       sortOrder="30"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Next Iteration</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="last_feed_name"
+                       translate="label"
+                       type="note"
+                       sortOrder="35"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Last generated feed</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="last_files"
+                       translate="label"
+                       type="note"
+                       sortOrder="35"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Last generated feeds</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronFiles</frontend_model>
+                </field>
+                <field id="error_stack"
+                       translate="label"
+                       type="note"
+                       sortOrder="40"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Errors</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+
+                <field id="view_log"
+                       translate="button_label"
+                       type="note"
+                       sortOrder="45"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <button_label>View Log</button_label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\ViewLogButton</frontend_model>
+                </field>
+            </group>
         </section>
         <section id="doofinder_feed_search"
                  translate="label"
