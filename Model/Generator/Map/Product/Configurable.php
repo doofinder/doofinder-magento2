@@ -73,19 +73,18 @@ class Configurable extends Product
             // Get values of associated items
             $associatesValues = $this->getAssociatesValues($field);
 
-            if (is_array($value)) {
-                $value = array_merge($value, $associatesValues);
-            } else {
-                $value = array_merge([$value], $associatesValues);
-
-                if (count($value) == 1) {
-                    $value = $value[0];
-                }
+            if (!is_array($value)) {
+                $value = [$value];
             }
 
-            // Clean up
-            if (is_array($value)) {
-                $value = array_values(array_unique($value));
+            $value = array_merge($value, $associatesValues);
+
+            // Remove duplicates
+            $value = array_values(array_unique($value));
+
+            // Remove array if value is single
+            if (count($value) == 1) {
+                $value = $value[0];
             }
         }
 
@@ -105,6 +104,15 @@ class Configurable extends Product
         foreach ($this->_item->getAssociates() as $associate) {
             $associatesValues[] = $this->getAssociateMap($associate)->get($field);
         }
+
+        /**
+         * Flatten array recursively
+         */
+        $flattened = array();
+        array_walk_recursive($associatesValues, function ($item) use (&$flattened) {
+            $flattened[] = $item;
+        });
+        $associatesValues = $flattened;
 
         /**
          * Filter out null values
