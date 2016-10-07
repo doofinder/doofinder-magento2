@@ -37,6 +37,7 @@
                 <enabled>0</enabled>
                 <apikey></apikey>
                 <hash_id></hash_id>
+                <request_limit>100</request_limit>
                 <total_limit>500</total_limit>
             </doofinder_internal_search>
         </doofinder_feed_search>

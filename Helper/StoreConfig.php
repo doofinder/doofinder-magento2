@@ -162,6 +162,36 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get request limit for Doofinder search.
+     *
+     * @param string $storeCode
+     * @return string
+     */
+    public function getSearchRequestLimit($storeCode = null)
+    {
+        return $this->_scopeConfig->getValue(
+            self::INTERNAL_SEARCH_CONFIG . '/request_limit',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Get total limit for Doofinder search.
+     *
+     * @param string $storeCode
+     * @return string
+     */
+    public function getSearchTotalLimit($storeCode = null)
+    {
+        return $this->_scopeConfig->getValue(
+            self::INTERNAL_SEARCH_CONFIG . '/total_limit',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
      * Check if atomic updates are enabled.
      *
      * @param string $storeCode
