@@ -4,7 +4,8 @@
     "require": {
         "php": "~5.5.0|~5.6.0|~7.0.0",
         "magento/magento-composer-installer": "*",
-        "sabre/xml": "^1.4"
+        "sabre/xml": "^1.4",
+        "doofinder/doofinder": "^5.4.0"
     },
     "type": "magento2-module",
     "license": [
@@ -13,8 +14,7 @@
     ],
     "autoload": {
         "files": [
-            "registration.php",
-            "lib/Doofinder/doofinder_management_api.php"
+            "registration.php"
         ],
         "psr-4": {
             "Doofinder\\Feed\\": "",

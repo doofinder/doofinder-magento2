@@ -25,7 +25,7 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
     private $_dma;
 
     /**
-     * @var \DoofinderManagementApiFactory
+     * @var \Doofinder\Api\Management\ClientFactory
      */
     private $_dmaFactory;
 
@@ -50,7 +50,7 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->_searchEngine = $this->getMock(
-            '\SearchEngine',
+            '\Doofinder\Api\Management\SearchEngine',
             [],
             [],
             '',
@@ -58,7 +58,7 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->_dma = $this->getMock(
-            '\DoofinderManagementApi',
+            '\Doofinder\Api\Management\Client',
             [],
             [],
             '',
@@ -67,7 +67,7 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
         $this->_dma->method('getSearchEngines')->willReturn([$this->_searchEngine]);
 
         $this->_dmaFactory = $this->getMock(
-            '\DoofinderManagementApiFactory',
+            '\Doofinder\Api\Management\ClientFactory',
             ['create'],
             [],
             '',

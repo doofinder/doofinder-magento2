@@ -8,7 +8,7 @@ use \Doofinder\Feed\Model\Generator\Component\Processor;
 class AtomicUpdater extends Component implements Processor
 {
     /**
-     * @var \DoofinderManagementApi
+     * @var \Doofinder\Api\Management\ClientFactory
      */
     protected $_doofinderManagementApi;
 
@@ -17,7 +17,7 @@ class AtomicUpdater extends Component implements Processor
      */
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
-        \DoofinderManagementApiFactory $dmaFactory,
+        \Doofinder\Api\Management\ClientFactory $dmaFactory,
         array $data = []
     ) {
         parent::__construct($logger, $data);
