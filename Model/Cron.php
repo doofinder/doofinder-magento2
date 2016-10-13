@@ -32,17 +32,6 @@ class Cron extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Run process.
-     *
-     * @todo implement me
-     * @return $this
-     */
-    protected function run()
-    {
-
-    }
-
-    /**
      * Check if cronjob is enabled.
      *
      * @return bool
