@@ -236,6 +236,29 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test isInternalSearchEnabled() method.
+     *
+     * @dataProvider testIsInternalSearchEnabledProvider
+     */
+    public function testIsInternalSearchEnabled($enabled, $expected)
+    {
+        $storeCode = 'sample';
+
+        $this->_scopeConfigMock->method('getValue')->with('catalog/search/engine', 'store', $storeCode)
+            ->willReturn($enabled);
+
+        $this->assertEquals($expected, $this->_helper->isInternalSearchEnabled($storeCode));
+    }
+
+    public function testIsInternalSearchEnabledProvider()
+    {
+        return [
+            [true, true],
+            [false, false],
+        ];
+    }
+
+    /**
      * Test isAtomicUpdatesEnabled() method.
      *
      * @dataProvider testIsAtomicUpdatesEnabledProvider
@@ -245,7 +268,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
         $storeCode = 'sample';
 
         $this->_scopeConfigMock->method('getValue')->will($this->returnValueMap([
-            ['doofinder_feed_search/doofinder_internal_search/enable', 'store', $storeCode, $engine],
+            ['catalog/search/engine', 'store', $storeCode, $engine],
             ['doofinder_feed_feed/feed_settings/atomic_updates_enabled', 'store', $storeCode, $atomic],
         ]));
 

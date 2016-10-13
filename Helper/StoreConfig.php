@@ -30,6 +30,16 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const INTERNAL_SEARCH_CONFIG = 'doofinder_feed_search/doofinder_internal_search';
 
     /**
+     * Path to catalog search engine setting
+     */
+    const CATALOG_SEARCH_ENGINE_CONFIG = 'catalog/search/engine';
+
+    /**
+     * Doofinder search engine name
+     */
+    const DOOFINDER_SEARCH_ENGINE_NAME = 'doofinder';
+
+    /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
@@ -192,6 +202,23 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Check if internal search is enabled.
+     *
+     * @param string $storeCode
+     * @return boolean
+     */
+    public function isInternalSearchEnabled($storeCode = null)
+    {
+        $engine = $this->_scopeConfig->getValue(
+            self::CATALOG_SEARCH_ENGINE_CONFIG,
+            $this->getScopeStore(),
+            $storeCode
+        );
+
+        return $engine == self::DOOFINDER_SEARCH_ENGINE_NAME;
+    }
+
+    /**
      * Check if atomic updates are enabled.
      *
      * @param string $storeCode
@@ -199,11 +226,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isAtomicUpdatesEnabled($storeCode = null)
     {
-        $engineEnabled = $this->_scopeConfig->getValue(
-            self::INTERNAL_SEARCH_CONFIG . '/enable',
-            $this->getScopeStore(),
-            $storeCode
-        );
+        $engineEnabled = $this->isInternalSearchEnabled($storeCode);
 
         $atomicUpdatesEnabled = $this->_scopeConfig->getValue(
             self::FEED_SETTINGS_CONFIG . '/atomic_updates_enabled',
