@@ -2,6 +2,11 @@
 
 namespace Doofinder\Feed\Helper;
 
+/**
+ * Product class
+ *
+ * @package Doofinder\Feed\Helper
+ */
 class Product extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
@@ -24,6 +29,13 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $_stockRegistry;
 
+    /**
+     * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory
+     * @param \Magento\Catalog\Helper\Image $imageHelper
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
+     */
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory,
         \Magento\Catalog\Helper\Image $imageHelper,
@@ -41,7 +53,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get product id
      *
-     * @param \Magento\Catalog\Model\Product
+     * @param \Magento\Catalog\Model\Product $product
      * @return int
      */
     public function getProductId(\Magento\Catalog\Model\Product $product)
@@ -52,9 +64,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get product url
      *
-     * @todo Use store config
-     *
-     * @param \Magento\Catalog\Model\Product
+     * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
     public function getProductUrl(\Magento\Catalog\Model\Product $product)
@@ -67,7 +77,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @todo This might need some optimalization
      *
-     * @param \Magento\Catalog\Model\Product
+     * @param \Magento\Catalog\Model\Product $product
      * @return \Magento\Catalog\Model\Category[][]
      */
     public function getProductCategoriesWithParents(\Magento\Catalog\Model\Product $product)
@@ -95,17 +105,16 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get product image url
      *
-     * @todo Use store config
-     *
-     * @param \Magento\Catalog\Model\Product
+     * @param \Magento\Catalog\Model\Product $product
+     * @param string $size
      * @return string|null
      */
-    public function getProductImageUrl(\Magento\Catalog\Model\Product $product)
+    public function getProductImageUrl(\Magento\Catalog\Model\Product $product, $size = null)
     {
         if ($product->hasImage()) {
             return $this->_imageHelper
                 ->init($product, 'doofinder_image')
-                //->resize()
+                ->resize($size)
                 ->getUrl();
         }
     }
@@ -113,10 +122,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get product price
      *
-     * @todo This might not work properly with taxes
-     * @todo Add proper price rounding
-     *
-     * @param \Magento\Catalog\Model\Product
+     * @param \Magento\Catalog\Model\Product $product
      * @return float
      */
     public function getProductPrice(\Magento\Catalog\Model\Product $product)
@@ -125,12 +131,14 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get product availability
+     *
      * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
     public function getProductAvailability(\Magento\Catalog\Model\Product $product)
     {
-        if ($this->_getStockItem($product->getId())->getIsInStock()) {
+        if ($this->getStockItem($product->getId())->getIsInStock()) {
             return 'in stock';
         }
 
@@ -138,7 +146,9 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @return mixed
+     * Get currency code
+     *
+     * @return string
      */
     public function getCurrencyCode()
     {
@@ -146,9 +156,11 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get attribute text
+     *
      * @param \Magento\Catalog\Model\Product $product
-     * @param $attributeName
-     * @return mixed
+     * @param string $attributeName
+     * @return string
      */
     public function getAttributeText(\Magento\Catalog\Model\Product $product, $attributeName)
     {
@@ -156,14 +168,14 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @todo - we need this?
+     * Get quantity and stock status
      *
      * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
     public function getQuantityAndStockStatus(\Magento\Catalog\Model\Product $product)
     {
-        $qty = $this->_getStockItem($product->getId())->getQty();
+        $qty = $this->getStockItem($product->getId())->getQty();
         $availability = $this->getProductAvailability($product);
 
         return implode(' - ', array_filter([$qty, $availability], function ($item) {
@@ -172,10 +184,12 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get stock item
+     *
      * @param int $productId
-     * @return mixed
+     * @return \Magento\CatalogInventory\Model\Stock\Item
      */
-    protected function _getStockItem($productId)
+    protected function getStockItem($productId)
     {
         return $this->_stockRegistry->getStockItem($productId);
     }
