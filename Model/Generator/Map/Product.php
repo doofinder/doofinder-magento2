@@ -4,6 +4,11 @@ namespace Doofinder\Feed\Model\Generator\Map;
 
 use \Doofinder\Feed\Model\Generator\Map;
 
+/**
+ * Class Product
+ *
+ * @package Doofinder\Feed\Model\Generator\Map
+ */
 class Product extends Map
 {
     /**
@@ -84,7 +89,7 @@ class Product extends Map
     /**
      * Get product id
      *
-     * @param \Magento\Catalog\Model\Product
+     * @param \Magento\Catalog\Model\Product $product
      * @return int
      */
     protected function getProductId(\Magento\Catalog\Model\Product $product)
@@ -95,7 +100,7 @@ class Product extends Map
     /**
      * Get product url
      *
-     * @param \Magento\Catalog\Model\Product
+     * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
     protected function getProductUrl(\Magento\Catalog\Model\Product $product)
@@ -106,41 +111,40 @@ class Product extends Map
     /**
      * Get product categories
      *
-     * @todo This might need some optimalization
-     *
-     * @param \Magento\Catalog\Model\Product
+     * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
     protected function getProductCategories(\Magento\Catalog\Model\Product $product)
     {
-        $categories = $this->_helper->getProductCategoriesWithParents($product);
+        $tree = $this->_helper->getProductCategoriesWithParents($product);
 
-        $entries = [];
-        foreach ($categories as $entry) {
-            $names = [];
-
-            foreach ($entry as $category) {
-                $names[] = $category->getName();
-            }
-
-            $entries[] = implode(\Doofinder\Feed\Model\Generator::CATEGORY_TREE_SEPARATOR, $names);
-        }
-
-        return implode(\Doofinder\Feed\Model\Generator::CATEGORY_SEPARATOR, $entries);
+        /**
+         * Stringifies tree by imploding a set of imploded categories and their parents
+         * example: Category 1 > Category 1.1 % Category 2 > Category 2.1 > Category 2.1.1
+         */
+        return implode(
+            \Doofinder\Feed\Model\Generator::CATEGORY_SEPARATOR,
+            array_map(function ($categories) {
+                return implode(
+                    \Doofinder\Feed\Model\Generator::CATEGORY_TREE_SEPARATOR,
+                    array_map(function ($category) {
+                        return $category->getName();
+                    }, $categories)
+                );
+            }, $tree)
+        );
     }
 
     /**
      * Get product image
      *
-     * @todo Use store config
-     *
-     * @param \Magento\Catalog\Model\Product
-     * @param string
+     * @param \Magento\Catalog\Model\Product $product
+     * @param string $size
      * @return string|null
      */
-    protected function getProductImage(\Magento\Catalog\Model\Product $product, $imageSize)
+    protected function getProductImage(\Magento\Catalog\Model\Product $product, $size)
     {
-        return $this->_helper->getProductImageUrl($product, $imageSize);
+        return $this->_helper->getProductImageUrl($product, $size);
     }
 
     /**
@@ -148,7 +152,7 @@ class Product extends Map
      *
      * @todo Include minimal_price
      *
-     * @param \Magento\Catalog\Model\Product
+     * @param \Magento\Catalog\Model\Product $product
      * @return string|null
      */
     protected function getProductPrice(\Magento\Catalog\Model\Product $product)
@@ -157,8 +161,9 @@ class Product extends Map
     }
 
     /**
-     * @param \Magento\Catalog\Model\Product $product
+     * Get product availability
      *
+     * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
     protected function getProductAvailability(\Magento\Catalog\Model\Product $product)
@@ -167,7 +172,9 @@ class Product extends Map
     }
 
     /**
-     * @return mixed
+     * Get currency code
+     *
+     * @return string
      */
     protected function getCurrencyCode()
     {
@@ -175,6 +182,8 @@ class Product extends Map
     }
 
     /**
+     * Get quantity and stock status
+     *
      * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
@@ -184,6 +193,8 @@ class Product extends Map
     }
 
     /**
+     * Get attribute text
+     *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $field
      * @return string

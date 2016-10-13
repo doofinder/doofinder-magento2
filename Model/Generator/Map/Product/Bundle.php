@@ -4,6 +4,11 @@ namespace Doofinder\Feed\Model\Generator\Map\Product;
 
 use \Doofinder\Feed\Model\Generator\Map\Product;
 
+/**
+ * Class Bundle
+ *
+ * @package Doofinder\Feed\Model\Generator\Map\Product
+ */
 class Bundle extends Product
 {
     /**
