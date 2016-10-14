@@ -55,7 +55,7 @@ class Product extends Map
                 return $this->getProductUrl($this->_context);
 
             case 'category_ids':
-                return $this->getProductCategories($this->_context);
+                return $this->getProductCategories($this->_context, $this->getCategoriesInNavigation());
 
             case 'image':
                 return $this->getProductImage($this->_context, $this->getImageSize());
@@ -112,11 +112,12 @@ class Product extends Map
      * Get product categories
      *
      * @param \Magento\Catalog\Model\Product $product
+     * @param boolean $categoriesInNavigation - Export only categories in navigation
      * @return string
      */
-    protected function getProductCategories(\Magento\Catalog\Model\Product $product)
+    protected function getProductCategories(\Magento\Catalog\Model\Product $product, $categoriesInNavigation)
     {
-        $tree = $this->_helper->getProductCategoriesWithParents($product);
+        $tree = $this->_helper->getProductCategoriesWithParents($product, $categoriesInNavigation);
 
         /**
          * Stringifies tree by imploding a set of imploded categories and their parents

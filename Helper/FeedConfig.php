@@ -137,6 +137,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
             'image_size' => $this->_config['image_size'],
             'split_configurable_products' => $this->_config['split_configurable_products'],
             'export_product_prices' => $this->_config['export_product_prices'],
+            'categories_in_navigation' => $this->_config['categories_in_navigation'],
             'map' => $this->getFeedAttributes()
         ];
     }

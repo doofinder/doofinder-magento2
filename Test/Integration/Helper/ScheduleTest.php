@@ -75,6 +75,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                     'currency' => 'df_currency',
                 ],
                 'atomic_updates_enabled' => 0,
+                'categories_in_navigation' => 0,
             ],
             $this->_helper->getStoreConfig()
         );

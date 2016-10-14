@@ -47,6 +47,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
             'image_size' => 'small',
             'split_configurable_products' => 1,
             'export_product_prices' => 0,
+            'categories_in_navigation' => 0,
         ]);
 
         $this->_helper = $this->_objectManager->getObject(
@@ -76,6 +77,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                             'split_configurable_products' => 1,
                             'export_product_prices' => 0,
                             'image_size' => 'small',
+                            'categories_in_navigation' => 0,
                         ],
                         'Cleaner' => [],
                     ],
@@ -112,6 +114,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                             'split_configurable_products' => 1,
                             'export_product_prices' => 0,
                             'image_size' => 'small',
+                            'categories_in_navigation' => 0,
                         ],
                         'Cleaner' => [],
                         'Xml' => [],
@@ -156,6 +159,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                             'split_configurable_products' => 1,
                             'export_product_prices' => 0,
                             'image_size' => 'small',
+                            'categories_in_navigation' => 0,
                         ],
                         'Cleaner' => [],
                         'Xml' => [],

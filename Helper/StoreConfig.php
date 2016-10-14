@@ -236,4 +236,19 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $engineEnabled && $atomicUpdatesEnabled;
     }
+
+    /**
+     * Check if should export categories in navigation.
+     *
+     * @param string $storeCode
+     * @return boolean
+     */
+    public function isExportCategoriesInNavigation($storeCode = null)
+    {
+        return $this->_scopeConfig->getValue(
+            self::FEED_SETTINGS_CONFIG . '/categories_in_navigation',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
 }

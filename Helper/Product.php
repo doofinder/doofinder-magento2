@@ -91,6 +91,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $categoryCollection
             ->addIdFilter($ids)
             ->addAttributeToSelect('name')
+            ->addAttributeToSelect('include_in_menu')
             ->addFieldToFilter('is_active', 1)
             ->addFieldToFilter('level', ['gt' => 1]);
 
@@ -101,9 +102,10 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get category tree
      *
      * @param \Magento\Catalog\Model\Category[] $categories
+     * @param boolean $fromNavigation - exclude categories not in menu
      * @return \Magento\Catalog\Model\Category[][]
      */
-    protected function getCategoryTree(array $categories)
+    protected function getCategoryTree(array $categories, $fromNavigation)
     {
         // Store all requested category ids
         $categoryIds = array_map(function ($category) {
@@ -128,12 +130,18 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             $categoryId = $parentId = $category->getId();
 
             while (isset($parents[$parentId])) {
+                // Do not process categories not in menu if $fromNavigation is set
+                if ($fromNavigation && !$parents[$parentId]->getIncludeInMenu()) {
+                    break;
+                }
                 $this->_categoryTree[$categoryId][$parentId] = $parents[$parentId];
                 $parentId = $parents[$parentId]->getParentId();
             }
 
             // Now reverse the order to make parents before children
-            $this->_categoryTree[$categoryId] = array_reverse($this->_categoryTree[$categoryId], true);
+            if (isset($this->_categoryTree[$categoryId])) {
+                $this->_categoryTree[$categoryId] = array_reverse($this->_categoryTree[$categoryId], true);
+            }
         }
 
         // Return tree
@@ -144,12 +152,13 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get product categories tree
      *
      * @param \Magento\Catalog\Model\Product
+     * @param boolean $fromNavigation - exclude categories not in menu
      * @return \Magento\Catalog\Model\Category[][]
      */
-    public function getProductCategoriesWithParents(\Magento\Catalog\Model\Product $product)
+    public function getProductCategoriesWithParents(\Magento\Catalog\Model\Product $product, $fromNavigation = false)
     {
         $categories = $this->getCategories($product->getCategoryIds());
-        return $this->getCategoryTree($categories);
+        return $this->getCategoryTree($categories, $fromNavigation);
     }
 
     /**

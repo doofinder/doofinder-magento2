@@ -194,6 +194,19 @@
                         <![CDATA[Requires a Management API key configured in Search Configuration.]]>
                     </comment>
                 </field>
+                <field id="categories_in_navigation"
+                    translate="label"
+                    type="select"
+                    sortOrder="10"
+                    showInDefault="1"
+                    showInWebsite="0"
+                    showInStore="1">
+                    <label>Export only categories present in navigation menus</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Whether this option is enabled or not, only active categories will be exported.]]>
+                    </comment>
+                </field>
             </group>
             <group id="feed_cron"
                    translate="label"

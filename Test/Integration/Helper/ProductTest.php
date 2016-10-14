@@ -113,6 +113,41 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test getProductCategoriesWithParentsInNavigation
+     *
+     * @magentoDataFixture Magento/Catalog/_files/categories.php
+     */
+    public function testGetProductCategoriesWithParentsNavigation()
+    {
+        $product = $this->_productRepository->get('simple');
+        $category = $this->_categoryRepository->get(3);
+        $category->setIncludeInMenu(0);
+        $category->save();
+
+        $this->assertEquals(
+            [
+                4 => [
+                    4 => '1/2/3/4',
+                ],
+                13 => [
+                    13 => '1/2/3/13',
+                ],
+            ],
+            array_map(
+                function ($element) {
+                    return array_map(
+                        function ($category) {
+                            return $category->getPath();
+                        },
+                        $element
+                    );
+                },
+                $this->_helper->getProductCategoriesWithParents($product, true)
+            )
+        );
+    }
+
+    /**
      * Test getProductImageUrl
      *
      * @magentoDataFixture Magento/Catalog/_files/product_with_image.php

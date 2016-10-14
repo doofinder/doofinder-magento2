@@ -284,4 +284,28 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
             [false, true, false],
         ];
     }
+
+    /**
+     * Test isExportCategoriesInNavigation() method.
+     *
+     * @dataProvider testIsExportCategoriesInNavigationProvider
+     */
+    public function testIsExportCategoriesInNavigation($value, $expected)
+    {
+        $storeCode = 'sample';
+
+        $this->_scopeConfigMock->method('getValue')->will($this->returnValueMap([
+            ['doofinder_feed_feed/feed_settings/categories_in_navigation', 'store', $storeCode, $value],
+        ]));
+
+        $this->assertEquals($expected, $this->_helper->isExportCategoriesInNavigation($storeCode));
+    }
+
+    public function testIsExportCategoriesInNavigationProvider()
+    {
+        return [
+            [true,  true],
+            [false, false],
+        ];
+    }
 }

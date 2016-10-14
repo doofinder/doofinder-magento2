@@ -20,6 +20,7 @@
                 <image_size></image_size>
                 <split_configurable_products>0</split_configurable_products>
                 <atomic_updates_enabled>0</atomic_updates_enabled>
+                <categories_in_navigation>0</categories_in_navigation>
             </feed_settings>
             <feed_cron>
                 <enabled>1</enabled>
