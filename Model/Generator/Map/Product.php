@@ -151,14 +151,19 @@ class Product extends Map
     /**
      * Get product price
      *
-     * @todo Include minimal_price
-     *
      * @param \Magento\Catalog\Model\Product $product
      * @return string|null
      */
     protected function getProductPrice(\Magento\Catalog\Model\Product $product)
     {
-        return number_format($this->_helper->getProductPrice($product), 2, '.', '');
+        $price = $this->_helper->getProductPrice($product);
+
+        // Do not export prices below the minimal price
+        if ($price < $this->getMinimalPrice()) {
+            return null;
+        }
+
+        return number_format($price, 2, '.', '');
     }
 
     /**
