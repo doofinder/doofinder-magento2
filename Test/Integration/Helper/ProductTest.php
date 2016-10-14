@@ -86,17 +86,14 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                [
-                    2 => '1/2',
-                ],
-                [
+                3 => [
                     3 => '1/2/3',
                 ],
-                [
+                4 => [
                     3 => '1/2/3',
                     4 => '1/2/3/4',
                 ],
-                [
+                13 => [
                     3 => '1/2/3',
                     13 => '1/2/3/13',
                 ],

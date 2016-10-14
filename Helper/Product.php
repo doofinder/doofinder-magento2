@@ -30,6 +30,12 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_stockRegistry;
 
     /**
+     * Static cache for category tree
+     * @var \Magento\Catalog\Model\Category[][]
+     */
+    protected $_categoryTree;
+
+    /**
      * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory
      * @param \Magento\Catalog\Helper\Image $imageHelper
      * @param \Magento\Framework\App\Helper\Context $context
@@ -47,6 +53,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_imageHelper = $imageHelper;
         $this->_storeManager = $storeManager;
         $this->_stockRegistry = $stockRegistry;
+        $this->_categoryTree = [];
         parent::__construct($context);
     }
 
@@ -73,33 +80,76 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get product categories
+     * Get categories
      *
-     * @todo This might need some optimalization
+     * @param int[] $ids
+     * @return \Magento\Catalog\Model\Category[]
+     */
+    protected function getCategories(array $ids)
+    {
+        $categoryCollection = $this->_categoryCollectionFactory->create();
+        $categoryCollection
+            ->addIdFilter($ids)
+            ->addAttributeToSelect('name')
+            ->addFieldToFilter('is_active', 1)
+            ->addFieldToFilter('level', ['gt' => 1]);
+
+        return $categoryCollection->getItems();
+    }
+
+    /**
+     * Get category tree
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Category[] $categories
+     * @return \Magento\Catalog\Model\Category[][]
+     */
+    protected function getCategoryTree(array $categories)
+    {
+        // Store all requested category ids
+        $categoryIds = array_map(function ($category) {
+            return $category->getId();
+        }, $categories);
+
+        // Exclude previously processed categories
+        $categories = array_diff_key($categories, $this->_categoryTree);
+
+        // Grab ids of all parent categories of all product categories
+        $parentIds = [];
+        array_walk($categories, function ($category) use (&$parentIds) {
+            $parentIds = array_merge($parentIds, $category->getParentIds());
+        });
+        $parentIds = array_unique($parentIds);
+
+        // Combine product categories with its parents for simplicity
+        $parents = $categories + $this->getCategories($parentIds);
+
+        // Now build tree of categories with its parents
+        foreach ($categories as $category) {
+            $categoryId = $parentId = $category->getId();
+
+            while (isset($parents[$parentId])) {
+                $this->_categoryTree[$categoryId][$parentId] = $parents[$parentId];
+                $parentId = $parents[$parentId]->getParentId();
+            }
+
+            // Now reverse the order to make parents before children
+            $this->_categoryTree[$categoryId] = array_reverse($this->_categoryTree[$categoryId], true);
+        }
+
+        // Return tree
+        return array_intersect_key($this->_categoryTree, array_flip($categoryIds));
+    }
+
+    /**
+     * Get product categories tree
+     *
+     * @param \Magento\Catalog\Model\Product
      * @return \Magento\Catalog\Model\Category[][]
      */
     public function getProductCategoriesWithParents(\Magento\Catalog\Model\Product $product)
     {
-        $categoryIds = $product->getResource()->getCategoryIds($product);
-
-        $categoryCollection = $this->_categoryCollectionFactory->create();
-        $categoryCollection
-            ->addIdFilter($categoryIds)
-            ->addAttributeToSelect('name')
-            ->load();
-
-        $categories = array();
-
-        foreach ($categoryCollection as $category) {
-            $parents = $category->getParentCategories();
-            $parents[$category->getId()] = $category;
-
-            $categories[] = $parents;
-        }
-
-        return $categories;
+        $categories = $this->getCategories($product->getCategoryIds());
+        return $this->getCategoryTree($categories);
     }
 
     /**
