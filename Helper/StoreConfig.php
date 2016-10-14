@@ -25,6 +25,11 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const FEED_SETTINGS_CONFIG = 'doofinder_feed_feed/feed_settings';
 
     /**
+     * Path to search layer settings in config.xml/core_config_data
+     */
+    const SEARCH_LAYER_CONFIG = 'doofinder_feed_search/doofinder_layer';
+
+    /**
      * Path to internal search settings in config.xml/core_config_data
      */
     const INTERNAL_SEARCH_CONFIG = 'doofinder_feed_search/doofinder_internal_search';
@@ -247,6 +252,21 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             self::FEED_SETTINGS_CONFIG . '/categories_in_navigation',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Get search layer script.
+     *
+     * @param string $storeCode
+     * @return string
+     */
+    public function getSearchLayerScript($storeCode = null)
+    {
+        return $this->_scopeConfig->getValue(
+            self::SEARCH_LAYER_CONFIG . '/script',
             $this->getScopeStore(),
             $storeCode
         );

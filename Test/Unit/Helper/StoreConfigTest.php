@@ -308,4 +308,19 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
             [false, false],
         ];
     }
+
+    /**
+     * Test getSearchLayerScript() method.
+     */
+    public function testGetSearchLayerScript()
+    {
+        $storeCode = 'sample';
+        $script = '<script type="text/javascript">sample script</script>';
+
+        $this->_scopeConfigMock->method('getValue')->will($this->returnValueMap([
+            ['doofinder_feed_search/doofinder_layer/script', 'store', $storeCode, $script],
+        ]));
+
+        $this->assertEquals($script, $this->_helper->getSearchLayerScript($storeCode));
+    }
 }
