@@ -69,6 +69,21 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $_filesystem;
 
+    /**
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
+     * @param \Doofinder\Feed\Model\GeneratorFactory $generatorFactory
+     * @param \Doofinder\Feed\Model\CronFactory $cronFactory
+     * @param \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory $cronCollectionFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
+     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
+     * @param \Doofinder\Feed\Helper\FeedConfig $feedConfig
+     * @param \Magento\Framework\Stdlib\DateTime $dateTime
+     * @param \Doofinder\Feed\Logger\Feed $logger
+     * @param \Doofinder\Feed\Logger\FeedFactory $feedLoggerFactory
+     * @param \Magento\Framework\Filesystem $filesystem
+     */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\Message\ManagerInterface $messageManager,
@@ -103,8 +118,6 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get store config.
-     *
-     * @notice This should not change current store
      *
      * @param null|string $storeCode
      * @return array
