@@ -75,15 +75,9 @@ class Product extends Map
 
             case 'quantity_and_stock_status':
                 return $this->getQuantityAndStockStatus($this->_context);
-
-            case 'color':
-            case 'tax_class_id':
-            case 'manufacturer':
-            case 'weight_type':
-                return $this->getAttributeText($this->_context, $field);
         }
 
-        return parent::get($field);
+        return $this->getAttributeText($this->_context, $field);
     }
 
     /**

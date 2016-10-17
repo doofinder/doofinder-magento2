@@ -56,6 +56,14 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             )
         );
 
+        $this->_product = $this->getMock(
+            '\Magento\Catalog\Model\Product',
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->_helper = $this->getMock(
             '\Doofinder\Feed\Helper\Product',
             [],
@@ -77,21 +85,15 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->_helper->method('getProductPrice')->willReturn(10.1234);
         $this->_helper->method('getProductAvailability')->willReturn('in stock');
         $this->_helper->method('getCurrencyCode')->willReturn('USD');
-        $this->_helper->method('getAttributeText')->will($this->onConsecutiveCalls('blue', 'Taxable', 'Company'));
         $this->_helper->method('getQuantityAndStockStatus')->willReturn('5 - in stock');
-
-        $this->_product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
-            [],
-            [],
-            '',
-            false
-        );
         $map = [
-            ['title', null, 'Sample title',],
-            ['description', null, 'Sample description',],
+            [$this->_product, 'title', 'Sample title',],
+            [$this->_product, 'description', 'Sample description',],
+            [$this->_product, 'color', 'blue'],
+            [$this->_product, 'tax_class_id', 'Taxable'],
+            [$this->_product, 'manufacturer', 'Company'],
         ];
-        $this->_product->method('getData')->will($this->returnValueMap($map));
+        $this->_helper->method('getAttributeText')->will($this->returnValueMap($map));
 
         $this->_item = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Item',

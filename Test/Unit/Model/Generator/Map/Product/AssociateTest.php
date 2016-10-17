@@ -43,6 +43,7 @@ class AssociateTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
+        $this->_helper->method('getAttributeText')->willReturn('sample value');
 
         $this->_product = $this->getMock(
             '\Magento\Catalog\Model\Product',
@@ -51,10 +52,6 @@ class AssociateTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
-        $this->_productDataValue = 'sample value';
-        $this->_product->method('getData')->will($this->returnCallback(function () {
-            return $this->_productDataValue;
-        }));
 
         $this->_item = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Item',

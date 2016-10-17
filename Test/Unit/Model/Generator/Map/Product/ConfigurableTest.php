@@ -43,6 +43,10 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
+        $this->_productAttributeValue = 'sample parent value';
+        $this->_helper->method('getAttributeText')->will($this->returnCallback(function () {
+            return $this->_productAttributeValue;
+        }));
 
         $this->_product = $this->getMock(
             '\Magento\Catalog\Model\Product',
@@ -51,10 +55,6 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
-        $this->_productDataValue = 'sample parent value';
-        $this->_product->method('getData')->will($this->returnCallback(function () {
-            return $this->_productDataValue;
-        }));
 
         $this->_associate = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Item',
@@ -171,7 +171,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetNoSplitParentArray()
     {
-        $this->_productDataValue = ['sample parent value 1', 'sample parent value 2'];
+        $this->_productAttributeValue = ['sample parent value 1', 'sample parent value 2'];
 
         $this->_model->setSplitConfigurableProducts(false);
         $this->_model->before();

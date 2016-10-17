@@ -223,7 +223,13 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAttributeText(\Magento\Catalog\Model\Product $product, $attributeName)
     {
-        return $product->getAttributeText($attributeName);
+        $value = $product->getResource()->getAttribute($attributeName)->getFrontend()->getValue($product);
+
+        if (is_a($value, '\Magento\Framework\Phrase')) {
+            $value = $value->render();
+        }
+
+        return $value;
     }
 
     /**

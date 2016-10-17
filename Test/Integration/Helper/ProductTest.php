@@ -211,6 +211,16 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             __('None'),
             $this->_helper->getAttributeText($product, 'tax_class_id')
         );
+
+        $this->assertEquals(
+            'Simple Product',
+            $this->_helper->getAttributeText($product, 'name')
+        );
+
+        $this->assertEquals(
+            'Description with <b>html tag</b>',
+            $this->_helper->getAttributeText($product, 'description')
+        );
     }
 
     /**
