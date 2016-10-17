@@ -166,7 +166,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
             false
         );
         $this->_store->method('getBaseUrl')->with(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
-            ->willReturn('http://example.com/media');
+            ->willReturn('http://example.com/media/');
 
         $this->_storeManager = $this->getMock(
             '\Magento\Store\Model\StoreManagerInterface',

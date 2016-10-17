@@ -424,7 +424,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         $baseUrl = $this->_storeManager->getStore($storeCode)->getBaseUrl(
             \Magento\Framework\UrlInterface::URL_TYPE_MEDIA
         );
-        return $baseUrl . '/' . $filename;
+        return $baseUrl . $filename;
     }
 
     /**

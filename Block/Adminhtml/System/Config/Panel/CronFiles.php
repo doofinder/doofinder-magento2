@@ -54,7 +54,7 @@ class CronFiles extends Message
         foreach ($storeCodes as $storeCode) {
             if ($this->_schedule->isFeedFileExist($storeCode)) {
                 $url = $this->_schedule->getFeedFileUrl($storeCode);
-                $files[] = '<a href="' . $url . ' target="_blank">' . $url . '</a>';
+                $files[] = '<a href="' . $url . '" target="_blank">' . $url . '</a>';
             } else {
                 $files[] = __('Currently there is no file to preview.');
             }
