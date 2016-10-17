@@ -199,39 +199,34 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     /**
      * Test getAttributeText
      *
-     * @todo write test
-     *
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      * @magentoAppIsolation enabled
      */
 
     public function testGetAttributeText()
     {
-        /*$product = $this->_productRepository->get('simple');
+        $product = $this->_productRepository->get('simple');
 
         $this->assertEquals(
-            'ATTRIBUTE VALUE',
-            $this->_helper->getAttributeText($product, 'ATTRIBUTE CODE')
-        );*/
+            __('None'),
+            $this->_helper->getAttributeText($product, 'tax_class_id')
+        );
     }
 
     /**
      * Test getQuantityAndStockStatus
-     *
-     * @todo write test
      *
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      * @magentoAppIsolation enabled
      */
     public function testGetQuantityAndStockStatus()
     {
-        /*$product = $this->_productRepository->get('simple');
+        $product = $this->_productRepository->get('simple');
 
         $this->assertEquals(
-            '10 - In stock',
+            '100 - in stock',
             $this->_helper->getQuantityAndStockStatus($product)
-        );*/
-
+        );
     }
 
     /**
