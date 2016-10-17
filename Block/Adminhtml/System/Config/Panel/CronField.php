@@ -100,10 +100,15 @@ class CronField extends Message
         switch ($field) {
             case 'next_run':
             case 'next_iteration':
-                $date = new \DateTime($value);
-                $date->setTimezone(new \DateTimeZone($this->_timezone->getConfigTimezone()));
+                /**
+                 * @fixme Using '-' in database is defenitely wrong practice
+                 */
+                if ($value != '-') {
+                    $date = new \DateTime($value);
+                    $date->setTimezone(new \DateTimeZone($this->_timezone->getConfigTimezone()));
 
-                $value = $this->_datetime->formatDate($date);
+                    $value = $this->_datetime->formatDate($date);
+                }
                 break;
 
             case 'last_feed_name':
