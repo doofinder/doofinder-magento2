@@ -3,11 +3,9 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
         <job name="doofinder_feed_reschedule_tasks" instance="Doofinder\Feed\Cron\RescheduleTasks" method="execute">
-            <config_path>crontab/default/jobs/feed_generate/schedule/cron_expr</config_path>
             <schedule>* * * * *</schedule>
         </job>
         <job name="doofinder_feed_generate_feed" instance="Doofinder\Feed\Cron\GenerateFeed" method="execute">
-            <config_path>crontab/default/jobs/feed_generate/schedule/cron_expr</config_path>
             <schedule>* * * * *</schedule>
         </job>
     </group>
