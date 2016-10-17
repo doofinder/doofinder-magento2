@@ -176,8 +176,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test execute() method.
-     *
-     * @todo wait for feed/config controller implementation
      */
     public function testExecuteEnabled()
     {
