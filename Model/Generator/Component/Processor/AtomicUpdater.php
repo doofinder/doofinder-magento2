@@ -23,7 +23,7 @@ class AtomicUpdater extends Component implements Processor
         parent::__construct($logger, $data);
 
         // Create DoofinderManagementApi instance
-        $this->_doofinderManagementApi = $dmaFactory->create($this->getData('api_key'));
+        $this->_doofinderManagementApi = $dmaFactory->create(['apiKey' => $this->getData('api_key')]);
 
         // Prepare SearchEngine instance
         $hashId = $this->getData('hash_id');

@@ -90,7 +90,7 @@ class ProductAtomicUpdate implements \Magento\Framework\Event\ObserverInterface
 
             // Add fixed product fetcher
             $feedConfig['data']['config']['fetchers']['Product\Fixed'] = [
-                'products' => $observer->getEvent()->getProduct(),
+                'products' => [$observer->getEvent()->getProduct()],
             ];
 
             // Add atomic update processor

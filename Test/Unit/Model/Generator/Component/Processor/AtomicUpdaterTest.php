@@ -74,7 +74,7 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
             false
         );
         $this->_dmaFactory->expects($this->once())->method('create')
-            ->with('sample_api_key')->willReturn($this->_dma);
+            ->with(['apiKey' => 'sample_api_key'])->willReturn($this->_dma);
 
         $this->_model = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Processor\AtomicUpdater',

@@ -114,7 +114,7 @@ class ProductAtomicUpdateTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
-        $this->_event->method('getProduct')->willReturn([$this->_product]);
+        $this->_event->method('getProduct')->willReturn($this->_product);
 
         $this->_invokedObserver = $this->getMock(
             '\Magento\Framework\Event\Observer',
