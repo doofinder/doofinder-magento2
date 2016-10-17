@@ -85,9 +85,7 @@ class XmlTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test process
-     *
-     * @notice This test does is testing nothing concrete
+     * Test process open/output
      */
     public function testProcess()
     {
