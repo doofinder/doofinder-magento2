@@ -86,7 +86,15 @@ class Mapper extends Component implements Processor
     protected function processDefinition(array $definition)
     {
         $field = $definition['field'];
-        return $this->_map->get($field);
+        $value = $this->_map->get($field);
+
+        switch ($field) {
+            case 'boost':
+                $value = is_array($value) ? max($value) : $value;
+                break;
+        }
+
+        return $value;
     }
 
     /**
