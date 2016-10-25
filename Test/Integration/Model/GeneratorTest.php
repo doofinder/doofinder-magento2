@@ -46,21 +46,21 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
 <channel>
-<title>Product feed</title>
-<link>%s/doofinder/feed</link>
-<pubDate>%s, %d %s %d %d:%d:%d UTC</pubDate>
-<generator>Doofinder/%d.%d.%d</generator>
-<description>Magento Product feed for Doofinder</description>
+<title><![CDATA[Product feed]]></title>
+<link><![CDATA[%s/doofinder/feed]]></link>
+<pubDate><![CDATA[%s, %d %s %d %d:%d:%d UTC]]></pubDate>
+<generator><![CDATA[Doofinder/%d.%d.%d]]></generator>
+<description><![CDATA[Magento Product feed for Doofinder]]></description>
 <item>
- <title>Simple Product</title>
- <description>Short description</description>
- <price>10.00</price>
- <mpn>simple</mpn>
+ <title><![CDATA[Simple Product]]></title>
+ <description><![CDATA[Short description]]></description>
+ <price><![CDATA[10.00]]></price>
+ <mpn><![CDATA[simple]]></mpn>
 </item>
 <item>
- <title>Virtual Product</title>
- <price>10.00</price>
- <mpn>virtual-product</mpn>
+ <title><![CDATA[Virtual Product]]></title>
+ <price><![CDATA[10.00]]></price>
+ <mpn><![CDATA[virtual-product]]></mpn>
 </item>
 </channel>
 </rss>

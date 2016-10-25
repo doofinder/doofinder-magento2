@@ -109,11 +109,11 @@ class Xml extends Component implements Processor
             $writer->writeRaw('<channel>' . PHP_EOL);
 
             $writer->write([
-                'title' => 'Product feed',
-                'link' => $this->getFeedUrl(),
-                'pubDate' => strftime('%a, %d %b %Y %H:%M:%S %Z'),
-                'generator' => $this->getModuleVersion(),
-                'description' => 'Magento Product feed for Doofinder',
+                'title' => new \Sabre\Xml\Element\Cdata('Product feed'),
+                'link' => new \Sabre\Xml\Element\Cdata($this->getFeedUrl()),
+                'pubDate' => new \Sabre\Xml\Element\Cdata(strftime('%a, %d %b %Y %H:%M:%S %Z')),
+                'generator' => new \Sabre\Xml\Element\Cdata($this->getModuleVersion()),
+                'description' => new \Sabre\Xml\Element\Cdata('Magento Product feed for Doofinder'),
             ]);
         }
 

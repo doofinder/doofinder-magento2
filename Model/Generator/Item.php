@@ -53,6 +53,10 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
                 }
             }
 
+            if (!is_array($value) && !is_a($value, '\Sabre\Xml\XmlSerializable')) {
+                $value = new \Sabre\Xml\Element\Cdata($value);
+            }
+
             $properties[] = [
                 'name' => $key,
                 'value' => $value,

@@ -49,12 +49,12 @@ class ItemTest extends \PHPUnit_Framework_TestCase
 <?xml version="1.0"?>
 <feed>
  <item>
-  <name>Sample product</name>
-  <price>20.99</price>
-  <description>Lorem ipsum dolor sit amet</description>
+  <name><![CDATA[Sample product]]></name>
+  <price><![CDATA[20.99]]></price>
+  <description><![CDATA[Lorem ipsum dolor sit amet]]></description>
   <nested>
-   <cookie>muffin</cookie>
-   <juice>apple</juice>
+   <cookie><![CDATA[muffin]]></cookie>
+   <juice><![CDATA[apple]]></juice>
   </nested>
  </item>
 </feed>
