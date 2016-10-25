@@ -85,7 +85,6 @@ class Index extends \Doofinder\Feed\Controller\Base
     protected function getFeedCustomParams()
     {
         $params = [
-            'minimal_price' => $this->getParamInt('minimal_price'),
             'offset' => $this->getParamInt('offset'),
             'limit' => $this->getParamInt('limit'),
         ];

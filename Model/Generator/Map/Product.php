@@ -152,11 +152,6 @@ class Product extends Map
     {
         $price = $this->_helper->getProductPrice($product);
 
-        // Do not export prices below the minimal price
-        if ($price < $this->getMinimalPrice()) {
-            return null;
-        }
-
         return number_format($price, 2, '.', '');
     }
 
