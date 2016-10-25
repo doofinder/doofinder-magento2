@@ -63,9 +63,17 @@ class Product extends Component implements Fetcher
         $collection = $this->getProductCollection($this->getLimit(), $this->getOffset());
         $collection->load();
 
-        // Check if fetcher is started and done
+        // Check if fetcher is started
         $this->_isStarted = !$this->getOffset();
-        $this->_isDone = !$this->getLimit() || $this->getLimit() >= $collection->getSize();
+
+        // Check if fetcher is done
+        if ($collection->getSize() > 0) {
+            $this->_isDone = !$this->getLimit() || $this->getLimit() >= $collection->getSize();
+        } else {
+            // Done if not items fetched but fetcher is started
+            $this->_isDone = $this->_isStarted;
+        }
+
 
         // Set the last processed entity id
         $this->_lastProcessedEntityId = $this->getOffset();
