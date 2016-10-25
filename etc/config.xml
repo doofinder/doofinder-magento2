@@ -13,7 +13,6 @@
                 <price>price</price>
                 <mpn>sku</mpn>
                 <availability>df_availability</availability>
-                <currency>df_currency</currency>
             </feed_attributes>
             <feed_settings>
                 <export_product_prices>1</export_product_prices>
