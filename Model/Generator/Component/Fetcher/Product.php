@@ -151,6 +151,11 @@ class Product extends Component implements Fetcher
         }
 
         if ($offset) {
+            // Transform offset to last processed entity id if offset is from frontend
+            if ($this->getTransformOffset()) {
+                $offset = $this->getLastProcessedEntityIdFromOffset($offset);
+            }
+
             $collection->addAttributeToFilter('entity_id', ['gt' => $offset]);
         }
 
@@ -215,5 +220,24 @@ class Product extends Component implements Fetcher
         $total = $collection->getSize();
 
         return $total ? (1 - round(1.0 * $this->_itemsLeftCount / $total, 2)) : 1.0;
+    }
+
+    /**
+     * Get entity_id offset from query offset
+     *
+     * @notice This is a workaround for frontend controller
+     *         which passes offset as a number of processed
+     *         products instead of last processed entity id
+     *
+     * @return int
+     */
+    protected function getLastProcessedEntityIdFromOffset()
+    {
+        $collection = $this->getProductCollection();
+        $collection->getSelect()->limit(1, $this->getOffset() - 1);
+
+        $item = $collection->fetchItem();
+
+        return $item ? $item->getEntityId() : null;
     }
 }

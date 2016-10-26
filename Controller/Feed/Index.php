@@ -68,6 +68,9 @@ class Index extends \Doofinder\Feed\Controller\Base
             $this->_storeManager->setCurrentStore($storeCode);
         }
 
+        // Enforce transforming offset to last processed entity id
+        $feedConfig['data']['config']['fetchers']['Product']['transform_offset'] = true;
+
         $generator = $this->_generatorFactory->create($feedConfig);
         $generator->run();
 

@@ -149,6 +149,57 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test fetch with offset transform
+     */
+    public function testFetchWithOffsetTransform()
+    {
+        $this->_model->setLimit(10);
+        $this->_model->setOffset(30);
+        $this->_model->setTransformOffset(true);
+
+        $select = $this->getMock(
+            '\Magento\Framework\DB\Select',
+            [],
+            [],
+            '',
+            false
+        );
+        $select->expects($this->once())->method('limit')->with(1, 29);
+        $this->_productCollection->method('getSelect')->willReturn($select);
+
+        $product = $this->getMock(
+            '\Magento\Catalog\Model\Product',
+            [],
+            [],
+            '',
+            false
+        );
+        $product->method('getEntityId')->willReturn(51);
+        $this->_productCollection->method('fetchItem')->willReturn($product);
+
+        $this->_productCollection->expects($this->once())->method('setPageSize')
+            ->with(10)
+            ->willReturn(array($this->_product));
+        $this->_productCollection->expects($this->any())->method('addAttributeToFilter')
+            ->withConsecutive(
+                ['status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED],
+                ['visibility', [
+                    \Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH,
+                    \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH
+                ]],
+                ['status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED],
+                ['visibility', [
+                    \Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH,
+                    \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH
+                ]],
+                ['entity_id', ['gt' => 51]]
+             )
+            ->willReturn($this->_productCollection);
+
+        $this->_model->fetch();
+    }
+
+    /**
      * Test isStarted() and isDone() methods
      *
      * @dataProvider testStartedDoneProvider
