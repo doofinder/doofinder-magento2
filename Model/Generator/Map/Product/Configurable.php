@@ -87,6 +87,11 @@ class Configurable extends Product
             // Remove duplicates
             $value = array_values(array_unique($value));
 
+            // Filter out empty values (0 is not an empty value)
+            $value = array_filter($value, function ($item) {
+                return $item || $item === 0;
+            });
+
             // Remove array if value is single
             if (count($value) == 1) {
                 $value = $value[0];
