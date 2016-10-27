@@ -208,7 +208,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $product = $this->_productRepository->get('simple');
 
         $this->assertEquals(
-            __('None'),
+            null,
             $this->_helper->getAttributeText($product, 'tax_class_id')
         );
 
