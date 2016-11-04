@@ -227,6 +227,7 @@
                        showInStore="1"
                        showInWebsite="1">
                     <label>Feed generation start time</label>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\StartTime</backend_model>
                     <comment>
                         <![CDATA[ The time at which the feed generation starts.]]>
                     </comment>

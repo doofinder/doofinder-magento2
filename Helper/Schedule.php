@@ -131,13 +131,15 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * Convert time array to \DateTime
      *
      * @param array $time - [hours, minutes, seconds]
-     * @param boolean $timezoneOffset
-     * @param null|\DateTime $base - Base \DateTime
-     * @return \DateTime - in default timezone
+     * @param string|null $timezone
+     * @param \DateTime|null $base - Base \DateTime
+     * @return \DateTime
      */
-    public function timeArrayToDate(array $time, $timezoneOffset = true, $base = null)
+    public function timeArrayToDate(array $time, $timezone = null, $base = null)
     {
-        $timezone = $timezoneOffset ? $this->_timezone->getConfigTimezone() : date_default_timezone_get();
+        if (!$timezone) {
+            $timezone = date_default_timezone_get();
+        }
 
         $date = new \DateTime(
             $base ? $base->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT) : null,
@@ -281,7 +283,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             if ($now) {
                 $date = new \DateTime(null, new \DateTimeZone($this->_timezone->getDefaultTimezone()));
             } else {
-                $date = $this->timeArrayToDate($config['start_time']);
+                $date = $this->timeArrayToDate($config['start_time'], $this->_timezone->getDefaultTimezone());
             }
 
             $this->rescheduleProcess($process, $this->getScheduleDate($date, $config['frequency']));

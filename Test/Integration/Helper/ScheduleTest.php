@@ -85,9 +85,9 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider testTimeArrayToDateProvider
      */
-    public function testTimeArrayToDate($time, $timezoneOffset, $base, $expected)
+    public function testTimeArrayToDate($time, $timezone, $base, $expected)
     {
-        $date = $this->_helper->timeArrayToDate($time, $timezoneOffset, $base);
+        $date = $this->_helper->timeArrayToDate($time, $timezone, $base);
 
         $this->assertEquals($expected, $date);
     }
@@ -97,31 +97,31 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 [10, 0, 0],
-                true,
+                'Europe/Berlin',
                 new \DateTime('2016-01-01 00:00:00'),
-                new \DateTime('2016-01-01 10:00:00', $this->getConfigTimezone())
+                new \DateTime('2016-01-01 10:00:00', new \DateTimeZone('Europe/Berlin'))
             ],
             [
                 [20, 0, 0],
-                true,
+                'Europe/Berlin',
                 new \DateTime('2016-05-01 00:00:00'),
-                new \DateTime('2016-05-01 20:00:00', $this->getConfigTimezone())
+                new \DateTime('2016-05-01 20:00:00', new \DateTimeZone('Europe/Berlin'))
             ],
             [
                 [10, 0, 0],
-                false,
+                null,
                 new \DateTime('2017-02-11 00:00:00'),
                 new \DateTime('2017-02-11 10:00:00')
             ],
             [
                 [0, 0, 0],
-                false,
+                null,
                 new \DateTime('2016-01-01 00:00:00'),
                 new \DateTime('2016-01-01 00:00:00')
             ],
             [
                 [4, 30, 0],
-                false,
+                null,
                 new \DateTime('2016-01-01 03:00:00', new \DateTimeZone('Europe/Berlin')),
                 new \DateTime('2016-01-01 04:30:00')
             ],
@@ -214,15 +214,15 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $process->getErrorStack());
         $this->assertEquals('0%', $process->getComplete());
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))->modify('+1 day')->setTime(0, 0, 0),
+            (new \DateTime(null, $this->getDefaultTimezone()))->modify('+1 day')->setTime(0, 0, 0),
             new \DateTime($process->getNextRun(), $this->getDefaultTimezone())
         );
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))->modify('+1 day')->setTime(0, 0, 0),
+            (new \DateTime(null, $this->getDefaultTimezone()))->modify('+1 day')->setTime(0, 0, 0),
             new \DateTime($process->getNextIteration(), $this->getDefaultTimezone())
         );
-        $this->assertStringMatchesFormat('%d-%d-%d 07:00:00', $process->getNextRun());
-        $this->assertStringMatchesFormat('%d-%d-%d 07:00:00', $process->getNextIteration());
+        $this->assertStringMatchesFormat('%d-%d-%d 00:00:00', $process->getNextRun());
+        $this->assertStringMatchesFormat('%d-%d-%d 00:00:00', $process->getNextIteration());
         $this->assertEquals('None', $process->getLastFeedName());
         $this->assertEquals(0, $process->getOffset());
         $this->assertStringMatchesFormat('%d-%d-%d %d:%d:%d', $process->getCreatedAt());
@@ -240,11 +240,11 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $process = $this->_helper->updateProcess($this->_defaultStore);
 
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))->modify('+7 days')->setTime(0, 0, 0),
+            (new \DateTime(null, $this->getDefaultTimezone()))->modify('+7 days')->setTime(0, 0, 0),
             new \DateTime($process->getNextRun(), $this->getDefaultTimezone())
         );
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))->modify('+7 days')->setTime(0, 0, 0),
+            (new \DateTime(null, $this->getDefaultTimezone()))->modify('+7 days')->setTime(0, 0, 0),
             new \DateTime($process->getNextIteration(), $this->getDefaultTimezone())
         );
     }
@@ -260,11 +260,11 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $process = $this->_helper->updateProcess($this->_defaultStore);
 
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))->modify('+1 month')->setTime(0, 0, 0),
+            (new \DateTime(null, $this->getDefaultTimezone()))->modify('+1 month')->setTime(0, 0, 0),
             new \DateTime($process->getNextRun(), $this->getDefaultTimezone())
         );
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))->modify('+1 month')->setTime(0, 0, 0),
+            (new \DateTime(null, $this->getDefaultTimezone()))->modify('+1 month')->setTime(0, 0, 0),
             new \DateTime($process->getNextIteration(), $this->getDefaultTimezone())
         );
     }
@@ -280,19 +280,19 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $process = $this->_helper->updateProcess($this->_defaultStore);
 
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))
+            (new \DateTime(null, $this->getDefaultTimezone()))
                 ->setTime(10, 15, 30)
                 ->format('H:i:s'),
             (new \DateTime($process->getNextRun(), $this->getDefaultTimezone()))
-                ->setTimezone($this->getConfigTimezone())
+                ->setTimezone($this->getDefaultTimezone())
                 ->format('H:i:s')
         );
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))
+            (new \DateTime(null, $this->getDefaultTimezone()))
                 ->setTime(10, 15, 30)
                 ->format('H:i:s'),
             (new \DateTime($process->getNextIteration(), $this->getDefaultTimezone()))
-                ->setTimezone($this->getConfigTimezone())
+                ->setTimezone($this->getDefaultTimezone())
                 ->format('H:i:s')
         );
     }
@@ -327,15 +327,15 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $process->getErrorStack());
         $this->assertEquals('0%', $process->getComplete());
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))->modify('+1 day')->setTime(0, 0, 0),
+            (new \DateTime(null, $this->getDefaultTimezone()))->modify('+1 day')->setTime(0, 0, 0),
             new \DateTime($process->getNextRun(), $this->getDefaultTimezone())
         );
         $this->assertEquals(
-            (new \DateTime(null, $this->getConfigTimezone()))->modify('+1 day')->setTime(0, 0, 0),
+            (new \DateTime(null, $this->getDefaultTimezone()))->modify('+1 day')->setTime(0, 0, 0),
             new \DateTime($process->getNextIteration(), $this->getDefaultTimezone())
         );
-        $this->assertStringMatchesFormat('%d-%d-%d 07:00:00', $process->getNextRun());
-        $this->assertStringMatchesFormat('%d-%d-%d 07:00:00', $process->getNextIteration());
+        $this->assertStringMatchesFormat('%d-%d-%d 00:00:00', $process->getNextRun());
+        $this->assertStringMatchesFormat('%d-%d-%d 00:00:00', $process->getNextIteration());
         $this->assertEquals('doofinder-default.xml', $process->getLastFeedName());
         $this->assertEquals(0, $process->getOffset());
         $this->assertStringMatchesFormat('%d-%d-%d %d:%d:%d', $process->getCreatedAt());
