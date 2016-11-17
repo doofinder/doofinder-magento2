@@ -41,14 +41,14 @@
     <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
         <arguments>
             <argument name="handlers" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\Indexer\IndexerHandler</item>
+                <item name="doofinder" xsi:type="string">\Doofinder\Feed\Search\IndexerHandler</item>
             </argument>
         </arguments>
     </type>
     <type name="Magento\CatalogSearch\Model\Indexer\IndexStructureFactory">
         <arguments>
             <argument name="structures" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\Indexer\IndexStructure</item>
+                <item name="doofinder" xsi:type="string">\Doofinder\Feed\Search\IndexStructure</item>
             </argument>
         </arguments>
     </type>

@@ -30,10 +30,12 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Api\Search\ClientFactory $searchFactory
+        \Doofinder\Api\Search\ClientFactory $searchFactory,
+        \Doofinder\Api\Management\ClientFactory $dmaFactory
     ) {
         $this->_storeConfig = $storeConfig;
         $this->_searchFactory = $searchFactory;
+        $this->_dmaFactory = $dmaFactory;
         parent::__construct($context);
     }
 
@@ -113,5 +115,88 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     protected function getStoreCode()
     {
         return $this->_storeConfig->getStoreCode();
+    }
+
+    /**
+     * Get Doofinder Search Engine
+     *
+     * @param string $storeCode
+     * @return \Doofinder\Api\Management\SearchEngine
+     */
+    protected function getDoofinderSearchEngine()
+    {
+        // Create DoofinderManagementApi instance
+        $doofinderManagementApi = $this->_dmaFactory->create(['apiKey' => $this->_storeConfig->getApiKey()]);
+
+        // Prepare SearchEngine instance
+        $hashId = $this->_storeConfig->getHashId($this->getStoreCode());
+        foreach ($doofinderManagementApi->getSearchEngines() as $searchEngine) {
+            if ($searchEngine->hashid == $hashId) {
+                return $searchEngine;
+            }
+        }
+
+        throw new \Magento\Framework\Exception\LocalizedException(
+            __('Search engine with HashID %1 doesn\'t exists. Please, check your configuration.', $hashId)
+        );
+    }
+
+    /**
+     * Update Doofinder items
+     *
+     * @param array $items
+     */
+    public function updateDoofinderItems(array $items)
+    {
+        $searchEngine = $this->getDoofinderSearchEngine();
+        $result = $searchEngine->updateItems('product', $items);
+
+        if (!$result) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('There was an error during Doofinder index items update.')
+            );
+        }
+    }
+
+    /**
+     * Delete Doofinder items
+     *
+     * @param array $items
+     */
+    public function deleteDoofinderItems(array $items)
+    {
+        $searchEngine = $this->getDoofinderSearchEngine();
+        $result = $searchEngine->deleteItems('product', array_map(function ($item) {
+            return $item['id'];
+        }, $items));
+
+        if (!$result) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('There was an error during Doofinder index items deletion.')
+            );
+        }
+
+        if (!empty($result['errors'])) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Following items could not be deleted from Doofinder index: %1.', implode(', ', $result['errors']))
+            );
+        }
+
+        return true;
+    }
+
+    public function cleanDoofinderItems()
+    {
+        $searchEngine = $this->getDoofinderSearchEngine();
+        $deleteResult = $searchEngine->deleteType('product');
+        $addResult = $searchEngine->addType('product');
+
+        if (!$deleteResult || !$addResult) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('There was an error during Doofinder index deletion')
+            );
+        }
+
+        return true;
     }
 }

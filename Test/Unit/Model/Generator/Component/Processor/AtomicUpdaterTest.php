@@ -15,19 +15,9 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
     private $_item;
 
     /**
-     * @var \SearchEngine
+     * @var \Doofinder\Feed\Helper\Search
      */
-    private $_searchEngine;
-
-    /**
-     * @var \DoofinderManagementApi
-     */
-    private $_dma;
-
-    /**
-     * @var \Doofinder\Api\Management\ClientFactory
-     */
-    private $_dmaFactory;
+    private $_search;
 
     /**
      * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
@@ -49,39 +39,21 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_searchEngine = $this->getMock(
-            '\Doofinder\Api\Management\SearchEngine',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_dma = $this->getMock(
-            '\Doofinder\Api\Management\Client',
-            [],
+        $this->_search = $this->getMock(
+            '\Doofinder\Feed\Helper\Search',
+            ['someActionDoofinderItems'],
             [],
             '',
             false
         );
-        $this->_dma->method('getSearchEngines')->willReturn([$this->_searchEngine]);
-
-        $this->_dmaFactory = $this->getMock(
-            '\Doofinder\Api\Management\ClientFactory',
-            ['create'],
-            [],
-            '',
-            false
-        );
-        $this->_dmaFactory->expects($this->once())->method('create')
-            ->with(['apiKey' => 'sample_api_key'])->willReturn($this->_dma);
 
         $this->_model = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Processor\AtomicUpdater',
             [
-                'dmaFactory' => $this->_dmaFactory,
+                'search' => $this->_search,
                 'data' => [
                     'api_key' => 'sample_api_key',
+                    'action' => 'someAction',
                 ],
             ]
         );
@@ -99,8 +71,8 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
 
         $this->_item->method('getData')->willReturn($data);
 
-        $this->_searchEngine->expects($this->once())->method('updateItems')
-            ->with('product', [$data]);
+        $this->_search->expects($this->once())->method('someActionDoofinderItems')
+            ->with([$data]);
 
         $this->_model->process([$this->_item]);
     }
