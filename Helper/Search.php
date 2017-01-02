@@ -149,7 +149,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     public function updateDoofinderItems(array $items)
     {
         $searchEngine = $this->getDoofinderSearchEngine();
-        $result = $searchEngine->updateItems('product', $items);
+        $result = $searchEngine->updateItems('product', array_values($items));
 
         if (!$result) {
             throw new \Magento\Framework\Exception\LocalizedException(
