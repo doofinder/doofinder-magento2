@@ -68,7 +68,7 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
         $this->_feedConfig = $feedConfig;
         $this->_generatorFactory = $generatorFactory;
         $this->_searchHelper = $searchHelper;
-        $this->_batchSize = 200;
+        $this->_batchSize = 100;
     }
 
     /**

@@ -179,7 +179,7 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
     public function testSaveIndex()
     {
         $this->_batch->expects($this->once())->method('getItems')
-            ->with($this->_documents, 200)->willReturn($this->_documents);
+            ->with($this->_documents, 100)->willReturn($this->_documents);
 
         $this->_generator->expects($this->once())->method('run');
 
@@ -216,7 +216,7 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
     public function testDeleteIndex()
     {
         $this->_batch->expects($this->once())->method('getItems')
-            ->with($this->_documents, 200)->willReturn($this->_documents);
+            ->with($this->_documents, 100)->willReturn($this->_documents);
 
         $this->_generator->expects($this->once())->method('run');
 
