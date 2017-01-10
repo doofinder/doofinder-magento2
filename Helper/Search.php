@@ -15,6 +15,16 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_searchFactory;
 
     /**
+     * @var \Doofinder\Feed\Wrapper\Throttle
+     */
+    protected $_throttleFactory;
+
+    /**
+     * @var \Doofinder\Api\Management\SearchEngine[]
+     */
+    protected $_searchEngines = null;
+
+    /**
      * @var \Doofinder\Api\Search\Client|null
      */
     protected $_lastSearch = null;
@@ -31,11 +41,13 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\Helper\Context $context,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Doofinder\Api\Search\ClientFactory $searchFactory,
-        \Doofinder\Api\Management\ClientFactory $dmaFactory
+        \Doofinder\Api\Management\ClientFactory $dmaFactory,
+        \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory
     ) {
         $this->_storeConfig = $storeConfig;
         $this->_searchFactory = $searchFactory;
         $this->_dmaFactory = $dmaFactory;
+        $this->_throttleFactory = $throttleFactory;
         parent::__construct($context);
     }
 
@@ -121,19 +133,27 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      * Get Doofinder Search Engine
      *
      * @param string $storeCode
-     * @return \Doofinder\Api\Management\SearchEngine
+     * @return \Doofinder\Feed\Wrapper\Throttle
      */
     protected function getDoofinderSearchEngine()
     {
-        // Create DoofinderManagementApi instance
-        $doofinderManagementApi = $this->_dmaFactory->create(['apiKey' => $this->_storeConfig->getApiKey()]);
+        if ($this->_searchEngines === null) {
+            $this->_searchEngines = [];
+
+            // Create DoofinderManagementApi instance
+            $doofinderManagementApi = $this->_throttleFactory->create([
+                'obj' => $this->_dmaFactory->create(['apiKey' => $this->_storeConfig->getApiKey()])
+            ]);
+
+            foreach ($doofinderManagementApi->getSearchEngines() as $searchEngine) {
+                $this->_searchEngines[$searchEngine->hashid] = $searchEngine;
+            }
+        }
 
         // Prepare SearchEngine instance
         $hashId = $this->_storeConfig->getHashId($this->getStoreCode());
-        foreach ($doofinderManagementApi->getSearchEngines() as $searchEngine) {
-            if ($searchEngine->hashid == $hashId) {
-                return $searchEngine;
-            }
+        if (!empty($this->_searchEngines[$hashId])) {
+            return $this->_throttleFactory->create(['obj' => $this->_searchEngines[$hashId]]);
         }
 
         throw new \Magento\Framework\Exception\LocalizedException(
