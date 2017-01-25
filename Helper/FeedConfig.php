@@ -175,4 +175,16 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return isset($this->_params[$key]) ? $this->_params[$key] : null;
     }
+
+    /**
+     * Get feed password
+     *
+     * @param string $storeCode
+     * @return mixed
+     */
+    public function getFeedPassword($storeCode = null)
+    {
+        $storeConfig = $this->_storeConfig->getStoreConfig($storeCode);
+        return isset($storeConfig['password']) ? $storeConfig['password'] : null;
+    }
 }

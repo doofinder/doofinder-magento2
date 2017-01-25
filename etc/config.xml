@@ -15,6 +15,7 @@
                 <availability>df_availability</availability>
             </feed_attributes>
             <feed_settings>
+                <password></password>
                 <export_product_prices>1</export_product_prices>
                 <image_size></image_size>
                 <split_configurable_products>0</split_configurable_products>

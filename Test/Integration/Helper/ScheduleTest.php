@@ -75,6 +75,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 ],
                 'atomic_updates_enabled' => 0,
                 'categories_in_navigation' => 0,
+                'password' => null,
             ],
             $this->_helper->getStoreConfig()
         );

@@ -61,6 +61,13 @@ class Index extends \Doofinder\Feed\Controller\Base
     {
         $storeCode = $this->getParamString('store');
 
+        // Do not proceed if password check fails
+        if (!$this->checkPassword($storeCode)) {
+            throw new \Magento\Framework\Exception\NotFoundException(
+                __('Unauthorized access to feed.')
+            );
+        }
+
         $feedConfig = $this->_feedConfig->getFeedConfig($storeCode, $this->getFeedCustomParams());
 
         // Set current store for generator
@@ -95,5 +102,17 @@ class Index extends \Doofinder\Feed\Controller\Base
         return array_filter($params, function ($value) {
             return !is_null($value);
         });
+    }
+
+    /**
+     * Check password
+     *
+     * @param string $storeCode
+     * @return boolean
+     */
+    protected function checkPassword($storeCode)
+    {
+        $password = $this->_feedConfig->getFeedPassword($storeCode);
+        return !$password || $this->getParamString('password') == $password;
     }
 }

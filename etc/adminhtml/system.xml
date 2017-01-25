@@ -134,6 +134,18 @@
                 showInWebsite="1"
                 showInStore="1">
                 <label>Feed Settings</label>
+                <field id="password"
+                    translate="label"
+                    type="text"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Password</label>
+                    <comment>
+                        <![CDATA[Protect feed with given password.]]>
+                    </comment>
+                </field>
                 <field id="export_product_prices"
                     translate="label"
                     type="select"
