@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <doofinder_feed_feed>
+            <feed_attributes>
+                <id>df_id</id>
+                <title>name</title>
+                <description>short_description</description>
+                <brand>manufacturer</brand>
+                <link>url_key</link>
+                <image_link>image</image_link>
+                <price>price</price>
+                <mpn>sku</mpn>
+                <availability>df_availability</availability>
+            </feed_attributes>
+            <feed_settings>
+                <password></password>
+                <export_product_prices>1</export_product_prices>
+                <image_size></image_size>
+                <split_configurable_products>0</split_configurable_products>
+                <atomic_updates_enabled>0</atomic_updates_enabled>
+                <categories_in_navigation>0</categories_in_navigation>
+            </feed_settings>
+            <feed_cron>
+                <enabled>1</enabled>
+                <start_time>0,0,0</start_time>
+                <frequency>D</frequency>
+                <step_size>1000</step_size>
+                <step_delay>5</step_delay>
+            </feed_cron>
+        </doofinder_feed_feed>
+        <doofinder_feed_search>
+            <doofinder_layer>
+                <enabled>0</enabled>
+            </doofinder_layer>
+            <doofinder_internal_search>
+                <enabled>0</enabled>
+                <apikey></apikey>
+                <hash_id></hash_id>
+                <request_limit>100</request_limit>
+                <total_limit>500</total_limit>
+            </doofinder_internal_search>
+        </doofinder_feed_search>
+        <directives>
+            <df_id><![CDATA[Product Id]]></df_id>
+            <df_availability><![CDATA[Product Availability]]></df_availability>
+            <df_currency><![CDATA[Product Currency]]></df_currency>
+        </directives>
+    </default>
+</config>

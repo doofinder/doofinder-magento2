@@ -1,0 +1,514 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="doofinder_feed"
+            translate="label"
+            sortOrder="1000">
+            <label>Doofinder feed</label>
+        </tab>
+        <section id="doofinder_feed_feed"
+            translate="label"
+            type="text"
+            sortOrder="1"
+            showInDefault="1"
+            showInWebsite="1"
+            showInStore="1">
+            <label>Product Data Feed</label>
+            <tab>doofinder_feed</tab>
+            <resource>Doofinder_Feed::config</resource>
+            <group id="feed_attributes"
+            translate="label"
+            type="text"
+            sortOrder="1"
+            showInDefault="1"
+            showInWebsite="1"
+            showInStore="1">
+                <label>Feed Attributes</label>
+                <field id="id"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>ID</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="title"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Title</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="description"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Description</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="brand"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Brand</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="link"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Link</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="image_link"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Image link</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="price"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Price</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="mpn"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>MPN</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="availability"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Availability</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="additional_attributes"
+                    translate="label"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Additional Attributes</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\Map\Additional</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+            <group id="feed_settings"
+                translate="label"
+                type="text"
+                sortOrder="2"
+                showInDefault="1"
+                showInWebsite="1"
+                showInStore="1">
+                <label>Feed Settings</label>
+                <field id="password"
+                    translate="label"
+                    type="text"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Password</label>
+                    <comment>
+                        <![CDATA[Protect feed with given password.]]>
+                    </comment>
+                </field>
+                <field id="export_product_prices"
+                    translate="label"
+                    type="select"
+                    sortOrder="2"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Export Product Prices</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="split_configurable_products"
+                    translate="label"
+                    type="select"
+                    sortOrder="2"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Split Configurable Products</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                        Export each component of a configurable product separately, instead of exporting them as a single product.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="image_size"
+                    translate="label"
+                    type="text"
+                    sortOrder="2"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Image size</label>
+                    <comment>
+                        <![CDATA[Export product image with given width. Leave empty to use original size.]]>
+                    </comment>
+                </field>
+                <field id="atomic_updates_enabled"
+                    translate="label"
+                    type="select"
+                    sortOrder="1"
+                    showInDefault="1"
+                    showInWebsite="0"
+                    showInStore="1">
+                    <label>Use Doofinder API to update products on save</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Requires a Management API key configured in Search Configuration.]]>
+                    </comment>
+                </field>
+                <field id="categories_in_navigation"
+                    translate="label"
+                    type="select"
+                    sortOrder="10"
+                    showInDefault="1"
+                    showInWebsite="0"
+                    showInStore="1">
+                    <label>Export only categories present in navigation menus</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Whether this option is enabled or not, only active categories will be exported.]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="feed_cron"
+                   translate="label"
+                   type="text"
+                   sortOrder="3"
+                   showInDefault="1"
+                   showInStore="1"
+                   showInWebsite="1">
+                <label>Feed Cron</label>
+                <field id="enabled"
+                       translate="label"
+                       type="select"
+                       sortOrder="1"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[ Activate/deactivate the feed for this store ]]>
+                    </comment>
+                </field>
+                <field id="start_time"
+                       translate="label"
+                       type="time"
+                       sortOrder="2"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Feed generation start time</label>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\StartTime</backend_model>
+                    <comment>
+                        <![CDATA[ The time at which the feed generation starts.]]>
+                    </comment>
+                </field>
+                <field id="frequency"
+                       translate="label"
+                       type="select"
+                       sortOrder="3"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Frequency</label>
+                    <source_model>Magento\Cron\Model\Config\Source\Frequency</source_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\Cron</backend_model>
+                    <comment>
+                        <![CDATA[
+                        Feed generating frequency (e.g. "monthly" means that the feed will be generated on the first day of each month at a given hour).
+                        ]]>
+                    </comment>
+                </field>
+                <field id="step_size"
+                       translate="label"
+                       type="text"
+                       sortOrder="4"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Step size</label>
+                    <comment>
+                        <![CDATA[
+                        The maximum number of products added to the feed on each iteration of the generation process (maximum recommended value: 1000)
+                        ]]>
+                    </comment>
+                </field>
+                <field id="step_delay"
+                       translate="label"
+                       type="text"
+                       sortOrder="3"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Step delay</label>
+                    <comment>
+                        <![CDATA[
+                         The interval (in minutes) between subsequent stages of the feed generation process.
+                         It should not be smaller than the frequency of execution of your cron.sh file.
+                         ]]>
+                    </comment>
+                </field>
+                <field id="generate"
+                       translate="button_label"
+                       sortOrder="62"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <button_label>Start Feed Generation Now</button_label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\GenerateButton</frontend_model>
+                </field>
+            </group>
+            <group id="feed_status"
+                translate="label"
+                type="text"
+                sortOrder="20"
+                showInDefault="1"
+                showInWebsite="0"
+                showInStore="1">
+                <label>Feed Status</label>
+                <field id="cron_issue"
+                       translate="label"
+                       type="note"
+                       sortOrder="5"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Cron Issues</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\Cron</frontend_model>
+                </field>
+                <field id="status"
+                       translate="label"
+                       type="note"
+                       sortOrder="10"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Status</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="message"
+                       translate="label"
+                       type="note"
+                       sortOrder="15"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Message</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="complete"
+                       translate="label"
+                       type="note"
+                       sortOrder="20"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Complete</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="next_run"
+                       translate="label"
+                       type="note"
+                       sortOrder="25"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Next Run</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="next_iteration"
+                       translate="label"
+                       type="note"
+                       sortOrder="30"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Next Iteration</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="last_feed_name"
+                       translate="label"
+                       type="note"
+                       sortOrder="35"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Last generated feed</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+                <field id="last_files"
+                       translate="label"
+                       type="note"
+                       sortOrder="35"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Last generated feeds</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronFiles</frontend_model>
+                </field>
+                <field id="error_stack"
+                       translate="label"
+                       type="note"
+                       sortOrder="40"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Errors</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField</frontend_model>
+                </field>
+
+                <field id="view_log"
+                       translate="button_label"
+                       type="note"
+                       sortOrder="45"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <button_label>View Log</button_label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\ViewLogButton</frontend_model>
+                </field>
+            </group>
+        </section>
+        <section id="doofinder_feed_search"
+                 translate="label"
+                 type="text"
+                 sortOrder="2"
+                 showInDefault="1"
+                 showInStore="1"
+                 showInWebsite="1">
+                <label>Search Configuration</label>
+                <tab>doofinder_feed</tab>
+                <resource>Doofinder_Feed::config</resource>
+                <group id="doofinder_layer"
+                       translate="label"
+                       type="text"
+                       sortOrder="1"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Doofinder Layer</label>
+                    <field id="enabled"
+                           translate="label"
+                           type="select"
+                           sortOrder="1"
+                           showInDefault="1"
+                           showInStore="1"
+                           showInWebsite="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[ Activate/deactivate the search layer. IMPORTANT: You must configure a different Layer script for each store view ]]>
+                        </comment>
+                    </field>
+                    <field id="script"
+                           translate="label"
+                           type="textarea"
+                           sortOrder="2"
+                           showInDefault="0"
+                           showInStore="1"
+                           showInWebsite="0">
+                        <label>Script</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[ Paste your integration script here. ]]>
+                        </comment>
+                    </field>
+                </group>
+                <group id="doofinder_internal_search"
+                       translate="label"
+                       type="text"
+                       sortOrder="2"
+                       showInStore="1"
+                       showInWebsite="1"
+                       showInDefault="1">
+                    <label>Internal Search</label>
+                    <field id="enabled"
+                           translate="label"
+                           type="note"
+                           sortOrder="1"
+                           showInDefault="1"
+                           showInStore="1"
+                           showInWebsite="0">
+                        <label>Enabled</label>
+                        <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled</frontend_model>
+                    </field>
+                    <field id="api_key"
+                           translate="label"
+                           type="text"
+                           sortOrder="2"
+                           showInDefault="1"
+                           showInStore="0"
+                           showInWebsite="0">
+                        <label>API Key</label>
+                    </field>
+                    <field id="hash_id"
+                           translate="label"
+                           type="text"
+                           sortOrder="2"
+                           showInDefault="0"
+                           showInStore="1"
+                           showInWebsite="0">
+                        <label>Hash Id</label>
+                        <backend_model>Doofinder\Feed\Model\Config\Backend\HashIdValidation</backend_model>
+                        <comment>
+                            <![CDATA[ You must configure a "hashid" for each store view. ]]>
+                        </comment>
+                    </field>
+                    <field id="total_limit"
+                           translate="label"
+                           type="text"
+                           sortOrder="3"
+                           showInDefault="1"
+                           showInStore="1"
+                           showInWebsite="0">
+                        <label>Total limit</label>
+                        <validate>required-entry validate-number</validate>
+                        <comment>
+                            <![CDATA[ Number of results returned for search query. ]]>
+                        </comment>
+                    </field>
+                </group>
+        </section>
+    </system>
+</config>
