@@ -25,16 +25,6 @@
             showInWebsite="1"
             showInStore="1">
                 <label>Feed Attributes</label>
-                <field id="id"
-                    translate="label"
-                    type="select"
-                    sortOrder="1"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>ID</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
                 <field id="title"
                     translate="label"
                     type="select"
