@@ -2,6 +2,8 @@
 
 namespace Doofinder\Feed\Helper;
 
+use Magento\Framework\UrlInterface;
+
 /**
  * Product class
  *
@@ -76,7 +78,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getProductUrl(\Magento\Catalog\Model\Product $product)
     {
-        return $product->getProductUrl(false);
+        return $product->getUrlInStore(['_type' => UrlInterface::URL_TYPE_WEB]);
     }
 
     /**
