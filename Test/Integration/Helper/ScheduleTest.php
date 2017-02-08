@@ -72,6 +72,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                     'price' => 'price',
                     'mpn' => 'sku',
                     'availability' => 'df_availability',
+                    'categories' => 'category_ids',
                 ],
                 'atomic_updates_enabled' => 0,
                 'categories_in_navigation' => 0,

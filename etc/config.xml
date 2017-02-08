@@ -13,6 +13,7 @@
                 <price>price</price>
                 <mpn>sku</mpn>
                 <availability>df_availability</availability>
+                <categories>category_ids</categories>
             </feed_attributes>
             <feed_settings>
                 <password></password>

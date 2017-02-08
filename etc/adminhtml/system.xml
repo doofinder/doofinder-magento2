@@ -55,10 +55,20 @@
                     <label>Brand</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
                 </field>
-                <field id="link"
+                <field id="categories"
                     translate="label"
                     type="select"
                     sortOrder="5"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Categories</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="link"
+                    translate="label"
+                    type="select"
+                    sortOrder="6"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -68,7 +78,7 @@
                 <field id="image_link"
                     translate="label"
                     type="select"
-                    sortOrder="6"
+                    sortOrder="7"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -78,7 +88,7 @@
                 <field id="price"
                     translate="label"
                     type="select"
-                    sortOrder="7"
+                    sortOrder="8"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -88,7 +98,7 @@
                 <field id="mpn"
                     translate="label"
                     type="select"
-                    sortOrder="8"
+                    sortOrder="9"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -98,7 +108,7 @@
                 <field id="availability"
                     translate="label"
                     type="select"
-                    sortOrder="9"
+                    sortOrder="10"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -107,7 +117,7 @@
                 </field>
                 <field id="additional_attributes"
                     translate="label"
-                    sortOrder="10"
+                    sortOrder="11"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
