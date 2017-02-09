@@ -5,6 +5,11 @@ namespace Doofinder\Feed\Search;
 class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerInterface
 {
     /**
+     * @var \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory
+     */
+    protected $_indexerHandlerFactory;
+
+    /**
      * @var \Magento\Framework\Indexer\SaveHandler\Batch
      */
     protected $_batch;
@@ -43,7 +48,9 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
      * @var \Doofinder\Feed\Helper\Search
      */
     protected $_searchHelper;
+
     /**
+     * @param \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory $indexerHandlerFactory
      * @param \Magento\Framework\Indexer\SaveHandler\Batch $batch
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
@@ -51,16 +58,22 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
      * @param \Doofinder\Feed\Helper\FeedConfig $feedConfig
      * @param \Doofinder\Feed\Model\GeneratorFactory $generatorFactory
      * @param \Doofinder\Feed\Helper\Search
+     * @param array $data
+     * @param int $batchSize = 100
      */
     public function __construct(
+        \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory $indexerHandlerFactory,
         \Magento\Framework\Indexer\SaveHandler\Batch $batch,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Doofinder\Feed\Helper\FeedConfig $feedConfig,
         \Doofinder\Feed\Model\GeneratorFactory $generatorFactory,
-        \Doofinder\Feed\Helper\Search $searchHelper
+        \Doofinder\Feed\Helper\Search $searchHelper,
+        array $data,
+        $batchSize = 100
     ) {
+        $this->_indexerHandler = $indexerHandlerFactory->create(['data' => $data]);
         $this->_batch = $batch;
         $this->_productCollectionFactory = $productCollectionFactory;
         $this->_storeManager = $storeManager;
@@ -68,7 +81,7 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
         $this->_feedConfig = $feedConfig;
         $this->_generatorFactory = $generatorFactory;
         $this->_searchHelper = $searchHelper;
-        $this->_batchSize = 100;
+        $this->_batchSize = $batchSize;
     }
 
     /**
@@ -79,6 +92,8 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
         foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
             $this->insertDocuments($batchDocuments, $dimensions);
         }
+
+        $this->_indexerHandler->saveIndex($dimensions, $documents);
     }
 
     /**
@@ -89,6 +104,8 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
         foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
             $this->dropDocuments($batchDocuments, $dimensions);
         }
+
+        $this->_indexerHandler->deleteIndex($dimensions, $documents);
     }
 
     /**
@@ -96,7 +113,8 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
      */
     public function cleanIndex($dimensions)
     {
-        return $this->_searchHelper->cleanDoofinderItems();
+        $this->_searchHelper->cleanDoofinderItems();
+        $this->_indexerHandler->cleanIndex($dimensions);
     }
 
     /**

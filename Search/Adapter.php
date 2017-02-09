@@ -11,6 +11,11 @@ namespace Doofinder\Feed\Search;
 class Adapter implements \Magento\Framework\Search\AdapterInterface
 {
     /**
+     * @var \Magento\Framework\Search\Adapter\Mysql\Adapter
+     */
+    protected $_adapter;
+
+    /**
      * @var \Magento\Framework\Search\Adapter\Mysql\ResponseFactory
      */
     protected $_responseFactory;
@@ -41,6 +46,7 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
     protected $_search;
 
     /**
+     * @param \Magento\Framework\Search\Adapter\Mysql\Adapter $adapter
      * @param \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory
      * @param \Magento\Framework\Search\Adapter\Mysql\TemporaryStorage $temporaryStorage
      * @param \Magento\Framework\Api\Search\DocumentFactory $documentFactory
@@ -49,6 +55,7 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
      * @param \Doofinder\Feed\Helper\Search $search
      */
     public function __construct(
+        \Magento\Framework\Search\Adapter\Mysql\Adapter $adapter,
         \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory,
         \Magento\Framework\Search\Adapter\Mysql\TemporaryStorage $temporaryStorage,
         \Magento\Framework\Api\Search\DocumentFactory $documentFactory,
@@ -56,6 +63,7 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
         \Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder $aggregationBuilder,
         \Doofinder\Feed\Helper\Search $search
     ) {
+        $this->_adapter = $adapter;
         $this->_responseFactory = $responseFactory;
         $this->_temporaryStorage = $temporaryStorage;
         $this->_documentFactory = $documentFactory;
@@ -69,6 +77,10 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
      */
     public function query(\Magento\Framework\Search\RequestInterface $request)
     {
+        if ($request->getName() != 'quick_search_container') {
+            return $this->_adapter->query($request);
+        }
+
         /**
          * @todo Add cache magic here ?
          */

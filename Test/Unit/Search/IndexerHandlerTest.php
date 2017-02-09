@@ -60,6 +60,16 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
     private $_dimension;
 
     /**
+     * @var \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory
+     */
+    private $_indexerHandlerFactory;
+
+    /**
+     * @var \Magento\CatalogSearch\Model\Indexer\IndexerHandler
+     */
+    private $_indexerHandler;
+
+    /**
      * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
      */
     private $_objectManagerHelper;
@@ -161,6 +171,23 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
         $this->_dimension->method('getName')->willReturn('scope');
         $this->_dimension->method('getValue')->willReturn('sample');
 
+        $this->_indexerHandler = $this->getMock(
+            '\Magento\CatalogSearch\Model\Indexer\IndexerHandler',
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->_indexerHandlerFactory = $this->getMock(
+            '\Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_indexerHandlerFactory->method('create')->willReturn($this->_indexerHandler);
+
         $this->_indexer = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Search\IndexerHandler',
             [
@@ -169,6 +196,8 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
                 'productCollectionFactory' => $this->_productCollectionFactory,
                 'feedConfig' => $this->_feedConfig,
                 'searchHelper' => $this->_searchHelper,
+                'indexerHandlerFactory' => $this->_indexerHandlerFactory,
+                'data' => []
             ]
         );
     }
@@ -207,6 +236,9 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
             ])
             ->willReturn($this->_generator);
 
+        $this->_indexerHandler->expects($this->once())->method('saveIndex')
+            ->with([$this->_dimension], $this->_documents);
+
         $this->_indexer->saveIndex([$this->_dimension], $this->_documents);
     }
 
@@ -244,6 +276,9 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
             ])
             ->willReturn($this->_generator);
 
+        $this->_indexerHandler->expects($this->once())->method('deleteIndex')
+            ->with([$this->_dimension], $this->_documents);
+
         $this->_indexer->deleteIndex([$this->_dimension], $this->_documents);
     }
 
@@ -252,7 +287,10 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCleanIndex()
     {
-        $this->assertTrue($this->_indexer->cleanIndex($this->_dimension));
+        $this->_indexerHandler->expects($this->once())->method('cleanIndex')
+            ->with($this->_dimension);
+
+        $this->_indexer->cleanIndex($this->_dimension);
     }
 
     /**
