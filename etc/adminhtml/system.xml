@@ -95,10 +95,20 @@
                     <label>Price</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
                 </field>
-                <field id="mpn"
+                <field id="sale_price"
                     translate="label"
                     type="select"
                     sortOrder="9"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Sale Price</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
+                <field id="mpn"
+                    translate="label"
+                    type="select"
+                    sortOrder="10"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -108,7 +118,7 @@
                 <field id="availability"
                     translate="label"
                     type="select"
-                    sortOrder="10"
+                    sortOrder="11"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -117,7 +127,7 @@
                 </field>
                 <field id="additional_attributes"
                     translate="label"
-                    sortOrder="11"
+                    sortOrder="12"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">

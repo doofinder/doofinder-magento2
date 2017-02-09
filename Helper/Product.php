@@ -184,11 +184,23 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get product price
      *
      * @param \Magento\Catalog\Model\Product $product
+     * @param string $attribute = 'price'
      * @return float
      */
-    public function getProductPrice(\Magento\Catalog\Model\Product $product)
+    public function getProductPrice(\Magento\Catalog\Model\Product $product, $attribute = 'price')
     {
-        return round($product->getPriceInfo()->getPrice('final_price')->getAmount()->getValue(), 2);
+        switch ($attribute) {
+            case 'special_price':
+            case 'tier_price':
+            case 'regular_price':
+                $type = $attribute;
+                break;
+
+            default:
+                $type = 'final_price';
+        }
+
+        return round($product->getPriceInfo()->getPrice($type)->getAmount()->getValue(), 2);
     }
 
     /**
