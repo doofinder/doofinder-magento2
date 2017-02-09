@@ -50,6 +50,16 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
     protected $_searchHelper;
 
     /**
+     * @var  IndexStructure
+     */
+    protected $_indexStructure;
+
+    /**
+     * @var array
+     */
+    private $_data;
+
+    /**
      * @param \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory $indexerHandlerFactory
      * @param \Magento\Framework\Indexer\SaveHandler\Batch $batch
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
@@ -58,6 +68,7 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
      * @param \Doofinder\Feed\Helper\FeedConfig $feedConfig
      * @param \Doofinder\Feed\Model\GeneratorFactory $generatorFactory
      * @param \Doofinder\Feed\Helper\Search
+     * @param IndexStructure $indexStructure
      * @param array $data
      * @param int $batchSize = 100
      */
@@ -70,6 +81,7 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
         \Doofinder\Feed\Helper\FeedConfig $feedConfig,
         \Doofinder\Feed\Model\GeneratorFactory $generatorFactory,
         \Doofinder\Feed\Helper\Search $searchHelper,
+        IndexStructure $indexStructure,
         array $data,
         $batchSize = 100
     ) {
@@ -81,6 +93,8 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
         $this->_feedConfig = $feedConfig;
         $this->_generatorFactory = $generatorFactory;
         $this->_searchHelper = $searchHelper;
+        $this->_indexStructure = $indexStructure;
+        $this->_data = $data;
         $this->_batchSize = $batchSize;
     }
 
@@ -113,7 +127,9 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
      */
     public function cleanIndex($dimensions)
     {
-        $this->_searchHelper->cleanDoofinderItems();
+        $this->_indexStructure->delete($this->getIndexName(), $dimensions);
+        $this->_indexStructure->create($this->getIndexName(), [], $dimensions);
+
         $this->_indexerHandler->cleanIndex($dimensions);
     }
 
@@ -163,7 +179,7 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
     {
         $originalStoreCode = $this->_storeConfig->getStoreCode();
 
-        $storeId = $this->getStoreId($dimensions);
+        $storeId = $this->_indexStructure->getStoreId($dimensions);
         $this->_storeManager->setCurrentStore($storeId);
 
         $feedConfig = $this->_feedConfig->getLeanFeedConfig($storeId);
@@ -211,19 +227,10 @@ class IndexerHandler implements \Magento\Framework\Indexer\SaveHandler\IndexerIn
     }
 
     /**
-     * Get store id from dimensions
-     *
-     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
-     * @return int
+     * @return string
      */
-    private function getStoreId(array $dimensions)
+    private function getIndexName()
     {
-        foreach ($dimensions as $dimension) {
-            if ($dimension->getName() == 'scope') {
-                return $dimension->getValue();
-            }
-        }
-
-        return null;
+        return $this->_data['indexer_id'];
     }
 }

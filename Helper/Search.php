@@ -205,18 +205,27 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         return true;
     }
 
-    public function cleanDoofinderItems()
+    /**
+     * Delete Doofinder index
+     */
+    public function deleteDoofinderIndex()
     {
-        $searchEngine = $this->getDoofinderSearchEngine();
-        $deleteResult = $searchEngine->deleteType('product');
-        $addResult = $searchEngine->addType('product');
-
-        if (!$deleteResult || !$addResult) {
+        if (!$this->getDoofinderSearchEngine()->deleteType('product')) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('There was an error during Doofinder index deletion')
             );
         }
+    }
 
-        return true;
+    /**
+     * Create Doofinder index
+     */
+    public function createDoofinderIndex()
+    {
+        if (!$this->getDoofinderSearchEngine()->addType('product')) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('There was an error during Doofinder index creation')
+            );
+        }
     }
 }

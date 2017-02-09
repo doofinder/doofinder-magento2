@@ -70,6 +70,11 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
     private $_indexerHandler;
 
     /**
+     * @var \Doofinder\Feed\Search\IndexStructure
+     */
+    private $_indexStructure;
+
+    /**
      * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
      */
     private $_objectManagerHelper;
@@ -188,6 +193,16 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
         );
         $this->_indexerHandlerFactory->method('create')->willReturn($this->_indexerHandler);
 
+        $this->_indexStructure = $this->getMock(
+            '\Doofinder\Feed\Search\IndexStructure',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_indexStructure->method('getStoreId')
+            ->with([$this->_dimension])->willReturn('sample');
+
         $this->_indexer = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Search\IndexerHandler',
             [
@@ -197,7 +212,8 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
                 'feedConfig' => $this->_feedConfig,
                 'searchHelper' => $this->_searchHelper,
                 'indexerHandlerFactory' => $this->_indexerHandlerFactory,
-                'data' => []
+                'indexStructure' => $this->_indexStructure,
+                'data' => ['indexer_id' => 'sample-indexer'],
             ]
         );
     }
@@ -288,9 +304,14 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
     public function testCleanIndex()
     {
         $this->_indexerHandler->expects($this->once())->method('cleanIndex')
-            ->with($this->_dimension);
+            ->with([$this->_dimension]);
 
-        $this->_indexer->cleanIndex($this->_dimension);
+        $this->_indexStructure->expects($this->once())->method('delete')
+            ->with('sample-indexer', [$this->_dimension]);
+        $this->_indexStructure->expects($this->once())->method('create')
+            ->with('sample-indexer', [], [$this->_dimension]);
+
+        $this->_indexer->cleanIndex([$this->_dimension]);
     }
 
     /**
