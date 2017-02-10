@@ -2,17 +2,17 @@
 
 namespace Doofinder\Feed\Search;
 
-class IndexStructure implements \Magento\Framework\Indexer\IndexStructureInterface
+class IndexStructure extends \Magento\CatalogSearch\Model\Indexer\IndexStructure
 {
-    /**
-     * @var \Magento\CatalogSearch\Model\Indexer\IndexStructure
-     */
-    protected $_indexStructure;
-
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
     protected $_search;
+
+    /**
+     * @var \Doofinder\Feed\Helper\StoreConfig
+     */
+    protected $_storeConfig;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
@@ -20,17 +20,16 @@ class IndexStructure implements \Magento\Framework\Indexer\IndexStructureInterfa
     protected $_storeManager;
 
     /**
-     * @param \Magento\CatalogSearch\Model\Indexer\IndexStructure
      * @param \Doofinder\Feed\Helper\Search $search
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
     public function __construct(
-        \Magento\CatalogSearch\Model\Indexer\IndexStructure $indexStructure,
         \Doofinder\Feed\Helper\Search $search,
+        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
-        $this->_indexStructure = $indexStructure;
         $this->_search = $search;
+        $this->_storeConfig = $storeConfig;
         $this->_storeManager = $storeManager;
     }
 
@@ -41,9 +40,9 @@ class IndexStructure implements \Magento\Framework\Indexer\IndexStructureInterfa
      */
     public function delete($index, array $dimensions = [])
     {
-        $this->action('deleteIndex');
+        $this->action('deleteDoofinderIndex', $dimensions);
 
-        $this->_indexStructure->delete($index, $dimensions);
+        parent::delete($index, $dimensions);
     }
 
     /**
@@ -55,9 +54,9 @@ class IndexStructure implements \Magento\Framework\Indexer\IndexStructureInterfa
      */
     public function create($index, array $fields, array $dimensions = [])
     {
-        $this->action('createIndex');
+        $this->action('createDoofinderIndex', $dimensions);
 
-        $this->_indexStructure->create($index, $fields, $dimensions);
+        parent::create($index, $fields, $dimensions);
     }
 
     /**
@@ -69,28 +68,11 @@ class IndexStructure implements \Magento\Framework\Indexer\IndexStructureInterfa
     protected function action($method, array $dimensions)
     {
         $originalStoreCode = $this->_storeConfig->getStoreCode();
-        $storeId = $this->getStoreId($dimensions);
+        $storeId = $this->_search->getStoreIdFromDimensions($dimensions);
         $this->_storeManager->setCurrentStore($storeId);
 
         $this->_search->{$method}();
 
         $this->_storeManager->setCurrentStore($originalStoreId);
-    }
-
-    /**
-     * Get store id from dimensions
-     *
-     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
-     * @return int
-     */
-    public function getStoreId(array $dimensions)
-    {
-        foreach ($dimensions as $dimension) {
-            if ($dimension->getName() == 'scope') {
-                return $dimension->getValue();
-            }
-        }
-
-        return null;
     }
 }

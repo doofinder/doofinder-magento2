@@ -228,4 +228,21 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
             );
         }
     }
+
+    /**
+     * Get store id from dimensions
+     *
+     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @return int
+     */
+    public function getStoreIdFromDimensions(array $dimensions)
+    {
+        foreach ($dimensions as $dimension) {
+            if ($dimension->getName() == 'scope') {
+                return $dimension->getValue();
+            }
+        }
+
+        return null;
+    }
 }
