@@ -197,9 +197,11 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         if (!empty($result['errors'])) {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('Following items could not be deleted from Doofinder index: %1.', implode(', ', $result['errors']))
-            );
+            $this->_logger->warning(__(
+                'Following items could not be deleted from Doofinder index: %1.',
+                implode(', ', $result['errors'])
+            ));
+            return false;
         }
 
         return true;
