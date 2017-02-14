@@ -15,10 +15,12 @@ class Bundle extends Product
      * Get bundle product price
      *
      * @param \Magento\Catalog\Model\Product $product
+     * @param string $field
+     * @param boolean $minimal = true
      * @return float
      */
-    protected function getProductPrice(\Magento\Catalog\Model\Product $product)
+    protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = true)
     {
-        return $product->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue();
+        return parent::getProductPrice($product, $field, $minimal);
     }
 }

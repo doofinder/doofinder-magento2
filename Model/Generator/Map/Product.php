@@ -152,15 +152,16 @@ class Product extends Map
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $field
+     * @param boolean $minimal = false
      * @return string|null
      */
-    protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field)
+    protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)
     {
         if (!$this->getExportProductPrices()) {
             return null;
         }
 
-        $price = $this->_helper->getProductPrice($product, $field);
+        $price = $this->_helper->getProductPrice($product, $field, $minimal);
 
         return number_format($price, 2, '.', '');
     }
