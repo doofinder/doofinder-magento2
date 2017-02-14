@@ -20,14 +20,19 @@ class IndexStructure extends \Magento\CatalogSearch\Model\Indexer\IndexStructure
     protected $_storeManager;
 
     /**
+     * @param \Magento\Framework\App\ResourceConnection $resource
+     * @param \Magento\Framework\Indexer\ScopeResolver\IndexScopeResolver $indexScopeResolver
      * @param \Doofinder\Feed\Helper\Search $search
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
     public function __construct(
+        \Magento\Framework\App\ResourceConnection $resource,
+        \Magento\Framework\Indexer\ScopeResolver\IndexScopeResolver $indexScopeResolver,
         \Doofinder\Feed\Helper\Search $search,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
+        parent::__construct($resource, $indexScopeResolver);
         $this->_search = $search;
         $this->_storeConfig = $storeConfig;
         $this->_storeManager = $storeManager;
@@ -73,6 +78,6 @@ class IndexStructure extends \Magento\CatalogSearch\Model\Indexer\IndexStructure
 
         $this->_search->{$method}();
 
-        $this->_storeManager->setCurrentStore($originalStoreId);
+        $this->_storeManager->setCurrentStore($originalStoreCode);
     }
 }
