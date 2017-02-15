@@ -14,7 +14,6 @@ class Grouped extends Product
     /**
      * Get bundle product price
      *
-     *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $field
      * @param boolean $minimal = false
@@ -22,9 +21,8 @@ class Grouped extends Product
      */
     protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)
     {
-        /** @fixme We should not do this like here but there is a bug in core */
-        if (in_array($field, ['price', 'final_price'])) {
-            return $product->getProductPrice();
+        if ($field == 'final_price') {
+            $minimal = true;
         }
 
         return parent::getProductPrice($product, $field, $minimal);
