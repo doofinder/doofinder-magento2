@@ -151,9 +151,10 @@
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
-                    <label>Password</label>
+                    <label>Security Phrase</label>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\Password</backend_model>
                     <comment>
-                        <![CDATA[Protect feed with given password.]]>
+                        <![CDATA[Protect feed with given phrase.]]>
                     </comment>
                 </field>
                 <field id="export_product_prices"

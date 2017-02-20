@@ -353,11 +353,24 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * Get feed file name
      *
      * @param string $storeCode
+     * @param boolean $withPassword = true
      * @return string
      */
-    public function getFeedFilename($storeCode)
+    public function getFeedFilename($storeCode, $withPassword = true)
     {
-        return 'doofinder-' . $storeCode . '.xml';
+        $filename = 'doofinder-' . $storeCode;
+
+        if ($withPassword) {
+            $config = $this->getStoreConfig($storeCode);
+
+            if ($config['password']) {
+                $filename .= '-' . $config['password'];
+            }
+        }
+
+        $filename .= '.xml';
+
+        return  $filename;
     }
 
     /**
@@ -418,11 +431,12 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * Get feed file url.
      *
      * @param string $storeCode
+     * @param string $withPassword = true
      * @return string
      */
-    public function getFeedFileUrl($storeCode)
+    public function getFeedFileUrl($storeCode, $withPassword = true)
     {
-        $filename = $this->getFeedFilename($storeCode);
+        $filename = $this->getFeedFilename($storeCode, $withPassword);
         $baseUrl = $this->_storeManager->getStore($storeCode)->getBaseUrl(
             \Magento\Framework\UrlInterface::URL_TYPE_MEDIA
         );

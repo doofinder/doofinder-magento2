@@ -77,6 +77,11 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      */
     protected $_feedLoggerFactory;
 
+    /**
+     * @var \Doofinder\Feed\Helper\StoreConfig
+     */
+    protected $_storeConfig;
+
     public function setUp()
     {
         $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
@@ -194,6 +199,14 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         );
         $this->_feedLoggerFactory->method('create')->willReturn($this->_feedLogger);
 
+        $this->_storeConfig = $this->getMock(
+            '\Doofinder\Feed\Helper\StoreConfig',
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->_helper = $this->_objectManager->getObject(
             '\Doofinder\Feed\Helper\Schedule',
             [
@@ -202,6 +215,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 'timezone' => $this->_timezone,
                 'storeManager' => $this->_storeManager,
                 'feedLoggerFactory' => $this->_feedLoggerFactory,
+                'storeConfig' => $this->_storeConfig,
             ]
         );
     }
@@ -311,12 +325,25 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test getFeedFileUrl() method
+     *
+     * @dataProvider testGetFeedFileUrlProvider
      */
-    public function testGetFeedFileUrl()
+    public function testGetFeedFileUrl($storeCode, $password, $withPassword, $expected)
     {
+        $this->_storeConfig->method('getStoreConfig')->with($storeCode)->willReturn(['password' => $password]);
+
         $this->assertEquals(
-            'http://example.com/media/doofinder-default.xml',
-            $this->_helper->getFeedFileUrl('default')
+            $expected,
+            $this->_helper->getFeedFileUrl($storeCode, $withPassword)
         );
+    }
+
+    public function testGetFeedFileUrlProvider()
+    {
+        return [
+            ['default', null, true, 'http://example.com/media/doofinder-default.xml'],
+            ['default', 'secret', true, 'http://example.com/media/doofinder-default-secret.xml'],
+            ['default', 'secret', false, 'http://example.com/media/doofinder-default.xml'],
+        ];
     }
 }
