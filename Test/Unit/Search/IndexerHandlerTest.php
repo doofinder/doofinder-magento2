@@ -60,6 +60,21 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
     private $_dimension;
 
     /**
+     * @var \Magento\Framework\Indexer\IndexStructureInterface
+     */
+    private $_indexStructure;
+
+    /**
+     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     */
+    private $_connection;
+
+    /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    private $_resource;
+
+    /**
      * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
      */
     private $_objectManagerHelper;
@@ -142,15 +157,6 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        $this->_searchHelper = $this->getMock(
-            '\Doofinder\Feed\Helper\Search',
-            [],
-            [],
-            '',
-            false
-        );
-        $this->_searchHelper->method('cleanDoofinderItems')->willReturn(true);
-
         $this->_dimension = $this->getMock(
             '\Magento\Framework\Search\Request\Dimension',
             [],
@@ -161,6 +167,42 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
         $this->_dimension->method('getName')->willReturn('scope');
         $this->_dimension->method('getValue')->willReturn('sample');
 
+        $this->_searchHelper = $this->getMock(
+            '\Doofinder\Feed\Helper\Search',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_searchHelper->method('cleanDoofinderItems')->willReturn(true);
+        $this->_searchHelper->method('getStoreIdFromDimensions')
+            ->with([$this->_dimension])->willReturn('sample');
+
+        $this->_indexStructure = $this->getMock(
+            '\Magento\Framework\Indexer\IndexStructureInterface',
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->_connection = $this->getMock(
+            '\Magento\Framework\DB\Adapter\AdapterInterface',
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->_resource = $this->getMock(
+            '\Magento\Framework\App\ResourceConnection',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_resource->method('getConnection')->willReturn($this->_connection);
+
         $this->_indexer = $this->_objectManagerHelper->getObject(
             '\Doofinder\Feed\Search\IndexerHandler',
             [
@@ -169,6 +211,12 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
                 'productCollectionFactory' => $this->_productCollectionFactory,
                 'feedConfig' => $this->_feedConfig,
                 'searchHelper' => $this->_searchHelper,
+                'indexStructure' => $this->_indexStructure,
+                'resource' => $this->_resource,
+                'data' => [
+                    'indexer_id' => 'sample-indexer',
+                    'fieldsets' => [],
+                ],
             ]
         );
     }
@@ -178,8 +226,8 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSaveIndex()
     {
-        $this->_batch->expects($this->once())->method('getItems')
-            ->with($this->_documents, 100)->willReturn($this->_documents);
+        $this->_batch->expects($this->exactly(2))->method('getItems')
+            ->with($this->_documents, 100)->willReturn([$this->_documents->getArrayCopy()]);
 
         $this->_generator->expects($this->once())->method('run');
 
@@ -215,8 +263,8 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeleteIndex()
     {
-        $this->_batch->expects($this->once())->method('getItems')
-            ->with($this->_documents, 100)->willReturn($this->_documents);
+        $this->_batch->expects($this->exactly(2))->method('getItems')
+            ->with($this->_documents, 100)->willReturn([$this->_documents->getArrayCopy()]);
 
         $this->_generator->expects($this->once())->method('run');
 
@@ -252,7 +300,12 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCleanIndex()
     {
-        $this->assertTrue($this->_indexer->cleanIndex($this->_dimension));
+        $this->_indexStructure->expects($this->once())->method('delete')
+            ->with('sample-indexer', [$this->_dimension]);
+        $this->_indexStructure->expects($this->once())->method('create')
+            ->with('sample-indexer', [], [$this->_dimension]);
+
+        $this->_indexer->cleanIndex([$this->_dimension]);
     }
 
     /**

@@ -106,7 +106,7 @@ class Config extends \Doofinder\Feed\Controller\Base
             $settings = $this->_storeConfig->getStoreConfig($storeCode);
 
             if ($settings['enabled']) {
-                $feedUrl = $this->_schedule->getFeedFileUrl($storeCode);
+                $feedUrl = $this->_schedule->getFeedFileUrl($storeCode, false);
                 $feedExists = $this->_schedule->isFeedFileExist($storeCode);
             } else {
                 $feedUrl = $store->getUrl('doofinder/feed');

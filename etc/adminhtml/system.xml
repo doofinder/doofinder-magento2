@@ -25,20 +25,10 @@
             showInWebsite="1"
             showInStore="1">
                 <label>Feed Attributes</label>
-                <field id="id"
-                    translate="label"
-                    type="select"
-                    sortOrder="1"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>ID</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
                 <field id="title"
                     translate="label"
                     type="select"
-                    sortOrder="1"
+                    sortOrder="2"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -48,7 +38,7 @@
                 <field id="description"
                     translate="label"
                     type="select"
-                    sortOrder="1"
+                    sortOrder="3"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -58,17 +48,27 @@
                 <field id="brand"
                     translate="label"
                     type="select"
-                    sortOrder="1"
+                    sortOrder="4"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
                     <label>Brand</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
                 </field>
+                <field id="categories"
+                    translate="label"
+                    type="select"
+                    sortOrder="5"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Categories</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
                 <field id="link"
                     translate="label"
                     type="select"
-                    sortOrder="1"
+                    sortOrder="6"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -78,7 +78,7 @@
                 <field id="image_link"
                     translate="label"
                     type="select"
-                    sortOrder="1"
+                    sortOrder="7"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -88,17 +88,27 @@
                 <field id="price"
                     translate="label"
                     type="select"
-                    sortOrder="1"
+                    sortOrder="8"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
                     <label>Price</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
                 </field>
+                <field id="sale_price"
+                    translate="label"
+                    type="select"
+                    sortOrder="9"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Sale Price</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                </field>
                 <field id="mpn"
                     translate="label"
                     type="select"
-                    sortOrder="1"
+                    sortOrder="10"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -108,7 +118,7 @@
                 <field id="availability"
                     translate="label"
                     type="select"
-                    sortOrder="1"
+                    sortOrder="11"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -117,7 +127,7 @@
                 </field>
                 <field id="additional_attributes"
                     translate="label"
-                    sortOrder="1"
+                    sortOrder="12"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
@@ -141,9 +151,10 @@
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
-                    <label>Password</label>
+                    <label>Security Phrase</label>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\Password</backend_model>
                     <comment>
-                        <![CDATA[Protect feed with given password.]]>
+                        <![CDATA[Protect feed with given phrase.]]>
                     </comment>
                 </field>
                 <field id="export_product_prices"

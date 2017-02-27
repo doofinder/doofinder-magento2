@@ -197,26 +197,54 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         if (!empty($result['errors'])) {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('Following items could not be deleted from Doofinder index: %1.', implode(', ', $result['errors']))
-            );
+            $this->_logger->warning(__(
+                'Following items could not be deleted from Doofinder index: %1.',
+                implode(', ', $result['errors'])
+            ));
+            return false;
         }
 
         return true;
     }
 
-    public function cleanDoofinderItems()
+    /**
+     * Delete Doofinder index
+     */
+    public function deleteDoofinderIndex()
     {
-        $searchEngine = $this->getDoofinderSearchEngine();
-        $deleteResult = $searchEngine->deleteType('product');
-        $addResult = $searchEngine->addType('product');
-
-        if (!$deleteResult || !$addResult) {
+        if (!$this->getDoofinderSearchEngine()->deleteType('product')) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('There was an error during Doofinder index deletion')
             );
         }
+    }
 
-        return true;
+    /**
+     * Create Doofinder index
+     */
+    public function createDoofinderIndex()
+    {
+        if (!$this->getDoofinderSearchEngine()->addType('product')) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('There was an error during Doofinder index creation')
+            );
+        }
+    }
+
+    /**
+     * Get store id from dimensions
+     *
+     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @return int
+     */
+    public function getStoreIdFromDimensions(array $dimensions)
+    {
+        foreach ($dimensions as $dimension) {
+            if ($dimension->getName() == 'scope') {
+                return $dimension->getValue();
+            }
+        }
+
+        return null;
     }
 }

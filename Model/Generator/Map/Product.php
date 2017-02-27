@@ -60,12 +60,17 @@ class Product extends Map
             case 'image':
                 return $this->getProductImage($this->_context, $this->getImageSize());
 
-            case 'price':
-                if (!$this->getExportProductPrices()) {
-                    return null;
-                }
+            case 'df_regular_price':
+                return $this->getProductPrice($this->_context, 'regular_price');
 
-                return $this->getProductPrice($this->_context);
+            case 'df_sale_price':
+                return $this->getProductPrice($this->_context, 'final_price');
+
+            case 'price':
+            case 'special_price':
+            case 'tier_price':
+            case 'minimal_price':
+                return $this->getProductPrice($this->_context, $field);
 
             case 'df_availability':
                 return $this->getProductAvailability($this->_context);
@@ -146,11 +151,17 @@ class Product extends Map
      * Get product price
      *
      * @param \Magento\Catalog\Model\Product $product
+     * @param string $field
+     * @param boolean $minimal = false
      * @return string|null
      */
-    protected function getProductPrice(\Magento\Catalog\Model\Product $product)
+    protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)
     {
-        $price = $this->_helper->getProductPrice($product);
+        if (!$this->getExportProductPrices()) {
+            return null;
+        }
+
+        $price = $this->_helper->getProductPrice($product, $field, $minimal);
 
         return number_format($price, 2, '.', '');
     }

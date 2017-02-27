@@ -158,7 +158,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             false
         );
         $this->_schedule->method('isFeedFileExist')->willReturn(false);
-        $this->_schedule->method('getFeedFileUrl')->willReturn('http://example.com/pub/media//doofinder-default.xml');
+        $this->_schedule->method('getFeedFileUrl')->with('default', false)
+            ->willReturn('http://example.com/pub/media//doofinder-default.xml');
 
         $this->_controller = $this->_objectManager->getObject(
             '\Doofinder\Feed\Controller\Feed\Config',

@@ -15,10 +15,16 @@ class Grouped extends Product
      * Get bundle product price
      *
      * @param \Magento\Catalog\Model\Product $product
+     * @param string $field
+     * @param boolean $minimal = false
      * @return float
      */
-    protected function getProductPrice(\Magento\Catalog\Model\Product $product)
+    protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)
     {
-        return $product->getPriceInfo()->getPrice('final_price')->getMinimalPrice()->getValue();
+        if ($field == 'final_price') {
+            $minimal = true;
+        }
+
+        return parent::getProductPrice($product, $field, $minimal);
     }
 }

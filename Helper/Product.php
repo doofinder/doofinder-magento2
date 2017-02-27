@@ -2,6 +2,8 @@
 
 namespace Doofinder\Feed\Helper;
 
+use Magento\Framework\UrlInterface;
+
 /**
  * Product class
  *
@@ -76,7 +78,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getProductUrl(\Magento\Catalog\Model\Product $product)
     {
-        return $product->getProductUrl(false);
+        return $product->getUrlInStore(['_type' => UrlInterface::URL_TYPE_WEB]);
     }
 
     /**
@@ -182,11 +184,26 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get product price
      *
      * @param \Magento\Catalog\Model\Product $product
+     * @param string $attribute = 'price'
+     * @param boolean $minimal = false
      * @return float
      */
-    public function getProductPrice(\Magento\Catalog\Model\Product $product)
+    public function getProductPrice(\Magento\Catalog\Model\Product $product, $attribute = 'price', $minimal = false)
     {
-        return round($product->getPriceInfo()->getPrice('final_price')->getAmount()->getValue(), 2);
+        switch ($attribute) {
+            case 'special_price':
+            case 'tier_price':
+            case 'regular_price':
+                $type = $attribute;
+                break;
+
+            default:
+                $type = 'final_price';
+        }
+
+        $price = $product->getPriceInfo()->getPrice($type);
+        $amount = $minimal ? $price->getMinimalPrice() : $price->getAmount();
+        return round($amount->getValue(), 2);
     }
 
     /**
