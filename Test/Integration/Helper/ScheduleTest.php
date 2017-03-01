@@ -62,6 +62,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 'image_size' => null,
                 'split_configurable_products' => '0',
                 'export_product_prices' => '1',
+                'price_tax_mode' => 0,
                 'attributes' => [
                     'id' => 'df_id',
                     'title' => 'name',

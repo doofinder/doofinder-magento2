@@ -31,17 +31,19 @@ class Configurable extends Product
      *
      * @param \Doofinder\Feed\Model\Generator\Map\Product\AssociateFactory $mapFactory
      * @param \Doofinder\Feed\Helper\Product $helper
-     * @param \Magento\Catalog\Model\Product $context
+     * @param \Doofinder\Feed\Model\Generator\Item $item
+     * @param \Magento\Tax\Model\Config $taxConfig
      * @param array $data = []
      */
     public function __construct(
         \Doofinder\Feed\Model\Generator\Map\Product\AssociateFactory $mapFactory,
         \Doofinder\Feed\Helper\Product $helper,
         \Doofinder\Feed\Model\Generator\Item $item,
+        \Magento\Tax\Model\Config $taxConfig,
         array $data = []
     ) {
         $this->_mapFactory = $mapFactory;
-        parent::__construct($helper, $item, $data);
+        parent::__construct($helper, $item, $taxConfig, $data);
     }
 
     /**

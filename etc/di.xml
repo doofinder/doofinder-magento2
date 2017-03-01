@@ -73,4 +73,7 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Tax\Model\Config">
+        <plugin name="doofinderFeedTaxConfig" type="Doofinder\Feed\Model\Tax\Plugin\Config"/>
+    </type>
 </config>

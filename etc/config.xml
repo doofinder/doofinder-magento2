@@ -19,6 +19,7 @@
             <feed_settings>
                 <password></password>
                 <export_product_prices>1</export_product_prices>
+                <price_tax_mode>0</price_tax_mode>
                 <image_size></image_size>
                 <split_configurable_products>0</split_configurable_products>
                 <atomic_updates_enabled>0</atomic_updates_enabled>
