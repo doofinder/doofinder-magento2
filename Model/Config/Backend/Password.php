@@ -100,7 +100,8 @@ class Password extends \Magento\Framework\App\Config\Value
                         $directory->renameFile($oldFilename, $newFilename);
                     } else {
                         throw new \Magento\Framework\Exception\LocalizedException(__(
-                            'Feed file could not be renamed accordingly to new %1 value because file with name %2 already exists.',
+                            'Feed file could not be renamed accordingly to new %1 ' .
+                            'value because file with name %2 already exists.',
                             $this->getData('field_config/label'),
                             $newFilename
                         ));
