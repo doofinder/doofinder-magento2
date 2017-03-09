@@ -52,7 +52,8 @@ class PasswordTest extends \PHPUnit_Framework_TestCase
      * Test beforeSave()
      *
      * @expectedException \Magento\Framework\Exception\LocalizedException
-     * @expectedExceptionMessage Sample field value is invalid. Only alphanumeric characters with underscores (_) and hyphens (-) are allowed.
+     * @expectedExceptionMessage Sample field value is invalid.
+     *                           Only alphanumeric characters with underscores (_) and hyphens (-) are allowed.
      * @dataProvider testBeforeSaveInvalidDataProvider
      */
     public function testBeforeSaveInvalid($value)
