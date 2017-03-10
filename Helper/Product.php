@@ -185,10 +185,10 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $attribute = 'price'
-     * @param boolean $minimal = false
+     * @param boolean|null $tax = null
      * @return float
      */
-    public function getProductPrice(\Magento\Catalog\Model\Product $product, $attribute = 'price', $minimal = false)
+    public function getProductPrice(\Magento\Catalog\Model\Product $product, $attribute = 'price', $tax = null)
     {
         switch ($attribute) {
             case 'special_price':
@@ -202,8 +202,20 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $price = $product->getPriceInfo()->getPrice($type);
-        $amount = $minimal ? $price->getMinimalPrice() : $price->getAmount();
-        return round($amount->getValue(), 2);
+        $amount = $price->getAmount();
+
+        $value = $amount->getValue();
+
+        if ($tax !== null) {
+            $value = $amount->getBaseAmount();
+
+            if ($tax) {
+                $adjustment = $product->getPriceInfo()->getAdjustment('tax');
+                $value = $adjustment->applyAdjustment($value, $product);
+            }
+        }
+
+        return round($value, 2);
     }
 
     /**

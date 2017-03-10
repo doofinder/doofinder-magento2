@@ -111,7 +111,7 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      */
     public function saveIndex($dimensions, \Traversable $documents)
     {
-        foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
+        foreach ($this->_batch->getItems(clone($documents), $this->_batchSize) as $batchDocuments) {
             $this->insertDocuments($batchDocuments, $dimensions);
         }
 
@@ -123,7 +123,7 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      */
     public function deleteIndex($dimensions, \Traversable $documents)
     {
-        foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
+        foreach ($this->_batch->getItems(clone($documents), $this->_batchSize) as $batchDocuments) {
             $this->dropDocuments($batchDocuments, $dimensions);
         }
 
@@ -172,7 +172,7 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
      * @param string $action
      */
-    private function runGenerator($ids, array $dimensions, $action)
+    private function runGenerator(array $ids, array $dimensions, $action)
     {
         $originalStoreCode = $this->_storeConfig->getStoreCode();
 
@@ -182,13 +182,9 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
         $feedConfig = $this->_feedConfig->getLeanFeedConfig($storeId);
 
         // Add fixed product fetcher
-        if ($ids) {
-            $feedConfig['data']['config']['fetchers']['Product\Fixed'] = [
-                'products' => $this->getProducts($ids),
-            ];
-        } else {
-            $feedConfig['data']['config']['fetchers']['Product'] = [];
-        }
+        $feedConfig['data']['config']['fetchers']['Product\Fixed'] = [
+            'products' => $this->getProducts($ids),
+        ];
 
         // Add atomic update processor
         $feedConfig['data']['config']['processors']['AtomicUpdater'] = [

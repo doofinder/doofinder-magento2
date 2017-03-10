@@ -47,6 +47,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
             'image_size' => 'small',
             'split_configurable_products' => 1,
             'export_product_prices' => 0,
+            'price_tax_mode' => 0,
             'categories_in_navigation' => 0,
         ]);
 
@@ -75,6 +76,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                             ],
                             'split_configurable_products' => 1,
                             'export_product_prices' => 0,
+                            'price_tax_mode' => 0,
                             'image_size' => 'small',
                             'categories_in_navigation' => 0,
                         ],
@@ -111,6 +113,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                             ],
                             'split_configurable_products' => 1,
                             'export_product_prices' => 0,
+                            'price_tax_mode' => 0,
                             'image_size' => 'small',
                             'categories_in_navigation' => 0,
                         ],
@@ -154,6 +157,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
                             ],
                             'split_configurable_products' => 1,
                             'export_product_prices' => 0,
+                            'price_tax_mode' => 0,
                             'image_size' => 'small',
                             'categories_in_navigation' => 0,
                         ],

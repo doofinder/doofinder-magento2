@@ -328,13 +328,13 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider testGetFeedFileUrlProvider
      */
-    public function testGetFeedFileUrl($storeCode, $password, $withPassword, $expected)
+    public function testGetFeedFileUrl($storeCode, $passwordConfig, $password, $expected)
     {
-        $this->_storeConfig->method('getStoreConfig')->with($storeCode)->willReturn(['password' => $password]);
+        $this->_storeConfig->method('getStoreConfig')->with($storeCode)->willReturn(['password' => $passwordConfig]);
 
         $this->assertEquals(
             $expected,
-            $this->_helper->getFeedFileUrl($storeCode, $withPassword)
+            $this->_helper->getFeedFileUrl($storeCode, $password)
         );
     }
 
@@ -344,6 +344,8 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
             ['default', null, true, 'http://example.com/media/doofinder-default.xml'],
             ['default', 'secret', true, 'http://example.com/media/doofinder-default-secret.xml'],
             ['default', 'secret', false, 'http://example.com/media/doofinder-default.xml'],
+            ['default', null, 'secret', 'http://example.com/media/doofinder-default-secret.xml'],
+            ['default', 'secret', 'other', 'http://example.com/media/doofinder-default-other.xml'],
         ];
     }
 }

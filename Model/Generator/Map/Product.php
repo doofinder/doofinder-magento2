@@ -3,6 +3,7 @@
 namespace Doofinder\Feed\Model\Generator\Map;
 
 use \Doofinder\Feed\Model\Generator\Map;
+use \Doofinder\Feed\Model\Config\Source\Feed\PriceTaxMode;
 
 /**
  * Class Product
@@ -17,18 +18,28 @@ class Product extends Map
     protected $_helper = null;
 
     /**
+     * Tax helper
+     *
+     * @var \Magento\Tax\Model\Config
+     */
+    protected $_taxConfig;
+
+    /**
      * Class constructor
      *
      * @param \Doofinder\Feed\Helper\Product $helper
      * @param \Doofinder\Feed\Model\Generator\Item $item
+     * @param \Magento\Tax\Model\Config $taxConfig
      * @param array $data = []
      */
     public function __construct(
         \Doofinder\Feed\Helper\Product $helper,
         \Doofinder\Feed\Model\Generator\Item $item,
+        \Magento\Tax\Model\Config $taxConfig,
         array $data = []
     ) {
         $this->_helper = $helper;
+        $this->_taxConfig = $taxConfig;
 
         if (!is_a($item->getContext(), '\Magento\Catalog\Model\Product')) {
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -152,16 +163,28 @@ class Product extends Map
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $field
-     * @param boolean $minimal = false
      * @return string|null
      */
-    protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)
+    protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field)
     {
         if (!$this->getExportProductPrices()) {
             return null;
         }
 
-        $price = $this->_helper->getProductPrice($product, $field, $minimal);
+        $tax = null;
+        if ($this->_taxConfig->needPriceConversion()) {
+            switch ($this->getPriceTaxMode()) {
+                case PriceTaxMode::MODE_WITH_TAX:
+                    $tax = true;
+                    break;
+
+                case PriceTaxMode::MODE_WITHOUT_TAX:
+                    $tax = false;
+                    break;
+            }
+        }
+
+        $price = $this->_helper->getProductPrice($product, $field, $tax);
 
         return number_format($price, 2, '.', '');
     }
