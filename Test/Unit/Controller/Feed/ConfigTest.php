@@ -139,7 +139,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         );
         $this->_helper->method('getModuleVersion')->willReturn('k.l.m');
 
-        $this->_scopeConfig = $this->getMock(
+        $this->_scopeConfig = $scopeConfig = $this->getMock(
             '\Magento\Framework\App\Config\ScopeConfigInterface',
             [],
             [],
@@ -147,7 +147,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             false
         );
         $this->_scopeConfig->method('getValue')->will($this->returnValueMap([
-            ['general/locale/code', $this->_scopeConfig::SCOPE_TYPE_DEFAULT, null, 'EN'],
+            ['general/locale/code', $scopeConfig::SCOPE_TYPE_DEFAULT, null, 'EN'],
         ]));
 
         $this->_schedule = $this->getMock(

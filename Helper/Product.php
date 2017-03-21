@@ -213,7 +213,8 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $amount = $price->getAmount();
 
         if ($tax === null) {
-            $tax = $this->_taxConfig->getPriceDisplayType() != $this->_taxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
+            $taxConfig = $this->_taxConfig;
+            $tax = $this->_taxConfig->getPriceDisplayType() != $taxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
         }
 
         if (!$tax) {
