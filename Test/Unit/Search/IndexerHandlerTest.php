@@ -131,7 +131,7 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->_productCollectionFactory = $this->getMock(
             '\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory',
-            [],
+            ['create'],
             [],
             '',
             false
