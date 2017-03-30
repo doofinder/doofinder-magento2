@@ -38,24 +38,32 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_categoryTree;
 
     /**
+     * @var \Magento\Tax\Model\Config
+     */
+    protected $_taxConfig;
+
+    /**
      * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory
      * @param \Magento\Catalog\Helper\Image $imageHelper
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
+     * @param \Magento\Tax\Model\Config $taxConfig
      */
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory,
         \Magento\Catalog\Helper\Image $imageHelper,
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
+        \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
+        \Magento\Tax\Model\Config $taxConfig
     ) {
         $this->_categoryCollectionFactory = $categoryCollectionFactory;
         $this->_imageHelper = $imageHelper;
         $this->_storeManager = $storeManager;
         $this->_stockRegistry = $stockRegistry;
         $this->_categoryTree = [];
+        $this->_taxConfig = $taxConfig;
         parent::__construct($context);
     }
 
@@ -185,10 +193,10 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $attribute = 'price'
-     * @param boolean $minimal = false
+     * @param boolean|null $tax = null
      * @return float
      */
-    public function getProductPrice(\Magento\Catalog\Model\Product $product, $attribute = 'price', $minimal = false)
+    public function getProductPrice(\Magento\Catalog\Model\Product $product, $attribute = 'price', $tax = null)
     {
         switch ($attribute) {
             case 'special_price':
@@ -202,8 +210,27 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $price = $product->getPriceInfo()->getPrice($type);
-        $amount = $minimal ? $price->getMinimalPrice() : $price->getAmount();
-        return round($amount->getValue(), 2);
+        $amount = $price->getAmount();
+
+        if ($tax === null) {
+            $taxConfig = $this->_taxConfig;
+            $tax = $this->_taxConfig->getPriceDisplayType() != $taxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
+        }
+
+        if (!$tax) {
+            // No tax needed, use base amount
+            $value = $amount->getBaseAmount();
+        } else if ($this->_taxConfig->priceIncludesTax()) {
+            // Tax already included, use value
+            $value = $amount->getValue();
+        } else {
+            // Tax needed but not included in base price, apply tax
+            // Apply tax to base amount to make sure tax is not added twice
+            $adjustment = $product->getPriceInfo()->getAdjustment('tax');
+            $value = $adjustment->applyAdjustment($amount->getBaseAmount(), $product);
+        }
+
+        return round($value, 2);
     }
 
     /**

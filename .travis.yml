@@ -1,0 +1,64 @@
+dist: trusty
+sudo: true
+language: php
+php:
+#  - '5.4'
+#  - '5.5'
+  - '5.6.29'
+  - '7.0.7'
+  - '7.0.17'
+#  - '7.1'
+#  - hhvm
+#  - nightly
+
+services:
+  - mysql
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+
+env:
+  matrix:
+  - MAGENTO_VERSION=2.1.0
+  - MAGENTO_VERSION=2.1.1
+  - MAGENTO_VERSION=2.1.2
+  - MAGENTO_VERSION=2.1.3
+  - MAGENTO_VERSION=2.1.4
+  - MAGENTO_VERSION=2.1.5
+
+  global:
+    - MYSQL_HOST=127.0.0.1
+    - MYSQL_USER=magento
+    - MYSQL_PASSWORD=magento
+    - MAGENTO_PATH=../magento
+    - MODULE_NAME=doofinder/doofinder-magento2
+    - MAGENTO_ADMIN_FIRSTNAME=Admin
+    - MAGENTO_ADMIN_LASTNAME=MyStore
+    - MAGENTO_ADMIN_EMAIL=amdin@example.com
+    - MAGENTO_ADMIN_USERNAME=admin
+    - MAGENTO_ADMIN_PASSWORD=admin123
+    - MAGENTO_AUTH_USER=a8788faf07814bec5bd422e7e148122e
+    - MAGENTO_TEST_CLEANUP=0
+    - secure: "k9IL6N8/HwmIYf9+cLaUO0uL5E0WYg0+Uip3jkyHPLTvMq3TipVvBdghXrOeR3QkiKNT2Bl38NdElKMjQKlrXPSBdSKRG4V/ndTf0lYZBh5/DgvEjJyaeakFuokMKtXN83qgYoHhzMiL7nKiekM9wj68tSeOXP09PbYMoZM23WEQAfLo0CqLD220b2eRF34OtoAcA3ZzfGn43wdkyCbxrzja71020futBriKYdLS2nsQ6P4kT7cLA/cw8OXBsYMqprYDBmDh+kPr5C3v8V6cRFDR0d/8dMsIIvSB44Hi+VPYwHzTVYswchm5AjeK6CaFoFU8LiRzFRkbieg3KBXVpGTe2fovCnO3Mn97GqQUZxZ741bwN5I+hS8NSyNvNAEYSH2jsPbihtaZNNid2VXKm/gNkhgkbr8T8MG3GCehFVqatlTBng92455yEF69DDz6GUDKJFylkWSFAE4XELKdWJuXZ0a4yc2saoePU2IbEESwb58kt7icPWmINMOVHAnYZhYdDrzfrSMImhyAXi6tZcpUxGPSVZ+OSQAcIGmebDcyYlOfpOqcv7UoxhQrI/8WHESHRjQ5C2dmu+ViML7Kpzsl1Z6twtk9F9xTkCqhlOh0FGqkZHo1/K6CvjgbgXIdBuCrmr3ZlHJQIG/oq6GkQ+JSUgQjnB/Qx65vy66zkyM="
+
+before_install:
+  - mysql -e 'CREATE DATABASE magento_integration_tests;'
+  - mysql -e "GRANT ALL PRIVILEGES ON magento_integration_tests.* TO 'magento'@'localhost' IDENTIFIED BY 'magento';"
+  - mysql -e 'FLUSH PRIVILEGES;'
+  - composer config --global http-basic.repo.magento.com "$MAGENTO_AUTH_USER" "$MAGENTO_AUTH_PASSWORD"
+  - phpenv config-rm xdebug.ini
+
+install:
+  - composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition "$MAGENTO_PATH" "$MAGENTO_VERSION"
+  - composer config -d "$MAGENTO_PATH" minimum-stability "dev" 2>/dev/null
+  - |-
+    composer config -d "$MAGENTO_PATH" repositories.1 "{\"type\": \"path\", \"url\": \"$TRAVIS_BUILD_DIR\"}" 2>/dev/null
+  - composer require -d "$MAGENTO_PATH" "$MODULE_NAME"
+  - cp Test/ci/phpunit.unit.xml "$MAGENTO_PATH/dev/tests/unit/phpunit.xml"
+  - cp Test/ci/phpunit.integration.xml "$MAGENTO_PATH/dev/tests/integration/phpunit.xml"
+  - cp Test/ci/install-config-mysql.php "$MAGENTO_PATH/dev/tests/integration/etc/install-config-mysql.php"
+
+script:
+  - bash -c 'cd "$MAGENTO_PATH/dev/tests/unit" && php ../../../vendor/bin/phpunit'
+  - bash -c 'cd "$MAGENTO_PATH/dev/tests/integration" && php ../../../vendor/bin/phpunit'

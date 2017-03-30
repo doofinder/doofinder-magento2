@@ -353,19 +353,20 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * Get feed file name
      *
      * @param string $storeCode
-     * @param boolean $withPassword = true
+     * @param string|boolean $password = true
      * @return string
      */
-    public function getFeedFilename($storeCode, $withPassword = true)
+    public function getFeedFilename($storeCode, $password = null)
     {
         $filename = 'doofinder-' . $storeCode;
 
-        if ($withPassword) {
+        if ($password === true) {
             $config = $this->getStoreConfig($storeCode);
+            $password = $config['password'];
+        }
 
-            if ($config['password']) {
-                $filename .= '-' . $config['password'];
-            }
+        if ($password && strlen($password)) {
+            $filename .= '-' . $password;
         }
 
         $filename .= '.xml';

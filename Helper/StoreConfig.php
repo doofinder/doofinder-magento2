@@ -100,7 +100,16 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             $this->_scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode)
         );
 
-        $config['start_time'] = explode(',', $config['start_time']);
+        /**
+         * @notice There is a bug in PHP 7.0.7 and Magento 2.1.3+
+         *         which resulted with references in $config array,
+         *         so we merge $config array with new value instead
+         *         of replacing key with new value.
+         */
+        $config = array_merge(
+            $config,
+            ['start_time' => explode(',', $config['start_time'])]
+        );
 
         return $config;
     }

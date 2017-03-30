@@ -167,6 +167,19 @@
                     <label>Export Product Prices</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="price_tax_mode"
+                    translate="label"
+                    type="select"
+                    sortOrder="2"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1">
+                    <label>Price Export Mode</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\PriceTaxMode</source_model>
+                    <comment>
+                        <![CDATA[Export product price tax mode: Auto - use catalog display setting; With tax - export prices with tax; Without tax - export prices without tax.]]>
+                    </comment>
+                </field>
                 <field id="split_configurable_products"
                     translate="label"
                     type="select"
