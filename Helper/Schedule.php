@@ -386,6 +386,17 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get feed lock file name
+     *
+     * @param string $storeCode
+     * @return string
+     */
+    protected function getFeedLockFilename($storeCode)
+    {
+        return $this->getFeedFilename($storeCode) . '.lock';
+    }
+
+    /**
      * Remove tmp xml file.
      *
      * @param string $storeCode
@@ -571,12 +582,52 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Lock process
+     *
+     * Locking process ensures that no other
+     * cron job runs it at the same time
+     *
+     * @param \Doofinder\Feed\Model\Cron
+     * @param boolean $remove = false - Should the lock be removed instead of created
+     */
+    protected function lockProcess(\Doofinder\Feed\Model\Cron $process, $remove = false)
+    {
+        $tmpDir = $this->_filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::TMP);
+        $lockFilename = $this->getFeedLockFilename($process->getStoreCode());
+
+        // Create lock file
+        if (!$remove) {
+            if ($tmpDir->isExist($lockFilename)) {
+                throw new \Exception(__('Process for store %1 is already locked', $process->getStoreCode()));
+            }
+
+            $tmpDir->touch($lockFilename);
+        } else {
+            $tmpDir->delete($lockFilename);
+        }
+    }
+
+    /**
+     * Unlock process
+     *
+     *
+     * @param \Doofinder\Feed\Model\Cron
+     */
+    protected function unlockProcess(\Doofinder\Feed\Model\Cron $process)
+    {
+        return $this->lockProcess($process, true);
+    }
+
+    /**
      * Run process
      *
      * @param \Doofinder\Feed\Model\Cron
      */
     public function runProcess(\Doofinder\Feed\Model\Cron $process)
     {
+        // Lock process
+        $this->lockProcess($process);
+
         $storeCode = $process->getStoreCode();
 
         // Set current store for generator
@@ -640,5 +691,8 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             $process->setMessage('#error#' . $e->getMessage());
             $this->scheduleProcess($process);
         }
+
+        // Unlock process
+        $this->unlockProcess($process);
     }
 }
