@@ -73,31 +73,74 @@ class Configurable extends Product
      */
     public function get($field)
     {
-        $value = parent::get($field);
-
         // Only merge associated items values if option is enabled
         if ($this->_grouped) {
-            // Get values of associated items
-            $associatesValues = $this->getAssociatesValues($field);
-
-            if (!is_array($value)) {
-                $value = [$value];
+            switch ($field) {
+                case 'df_availability':
+                    return $this->getAssociatesAvailability();
             }
 
-            $value = array_merge($value, $associatesValues);
+            return $this->getGroupedField($field);
+        }
 
-            // Remove duplicates
-            $value = array_values(array_unique($value));
+        return parent::get($field);
+    }
 
-            // Filter out empty values (0 is not an empty value)
-            $value = array_filter($value, function ($item) {
-                return $item || $item === 0;
-            });
+    /**
+     * Map availability of associated items
+     *
+     * @return mixed
+     */
+    protected function getAssociatesAvailability()
+    {
+        $value = parent::get('df_availability');
 
-            // Remove array if value is single
-            if (count($value) == 1) {
-                $value = $value[0];
-            }
+        // Return out of stock if configurable product is out of stock
+        if ($value == $this->_helper->getOutOfStockLabel()) {
+            return $value;
+        }
+
+        // Return out of stock label if all associated products are out of stock
+        $associatesValues = $this->getAssociatesValues('df_availability');
+        if (array_unique($associatesValues) == [$this->_helper->getOutOfStockLabel()]) {
+            return $this->_helper->getOutOfStockLabel();
+        }
+
+        // Return in stock otherwise
+        return $value;
+    }
+
+    /**
+     * Map field of merged values of associated items and configurable product
+     *
+     * @param string $field
+     * @return mixed
+     */
+    protected function getGroupedField($field)
+    {
+        // Get configurable product value
+        $value = parent::get($field);
+
+        // Get values of associated items
+        $associatesValues = $this->getAssociatesValues($field);
+
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+
+        $value = array_merge($value, $associatesValues);
+
+        // Remove duplicates
+        $value = array_values(array_unique($value));
+
+        // Filter out empty values (0 is not an empty value)
+        $value = array_filter($value, function ($item) {
+            return $item || $item === 0;
+        });
+
+        // Remove array if value is single
+        if (count($value) == 1) {
+            $value = $value[0];
         }
 
         return $value;
