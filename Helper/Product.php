@@ -242,10 +242,30 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     public function getProductAvailability(\Magento\Catalog\Model\Product $product)
     {
         if ($this->getStockItem($product->getId())->getIsInStock()) {
-            return 'in stock';
+            return $this->getInStockLabel();
         }
 
+        return $this->getOutOfStockLabel();
+    }
+
+    /**
+     * Get product 'out of stock' label
+     *
+     * @return string
+     */
+    public function getOutOfStockLabel()
+    {
         return 'out of stock';
+    }
+
+    /**
+     * Get product 'in stock' label
+     *
+     * @return string
+     */
+    public function getInStockLabel()
+    {
+        return 'in stock';
     }
 
     /**

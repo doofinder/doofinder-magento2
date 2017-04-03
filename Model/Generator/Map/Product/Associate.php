@@ -24,13 +24,13 @@ class Associate extends Product
                 if ($this->_context->isVisibleInSiteVisibility()) {
                     break;
                 }
+                // nobreak;
 
             case 'df_id':
             case 'name':
             case 'description':
             case 'price':
             case 'image':
-            case 'availability':
             case 'type_id':
                 return;
         }

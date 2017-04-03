@@ -93,7 +93,6 @@ class AssociateTest extends \PHPUnit_Framework_TestCase
             ['description', false],
             ['price', false],
             ['image', false],
-            ['availability', false],
             ['type_id', false],
         ];
     }
