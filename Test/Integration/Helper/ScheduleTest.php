@@ -54,7 +54,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'store_code' => 'default',
-                'enabled' => '1',
+                'enabled' => '0',
                 'start_time' => ['0', '0', '0'],
                 'frequency' => 'D',
                 'step_size' => '1000',
@@ -190,6 +190,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test regenerateSchedule() method
      *
      * @magentoDbIsolation enabled
+     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
      */
     public function testRegenerateSchedule()
     {
@@ -204,6 +205,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test updateProcess() method
      *
      * @magentoDbIsolation enabled
+     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
      */
     public function testUpdateProcess()
     {
@@ -238,6 +240,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      *
      * @magentoDbIsolation enabled
      * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/frequency W
+     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
      */
     public function testUpdateProcessWeekly()
     {
@@ -258,6 +261,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      *
      * @magentoDbIsolation enabled
      * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/frequency M
+     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
      */
     public function testUpdateProcessMonthly()
     {
@@ -278,6 +282,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      *
      * @magentoDbIsolation enabled
      * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/start_time 10,15,30
+     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
      */
     public function testUpdateProcessCustomTime()
     {
@@ -317,6 +322,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test updateProcess() method rescheduling
      *
      * @magentoDataFixture process_success
+     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
      */
     public function testUpdateProcessReschedule()
     {
@@ -355,6 +361,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test getActiveProcess() method
      *
      * @magentoDbIsolation enabled
+     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
      */
     public function testGetActiveProcess()
     {

@@ -242,6 +242,9 @@
                    showInStore="1"
                    showInWebsite="1">
                 <label>Feed Cron</label>
+                <comment>
+                    <![CDATA[Allows generating the data feed in a daily basis. If you're using internal search you don't need Cron. Data is indexed automatically via API.]]>
+                </comment>
                 <field id="enabled"
                        translate="label"
                        type="select"
