@@ -505,6 +505,9 @@
                            showInStore="0"
                            showInWebsite="0">
                         <label>API Key</label>
+                        <comment>
+                            <![CDATA[ You need a Management API Key. Search-only keys won't work. ]]>
+                        </comment>
                     </field>
                     <field id="hash_id"
                            translate="label"
