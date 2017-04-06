@@ -519,17 +519,17 @@
                             <![CDATA[ You must configure a "hashid" for each store view. ]]>
                         </comment>
                     </field>
-                    <field id="total_limit"
+                    <field id="page_limit"
                            translate="label"
                            type="text"
                            sortOrder="3"
                            showInDefault="1"
                            showInStore="1"
                            showInWebsite="0">
-                        <label>Total limit</label>
+                        <label>Page limit</label>
                         <validate>required-entry validate-number</validate>
                         <comment>
-                            <![CDATA[ Number of results returned for search query. ]]>
+                            <![CDATA[ Maximum number of pages obtained for a search query. Each page contains a maximum of 100 results. ]]>
                         </comment>
                     </field>
                 </group>

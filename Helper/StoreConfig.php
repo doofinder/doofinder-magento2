@@ -208,11 +208,13 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSearchTotalLimit($storeCode = null)
     {
-        return $this->_scopeConfig->getValue(
-            self::INTERNAL_SEARCH_CONFIG . '/total_limit',
+        $pageLimit = $this->_scopeConfig->getValue(
+            self::INTERNAL_SEARCH_CONFIG . '/page_limit',
             $this->getScopeStore(),
             $storeCode
         );
+
+        return $pageLimit * $this->getSearchRequestLimit($storeCode);
     }
 
     /**
