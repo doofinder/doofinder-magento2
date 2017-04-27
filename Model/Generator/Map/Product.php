@@ -18,6 +18,11 @@ class Product extends Map
     protected $_helper = null;
 
     /**
+     * @var \Magento\Framework\Pricing\PriceCurrencyInterface
+     */
+    protected $_priceCurrency;
+
+    /**
      * Tax helper
      *
      * @var \Magento\Tax\Model\Config
@@ -30,15 +35,18 @@ class Product extends Map
      * @param \Doofinder\Feed\Helper\Product $helper
      * @param \Doofinder\Feed\Model\Generator\Item $item
      * @param \Magento\Tax\Model\Config $taxConfig
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      * @param array $data = []
      */
     public function __construct(
         \Doofinder\Feed\Helper\Product $helper,
         \Doofinder\Feed\Model\Generator\Item $item,
         \Magento\Tax\Model\Config $taxConfig,
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         array $data = []
     ) {
         $this->_helper = $helper;
+        $this->_priceCurrency = $priceCurrency;
         $this->_taxConfig = $taxConfig;
 
         if (!is_a($item->getContext(), '\Magento\Catalog\Model\Product')) {
@@ -186,7 +194,11 @@ class Product extends Map
 
         $price = $this->_helper->getProductPrice($product, $field, $tax);
 
-        return number_format($price, 2, '.', '');
+        return $this->_priceCurrency->getCurrency()->format(
+            $price,
+            ['display' => \Zend_Currency::NO_SYMBOL],
+            false
+        );
     }
 
     /**

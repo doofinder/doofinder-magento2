@@ -33,6 +33,7 @@ class Configurable extends Product
      * @param \Doofinder\Feed\Helper\Product $helper
      * @param \Doofinder\Feed\Model\Generator\Item $item
      * @param \Magento\Tax\Model\Config $taxConfig
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      * @param array $data = []
      */
     public function __construct(
@@ -40,10 +41,11 @@ class Configurable extends Product
         \Doofinder\Feed\Helper\Product $helper,
         \Doofinder\Feed\Model\Generator\Item $item,
         \Magento\Tax\Model\Config $taxConfig,
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         array $data = []
     ) {
         $this->_mapFactory = $mapFactory;
-        parent::__construct($helper, $item, $taxConfig, $data);
+        parent::__construct($helper, $item, $taxConfig, $priceCurrency, $data);
     }
 
     /**
