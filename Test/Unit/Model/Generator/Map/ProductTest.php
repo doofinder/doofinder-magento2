@@ -25,6 +25,16 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     private $_product;
 
     /**
+     * @var \Magento\Directory\Model\Currency
+     */
+    private $_currency;
+
+    /**
+     * @var \Magento\Framework\Pricing\PriceCurrencyInterface
+     */
+    private $_priceCurrency;
+
+    /**
      * @var \Doofinder\Feed\Helper\Product
      */
     private $_helper;
@@ -63,6 +73,24 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
+
+        $this->_currency = $this->getMock(
+            '\Magento\Directory\Model\Currency',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_currency->method('format')->with(10.1234)->willReturn('10.12');
+
+        $this->_priceCurrency = $this->getMock(
+            '\Magento\Framework\Pricing\PriceCurrencyInterface',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_priceCurrency->method('getCurrency')->willReturn($this->_currency);
 
         $this->_helper = $this->getMock(
             '\Doofinder\Feed\Helper\Product',
@@ -109,6 +137,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             [
                 'helper' => $this->_helper,
                 'item' => $this->_item,
+                'priceCurrency' => $this->_priceCurrency,
             ]
         );
         $this->_model->setExportProductPrices(true);

@@ -230,7 +230,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             $value = $adjustment->applyAdjustment($amount->getBaseAmount(), $product);
         }
 
-        return round($value, 2);
+        return $value;
     }
 
     /**
