@@ -83,7 +83,15 @@ class Product extends Map
                 return $this->getProductPrice($this->_context, 'regular_price');
 
             case 'df_sale_price':
-                return $this->getProductPrice($this->_context, 'final_price');
+                $salePrice = $this->getProductPrice($this->_context, 'final_price');
+
+                if ($salePrice != $this->getProductPrice($this->_context, 'regular_price')) {
+                    // Only return 'sale price' if it differs from 'regular price'
+                    return $salePrice;
+                }
+
+                return null;
+
 
             case 'price':
             case 'special_price':
