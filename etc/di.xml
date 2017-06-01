@@ -76,4 +76,8 @@
     <type name="Magento\Tax\Model\Config">
         <plugin name="doofinderFeedTaxConfig" type="Doofinder\Feed\Model\Tax\Plugin\Config"/>
     </type>
+
+    <type name="Magento\Config\Model\Config">
+      <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
+    </type>
 </config>
