@@ -54,12 +54,12 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
 <item>
  <title><![CDATA[Simple Product]]></title>
  <description><![CDATA[Short description]]></description>
- <price><![CDATA[10.00]]></price>
+ <price><![CDATA[10]]></price>
  <mpn><![CDATA[simple]]></mpn>
 </item>
 <item>
  <title><![CDATA[Virtual Product]]></title>
- <price><![CDATA[10.00]]></price>
+ <price><![CDATA[10]]></price>
  <mpn><![CDATA[virtual-product]]></mpn>
 </item>
 </channel>

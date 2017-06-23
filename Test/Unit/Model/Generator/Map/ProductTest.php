@@ -81,7 +81,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
-        $this->_currency->method('format')->with(10.1234)->willReturn('10.12');
+        $this->_currency->method('format')->with(10.1234)->willReturn('10.1234');
 
         $this->_priceCurrency = $this->getMock(
             '\Magento\Framework\Pricing\PriceCurrencyInterface',
@@ -153,7 +153,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Category 1>Category 1.1%%Category 2', $this->_model->get('category_ids'));
         $this->assertEquals('http://example.com/path/to/image.jpg', $this->_model->get('image'));
         $this->assertEquals('http://example.com/simple-product.html', $this->_model->get('url_key'));
-        $this->assertEquals('10.12', $this->_model->get('price'));
+        $this->assertEquals('10.1234', $this->_model->get('price'));
         $this->assertEquals(null, $this->_model->setExportProductPrices(false)->get('price'));
         $this->assertEquals('in stock', $this->_model->get('df_availability'));
         $this->assertEquals('USD', $this->_model->get('df_currency'));

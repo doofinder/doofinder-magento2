@@ -200,13 +200,8 @@ class Product extends Map
             }
         }
 
-        $price = $this->_helper->getProductPrice($product, $field, $tax);
-
-        return $this->_priceCurrency->getCurrency()->format(
-            $price,
-            ['display' => \Zend_Currency::NO_SYMBOL],
-            false
-        );
+        // Return price converted to store currency
+        return $this->_helper->getProductPrice($product, $field, $tax);
     }
 
     /**
