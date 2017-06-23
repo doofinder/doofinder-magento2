@@ -67,13 +67,19 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         $limit = $this->_storeConfig->getSearchRequestLimit($this->getStoreCode());
 
         $client = $this->_searchFactory->create(['hashid' => $hashId, 'api_key' => $apiKey]);
-        $results = $client->query($queryText, null, ['rpp' => $limit, 'transformer' => 'onlyid', 'filter' => []]);
+
+        try {
+            $results = $client->query($queryText, null, ['rpp' => $limit, 'transformer' => 'onlyid', 'filter' => []]);
+        } catch (\Doofinder\Api\Search\Error $e) {
+            $results = null;
+            $this->_logger->critical($e->getMessage());
+        }
 
         // Store objects
         $this->_lastSearch = $client;
         $this->_lastResults = $results;
 
-        return $this->retrieveIds($results);
+        return $results ? $this->retrieveIds($results) : [];
     }
 
     /**
@@ -99,6 +105,10 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAllResults()
     {
+        if (!$this->_lastResults) {
+            return [];
+        }
+
         $limit = $this->_storeConfig->getSearchTotalLimit($this->getStoreCode());
         $ids = $this->retrieveIds($this->_lastResults);
 
@@ -116,7 +126,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getResultsCount()
     {
-        return $this->_lastResults->getProperty('total');
+        return $this->_lastResults ? $this->_lastResults->getProperty('total') : 0;
     }
 
     /**
