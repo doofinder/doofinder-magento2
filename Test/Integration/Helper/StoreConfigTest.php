@@ -49,7 +49,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
     public function testGetStoreCodesProvider()
     {
         return [
-            ['default', ['default']],
+            ['default', ['default', 'test']],
             ['test', ['test']],
         ];
     }

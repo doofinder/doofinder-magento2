@@ -135,7 +135,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         $currentStoreCode = $this->getStoreCode();
         $storeCodes = [];
 
-        if ($currentStoreCode == 'admin') {
+        if (in_array($currentStoreCode, ['admin', 'default'])) {
             $stores = $this->_storeManager->getStores();
 
             foreach ($stores as $store) {
