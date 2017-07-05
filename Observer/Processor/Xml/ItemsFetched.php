@@ -13,7 +13,6 @@ class ItemsFetched implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         if ($xmlProcessor = $observer->getGenerator()->getProcessor('Xml')) {
-
             $isStart = true;
             $isEnd = true;
 

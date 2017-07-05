@@ -2,43 +2,35 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Backend;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class HashIdValidationTest
  * @package Doofinder\Feed\Test\Unit\Model\Backend
  */
-class HashIdValidationTest extends \PHPUnit_Framework_TestCase
+class HashIdValidationTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
-    /**
-     * @var \Magento\Store\Model\Store
-     */
-    protected $_store;
-
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
-    protected $_resource;
+    private $_resource;
 
     /**
      * @var \Doofinder\Feed\Model\Config\Backend\HashIdValidation
      */
-    protected $_model;
+    private $_model;
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_storeConfig = $this->getMock(
             '\Doofinder\Feed\Helper\StoreConfig',
@@ -63,7 +55,7 @@ class HashIdValidationTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_model = $this->_objectManager->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Config\Backend\HashIdValidation',
             [
                 'storeConfig' => $this->_storeConfig,

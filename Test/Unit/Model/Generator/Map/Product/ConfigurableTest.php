@@ -2,12 +2,14 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Map\Product;
 
-class ConfigurableTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+class ConfigurableTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product\Configurable
      */
-    protected $_model;
+    private $_model;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
@@ -25,16 +27,11 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
     private $_helper;
 
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManagerHelper;
-
-    /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_helper = $this->getMock(
             '\Doofinder\Feed\Helper\Product',
@@ -102,7 +99,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
         );
         $this->_mapFactory->method('create')->willReturn($this->_map);
 
-        $this->_model = $this->_objectManagerHelper->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Generator\Map\Product\Configurable',
             [
                 'mapFactory' => $this->_mapFactory,

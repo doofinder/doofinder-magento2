@@ -2,44 +2,41 @@
 
 namespace Doofinder\Feed\Test\Unit\Console\Command;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class RecheduleProcessCommandTest
  *
  * @package Doofinder\Feed\Test\Unit\Console\Command
  */
-class RescheduleProcessCommandTest extends \PHPUnit_Framework_TestCase
+class RescheduleProcessCommandTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    protected $_store;
+    private $_store;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Doofinder\Feed\Console\Command\RescheduleProcessCommand
      */
-    protected $_command;
+    private $_command;
 
     /**
      * Prepares the environment before running a test.
      */
     public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_store = $this->getMock(
             '\Magento\Store\Model\Store',
@@ -66,7 +63,7 @@ class RescheduleProcessCommandTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_command = $this->_objectManager->getObject(
+        $this->_command = $this->objectManager->getObject(
             '\Doofinder\Feed\Console\Command\RescheduleProcessCommand',
             [
                 'storeManager'  => $this->_storeManager,
@@ -80,9 +77,11 @@ class RescheduleProcessCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute()
     {
+        // @codingStandardsIgnoreStart
         $commandTester = new \Symfony\Component\Console\Tester\CommandTester(
             $this->_command
         );
+        // @codingStandardsIgnoreEnd
 
         $this->_schedule->expects($this->once())->method('updateProcess')->with($this->_store, true, true);
 

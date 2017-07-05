@@ -7,52 +7,52 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
     /**
      * @var \Magento\Framework\Indexer\SaveHandler\Batch
      */
-    protected $_batch;
+    private $_batch;
 
     /**
      * @var \Magento\Framework\Indexer\IndexStructureInterface
      */
-    protected $_indexStructure;
+    private $_indexStructure;
 
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
-    protected $_productCollectionFactory;
+    private $_productCollectionFactory;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    protected $_feedConfig;
+    private $_feedConfig;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    protected $_generatorFactory;
+    private $_generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
-    protected $_searchHelper;
+    private $_searchHelper;
 
     /**
      * @var array
      */
-    protected $_data;
+    private $_data;
 
     /**
      * @var int
      */
-    protected $_batchSize;
+    private $_batchSize;
 
     /**
      * @param \Magento\Framework\Indexer\IndexStructureInterface $indexStructure
@@ -68,6 +68,7 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      * @param \Doofinder\Feed\Helper\Search
      * @param array $data
      * @param int $batchSize = 100
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         \Magento\Framework\Indexer\IndexStructureInterface $indexStructure,
@@ -75,7 +76,7 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
         \Magento\Eav\Model\Config $eavConfig,
         \Magento\Framework\Indexer\SaveHandler\Batch $batch,
         \Magento\Framework\Indexer\ScopeResolver\IndexScopeResolver $indexScopeResolver,
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productColFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Doofinder\Feed\Helper\FeedConfig $feedConfig,
@@ -95,7 +96,7 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
         );
 
         $this->_batch = $batch;
-        $this->_productCollectionFactory = $productCollectionFactory;
+        $this->_productCollectionFactory = $productColFactory;
         $this->_storeManager = $storeManager;
         $this->_storeConfig = $storeConfig;
         $this->_feedConfig = $feedConfig;
@@ -132,7 +133,7 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
 
     /**
      * {@inheritdoc}
-     * @todo Add hash id verification
+     * NOTICE Add hash id verification
      */
     public function isAvailable()
     {
@@ -217,13 +218,5 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
         $collection->addAttributeToFilter('entity_id', ['in' => $ids]);
         $collection->addStoreFilter();
         return $collection->getItems();
-    }
-
-    /**
-     * @return string
-     */
-    private function getIndexName()
-    {
-        return $this->_data['indexer_id'];
     }
 }

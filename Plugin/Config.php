@@ -10,7 +10,7 @@ class Config
     /**
      * @var \Doofinder\Feed\Helper\Indexer
      */
-    protected $_indexer;
+    private $_indexer;
 
     /**
      * Constructor
@@ -34,7 +34,8 @@ class Config
      */
     public function beforeSave(\Magento\Config\Model\Config $config)
     {
-        if ($config->getSection() == $this->_indexer::CONFIG_SECTION_ID) {
+        $indexer = $this->_indexer;
+        if ($config->getSection() == $indexer::CONFIG_SECTION_ID) {
             $this->_indexer->storeOldConfig();
         }
     }

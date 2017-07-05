@@ -4,6 +4,7 @@ namespace Doofinder\Feed\Model\Generator;
 
 class Map extends \Magento\Framework\DataObject
 {
+    // @codingStandardsIgnoreStart
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
@@ -13,6 +14,7 @@ class Map extends \Magento\Framework\DataObject
      * @var \Magento\Framework\DataObject
      */
     protected $_context;
+    // @codingStandardsIgnoreEnd
 
     /**
      * Class constructor
@@ -45,6 +47,7 @@ class Map extends \Magento\Framework\DataObject
      */
     public function before()
     {
+        return null;
     }
 
     /**
@@ -52,5 +55,6 @@ class Map extends \Magento\Framework\DataObject
      */
     public function after()
     {
+        return null;
     }
 }

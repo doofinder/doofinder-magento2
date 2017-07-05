@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Model\Generator\Component;
 
-interface Fetcher
+interface FetcherInterface
 {
     /**
      * Fetch generator items

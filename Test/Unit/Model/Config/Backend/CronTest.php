@@ -2,65 +2,62 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Backend;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class CronTest
  * @package Doofinder\Feed\Test\Unit\Model\Backend
  */
-class CronTest extends \PHPUnit_Framework_TestCase
+class CronTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Magento\Framework\Model\Context
      */
-    protected $_contextMock;
+    private $_context;
 
     /**
      * @var \Magento\Framework\Registry
      */
-    protected $_registryMock;
+    private $_registry;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_configScope;
+    private $_configScope;
 
     /**
      * @var \Magento\Framework\App\Cache\TypeListInterface
      */
-    protected $_cacheTypeListMock;
+    private $_cacheTypeList;
 
     /**
      * @var \Magento\Framework\App\Config\ValueFactory
      */
-    protected $_configValueFactoryMock;
+    private $_configValueFactory;
 
     /**
      * @var \Magento\Framework\App\Config\Value
      */
-    protected $_configValueMock;
+    private $_configValue;
 
     /**
      * @var \Magento\Framework\Event\ManagerInterface
      */
-    protected $_managerInterfaceMock;
+    private $_managerInterface;
 
     /**
      * @var \Doofinder\Feed\Model\Config\Backend\Cron
      */
-    protected $_model;
+    private $_model;
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
-        $this->_contextMock = $this->getMock(
+        $this->_context = $this->getMock(
             '\Magento\Framework\Model\Context',
             [],
             [],
@@ -68,7 +65,7 @@ class CronTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_registryMock = $this->getMock(
+        $this->_registry = $this->getMock(
             '\Magento\Framework\Registry',
             [],
             [],
@@ -84,7 +81,7 @@ class CronTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_cacheTypeListMock = $this->getMock(
+        $this->_cacheTypeList = $this->getMock(
             '\Magento\Framework\App\Cache\TypeListInterface',
             [],
             [],
@@ -92,7 +89,7 @@ class CronTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_configValueFactoryMock = $this->getMock(
+        $this->_configValueFactory = $this->getMock(
             '\Magento\Framework\App\Config\ValueFactory',
             ['create'],
             [],
@@ -100,7 +97,7 @@ class CronTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_configValueMock = $this->getMock(
+        $this->_configValue = $this->getMock(
             '\Magento\Framework\App\Config\Value',
             ['load', 'setValue', 'setPath', 'save'],
             [],
@@ -108,7 +105,7 @@ class CronTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_managerInterfaceMock = $this->getMock(
+        $this->_managerInterface = $this->getMock(
             '\Magento\Framework\Event\ManagerInterface',
             [],
             [],
@@ -116,36 +113,36 @@ class CronTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_contextMock->expects($this->once())
+        $this->_context->expects($this->once())
             ->method('getEventDispatcher')
-            ->willReturn($this->_managerInterfaceMock);
+            ->willReturn($this->_managerInterface);
 
-        $this->_configValueFactoryMock->expects($this->once())
+        $this->_configValueFactory->expects($this->once())
             ->method('create')
-            ->willReturn($this->_configValueMock);
+            ->willReturn($this->_configValue);
 
-        $this->_configValueMock->expects($this->once())
+        $this->_configValue->expects($this->once())
             ->method('load')
             ->with(\Doofinder\Feed\Model\Config\Backend\Cron::CRON_STRING_PATH, 'path')
             ->willReturnSelf();
 
-        $this->_configValueMock->expects($this->once())
+        $this->_configValue->expects($this->once())
             ->method('setValue')
             ->willReturnSelf();
 
-        $this->_configValueMock->expects($this->once())
+        $this->_configValue->expects($this->once())
             ->method('setPath')
             ->with(\Doofinder\Feed\Model\Config\Backend\Cron::CRON_STRING_PATH)
             ->willReturnSelf();
 
-        $this->_model = $this->_objectManager->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Config\Backend\Cron',
             [
-                'context' => $this->_contextMock,
-                'registry' => $this->_registryMock,
+                'context' => $this->_context,
+                'registry' => $this->_registry,
                 'config' => $this->_configScope,
-                'cacheTypeList' => $this->_cacheTypeListMock,
-                'configValueFactory' => $this->_configValueFactoryMock,
+                'cacheTypeList' => $this->_cacheTypeList,
+                'configValueFactory' => $this->_configValueFactory,
             ]
         );
     }

@@ -2,49 +2,46 @@
 
 namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\System\Config;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class InternalSearchEnabledTest
  *
  * @package Doofinder\Feed\Test\Unit\Block\Adminhtml\System\Config
  */
-class InternalSearchEnabledTest extends \PHPUnit_Framework_TestCase
+class InternalSearchEnabledTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Magento\Framework\Data\Form\Element\AbstractElement
      */
-    protected $_element;
+    private $_element;
 
     /**
      * @var \Magento\Backend\Model\Url
      */
-    protected $_urlBuilder;
+    private $_urlBuilder;
 
     /**
      * @var \Magento\Backend\Block\Template\Context
      */
-    protected $_context;
+    private $_context;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled
      */
-    protected $_block;
+    private $_block;
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_element = $this->getMock(
             '\Magento\Framework\Data\Form\Element\AbstractElement',
@@ -84,7 +81,7 @@ class InternalSearchEnabledTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_block = $this->_objectManager->getObject(
+        $this->_block = $this->objectManager->getObject(
             '\Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled',
             [
                 'context' => $this->_context,

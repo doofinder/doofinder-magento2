@@ -12,7 +12,7 @@ class Indexer implements \Magento\Framework\Event\ObserverInterface
     /**
      * @var \Doofinder\Feed\Helper\Indexer
      */
-    protected $_indexer;
+    private $_indexer;
 
     public function __construct(
         \Doofinder\Feed\Helper\Indexer $indexer
@@ -24,9 +24,12 @@ class Indexer implements \Magento\Framework\Event\ObserverInterface
      * Execute observer.
      *
      * @param \Magento\Framework\Event\Observer $observer
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @codingStandardsIgnoreStart
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
+    // @codingStandardsIgnoreEnd
         if ($this->_indexer->shouldIndexInvalidate()) {
             $this->_indexer->invalidate();
         }

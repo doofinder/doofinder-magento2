@@ -3,20 +3,21 @@
 namespace Doofinder\Feed\Model\Generator\Component\Fetcher;
 
 use \Doofinder\Feed\Model\Generator\Component;
-use \Doofinder\Feed\Model\Generator\Component\Fetcher;
+use \Doofinder\Feed\Model\Generator\Component\FetcherInterface;
 
-class Product extends Component implements Fetcher
+class Product extends Component implements FetcherInterface
 {
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
-    protected $_productCollectionFactory = null;
+    private $_productColFactory = null;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\ItemFactory
      */
-    protected $_generatorItemFactory = null;
+    private $_generatorItemFactory = null;
 
+    // @codingStandardsIgnoreStart
     /**
      * @var boolean
      */
@@ -30,7 +31,7 @@ class Product extends Component implements Fetcher
     /**
      * @var int
      */
-    protected $_lastProcessedEntityId = null;
+    protected $_lastEntityId = null;
 
     /**
      * Amount of all products left in current fetch
@@ -38,17 +39,18 @@ class Product extends Component implements Fetcher
      * @var int
      */
     protected $_itemsLeftCount = null;
+    // @codingStandardsEnd
 
     /**
      * Constructor
      */
     public function __construct(
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productColFactory,
         \Doofinder\Feed\Model\Generator\ItemFactory $generatorItemFactory,
         \Psr\Log\LoggerInterface $logger,
         array $data = []
     ) {
-        $this->_productCollectionFactory = $productCollectionFactory;
+        $this->_productColFactory = $productColFactory;
         $this->_generatorItemFactory = $generatorItemFactory;
         parent::__construct($logger, $data);
     }
@@ -58,7 +60,7 @@ class Product extends Component implements Fetcher
      *
      * @return \Magento\Catalog\Model\Product[]
      */
-    protected function fetchProducts()
+    public function fetchProducts()
     {
         $collection = $this->getProductCollection($this->getLimit(), $this->getOffset());
         $collection->load();
@@ -74,11 +76,10 @@ class Product extends Component implements Fetcher
             $this->_isDone = $this->_isStarted;
         }
 
-
         // Set the last processed entity id
-        $this->_lastProcessedEntityId = $this->getOffset();
+        $this->_lastEntityId = $this->getOffset();
         if ($collection->getSize()) {
-            $this->_lastProcessedEntityId = $collection->getLastItem()->getEntityId();
+            $this->_lastEntityId = $collection->getLastItem()->getEntityId();
         }
 
         // Set fetched size
@@ -96,7 +97,7 @@ class Product extends Component implements Fetcher
     {
         $products = $this->fetchProducts();
 
-        $items = array();
+        $items = [];
         foreach ($products as $product) {
             $item = $this->createItem($product);
             $items[] = $item;
@@ -118,7 +119,7 @@ class Product extends Component implements Fetcher
      * @param \Magento\Catalog\Model\Product
      * @return \Doofinder\Feed\Model\Generator\Item[]
      */
-    protected function fetchProductAssociates(\Magento\Catalog\Model\Product $product)
+    private function fetchProductAssociates(\Magento\Catalog\Model\Product $product)
     {
         $associates = [];
 
@@ -134,9 +135,9 @@ class Product extends Component implements Fetcher
      *
      * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
      */
-    protected function getProductCollection($limit = null, $offset = null)
+    private function getProductCollection($limit = null, $offset = null)
     {
-        $collection = $this->_productCollectionFactory->create()
+        $collection = $this->_productColFactory->create()
             ->addAttributeToSelect('*')
             ->addStoreFilter()
             ->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
@@ -167,7 +168,7 @@ class Product extends Component implements Fetcher
      *
      * @param \Magento\Catalog\Model\Product
      */
-    protected function createItem(\Magento\Catalog\Model\Product $product)
+    private function createItem(\Magento\Catalog\Model\Product $product)
     {
         $item = $this->_generatorItemFactory->create();
         $item->setContext($product);
@@ -206,7 +207,7 @@ class Product extends Component implements Fetcher
      */
     public function getLastProcessedEntityId()
     {
-        return $this->_lastProcessedEntityId;
+        return $this->_lastEntityId;
     }
 
     /**
@@ -231,13 +232,11 @@ class Product extends Component implements Fetcher
      *
      * @return int
      */
-    protected function getLastProcessedEntityIdFromOffset()
+    private function getLastProcessedEntityIdFromOffset()
     {
         $collection = $this->getProductCollection();
-        $collection->getSelect()->limit(1, $this->getOffset() - 1);
+        $ids = $collection->getAllIds(1, $this->getOffset() - 1);
 
-        $item = $collection->fetchItem();
-
-        return $item ? $item->getEntityId() : null;
+        return $ids ? reset($ids) : null;
     }
 }

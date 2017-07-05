@@ -10,7 +10,7 @@ class Config
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    private $_scopeConfig;
 
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -29,10 +29,13 @@ class Config
      * price export mode is set to 'with tax'.
      * All other tax setting combinations are fine.
      *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @return boolean
+     * @codingStandardsIgnoreStart
      */
     public function aroundNeedPriceConversion(\Magento\Tax\Model\Config $taxConfig, \Closure $closure)
     {
+    // @codingStandardsIgnoreEnd
         $needPriceConversion = $closure();
 
         // Already needs price conversion so do nothig

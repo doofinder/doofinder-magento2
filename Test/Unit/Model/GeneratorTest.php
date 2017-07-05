@@ -2,10 +2,11 @@
 
 namespace Doofinder\Feed\Test\Unit\Model;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 
-class GeneratorTest extends \PHPUnit_Framework_TestCase
+class GeneratorTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator
@@ -13,7 +14,7 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
     private $_model;
 
     /**
-     * @var \Doofinder\Feed\Model\Generator\Component\Fetcher
+     * @var \Doofinder\Feed\Model\Generator\Component\FetcherInterface
      */
     private $_fetcher;
 
@@ -72,9 +73,9 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function setUp()
+    public function setUp()
     {
-        $helper = new ObjectManager($this);
+        parent::setUp();
 
         $this->_xmlWriter = $this->getMock(
             '\Sabre\Xml\Writer',
@@ -115,11 +116,16 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
             ]);
         $this->_item->method('getContext')->willReturn($this->_product);
         $this->_item->method('isSkip')->will($this->onConsecutiveCalls(
-            false, true, false, false, false, true
+            false,
+            true,
+            false,
+            false,
+            false,
+            true
         ));
 
         $this->_fetcher = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\Fetcher',
+            '\Doofinder\Feed\Model\Generator\Component\FetcherInterface',
             [],
             [],
             '',
@@ -188,7 +194,7 @@ class GeneratorTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_model = $helper->getObject(
+        $this->_model = $this->objectManager->getObject(
             'Doofinder\Feed\Model\Generator',
             [
                 'fetcherFactory' => $this->_fetcherFactory,

@@ -3,9 +3,9 @@
 namespace Doofinder\Feed\Model\Generator\Component\Processor;
 
 use \Doofinder\Feed\Model\Generator\Component;
-use \Doofinder\Feed\Model\Generator\Component\Processor;
+use \Doofinder\Feed\Model\Generator\Component\ProcessorInterface;
 
-class Cleaner extends Component implements Processor
+class Cleaner extends Component implements ProcessorInterface
 {
     /**
      * Process items
@@ -24,7 +24,7 @@ class Cleaner extends Component implements Processor
      *
      * @param \Doofinder\Feed\Model\Generator\Item
      */
-    protected function processItem(\Doofinder\Feed\Model\Generator\Item $item)
+    private function processItem(\Doofinder\Feed\Model\Generator\Item $item)
     {
         foreach ($item->getData() as $key => $value) {
             $item->setData($key, $this->clean($value));
@@ -37,14 +37,14 @@ class Cleaner extends Component implements Processor
      * @param string|array
      * @return string|array
      */
-    protected function clean($field)
+    private function clean($field)
     {
         // Do nothing if field is empty
         if (!$field) {
             return $field;
         }
 
-        $cleaned = array_map(array($this, 'cleanString'), (array) $field);
+        $cleaned = array_map([$this, 'cleanString'], (array) $field);
         return is_array($field) ? $cleaned : $cleaned[0];
     }
 
@@ -54,7 +54,7 @@ class Cleaner extends Component implements Processor
      * @param string
      * @return string
      */
-    protected function cleanString($field)
+    public function cleanString($field)
     {
         $field = $this->cleanInvalidUTF($field);
         $field = $this->cleanNewlines($field);
@@ -72,7 +72,7 @@ class Cleaner extends Component implements Processor
      * @param string
      * @return string
      */
-    protected function cleanNewlines($field)
+    private function cleanNewlines($field)
     {
         return preg_replace('#<br(\s?/)?>#i', ' ', $field);
     }
@@ -83,7 +83,7 @@ class Cleaner extends Component implements Processor
      * @param string
      * @return string
      */
-    protected function cleanTags($field)
+    private function cleanTags($field)
     {
         return strip_tags($field);
     }
@@ -94,7 +94,7 @@ class Cleaner extends Component implements Processor
      * @param string
      * @return string
      */
-    protected function cleanDuplicatedSpaces($field)
+    private function cleanDuplicatedSpaces($field)
     {
         return preg_replace('/[ ]{2,}/', ' ', $field);
     }
@@ -105,7 +105,7 @@ class Cleaner extends Component implements Processor
      * @param string
      * @return string
      */
-    protected function trim($field)
+    private function trim($field)
     {
         return trim($field);
     }
@@ -116,9 +116,11 @@ class Cleaner extends Component implements Processor
      * @param string
      * @return string
      */
-    protected function decodeHtmlEntities($field)
+    private function decodeHtmlEntities($field)
     {
+        // @codingStandardsIgnoreStart
         return html_entity_decode($field, null, 'UTF-8');
+        // @codingStandardsIgnoreEnd
     }
 
     /**
@@ -129,7 +131,7 @@ class Cleaner extends Component implements Processor
      * @param string
      * @return string
      */
-    protected function cleanInvalidUTF($field)
+    private function cleanInvalidUTF($field)
     {
         $validUtf = '/([\x09\x0A\x0D\x20-\x7E]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF' .
                      '][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF' .

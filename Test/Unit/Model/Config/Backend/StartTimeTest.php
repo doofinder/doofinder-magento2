@@ -2,41 +2,50 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Backend;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class StartTimeTest
  * @package Doofinder\Feed\Test\Unit\Model\Backend
  */
-class StartTimeTest extends \PHPUnit_Framework_TestCase
+class StartTimeTest extends BaseTestCase
 {
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
+     * @var \DateTime
      */
-    protected $_objectManager;
+    private $_date;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\Timezone $timezone
      */
-    protected $_timezone;
+    private $_timezone;
 
     /**
      * @var int $offset
      */
-    protected $_offset;
+    private $_offset;
 
     /**
      * @var \Doofinder\Feed\Model\Config\Backend\StartTime
      */
-    protected $_model;
+    private $_model;
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
+
+        $this->_date = $this->getMock(
+            '\DateTime',
+            [],
+            [],
+            '',
+            false
+        );
 
         $this->_timezone = $this->getMock(
-
             '\Magento\Framework\Stdlib\DateTime\Timezone',
             [],
             [],
@@ -45,11 +54,14 @@ class StartTimeTest extends \PHPUnit_Framework_TestCase
         );
         $this->_timezone->method('getDefaultTimezone')->willReturn('UTC');
         $this->_timezone->method('getConfigTimezone')->willReturn('America/Los_Angeles');
+        $this->_timezone->method('date')->willReturn($this->_date);
+        // @codingStandardsIgnoreStart
         $this->_offset = (new \DateTimeZone('America/Los_Angeles'))->getOffset(
             new \DateTime(null, new \DateTimeZone('UTC'))
         ) / 3600;
+        // @codingStandardsIgnoreEnd
 
-        $this->_model = $this->_objectManager->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Config\Backend\StartTime',
             [
                 'timezone' => $this->_timezone,
@@ -62,6 +74,11 @@ class StartTimeTest extends \PHPUnit_Framework_TestCase
      */
     public function testAfterLoad()
     {
+        $this->_date->expects($this->once())
+            ->method('setTime')->with(10, 30, 0);
+        $this->_date->method('format')
+            ->with('H,i,s')->willReturn('0' . (10 + $this->_offset) . ',30,00');
+
         $this->_model->setValue('10,30,00');
         $this->_model->afterLoad();
 
@@ -73,6 +90,11 @@ class StartTimeTest extends \PHPUnit_Framework_TestCase
      */
     public function testBeforeSave()
     {
+        $this->_date->expects($this->once())
+            ->method('setTime')->with(10, 30, 0);
+        $this->_date->method('format')
+            ->with('H,i,s')->willReturn('0' . (10 - $this->_offset) . ',30,00');
+
         $this->_model->setValue(['10', '30', '00']);
         $this->_model->beforeSave();
 

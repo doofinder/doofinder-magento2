@@ -2,33 +2,30 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class FeedConfigTest
  * @package Doofinder\Feed\Test\Unit\Helper
  */
-class FeedConfigTest extends \PHPUnit_Framework_TestCase
+class FeedConfigTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    protected $_helper;
+    private $_helper;
 
     /**
      * Prepares the environment before running a test.
      */
     public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_storeConfig = $this->getMock(
             '\Doofinder\Feed\Helper\StoreConfig',
@@ -51,7 +48,7 @@ class FeedConfigTest extends \PHPUnit_Framework_TestCase
             'categories_in_navigation' => 0,
         ]);
 
-        $this->_helper = $this->_objectManager->getObject(
+        $this->_helper = $this->objectManager->getObject(
             '\Doofinder\Feed\Helper\FeedConfig',
             [
                 'storeConfig'   => $this->_storeConfig,

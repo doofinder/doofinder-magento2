@@ -41,7 +41,6 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
 
         $storeManager->setCurrentStore($store);
         $stores = $this->_helper->getStoreCodes();
-        //$storeManager->setCurrentStore('default');
 
         $this->assertEquals($expected, $stores);
     }

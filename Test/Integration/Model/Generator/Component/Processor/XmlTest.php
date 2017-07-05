@@ -94,7 +94,9 @@ EOT;
     public function tearDown()
     {
         if ($this->_currentFile) {
+            // @codingStandardsIgnoreStart
             unlink($this->_currentFile);
+            // @codingStandardsIgnoreEnd
             $this->_currentFile = null;
         }
     }

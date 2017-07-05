@@ -2,44 +2,41 @@
 
 namespace Doofinder\Feed\Test\Unit\Console\Command;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class RunProcessCommandTest
  *
  * @package Doofinder\Feed\Test\Unit\Console\Command
  */
-class RunProcessCommandTest extends \PHPUnit_Framework_TestCase
+class RunProcessCommandTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Doofinder\Feed\Model\CronFactory
      */
-    protected $_cronFactory;
+    private $_cronFactory;
 
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    protected $_process;
+    private $_process;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Doofinder\Feed\Console\Command\RunProcessCommand
      */
-    protected $_command;
+    private $_command;
 
     /**
      * Prepares the environment before running a test.
      */
     public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_process = $this->getMock(
             '\Doofinder\Feed\Model\Cron',
@@ -67,7 +64,7 @@ class RunProcessCommandTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_command = $this->_objectManager->getObject(
+        $this->_command = $this->objectManager->getObject(
             '\Doofinder\Feed\Console\Command\RunProcessCommand',
             [
                 'cronFactory'  => $this->_cronFactory,
@@ -81,9 +78,11 @@ class RunProcessCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute()
     {
+        // @codingStandardsIgnoreStart
         $commandTester = new \Symfony\Component\Console\Tester\CommandTester(
             $this->_command
         );
+        // @codingStandardsIgnoreEnd
 
         $this->_schedule->expects($this->once())->method('runProcess')->with($this->_process);
 

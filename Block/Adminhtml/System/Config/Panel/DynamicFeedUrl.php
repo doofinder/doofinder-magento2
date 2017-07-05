@@ -7,34 +7,26 @@ class DynamicFeedUrl extends Message
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
-
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    protected $_storeManager;
+    private $_storeConfig;
 
     /**
      * @var \Magento\Framework\UrlInterface
      */
-    protected $_frontendUrlBuilder;
+    private $_frontendUrlBuilder;
 
     /**
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\UrlInterface $frontendUrlBuilder
      * @param \Magento\Backend\Block\Template\Context $context
      * @param array $data
      */
     public function __construct(
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\UrlInterface $frontendUrlBuilder,
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
         $this->_storeConfig = $storeConfig;
-        $this->_storeManager = $storeManager;
         $this->_frontendUrlBuilder = $frontendUrlBuilder;
         parent::__construct($context, $data);
     }
@@ -42,11 +34,9 @@ class DynamicFeedUrl extends Message
     /**
      * Get element text
      *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
      */
-    protected function getText(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    public function getText()
     {
         $storeCodes = $this->_storeConfig->getStoreCodes();
 
@@ -56,7 +46,7 @@ class DynamicFeedUrl extends Message
             $config = $this->_storeConfig->getStoreConfig($storeCode);
 
             $password = $config['password'];
-            $params = array('language' => $store->getCode());
+            $params = ['language' => $store->getCode()];
 
             if ($password) {
                 $params['password'] = $password;

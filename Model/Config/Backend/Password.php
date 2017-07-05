@@ -11,17 +11,17 @@ class Password extends \Magento\Framework\App\Config\Value
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Magento\Framework\Filesystem
      */
-    protected $_filesystem;
+    private $_filesystem;
 
     /**
      * @param \Doofinder\Feed\Helper\Schedule $schedule

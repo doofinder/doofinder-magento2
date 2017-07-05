@@ -2,48 +2,48 @@
 
 namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\Form\Field;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class AdditionalAttributesTest
  *
  * @package Doofinder\Feed\Test\Unit\Block\Adminhtml\Form\Field
  */
-class AdditionalAttributesTest extends \PHPUnit_Framework_TestCase
+class AdditionalAttributesTest extends BaseTestCase
 {
-    /**
-     *
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
     /**
      * @var \Magento\Framework\View\Element\Context
      */
-    protected $_contextMock;
+    private $_context;
+
     /**
      * @var \Doofinder\Feed\Model\Config\Source\Feed\Attributes
      */
-    protected $_feedAttributesMock;
+    private $_feedAttributes;
+
     /**
      * @var \Magento\Framework\Escaper
      */
-    protected $_escaperMock;
+    private $_escaper;
+
     /**
      * @var \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes
      */
-    protected $_block;
+    private $_block;
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
-        $this->_contextMock = $this->getMockBuilder('\Magento\Framework\View\Element\Context')
+        $this->_context = $this->getMockBuilder('\Magento\Framework\View\Element\Context')
             ->setMethods(['getEscaper'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->_feedAttributesMock = $this->getMock(
+        $this->_feedAttributes = $this->getMock(
             '\Doofinder\Feed\Model\Config\Source\Feed\Attributes',
             [],
             [],
@@ -51,26 +51,27 @@ class AdditionalAttributesTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_escaperMock = $this->getMock('\Magento\Framework\Escaper',
+        $this->_escaper = $this->getMock(
+            '\Magento\Framework\Escaper',
             ['escapeHtml'],
             [],
             '',
             false
         );
 
-        $this->_contextMock->expects($this->once())
+        $this->_context->expects($this->once())
             ->method('getEscaper')
-            ->willReturn($this->_escaperMock);
+            ->willReturn($this->_escaper);
 
-        $this->_feedAttributesMock->expects($this->once())
+        $this->_feedAttributes->expects($this->once())
             ->method('getAllAttributes')
             ->willReturn(['code' => 'label', 'code2' => 'label2']);
 
-        $this->_block = $this->_objectManager->getObject(
+        $this->_block = $this->objectManager->getObject(
             '\Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes',
             [
-                'context' => $this->_contextMock,
-                'feedAttributes' => $this->_feedAttributesMock
+                'context' => $this->_context,
+                'feedAttributes' => $this->_feedAttributes
             ]
         );
     }
@@ -86,5 +87,4 @@ class AdditionalAttributesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($expected, $this->_block->_toHtml());
     }
-
 }

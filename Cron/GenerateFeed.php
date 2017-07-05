@@ -12,17 +12,17 @@ class GenerateFeed
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    protected $_generatorFactory;
+    private $_generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    protected $_feedConfig;
+    private $_feedConfig;
 
     /**
      * GenerateFeed constructor.

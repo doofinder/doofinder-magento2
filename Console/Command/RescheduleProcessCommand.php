@@ -16,58 +16,71 @@ class RescheduleProcessCommand extends \Symfony\Component\Console\Command\Comman
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Magento\Framework\App\State
      */
-    protected $_state;
+    private $_state;
 
     /**
-     * @param ModuleListInterface $moduleList
+     * @var \Symfony\Component\Console\Input\InputArgumentFactory
+     */
+    private $_inputArgFactory;
+
+    /**
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Doofinder\Feed\Helper\Schedule $schedule
+     * @param \Magento\Framework\App\State $state
+     * @param \Symfony\Component\Console\Input\InputArgumentFactory $inputArgFactory
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Doofinder\Feed\Helper\Schedule $schedule,
-        \Magento\Framework\App\State $state
+        \Magento\Framework\App\State $state,
+        \Symfony\Component\Console\Input\InputArgumentFactory $inputArgFactory
     ) {
         $this->_storeManager = $storeManager;
         $this->_schedule = $schedule;
         $this->_state = $state;
+        $this->_inputArgFactory = $inputArgFactory;
         parent::__construct();
     }
 
     /**
      * {@inheritdoc}
+     * @codingStandardsIgnoreStart
      */
     protected function configure()
     {
+    // @codingStandardsIgnoreEnd
         $this->setName('doofinder:feed:process:reschedule')
             ->setDescription('Reschedule Doofinder Feed Process')
-            ->setDefinition([
-                new InputArgument(
-                    self::STORE_ARGUMENT,
-                    InputArgument::OPTIONAL,
-                    'Store'
-                ),
-            ]);
+            ->addArgument(
+                self::STORE_ARGUMENT,
+                InputArgument::OPTIONAL,
+                'Store'
+            );
+
         parent::configure();
     }
 
     /**
      * {@inheritdoc}
+     * @codingStandardsIgnoreStart
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+    // @codingStandardsIgnoreEnd
         $this->_state->setAreaCode('frontend');
 
         $store = $input->getArgument(self::STORE_ARGUMENT);
-        if (is_null($store)) {
+        if ($store === null) {
             throw new \InvalidArgumentException('Argument ' . self::STORE_ARGUMENT . ' is missing.');
         }
 

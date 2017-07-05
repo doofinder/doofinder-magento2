@@ -17,12 +17,12 @@ class Options implements OptionSourceInterface
     /**
      * @var array
      */
-    protected $_options;
+    private $_options;
 
     /**
      * @var \Doofinder\Feed\Logger\Feed
      */
-    protected $_logger;
+    private $_logger;
 
     /**
      * Constructor
@@ -46,7 +46,7 @@ class Options implements OptionSourceInterface
         if (!$this->_options) {
             $this->_options = [];
 
-            foreach ($this->_logger->getLevelOptions() as $name => $level) {
+            foreach (array_values($this->_logger->getLevelOptions()) as $name) {
                 $name = strtolower($name);
                 $this->_options[] = [
                     'label' => $name,

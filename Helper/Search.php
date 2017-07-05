@@ -7,32 +7,32 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Doofinder\Api\Search\ClientFactory
      */
-    protected $_searchFactory;
+    private $_searchFactory;
 
     /**
      * @var \Doofinder\Feed\Wrapper\Throttle
      */
-    protected $_throttleFactory;
+    private $_throttleFactory;
 
     /**
      * @var \Doofinder\Api\Management\SearchEngine[]
      */
-    protected $_searchEngines = null;
+    private $_searchEngines = null;
 
     /**
      * @var \Doofinder\Api\Search\Client|null
      */
-    protected $_lastSearch = null;
+    private $_lastSearch = null;
 
     /**
      * @var \Doofinder\Api\Search\Results|null
      */
-    protected $_lastResults = null;
+    private $_lastResults = null;
 
     /**
      * @param \Magento\Framework\App\Helper\Context $context
@@ -69,7 +69,9 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         $client = $this->_searchFactory->create(['hashid' => $hashId, 'api_key' => $apiKey]);
 
         try {
+            // @codingStandardsIgnoreStart
             $results = $client->query($queryText, null, ['rpp' => $limit, 'transformer' => 'onlyid', 'filter' => []]);
+            // @codingStandardsIgnoreEnd
         } catch (\Doofinder\Api\Search\Error $e) {
             $results = null;
             $this->_logger->critical($e->getMessage());
@@ -88,7 +90,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Doofinder\Api\Search\Results $results
      * @return array
      */
-    protected function retrieveIds(\Doofinder\Api\Search\Results $results)
+    private function retrieveIds(\Doofinder\Api\Search\Results $results)
     {
         $ids = [];
         foreach ($results->getResults() as $result) {
@@ -134,7 +136,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    protected function getStoreCode()
+    private function getStoreCode()
     {
         return $this->_storeConfig->getStoreCode();
     }
@@ -145,17 +147,17 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $storeCode
      * @return \Doofinder\Feed\Wrapper\Throttle
      */
-    protected function getDoofinderSearchEngine()
+    private function getDoofinderSearchEngine()
     {
         if ($this->_searchEngines === null) {
             $this->_searchEngines = [];
 
             // Create DoofinderManagementApi instance
-            $doofinderManagementApi = $this->_throttleFactory->create([
+            $doofinderApi = $this->_throttleFactory->create([
                 'obj' => $this->_dmaFactory->create(['apiKey' => $this->_storeConfig->getApiKey()])
             ]);
 
-            foreach ($doofinderManagementApi->getSearchEngines() as $searchEngine) {
+            foreach ($doofinderApi->getSearchEngines() as $searchEngine) {
                 $this->_searchEngines[$searchEngine->hashid] = $searchEngine;
             }
         }

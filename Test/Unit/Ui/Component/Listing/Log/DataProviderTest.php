@@ -2,50 +2,47 @@
 
 namespace Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class DataProviderTest
  * @package Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log
  */
-class DataProviderTest extends \PHPUnit_Framework_TestCase
+class DataProviderTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Magento\Framework\App\Request\DataPersistorInterface
      */
-    protected $_dataPersistor;
+    private $_dataPersistor;
 
     /**
      * @var \Magento\Framework\Api\Filter
      */
-    protected $_filter;
+    private $_filter;
 
     /**
      * @var \Magento\Framework\Api\FilterBuilder
      */
-    protected $_filterBuilder;
+    private $_filterBuilder;
 
     /**
      * @var \Magento\Framework\Api\Search\SearchCriteria
      */
-    protected $_searchCriteria;
+    private $_searchCriteria;
 
     /**
      * @var \Magento\Framework\Api\Search\SearchCriteriaBuilder
      */
-    protected $_searchCriteriaBuilder;
+    private $_searchCriteriaBuilder;
 
     /**
      * @var \Doofinder\Feed\Ui\Component\Listing\Log\DataProvider
      */
-    protected $_dataProvider;
+    private $_dataProvider;
 
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_filter = $this->getMock(
             '\Magento\Framework\Api\Filter',
@@ -89,7 +86,7 @@ class DataProviderTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_dataProvider = $this->_objectManager->getObject(
+        $this->_dataProvider = $this->objectManager->getObject(
             '\Doofinder\Feed\Ui\Component\Listing\Log\DataProvider',
             [
                 'filterBuilder' => $this->_filterBuilder,

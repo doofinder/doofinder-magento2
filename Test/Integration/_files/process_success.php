@@ -3,11 +3,13 @@
 /** @var \Magento\TestFramework\ObjectManager $objectManager */
 $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
+// @codingStandardsIgnoreStart
 /** @var \Magento\Framework\Stdlib\DateTime $dateTime */
 $dateTime = $objectManager->get('\Magento\Framework\Stdlib\DateTime');
 
 /** @var \Doofinder\Feed\Model\Cron $process */
 $process = $objectManager->create('\Doofinder\Feed\Model\Cron');
+// @codingStandardsIgnoreEnd
 $process
     ->setStoreCode('default')
     ->setStatus($process::STATUS_WAITING)

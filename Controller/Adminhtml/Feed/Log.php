@@ -12,22 +12,22 @@ class Log extends \Magento\Backend\App\Action
     /**
      * @var \Magento\Framework\View\Result\PageFactory
      */
-    protected $_resultPageFactory = false;
+    private $_resultPageFactory = false;
 
     /**
      * @var \Magento\Framework\App\Request\DataPersistorInterface
      */
-    protected $_dataPersistor;
+    private $_dataPersistor;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     public function __construct(
         \Magento\Backend\App\Action\Context $context,

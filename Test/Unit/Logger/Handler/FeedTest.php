@@ -2,9 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Logger\Handler;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 
-class FeedTest extends \PHPUnit_Framework_TestCase
+class FeedTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Logger\Feed\Handler
@@ -37,16 +38,11 @@ class FeedTest extends \PHPUnit_Framework_TestCase
     private $_datetime;
 
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    private $_objectManager;
-
-    /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_process = $this->getMock(
             '\Doofinder\Feed\Model\Cron',
@@ -91,7 +87,7 @@ class FeedTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_handler = $this->_objectManager->getObject(
+        $this->_handler = $this->objectManager->getObject(
             '\Doofinder\Feed\Logger\Handler\Feed',
             [
                 'logFactory' => $this->_logFactory,
@@ -105,7 +101,9 @@ class FeedTest extends \PHPUnit_Framework_TestCase
      */
     public function testWrite()
     {
+        // @codingStandardsIgnoreStart
         $date = new \DateTime();
+        // @codingStandardsIgnoreEnd
 
         $record = [
             'level' => 100,

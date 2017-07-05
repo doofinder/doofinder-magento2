@@ -13,25 +13,14 @@ class GenerateButton extends \Magento\Config\Block\System\Config\Form\Field
     const GENERATE_URL = 'doofinder/feed/generate';
 
     /**
-     * GenerateButton constructor.
-     *
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param array $data
-     */
-    public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
-    }
-
-    /**
      * Set template file for button.
      *
      * @return $this
+     * @codingStandardsIgnoreStart
      */
     protected function _prepareLayout()
     {
+    // @codingStandardsIgnoreEnd
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
             $this->setTemplate('system/config/generatebutton.phtml');
@@ -56,9 +45,11 @@ class GenerateButton extends \Magento\Config\Block\System\Config\Form\Field
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
+     * @codingStandardsIgnoreStart
      */
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
+    // @codingStandardsIgnoreEnd
         $buttonLabel = $this->getButtonLabel($element);
 
         $this->addData(
@@ -72,7 +63,12 @@ class GenerateButton extends \Magento\Config\Block\System\Config\Form\Field
         return $this->_toHtml();
     }
 
-    protected function getButtonLabel(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    /**
+     * Get button label
+     *
+     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     */
+    private function getButtonLabel(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $originalData = $element->getOriginalData();
 

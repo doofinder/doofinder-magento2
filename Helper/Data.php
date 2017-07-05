@@ -16,17 +16,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Magento\Framework\Module\ModuleListInterface
      */
-    protected $_moduleList;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $_logger;
+    private $_moduleList;
 
     /**
      * Data constructor.
@@ -34,17 +29,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\Module\ModuleListInterface $moduleList
-     * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Module\ModuleListInterface $moduleList,
-        \Psr\Log\LoggerInterface $logger
+        \Magento\Framework\Module\ModuleListInterface $moduleList
     ) {
         $this->_storeManager = $storeManager;
         $this->_moduleList = $moduleList;
-        $this->_logger = $logger;
         parent::__construct($context);
     }
 
@@ -79,8 +71,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return ((int)($value *= 1) > 0);
         }
 
-        $yesOptions = array('true', 'on', 'yes');
-        $noOptions  = array('false', 'off', 'no');
+        $yesOptions = ['true', 'on', 'yes'];
+        $noOptions  = ['false', 'off', 'no'];
 
         if (in_array($value, $yesOptions)) {
             return true;
@@ -111,5 +103,59 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getModuleVersion()
     {
         return $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
+    }
+
+    /**
+     * Set content type as xml.
+     *
+     * @param \Magento\Framework\App\ResponseInterface $response
+     */
+    public function setXmlHeaders(\Magento\Framework\App\ResponseInterface $response)
+    {
+        $response->setHeader('Content-type', 'application/xml; charset="utf-8"', true);
+    }
+
+    /**
+     * Set content type as json.
+     *
+     * @param \Magento\Framework\App\ResponseInterface $response
+     * @return mixed
+     */
+    public function setJsonHeaders(\Magento\Framework\App\ResponseInterface $response)
+    {
+        $response->setHeader('Content-type', 'application/json; charset="utf-8"', true);
+    }
+
+    /**
+     * Get string param.
+     *
+     * @param string $paramName
+     * @return string|null
+     */
+    public function getParamString($paramName)
+    {
+        return is_string($param = $this->_getRequest()->getParam($paramName)) ? $param : null;
+    }
+
+    /**
+     * Get int param.
+     *
+     * @param string $paramName
+     * @return int|null
+     */
+    public function getParamInt($paramName)
+    {
+        return is_numeric($param = $this->_getRequest()->getParam($paramName)) ? (int) $param : null;
+    }
+
+    /**
+     * Get boolean param.
+     *
+     * @param string $paramName
+     * @return boolean|null
+     */
+    public function getParamBoolean($paramName)
+    {
+        return (($param = $this->_getRequest()->getParam($paramName)) === null) ? null : (boolean) $param;
     }
 }

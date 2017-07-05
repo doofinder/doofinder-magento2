@@ -9,12 +9,12 @@ class Feed extends \Monolog\Handler\AbstractProcessingHandler
     /**
      * @var \Doofinder\Feed\Model\LogFactory
      */
-    protected $_logFactory;
+    private $_logFactory;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime
      */
-    protected $_datetime;
+    private $_datetime;
 
     /**
      * @param \Doofinder\Feed\Model\LogFactory $logFactory
@@ -34,9 +34,11 @@ class Feed extends \Monolog\Handler\AbstractProcessingHandler
      *
      * @param  $record[]
      * @return void
+     * @codingStandardsIgnoreStart
      */
     protected function write(array $record)
     {
+    // @codingStandardsIgnoreEnd
         $logEntry = $this->_logFactory->create();
         $logEntry->setData([
             'message' => $record['message'],

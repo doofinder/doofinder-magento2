@@ -2,50 +2,47 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class StoreConfigTest
  * @package Doofinder\Feed\Test\Unit\Helper
  */
-class StoreConfigTest extends \PHPUnit_Framework_TestCase
+class StoreConfigTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManage
-     */
-    protected $_objectManager;
-
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfigMock;
+    private $_scopeConfig;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManagerMock;
+    private $_storeManager;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    protected $_loggerMock;
+    private $_logger;
 
     /**
      * @var \Magento\Store\Api\Data\StoreInterface
      */
-    protected $_storeInterfaceMock;
+    private $_storeInterface;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_helper;
+    private $_helper;
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
-        $this->_scopeConfigMock = $this->getMock(
+        $this->_scopeConfig = $this->getMock(
             '\Magento\Framework\App\Config\ScopeConfigInterface',
             [],
             [],
@@ -53,7 +50,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_storeManagerMock = $this->getMock(
+        $this->_storeManager = $this->getMock(
             '\Magento\Store\Model\StoreManagerInterface',
             [],
             [],
@@ -61,7 +58,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_storeInterfaceMock = $this->getMock(
+        $this->_storeInterface = $this->getMock(
             '\Magento\Store\Api\Data\StoreInterface',
             [],
             [],
@@ -69,7 +66,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_loggerMock = $this->getMock(
+        $this->_logger = $this->getMock(
             '\Psr\Log\LoggerInterface',
             [],
             [],
@@ -77,12 +74,12 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_helper = $this->_objectManager->getObject(
+        $this->_helper = $this->objectManager->getObject(
             '\Doofinder\Feed\Helper\StoreConfig',
             [
-                'scopeConfig'  => $this->_scopeConfigMock,
-                'storeManager'    => $this->_storeManagerMock,
-                'logger'        => $this->_loggerMock,
+                'scopeConfig'  => $this->_scopeConfig,
+                'storeManager'    => $this->_storeManager,
+                'logger'        => $this->_logger,
             ]
         );
     }
@@ -92,25 +89,25 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetStoreConfig()
     {
-        $this->_storeManagerMock->expects($this->once())
+        $this->_storeManager->expects($this->once())
             ->method('getStore')
-            ->willReturn($this->_storeInterfaceMock);
+            ->willReturn($this->_storeInterface);
 
-        $this->_storeInterfaceMock->expects($this->once())
+        $this->_storeInterface->expects($this->once())
             ->method('getCode')
             ->willReturn('default');
 
-        $this->_scopeConfigMock->expects($this->at(0))
+        $this->_scopeConfig->expects($this->at(0))
             ->method('getValue')
             ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_ATTRIBUTES_CONFIG)
             ->willReturn(['attr1' => 'value1', 'attr2' => 'value2']);
 
-        $this->_scopeConfigMock->expects($this->at(1))
+        $this->_scopeConfig->expects($this->at(1))
             ->method('getValue')
             ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_CRON_CONFIG)
             ->willReturn(['enabled' => 1, 'start_time' => '10,30,0']);
 
-        $this->_scopeConfigMock->expects($this->at(2))
+        $this->_scopeConfig->expects($this->at(2))
             ->method('getValue')
             ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_SETTINGS_CONFIG)
             ->willReturn(['split_configurable_products' => 0, 'image_size' => 'small', 'export_product_prices' => 1]);
@@ -135,11 +132,11 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetStoreCode()
     {
-        $this->_storeManagerMock->expects($this->once())
+        $this->_storeManager->expects($this->once())
             ->method('getStore')
-            ->willReturn($this->_storeInterfaceMock);
+            ->willReturn($this->_storeInterface);
 
-        $this->_storeInterfaceMock->expects($this->once())
+        $this->_storeInterface->expects($this->once())
             ->method('getCode')
             ->willReturn('default');
 
@@ -163,8 +160,8 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
             false
         );
         $store->method('getCode')->willReturn($current);
-        $this->_storeManagerMock->method('getStore')->willReturn($store);
-        $this->_storeManagerMock->method('getStores')->willReturn($stores);
+        $this->_storeManager->method('getStore')->willReturn($store);
+        $this->_storeManager->method('getStores')->willReturn($stores);
 
         $this->assertEquals($expected, $this->_helper->getStoreCodes($onlyActive));
     }
@@ -209,7 +206,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
     {
         $expected = 'sample_api_key';
 
-        $this->_scopeConfigMock
+        $this->_scopeConfig
             ->expects($this->once())
             ->method('getValue')
             ->with('doofinder_feed_search/doofinder_internal_search/api_key', 'default', null)
@@ -226,7 +223,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
         $storeCode = 'sample';
         $expected = 'sample_hash_id';
 
-        $this->_scopeConfigMock
+        $this->_scopeConfig
             ->expects($this->once())
             ->method('getValue')
             ->with('doofinder_feed_search/doofinder_internal_search/hash_id', 'store', $storeCode)
@@ -244,7 +241,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
     {
         $storeCode = 'sample';
 
-        $this->_scopeConfigMock->method('getValue')->with('catalog/search/engine', 'store', $storeCode)
+        $this->_scopeConfig->method('getValue')->with('catalog/search/engine', 'store', $storeCode)
             ->willReturn($enabled);
 
         $this->assertEquals($expected, $this->_helper->isInternalSearchEnabled($storeCode));
@@ -267,7 +264,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
     {
         $storeCode = 'sample';
 
-        $this->_scopeConfigMock->method('getValue')->will($this->returnValueMap([
+        $this->_scopeConfig->method('getValue')->will($this->returnValueMap([
             ['catalog/search/engine', 'store', $storeCode, $engine],
             ['doofinder_feed_feed/feed_settings/atomic_updates_enabled', 'store', $storeCode, $atomic],
         ]));
@@ -294,7 +291,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
     {
         $storeCode = 'sample';
 
-        $this->_scopeConfigMock->method('getValue')->will($this->returnValueMap([
+        $this->_scopeConfig->method('getValue')->will($this->returnValueMap([
             ['doofinder_feed_feed/feed_settings/categories_in_navigation', 'store', $storeCode, $value],
         ]));
 
@@ -317,7 +314,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
         $storeCode = 'sample';
         $script = '<script type="text/javascript">sample script</script>';
 
-        $this->_scopeConfigMock->method('getValue')->will($this->returnValueMap([
+        $this->_scopeConfig->method('getValue')->will($this->returnValueMap([
             ['doofinder_feed_search/doofinder_layer/script', 'store', $storeCode, $script],
         ]));
 

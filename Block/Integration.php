@@ -11,7 +11,7 @@ class Integration extends \Magento\Framework\View\Element\AbstractBlock
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
@@ -38,7 +38,7 @@ class Integration extends \Magento\Framework\View\Element\AbstractBlock
 
         /**
          * Disable search autocomplete
-         * @todo This works but could be done better
+         * NOTICE This works but could be done better
          */
         $script .= '<script type="text/javascript">';
         $script .= 'document.getElementById(\'search\').removeAttribute(\'data-mage-init\');';

@@ -12,12 +12,12 @@ class Schedule implements \Magento\Framework\Event\ObserverInterface
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    protected $_request;
+    private $_request;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     public function __construct(
         \Magento\Framework\App\RequestInterface $request,
@@ -31,9 +31,12 @@ class Schedule implements \Magento\Framework\Event\ObserverInterface
      * Execute observer.
      *
      * @param \Magento\Framework\Event\Observer $observer
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @codingStandardsIgnoreStart
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
+    // @codingStandardsIgnoreEnd
         // Check if user wants to reset the schedule
         $reset = (bool) $this->_request->getParam('reset');
 

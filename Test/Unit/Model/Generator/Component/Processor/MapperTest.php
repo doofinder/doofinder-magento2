@@ -2,44 +2,41 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Processor;
 
-class MapperTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+class MapperTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Mapper
      */
-    protected $_model;
+    private $_model;
 
     /**
      * @var \Magento\Catalog\Model\Product
      */
-    protected $_product;
+    private $_product;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    protected $_item;
+    private $_item;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Map
      */
-    protected $_map;
+    private $_map;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\MapFactory
      */
-    protected $_mapFactory;
-
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManagerHelper;
+    private $_mapFactory;
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_product = $this->getMock(
             '\Magento\Catalog\Model\Product',
@@ -82,7 +79,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         );
         $this->_mapFactory->method('create')->willReturn($this->_map);
 
-        $this->_model = $this->_objectManagerHelper->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Processor\Mapper',
             [
                 'mapFactory' => $this->_mapFactory,

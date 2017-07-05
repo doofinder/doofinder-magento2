@@ -2,7 +2,12 @@
 
 namespace Doofinder\Feed\Test\Unit\Search;
 
-class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
+class IndexerHandlerTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Search\IndexerHandler
@@ -75,18 +80,16 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
     private $_resource;
 
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    private $_objectManagerHelper;
-
-    /**
      * Prepares the environment before running a test.
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
+        // @codingStandardsIgnoreStart
         $this->_documents = new \ArrayObject([['sample' => 'item']]);
+        // @codingStandardsIgnoreEnd
 
         $this->_batch = $this->getMock(
             '\Magento\Framework\Indexer\SaveHandler\Batch',
@@ -203,12 +206,12 @@ class IndexerHandlerTest extends \PHPUnit_Framework_TestCase
         );
         $this->_resource->method('getConnection')->willReturn($this->_connection);
 
-        $this->_indexer = $this->_objectManagerHelper->getObject(
+        $this->_indexer = $this->objectManager->getObject(
             '\Doofinder\Feed\Search\IndexerHandler',
             [
                 'batch' => $this->_batch,
                 'generatorFactory' => $this->_generatorFactory,
-                'productCollectionFactory' => $this->_productCollectionFactory,
+                'productColFactory' => $this->_productCollectionFactory,
                 'feedConfig' => $this->_feedConfig,
                 'searchHelper' => $this->_searchHelper,
                 'indexStructure' => $this->_indexStructure,

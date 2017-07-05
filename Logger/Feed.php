@@ -7,12 +7,12 @@ class Feed extends \Monolog\Logger
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    protected $_process;
+    private $_process;
 
     /**
      * @var \Psr\Log\LoggerInterface $logger
      */
-    protected $_logger;
+    private $_logger;
 
     /**
      * @param \Doofinder\Feed\Model\Cron $process
@@ -25,8 +25,8 @@ class Feed extends \Monolog\Logger
         \Doofinder\Feed\Model\Cron $process,
         \Psr\Log\LoggerInterface $logger,
         $name,
-        array $handlers = array(),
-        array $processors = array()
+        array $handlers = [],
+        array $processors = []
     ) {
         $this->_process = $process;
         $this->_logger = $logger;
@@ -41,7 +41,7 @@ class Feed extends \Monolog\Logger
      * @param  array   $context The log context
      * @return Boolean Whether the record has been processed
      */
-    public function addRecord($level, $message, array $context = array())
+    public function addRecord($level, $message, array $context = [])
     {
         if (!isset($context['process'])) {
             $context['process'] = $this->_process;

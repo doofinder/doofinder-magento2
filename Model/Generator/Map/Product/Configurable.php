@@ -14,17 +14,17 @@ class Configurable extends Product
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product\AssociateFactory
      */
-    protected $_mapFactory;
+    private $_mapFactory;
 
     /**
      * @var boolean
      */
-    protected $_grouped;
+    private $_grouped;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Map[]
      */
-    protected $_associatesMaps = [];
+    private $_associatesMaps = [];
 
     /**
      * Class constructor
@@ -93,7 +93,7 @@ class Configurable extends Product
      *
      * @return mixed
      */
-    protected function getAssociatesAvailability()
+    private function getAssociatesAvailability()
     {
         $value = parent::get('df_availability');
 
@@ -118,7 +118,7 @@ class Configurable extends Product
      * @param string $field
      * @return mixed
      */
-    protected function getGroupedField($field)
+    private function getGroupedField($field)
     {
         // Get configurable product value
         $value = parent::get($field);
@@ -140,12 +140,16 @@ class Configurable extends Product
             return $item || $item === 0;
         });
 
-        // Remove array if value is single
-        if (count($value) == 1) {
-            $value = $value[0];
+        if (!$value) {
+            return $value;
         }
 
-        return $value;
+        if (count($value) > 1) {
+            return $value;
+        }
+
+        // Remove array if value is single
+        return $value[0];
     }
 
     /**
@@ -154,7 +158,7 @@ class Configurable extends Product
      * @param string $field
      * @return mixed
      */
-    protected function getAssociatesValues($field)
+    private function getAssociatesValues($field)
     {
         $associatesValues = [];
 
@@ -165,7 +169,7 @@ class Configurable extends Product
         /**
          * Flatten array recursively
          */
-        $flattened = array();
+        $flattened = [];
         array_walk_recursive($associatesValues, function ($item) use (&$flattened) {
             $flattened[] = $item;
         });
@@ -186,7 +190,7 @@ class Configurable extends Product
      * @param \Doofinder\Feed\Model\Generator\Item $associate
      * @return \Doofinder\Feed\Model\Generator\Map
      */
-    protected function getAssociateMap(\Doofinder\Feed\Model\Generator\Item $associate)
+    private function getAssociateMap(\Doofinder\Feed\Model\Generator\Item $associate)
     {
         $hash = spl_object_hash($associate);
 

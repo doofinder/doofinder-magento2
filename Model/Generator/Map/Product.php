@@ -14,20 +14,22 @@ class Product extends Map
 {
     /**
      * @var \Doofinder\Feed\Helper\Product
+     * @codingStandardsIgnoreStart
      */
     protected $_helper = null;
+    // @codingStandardsIgnoreEnd
 
     /**
      * @var \Magento\Framework\Pricing\PriceCurrencyInterface
      */
-    protected $_priceCurrency;
+    private $_priceCurrency;
 
     /**
      * Tax helper
      *
      * @var \Magento\Tax\Model\Config
      */
-    protected $_taxConfig;
+    private $_taxConfig;
 
     /**
      * Class constructor
@@ -63,9 +65,12 @@ class Product extends Map
      *
      * @param string $field
      * @return mixed
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @codingStandardsIgnoreStart
      */
     public function get($field)
     {
+    // @codingStandardsIgnoreEnd
         switch ($field) {
             case 'df_id':
                 return $this->getProductId($this->_context);
@@ -92,7 +97,6 @@ class Product extends Map
 
                 return null;
 
-
             case 'price':
             case 'special_price':
             case 'tier_price':
@@ -118,7 +122,7 @@ class Product extends Map
      * @param \Magento\Catalog\Model\Product $product
      * @return int
      */
-    protected function getProductId(\Magento\Catalog\Model\Product $product)
+    public function getProductId(\Magento\Catalog\Model\Product $product)
     {
         return $this->_helper->getProductId($product);
     }
@@ -129,7 +133,7 @@ class Product extends Map
      * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
-    protected function getProductUrl(\Magento\Catalog\Model\Product $product)
+    public function getProductUrl(\Magento\Catalog\Model\Product $product)
     {
         return $this->_helper->getProductUrl($product);
     }
@@ -138,12 +142,12 @@ class Product extends Map
      * Get product categories
      *
      * @param \Magento\Catalog\Model\Product $product
-     * @param boolean $categoriesInNavigation - Export only categories in navigation
+     * @param boolean $categoriesInNav - Export only categories in navigation
      * @return string
      */
-    protected function getProductCategories(\Magento\Catalog\Model\Product $product, $categoriesInNavigation)
+    public function getProductCategories(\Magento\Catalog\Model\Product $product, $categoriesInNav)
     {
-        $tree = $this->_helper->getProductCategoriesWithParents($product, $categoriesInNavigation);
+        $tree = $this->_helper->getProductCategoriesWithParents($product, $categoriesInNav);
 
         /**
          * Stringifies tree by imploding a set of imploded categories and their parents
@@ -169,7 +173,7 @@ class Product extends Map
      * @param string $size
      * @return string|null
      */
-    protected function getProductImage(\Magento\Catalog\Model\Product $product, $size)
+    public function getProductImage(\Magento\Catalog\Model\Product $product, $size)
     {
         return $this->_helper->getProductImageUrl($product, $size);
     }
@@ -181,7 +185,7 @@ class Product extends Map
      * @param string $field
      * @return string|null
      */
-    protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field)
+    public function getProductPrice(\Magento\Catalog\Model\Product $product, $field)
     {
         if (!$this->getExportProductPrices()) {
             return null;
@@ -210,7 +214,7 @@ class Product extends Map
      * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
-    protected function getProductAvailability(\Magento\Catalog\Model\Product $product)
+    public function getProductAvailability(\Magento\Catalog\Model\Product $product)
     {
         return $this->_helper->getProductAvailability($product);
     }
@@ -220,7 +224,7 @@ class Product extends Map
      *
      * @return string
      */
-    protected function getCurrencyCode()
+    public function getCurrencyCode()
     {
         return $this->_helper->getCurrencyCode();
     }
@@ -231,7 +235,7 @@ class Product extends Map
      * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
-    protected function getQuantityAndStockStatus(\Magento\Catalog\Model\Product $product)
+    public function getQuantityAndStockStatus(\Magento\Catalog\Model\Product $product)
     {
         return $this->_helper->getQuantityAndStockStatus($product);
     }
@@ -243,7 +247,7 @@ class Product extends Map
      * @param string $field
      * @return string
      */
-    protected function getAttributeText(\Magento\Catalog\Model\Product $product, $field)
+    public function getAttributeText(\Magento\Catalog\Model\Product $product, $field)
     {
         return $this->_helper->getAttributeText($product, $field);
     }

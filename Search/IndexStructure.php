@@ -7,17 +7,17 @@ class IndexStructure extends \Magento\CatalogSearch\Model\Indexer\IndexStructure
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
-    protected $_search;
+    private $_search;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @param \Magento\Framework\App\ResourceConnection $resource
@@ -70,7 +70,7 @@ class IndexStructure extends \Magento\CatalogSearch\Model\Indexer\IndexStructure
      * @param string $method
      * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
      */
-    protected function action($method, array $dimensions)
+    private function action($method, array $dimensions)
     {
         $originalStoreCode = $this->_storeConfig->getStoreCode();
         $storeId = $this->_search->getStoreIdFromDimensions($dimensions);

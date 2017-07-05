@@ -12,62 +12,57 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var \Magento\Framework\Message\ManagerInterface
      */
-    protected $_messageManager;
+    private $_messageManager;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    protected $_generatorFactory;
+    private $_generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Model\CronFactory
      */
-    protected $_cronFactory;
+    private $_cronFactory;
 
     /**
      * @var \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory
      */
-    protected $_cronCollectionFactory;
+    private $_cronCollectionFactory;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    protected $_timezone;
+    private $_timezone;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    protected $_feedConfig;
+    private $_feedConfig;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime
      */
-    protected $_dateTime;
-
-    /**
-     * @var \Doofinder\Feed\Logger\Feed
-     */
-    protected $_logger;
+    private $_dateTime;
 
     /**
      * @var \Doofinder\Feed\Logger\FeedFactory
      */
-    protected $_feedLoggerFactory;
+    private $_feedLoggerFactory;
 
     /**
      * @var \Magento\Framework\Filesystem
      */
-    protected $_filesystem;
+    private $_filesystem;
 
     /**
      * @param \Magento\Framework\App\Helper\Context $context
@@ -89,7 +84,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Doofinder\Feed\Model\GeneratorFactory $generatorFactory,
         \Doofinder\Feed\Model\CronFactory $cronFactory,
-        \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory $cronCollectionFactory,
+        \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory $cronColFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
@@ -102,7 +97,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_messageManager = $messageManager;
         $this->_generatorFactory = $generatorFactory;
         $this->_cronFactory = $cronFactory;
-        $this->_cronCollectionFactory = $cronCollectionFactory;
+        $this->_cronCollectionFactory = $cronColFactory;
         $this->_storeManager = $storeManager;
         $this->_timezone = $timezone;
         $this->_storeConfig = $storeConfig;
@@ -131,20 +126,16 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * Convert time array to \DateTime
      *
      * @param array $time - [hours, minutes, seconds]
-     * @param string|null $timezone
-     * @param \DateTime|null $base - Base \DateTime
+     * @param boolean $useTimezone = false
+     * @param \DateTime|null $base = null - Base date
      * @return \DateTime
      */
-    public function timeArrayToDate(array $time, $timezone = null, $base = null)
-    {
-        if (!$timezone) {
-            $timezone = date_default_timezone_get();
-        }
-
-        $date = new \DateTime(
-            $base ? $base->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT) : null,
-            new \DateTimeZone($timezone)
-        );
+    public function timeArrayToDate(
+        array $time,
+        $useTimezone = false,
+        \DateTime $base = null
+    ) {
+        $date = $this->_timezone->date($base, null, $useTimezone);
         $date->setTime($time[0], $time[1], $time[2]);
 
         return $date;
@@ -158,9 +149,12 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * @param null|\DateTime $now - Date used for testing purposes
      * @return \DateTime
      */
-    public function getScheduleDate($date, $frequency, $now = null)
-    {
-        $now = $now ? $now : new \DateTime();
+    public function getScheduleDate(
+        \DateTime $date,
+        $frequency,
+        \DateTime $now = null
+    ) {
+        $now = $now ? $now : $this->_timezone->date(null, null, false);
         $start = clone $date;
 
         if ($start < $now) {
@@ -207,18 +201,6 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $process = $this->_cronFactory->create()->load($storeCode, 'store_code');
         return $process->getId() ? $process : null;
-    }
-
-    /**
-     * Checks if process is registered in doofinder cron table
-     *
-     * @param string $storeCode
-     * @return bool
-     */
-    protected function isProcessRegistered($storeCode = 'default')
-    {
-        $process = $this->getProcessByStoreCode($storeCode);
-        return $process ? true : false;
     }
 
     /**
@@ -281,9 +263,9 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
 
             // Override time if $now is enabled
             if ($now) {
-                $date = new \DateTime(null, new \DateTimeZone($this->_timezone->getDefaultTimezone()));
+                $date = $this->_timezone->date(null, null, false);
             } else {
-                $date = $this->timeArrayToDate($config['start_time'], $this->_timezone->getDefaultTimezone());
+                $date = $this->timeArrayToDate($config['start_time']);
             }
 
             $this->rescheduleProcess($process, $this->getScheduleDate($date, $config['frequency']));
@@ -298,7 +280,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $storeCode = 'default'
      * @return \Doofinder\Feed\Model\Cron
      */
-    protected function registerProcess($storeCode = 'default')
+    private function registerProcess($storeCode = 'default')
     {
         $config = $this->getStoreConfig($storeCode);
 
@@ -308,7 +290,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             $status = $config['enabled'] ? $process::STATUS_WAITING : $process::STATUS_DISABLED;
         }
 
-        $data = array(
+        $data = [
             'store_code'    =>  $storeCode,
             'status'        =>  $status,
             'message'       =>  $process::MSG_EMPTY,
@@ -316,7 +298,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             'next_run'      =>  '-',
             'next_iteration'=>  '-',
             'last_feed_name'=>  'None',
-        );
+        ];
 
         $process
             ->setData($data)
@@ -332,7 +314,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Doofinder\Feed\Model\Cron $process
      */
-    protected function enableProcess(\Doofinder\Feed\Model\Cron $process)
+    private function enableProcess(\Doofinder\Feed\Model\Cron $process)
     {
         $process->enable();
         $this->_logger->info('Process has been enabled', ['process' => $process]);
@@ -343,7 +325,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Doofinder\Feed\Model\Cron
      */
-    protected function disableProcess(\Doofinder\Feed\Model\Cron $process)
+    private function disableProcess(\Doofinder\Feed\Model\Cron $process)
     {
         $process->disable();
         $this->_logger->info('Process has been disabled', ['process' => $process]);
@@ -365,7 +347,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             $password = $config['password'];
         }
 
-        if ($password && strlen($password)) {
+        if ($password) {
             $filename .= '-' . $password;
         }
 
@@ -380,7 +362,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $storeCode
      * @return string
      */
-    protected function getFeedTmpFilename($storeCode)
+    private function getFeedTmpFilename($storeCode)
     {
         return $this->getFeedFilename($storeCode) . '.tmp';
     }
@@ -391,7 +373,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $storeCode
      * @return string
      */
-    protected function getFeedLockFilename($storeCode)
+    private function getFeedLockFilename($storeCode)
     {
         return $this->getFeedFilename($storeCode) . '.lock';
     }
@@ -402,7 +384,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $storeCode
      * @return bool
      */
-    protected function removeTmpXml($storeCode)
+    private function removeTmpXml($storeCode)
     {
         $tmpFilename = $this->getFeedTmpFilename($storeCode);
 
@@ -461,7 +443,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $storeCode
      * @return boolean
      */
-    protected function checkFeedFilePermission($storeCode)
+    private function checkFeedFilePermission($storeCode)
     {
         $filename = $this->getFeedFilename($storeCode);
         $tmpFilename = $this->getFeedTmpFilename($storeCode);
@@ -486,7 +468,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Doofinder\Feed\Model\Cron $process
      * @param \DateTime $date
      */
-    protected function rescheduleProcess(\Doofinder\Feed\Model\Cron $process, $date)
+    private function rescheduleProcess(\Doofinder\Feed\Model\Cron $process, $date)
     {
         $process->setStatus($process::STATUS_PENDING)
             ->setComplete('0%')
@@ -506,12 +488,12 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Doofinder\Feed\Model\Cron $process
      */
-    protected function scheduleProcess(\Doofinder\Feed\Model\Cron $process)
+    private function scheduleProcess(\Doofinder\Feed\Model\Cron $process)
     {
         $config = $this->_storeConfig->getStoreConfig($process->getStoreCode());
 
         // Set new schedule time
-        $delayInMin = intval($config['step_delay']);
+        $delayInMin = (int) $config['step_delay'];
         $timeScheduled = $this->timeArrayToDate([date('H'), date('i') + $delayInMin, date('s')]);
 
         // Set process data and save
@@ -532,7 +514,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Doofinder\Feed\Model\Cron $process
      */
-    protected function endProcess(\Doofinder\Feed\Model\Cron $process)
+    private function endProcess(\Doofinder\Feed\Model\Cron $process)
     {
         $process
             ->setStatus($process::STATUS_WAITING)
@@ -571,14 +553,9 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return \DateTime
      */
-    protected function getNowDate()
+    private function getNowDate()
     {
-        $date = new \DateTime();
-        $date->setTimezone(
-            new \DateTimeZone($this->_timezone->getDefaultTimezone())
-        );
-
-        return $date;
+        return $this->_timezone->date(null, null, false);
     }
 
     /**
@@ -590,7 +567,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Doofinder\Feed\Model\Cron
      * @param boolean $remove = false - Should the lock be removed instead of created
      */
-    protected function lockProcess(\Doofinder\Feed\Model\Cron $process, $remove = false)
+    private function lockProcess(\Doofinder\Feed\Model\Cron $process, $remove = false)
     {
         $tmpDir = $this->_filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::TMP);
         $lockFilename = $this->getFeedLockFilename($process->getStoreCode());
@@ -598,7 +575,12 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         // Create lock file
         if (!$remove) {
             if ($tmpDir->isExist($lockFilename)) {
-                throw new \Exception(__('Process for store %1 is already locked', $process->getStoreCode()));
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __(
+                        'Process for store %1 is already locked',
+                        $process->getStoreCode()
+                    )
+                );
             }
 
             $tmpDir->touch($lockFilename);
@@ -613,7 +595,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Doofinder\Feed\Model\Cron
      */
-    protected function unlockProcess(\Doofinder\Feed\Model\Cron $process)
+    private function unlockProcess(\Doofinder\Feed\Model\Cron $process)
     {
         return $this->lockProcess($process, true);
     }
@@ -678,7 +660,13 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
                     $dir->getAbsolutePath($filename),
                     $dir->getDriver()
                 )) {
-                    throw new \Exception(__('Cannot rename %1 to %2', $tmpFilename, $filename));
+                    throw new \Magento\Framework\Exception\LocalizedException(
+                        __(
+                            'Cannot rename %1 to %2',
+                            $tmpFilename,
+                            $filename
+                        )
+                    );
                 }
                 $process->setLastFeedName($filename);
 

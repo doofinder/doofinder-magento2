@@ -2,50 +2,47 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class DataTest
  * @package Doofinder\Feed\Test\Unit\Helper
  */
-class DataTest extends \PHPUnit_Framework_TestCase
+class DataTest extends BaseTestCase
 {
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_objectManager;
+    private $_storeManager;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManagerMock;
-
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    protected $_storeConfigMock;
+    private $_storeConfig;
 
     /**
      * @var \Magento\Framework\Module\ModuleListInterface
      */
-    protected $_moduleMock;
+    private $_module;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    protected $_logger;
+    private $_logger;
 
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    protected $_helper;
+    private $_helper;
 
     /**
      * Prepares the environment before running a test.
      */
     public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
-        $this->_storeManagerMock = $this->getMock(
+        $this->_storeManager = $this->getMock(
             '\Magento\Store\Model\StoreManagerInterface',
             [],
             [],
@@ -53,7 +50,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_storeConfigMock = $this->getMock(
+        $this->_storeConfig = $this->getMock(
             'Magento\Store\Api\Data\StoreConfigInterface',
             [],
             [],
@@ -61,7 +58,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_moduleMock = $this->getMock(
+        $this->_module = $this->getMock(
             '\Magento\Framework\Module\ModuleListInterface',
             [],
             [],
@@ -77,11 +74,11 @@ class DataTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_helper = $this->_objectManager->getObject(
+        $this->_helper = $this->objectManager->getObject(
             '\Doofinder\Feed\Helper\Data',
             [
-                'storeManager'  => $this->_storeManagerMock,
-                'moduleList'    => $this->_moduleMock,
+                'storeManager'  => $this->_storeManager,
+                'moduleList'    => $this->_module,
                 'logger'        => $this->_logger,
             ]
         );
@@ -141,11 +138,11 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
     public function testGetBaseUrl()
     {
-        $this->_storeManagerMock->expects($this->once())
+        $this->_storeManager->expects($this->once())
             ->method('getStore')
-            ->willReturn($this->_storeConfigMock);
+            ->willReturn($this->_storeConfig);
 
-        $this->_storeConfigMock->expects($this->once())
+        $this->_storeConfig->expects($this->once())
             ->method('getBaseUrl')
             ->will($this->returnValue('localhost'));
 
@@ -160,7 +157,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
             'sequence' => []
         ];
 
-        $this->_moduleMock->expects($this->once())
+        $this->_module->expects($this->once())
             ->method('getOne')
             ->with(\Doofinder\Feed\Helper\Data::MODULE_NAME)
             ->willReturn($moduleInfo);

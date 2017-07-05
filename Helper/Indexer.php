@@ -12,24 +12,24 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    private $_scopeConfig;
 
     /**
      * @var \Magento\Framework\Indexer\IndexerRegistry
      */
-    protected $_indexerRegistry;
+    private $_indexerRegistry;
 
     /**
      * Old doofinder section configs before save
      *
      * @var array
      */
-    protected $_oldConfigs = [];
+    private $_oldConfigs = [];
 
     /**
      * @param \Magento\Framework\App\Helper\Context $context
@@ -54,17 +54,18 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function getConfigs()
+    private function getConfigs()
     {
         $scope = $this->_storeConfig->getScopeStore();
         $storeCodes = $this->_storeConfig->getStoreCodes();
+        $storeConfig = $this->_storeConfig;
 
         $configs = [];
         $ignore = ['password', 'categories_in_navigation'];
         foreach ($storeCodes as $storeCode) {
             $config = array_merge(
-                $this->_scopeConfig->getValue($this->_storeConfig::FEED_ATTRIBUTES_CONFIG, $scope, $storeCode),
-                $this->_scopeConfig->getValue($this->_storeConfig::FEED_SETTINGS_CONFIG, $scope, $storeCode)
+                $this->_scopeConfig->getValue($storeConfig::FEED_ATTRIBUTES_CONFIG, $scope, $storeCode),
+                $this->_scopeConfig->getValue($storeConfig::FEED_SETTINGS_CONFIG, $scope, $storeCode)
             );
 
             $config = array_diff_key($config, array_flip($ignore));

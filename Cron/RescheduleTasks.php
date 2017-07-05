@@ -12,7 +12,7 @@ class RescheduleTasks
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * GenerateFeed constructor.

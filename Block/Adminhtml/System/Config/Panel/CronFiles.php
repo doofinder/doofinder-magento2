@@ -10,72 +10,45 @@ class CronFiles extends Message
     const ALLOWED_TIME = 43200;
 
     /**
-     * @const NO_CRON_TASKS_MSG
-     */
-    const NO_CRON_TASKS_MSG = 'There are no registered cron tasks. ' .
-                              'Please, check your system\'s crontab configuration.';
-
-    /**
-     * @const CRON_NOT_FINISHED_MSG
-     */
-    const CRON_NOT_FINISHED_MSG = 'There are no finished cron tasks. ' .
-                                  'Please, check you system\'s crontab configuration.';
-
-    /**
-     * @const CRON_DELAYED_MSG
-     */
-    const CRON_DELAYED_MSG = 'Cron was run for the last time at %1. ' .
-                             'Taking into account the settings of the step delay option, ' .
-                             'there might be problems with the cron\'s configuration.';
-
-    /**
      * @var \Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory
      */
-    protected $_scheduleCollectionFactory;
+    private $_scheduleColFactory;
 
     /**
-     * @var \Magento\Framework\Stdlib\DateTime\Timezone
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    protected $_timezone;
+    private $_timezone;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    protected $_storeManager;
-
-    /**
-     * @param \Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory $scheduleCollectionFactory
-     * @param \Magento\Framework\Stdlib\DateTime\Timezone $timezone
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory $scheduleColFactory
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Doofinder\Feed\Helper\Schedule $schedule
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      * @param \Magento\Backend\Block\Template\Context $context
      * @param array $data
      */
     public function __construct(
-        \Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory $scheduleCollectionFactory,
-        \Magento\Framework\Stdlib\DateTime\Timezone $timezone,
+        \Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory $scheduleColFactory,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Doofinder\Feed\Helper\Schedule $schedule,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
-        $this->_scheduleCollectionFactory = $scheduleCollectionFactory;
+        $this->_scheduleColFactory = $scheduleColFactory;
         $this->_timezone = $timezone;
         $this->_schedule = $schedule;
         $this->_storeConfig = $storeConfig;
-        $this->_storeManager = $storeManager;
         parent::__construct($context, $data);
     }
 
@@ -84,32 +57,41 @@ class CronFiles extends Message
      *
      * @return string
      */
-    protected function getCronMessage()
+    private function getCronMessage()
     {
-        $collection = $this->_scheduleCollectionFactory->create();
+        $collection = $this->_scheduleColFactory->create();
         $collection->setOrder('finished_at', 'desc');
         $collection->setPageSize(1);
 
         if (!$collection->getSize()) {
-            return __(self::NO_CRON_TASKS_MSG);
+            return __(
+                'There are no registered cron tasks. ' .
+                'Please, check your system\'s crontab configuration.'
+            );
         }
 
-        $schedule = $collection->getFirstItem();
+        $items = $collection->getItems();
+        $schedule = reset($items);
         $finishedAt = $schedule->getData('finished_at');
         if (!$finishedAt) {
-            return __(self::CRON_NOT_FINISHED_MSG);
+            return __(
+                'There are no finished cron tasks. ' .
+                'Please, check you system\'s crontab configuration.'
+            );
         }
 
         /**
          * Get finished time in config timezone
          * Magento transform cron time's to config scope timezone
          */
-        $finishedTime = new \DateTime($finishedAt, new \DateTimeZone($this->_timezone->getConfigTimezone()));
+        $finishedTime = $this->_timezone->date($finishedAt);
 
         // If difference in seconds is bigger than allowed, display message
         if ((time() - $finishedTime->getTimestamp()) > self::ALLOWED_TIME) {
             return __(
-                self::CRON_DELAYED_MSG,
+                'Cron was run for the last time at %1. ' .
+                'Taking into account the settings of the step delay option, ' .
+                'there might be problems with the cron\'s configuration.',
                 $finishedAt
             );
         }
@@ -120,15 +102,14 @@ class CronFiles extends Message
     /**
      * Get element text
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
      */
-    protected function getText(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    public function getText()
     {
         $storeCodes = $this->_storeConfig->getStoreCodes();
 
         $enabled = false;
-        $messages = array();
+        $messages = [];
 
         foreach ($storeCodes as $storeCode) {
             $store = $this->_storeManager->getStore($storeCode);
@@ -146,12 +127,15 @@ class CronFiles extends Message
                     $message = __('Currently there is no file to preview.');
                 }
 
+                $date = $this->_timezone->date(null, null, false);
+                $date->setTime(...$config['start_time']);
+                $date = $this->_timezone->date($date);
+
                 $message .= '<p>';
                 $message .= __(
                     'Cron-based feed generation is <strong>enabled</strong>. ' .
-                    'Feed generation is being scheduled at %s:%s.',
-                    $config['start_time'][0],
-                    $config['start_time'][1]
+                    'Feed generation is being scheduled at %1.',
+                    $date->format('H:i:s')
                 );
                 $message .= '</p>';
             }
@@ -165,15 +149,16 @@ class CronFiles extends Message
             $html .= $this->getCronMessage();
         }
 
-        if (count(array_unique($messages)) == 1) {
-            return $html . reset($messages);
+        if (count(array_unique($messages)) > 1) {
+            foreach ($messages as $storeName => $message) {
+                $store = $this->_storeManager->getStore($storeCode);
+                $html .= '<p><strong>' . $storeName . ':</strong></p><p>' . $message . '</p>';
+            }
+
+            return $html;
         }
 
-        foreach ($messages as $storeName => $message) {
-            $store = $this->_storeManager->getStore($storeCode);
-            $html .= '<p><strong>' . $storeName . ':</strong></p><p>' . $message . '</p>';
-        }
-
-        return $html;
+        // Return single message
+        return $html . reset($messages);
     }
 }
