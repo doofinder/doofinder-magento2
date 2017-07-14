@@ -90,8 +90,8 @@ class Product extends Map
             case 'df_sale_price':
                 $salePrice = $this->getProductPrice($this->_context, 'final_price');
 
-                if ($salePrice != $this->getProductPrice($this->_context, 'regular_price')) {
-                    // Only return 'sale price' if it differs from 'regular price'
+                if ($salePrice < $this->getProductPrice($this->_context, 'regular_price')) {
+                    // Only return 'sale price' if is less than 'regular price'
                     return $salePrice;
                 }
 
