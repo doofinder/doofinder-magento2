@@ -7,42 +7,42 @@ namespace Doofinder\Feed\Controller\Feed;
  *
  * @package Doofinder\Feed\Controller\Feed
  */
-class Config extends \Doofinder\Feed\Controller\Base
+class Config extends \Magento\Framework\App\Action\Action
 {
     /**
      * @var \Magento\Framework\App\ProductMetadataInterface
      */
-    protected $_productMetadata;
+    private $_productMetadata;
 
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    protected $_helper;
+    private $_helper;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Magento\Framework\Filesystem
      */
-    protected $_filesystem;
+    private $_filesystem;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    private $_scopeConfig;
 
     /**
      * Config constructor.
@@ -55,7 +55,6 @@ class Config extends \Doofinder\Feed\Controller\Base
      * @param \Magento\Framework\Filesystem $filesystem
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory
      */
     public function __construct(
         \Magento\Framework\App\ProductMetadataInterface $productMetadata,
@@ -65,8 +64,7 @@ class Config extends \Doofinder\Feed\Controller\Base
         \Doofinder\Feed\Helper\Schedule $schedule,
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory
+        \Magento\Framework\App\Action\Context $context
     ) {
         $this->_productMetadata = $productMetadata;
         $this->_helper = $helper;
@@ -75,7 +73,7 @@ class Config extends \Doofinder\Feed\Controller\Base
         $this->_schedule = $schedule;
         $this->_filesystem = $filesystem;
         $this->_scopeConfig = $scopeConfig;
-        parent::__construct($context, $jsonResultFactory);
+        parent::__construct($context);
     }
 
     /**
@@ -83,7 +81,7 @@ class Config extends \Doofinder\Feed\Controller\Base
      */
     public function execute()
     {
-        $this->_setJsonHeaders();
+        $this->_helper->setJsonHeaders($this->getResponse());
 
         $config = [
             'platform' => [
@@ -94,9 +92,9 @@ class Config extends \Doofinder\Feed\Controller\Base
             'module' => [
                 'version' => $this->_helper->getModuleVersion(),
                 'feed' => $this->_storeManager->getStore()->getUrl('doofinder/feed'),
-                'options' => array(
+                'options' => [
                     'language' => [],
-                ),
+                ],
                 'configuration' => [],
             ],
         ];
@@ -122,6 +120,6 @@ class Config extends \Doofinder\Feed\Controller\Base
             ];
         }
 
-        return $this->_jsonResultFactory->create()->setData($config);
+        return $this->resultFactory->create('json')->setData($config);
     }
 }

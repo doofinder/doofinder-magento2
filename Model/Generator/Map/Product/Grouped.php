@@ -19,7 +19,7 @@ class Grouped extends Product
      * @param boolean $minimal = false
      * @return float
      */
-    protected function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)
+    public function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)
     {
         if ($field == 'final_price') {
             $minimal = true;

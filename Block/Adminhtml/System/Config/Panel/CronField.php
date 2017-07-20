@@ -12,34 +12,27 @@ class CronField extends Message
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
-     * @var \Magento\Framework\Stdlib\DateTime
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    protected $_datetime;
-
-    /**
-     * @var \Magento\Framework\Stdlib\DateTime\Timezone
-     */
-    protected $_timezone;
+    private $_timezone;
 
     /**
      * @param \Doofinder\Feed\Helper\Schedule $schedule
      * @param \Magento\Framework\Stdlib\DateTime $datetime
-     * @param \Magento\Framework\Stdlib\DateTime\Timezone $timezone
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Magento\Backend\Block\Template\Context $context
      * @param array $data
      */
     public function __construct(
         \Doofinder\Feed\Helper\Schedule $schedule,
-        \Magento\Framework\Stdlib\DateTime $datetime,
-        \Magento\Framework\Stdlib\DateTime\Timezone $timezone,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
         $this->_schedule = $schedule;
-        $this->_datetime = $datetime;
         $this->_timezone = $timezone;
         parent::__construct($context, $data);
     }
@@ -50,7 +43,7 @@ class CronField extends Message
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
      */
-    protected function getText(\Magento\Framework\Data\Form\Element\AbstractElement $element)
+    public function getText(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $storeId = $this->_request->getParam('store');
         $store = $this->_storeManager->getStore($storeId);
@@ -73,13 +66,49 @@ class CronField extends Message
     }
 
     /**
+     * Get last feed name
+     *
+     * @param string $storeCode
+     * @param string $feedName
+     * @return string
+     */
+    private function getLastFeedName($storeCode, $feedName)
+    {
+        if ($this->_schedule->isFeedFileExist($storeCode)) {
+            $url = $this->_schedule->getFeedFileUrl($storeCode);
+            return '<a href="' . $url . ' target="_blank">' . __('Get %1', $feedName) . '</a>';
+        }
+
+        return __('Currently there is no file to preview.');
+    }
+
+    /**
+     * Get next date
+     *
+     * @param string $value
+     * @return string
+     */
+    private function getNextDate($value)
+    {
+        /**
+         * NOTICE Using '-' in database is defenitely wrong practice
+         */
+        if ($value == '-') {
+            return $value;
+        }
+
+        $date = $this->_timezone->scopeDate(null, $value);
+        return $this->_timezone->formatDateTime($date);
+    }
+
+    /**
      * Get process field value
      *
      * @param string $storeCode
      * @param string $field
      * @return string
      */
-    protected function getProcessFieldValue($storeCode, $field)
+    private function getProcessFieldValue($storeCode, $field)
     {
         $process = $this->_schedule->getProcessByStoreCode($storeCode);
 
@@ -100,25 +129,11 @@ class CronField extends Message
         switch ($field) {
             case 'next_run':
             case 'next_iteration':
-                /**
-                 * @fixme Using '-' in database is defenitely wrong practice
-                 */
-                if ($value != '-') {
-                    $date = new \DateTime($value);
-                    $date->setTimezone(new \DateTimeZone($this->_timezone->getConfigTimezone()));
-
-                    $value = $this->_datetime->formatDate($date);
-                }
+                $value = $this->getNextDate($value);
                 break;
 
             case 'last_feed_name':
-                if ($this->_schedule->isFeedFileExist($storeCode)) {
-                    $url = $this->_schedule->getFeedFileUrl($storeCode);
-                    $value = '<a href="' . $url . ' target="_blank">' . __('Get %1', $value) . '</a>';
-                } else {
-                    $value = __('Currently there is no file to preview.');
-                }
-
+                $value = $this->getLastFeedName($storeCode, $value);
                 break;
         }
 
@@ -131,7 +146,7 @@ class CronField extends Message
      * @param string $name
      * @return string
      */
-    protected function getField($name = null)
+    private function getField($name = null)
     {
         $pattern = '/groups\[[^[]+\]\[fields\]\[([a-z_-]*)\]\[value\]/';
         $preg = preg_match($pattern, $name, $match);

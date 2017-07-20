@@ -13,44 +13,44 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
     /**
      * @var \Magento\Framework\Search\Adapter\Mysql\Adapter
      */
-    protected $_adapter;
+    private $_adapter;
 
     /**
      * @var \Magento\Framework\Search\Adapter\Mysql\ResponseFactory
      */
-    protected $_responseFactory;
+    private $_responseFactory;
 
     /**
      * @var \Magento\Framework\Search\Adapter\Mysql\TemporaryStorage
      */
-    protected $_temporaryStorage;
+    private $_temporaryStorage;
 
     /**
      * @var \Magento\Framework\Api\Search\DocumentFactory
      */
-    protected $_documentFactory;
+    private $_documentFactory;
 
     /**
      * @var \Magento\Framework\Api\AttributeValueFactory
      */
-    protected $_attributeValueFactory;
+    private $_attributeValueFactory;
 
     /**
      * @var \Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder
      */
-    protected $_aggregationBuilder;
+    private $_aggregationBuilder;
 
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
-    protected $_search;
+    private $_search;
 
     /**
      * @param \Magento\Framework\Search\Adapter\Mysql\Adapter $adapter
      * @param \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory
      * @param \Magento\Framework\Search\Adapter\Mysql\TemporaryStorage $temporaryStorage
      * @param \Magento\Framework\Api\Search\DocumentFactory $documentFactory
-     * @param \Magento\Framework\Api\AttributeValueFactory $attributeValueFactory
+     * @param \Magento\Framework\Api\AttributeValueFactory $attributeValFactory
      * @param \Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder $aggregationBuilder
      * @param \Doofinder\Feed\Helper\Search $search
      */
@@ -59,7 +59,7 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
         \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory,
         \Magento\Framework\Search\Adapter\Mysql\TemporaryStorage $temporaryStorage,
         \Magento\Framework\Api\Search\DocumentFactory $documentFactory,
-        \Magento\Framework\Api\AttributeValueFactory $attributeValueFactory,
+        \Magento\Framework\Api\AttributeValueFactory $attributeValFactory,
         \Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder $aggregationBuilder,
         \Doofinder\Feed\Helper\Search $search
     ) {
@@ -67,22 +67,26 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
         $this->_responseFactory = $responseFactory;
         $this->_temporaryStorage = $temporaryStorage;
         $this->_documentFactory = $documentFactory;
-        $this->_attributeValueFactory = $attributeValueFactory;
+        $this->_attributeValueFactory = $attributeValFactory;
         $this->_aggregationBuilder = $aggregationBuilder;
         $this->_search = $search;
     }
 
     /**
      * {@inheritdoc}
+     * @codingStandardsIgnoreStart
      */
     public function query(\Magento\Framework\Search\RequestInterface $request)
     {
+    // @codingStandardsIgnoreEnd
         if ($request->getName() != 'quick_search_container') {
+            // @codingStandardsIgnoreStart
             return $this->_adapter->query($request);
+            // @codingStandardsIgnoreEnd
         }
 
         /**
-         * @todo Add cache magic here ?
+         * NOTICE Add cache magic here ?
          */
         $documents = $this->getDocuments($this->getQueryString($request->getQuery()));
         $table = $this->_temporaryStorage->storeApiDocuments($this->createDocuments($documents));

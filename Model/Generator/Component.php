@@ -6,8 +6,10 @@ class Component extends \Magento\Framework\DataObject
 {
     /**
      * @var \Psr\Log\LoggerInterface
+     * @codingStandardsIgnoreStart
      */
     protected $_logger = null;
+    // @codingStandardsIgnoreEnd
 
     public function __construct(
         \Psr\Log\LoggerInterface $logger,

@@ -11,22 +11,27 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var array Feed attribute config
      */
-    protected $_feedConfig;
+    private $_feedConfig;
 
     /**
      * @var array Config for given store code
      */
-    protected $_config;
+    private $_config;
 
     /**
      * @var array Config parameters
      */
-    protected $_params;
+    private $_params;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
+
+    /**
+     * @var \Zend\Serializer\Adapter\PhpSerialize
+     */
+    private $_phpSerialize;
 
     /**
      * FeedConfig constructor.
@@ -36,9 +41,11 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig
+        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
+        \Zend\Serializer\Adapter\PhpSerialize $phpSerialize
     ) {
         $this->_storeConfig = $storeConfig;
+        $this->_phpSerialize = $phpSerialize;
         parent::__construct($context);
     }
 
@@ -84,7 +91,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param string $storeCode
      */
-    protected function setFeedConfig($storeCode)
+    private function setFeedConfig($storeCode)
     {
         $config = $this->getLeanFeedConfig($storeCode);
 
@@ -102,7 +109,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function getFetchers()
+    private function getFetchers()
     {
         return [
             'Product' => [
@@ -117,7 +124,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function getProcessors()
+    private function getProcessors()
     {
         return [
             'Mapper' => $this->getMapper(),
@@ -130,7 +137,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function getMapper()
+    private function getMapper()
     {
         return [
             'image_size' => $this->_config['image_size'],
@@ -147,15 +154,15 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    protected function getFeedAttributes()
+    private function getFeedAttributes()
     {
         $attributes = $this->_config['attributes'];
 
         if (array_key_exists('additional_attributes', $attributes)) {
-            $additionalKeys = unserialize($attributes['additional_attributes']);
+            $additionalKeys = $this->_phpSerialize->unserialize($attributes['additional_attributes']);
             unset($attributes['additional_attributes']);
 
-            $additionalAttributes = array();
+            $additionalAttributes = [];
             foreach ($additionalKeys as $key) {
                 $additionalAttributes[$key['field']] = $key['additional_attribute'];
             }
@@ -172,7 +179,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string $key
      * @return mixed
      */
-    protected function getParam($key)
+    private function getParam($key)
     {
         return isset($this->_params[$key]) ? $this->_params[$key] : null;
     }

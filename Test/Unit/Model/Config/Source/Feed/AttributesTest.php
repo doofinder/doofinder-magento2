@@ -2,45 +2,47 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Source\Feed;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class AttributesTest
  * @package Doofinder\Feed\Test\Unit\Model\Source\Feed
  */
-class AttributesTest extends \PHPUnit_Framework_TestCase
+class AttributesTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfigMock;
+    private $_scopeConfig;
+
     /**
      * @var Magento\Eav\Model\Config
      */
-    protected $_eavConfigMock;
+    private $_eavConfig;
+
     /**
      * @var \Magento\Framework\Escaper
      */
-    protected $_escaperMock;
+    private $_escaper;
+
     /**
      * @var \Magento\Eav\Model\Entity\Type
      */
-    protected $_entityTypeMock;
+    private $_entityType;
+
     /**
      * @var \Doofinder\Feed\Model\Config\Source\Feed\Attributes
      */
-    protected $_model;
+    private $_model;
 
     /**
-     *
+     * Set up
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
-        $this->_scopeConfigMock = $this->getMock(
+        $this->_scopeConfig = $this->getMock(
             '\Magento\Framework\App\Config\ScopeConfigInterface',
             [],
             [],
@@ -48,7 +50,7 @@ class AttributesTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_eavConfigMock = $this->getMock(
+        $this->_eavConfig = $this->getMock(
             '\Magento\Eav\Model\Config',
             [],
             [],
@@ -56,7 +58,7 @@ class AttributesTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_escaperMock = $this->getMock(
+        $this->_escaper = $this->getMock(
             '\Magento\Framework\Escaper',
             null,
             [],
@@ -64,7 +66,7 @@ class AttributesTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_entityTypeMock = $this->getMock(
+        $this->_entityType = $this->getMock(
             '\Magento\Eav\Model\Entity\Type',
             [],
             [],
@@ -72,7 +74,7 @@ class AttributesTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_scopeConfigMock->expects($this->any())
+        $this->_scopeConfig->expects($this->any())
             ->method('getValue')
             ->will($this->returnValue(['code' => 'label']));
 
@@ -89,26 +91,26 @@ class AttributesTest extends \PHPUnit_Framework_TestCase
             ->method('getAttributeCode')
             ->willReturn('attr code');
 
-        $attrCollectionMock = $this->_objectManager->getCollectionMock(
+        $attrCollection = $this->objectManager->getCollectionMock(
             '\Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection',
             [$eavAttribute]
         );
 
-        $this->_entityTypeMock->expects($this->once())
+        $this->_entityType->expects($this->once())
             ->method('getAttributeCollection')
-            ->willReturn($attrCollectionMock);
+            ->willReturn($attrCollection);
 
-        $this->_eavConfigMock->expects($this->once())
+        $this->_eavConfig->expects($this->once())
             ->method('getEntityType')
             ->with(\Magento\Catalog\Model\Product::ENTITY)
-            ->willReturn($this->_entityTypeMock);
+            ->willReturn($this->_entityType);
 
-        $this->_model = $this->_objectManager->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Config\Source\Feed\Attributes',
             [
-                'scopeConfig' => $this->_scopeConfigMock,
-                'eavConfig' => $this->_eavConfigMock,
-                'escaper' => $this->_escaperMock
+                'scopeConfig' => $this->_scopeConfig,
+                'eavConfig' => $this->_eavConfig,
+                'escaper' => $this->_escaper
             ]
         );
     }
@@ -118,10 +120,10 @@ class AttributesTest extends \PHPUnit_Framework_TestCase
      */
     public function testToOptionArray()
     {
-        $expected = array(
+        $expected = [
             'code' => 'Doofinder: label',
             'attr code' => 'Attribute: attr code'
-        );
+        ];
 
         $this->assertSame($expected, $this->_model->toOptionArray());
     }
@@ -131,10 +133,10 @@ class AttributesTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAllAttributes()
     {
-        $expected = array(
+        $expected = [
             'code' => 'Doofinder: label',
             'attr code' => 'Attribute: attr code'
-        );
+        ];
 
         $this->assertSame($expected, $this->_model->getAllAttributes());
     }

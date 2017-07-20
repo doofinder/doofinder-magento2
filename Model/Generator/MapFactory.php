@@ -11,20 +11,19 @@ class MapFactory
      *
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    protected $_objectManager = null;
+    private $_objectManager = null;
 
     /**
      * Instance name to create
      *
      * @var string
      */
-    protected $_instanceName = null;
+    private $_instanceName = null;
 
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $objectManager,
         $instanceName = '\Doofinder\Feed\Model\Generator\Map'
     ) {
-
         $this->_objectManager = $objectManager;
         $this->_instanceName = $instanceName;
     }
@@ -49,10 +48,11 @@ class MapFactory
             }
         }
 
+        // @codingStandardsIgnoreStart
         return $this->_objectManager->create($class, [
             'item' => $item,
             'data' => $data,
         ]);
+        // @codingStandardsIgnoreEnd
     }
-
 }

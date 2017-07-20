@@ -2,75 +2,81 @@
 
 namespace Doofinder\Feed\Test\Unit\Controller\Feed;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class ConfigTest
  * @package Doofinder\Feed\Test\Unit\Controller\Feed
  */
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Doofinder\Feed\Controller\Feed\Config
      */
-    protected $_controller;
+    private $_controller;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
-     *
      * @var \Magento\Framework\Controller\Result\Json
      */
-    protected $_jsonResult;
+    private $_jsonResult;
 
     /**
-     *
-     * @var \Magento\Framework\Controller\Result\JsonFactory
+     * @var \Magento\Framework\Controller\ResultFactory
      */
-    protected $_jsonResultFactory;
+    private $_resultFactory;
+
+    /**
+     * @var Magento\Framework\App\ResponseInterface
+     */
+    private $_response;
+
+    /**
+     * @var \Magento\Framework\App\Action\Context
+     */
+    private $_context;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    protected $_store;
+    private $_store;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Magento\Framework\App\ProductMetadataInterface
      */
-    protected $_productMetadata;
+    private $_productMetadata;
 
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    protected $_helper;
+    private $_helper;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    private $_scopeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * Prepares the environment before running a test.
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_storeConfig = $this->getMock(
             '\Doofinder\Feed\Helper\StoreConfig',
@@ -88,14 +94,33 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_jsonResultFactory = $this->getMock(
-            '\Magento\Framework\Controller\Result\JsonFactory',
+        $this->_resultFactory = $this->getMock(
+            '\Magento\Framework\Controller\ResultFactory',
             ['create'],
             [],
             '',
             false
         );
-        $this->_jsonResultFactory->method('create')->willReturn($this->_jsonResult);
+        $this->_resultFactory->method('create')
+            ->with('json')->willReturn($this->_jsonResult);
+
+        $this->_response = $this->getMock(
+            'Magento\Framework\App\ResponseInterface',
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->_context = $this->getMock(
+            'Magento\Framework\App\Action\Context',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_context->method('getResponse')->willReturn($this->_response);
+        $this->_context->method('getResultFactory')->willReturn($this->_resultFactory);
 
         $this->_store = $this->getMock(
             '\Magento\Store\Model\Store',
@@ -161,16 +186,17 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->_schedule->method('getFeedFileUrl')->with('default', false)
             ->willReturn('http://example.com/pub/media//doofinder-default.xml');
 
-        $this->_controller = $this->_objectManager->getObject(
+        $this->_controller = $this->objectManager->getObject(
             '\Doofinder\Feed\Controller\Feed\Config',
             [
                 'storeConfig' => $this->_storeConfig,
-                'jsonResultFactory' => $this->_jsonResultFactory,
+                'resultFactory' => $this->_resultFactory,
                 'storeManager' => $this->_storeManager,
                 'productMetadata' => $this->_productMetadata,
                 'helper' => $this->_helper,
                 'scopeConfig' => $this->_scopeConfig,
                 'schedule' => $this->_schedule,
+                'context' => $this->_context,
             ]
         );
     }
@@ -209,7 +235,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->_jsonResult->expects($this->at(1))->method('setData')->with($config);
+        $this->_jsonResult->expects($this->once())->method('setData')->with($config);
         $this->_controller->execute();
     }
 }

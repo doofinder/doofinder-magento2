@@ -2,7 +2,9 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Processor;
 
-class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+class AtomicUpdaterTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\AtomicUpdater
@@ -20,16 +22,11 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
     private $_search;
 
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    private $_objectManagerHelper;
-
-    /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_item = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Item',
@@ -47,7 +44,7 @@ class AtomicUpdaterTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_model = $this->_objectManagerHelper->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Processor\AtomicUpdater',
             [
                 'search' => $this->_search,

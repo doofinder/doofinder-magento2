@@ -11,7 +11,7 @@ class StartTime extends \Magento\Framework\App\Config\Value
     /**
      * @var \Magento\Framework\Stdlib\DateTime\Timezone $timezone
      */
-    protected $_timezone;
+    private $_timezone;
 
     /**
      * @param \Magento\Framework\Model\Context $context
@@ -20,6 +20,7 @@ class StartTime extends \Magento\Framework\App\Config\Value
      * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param array $data
      */
     public function __construct(
@@ -29,7 +30,7 @@ class StartTime extends \Magento\Framework\App\Config\Value
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        \Magento\Framework\Stdlib\DateTime\Timezone $timezone,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         array $data = []
     ) {
         $this->_timezone = $timezone;
@@ -43,9 +44,9 @@ class StartTime extends \Magento\Framework\App\Config\Value
     public function beforeSave()
     {
         list($hours, $minutes, $seconds) = $this->getValue();
-        $date = new \DateTime(null, new \DateTimeZone($this->_timezone->getConfigTimezone()));
+        $date = $this->_timezone->date();
         $date->setTime($hours, $minutes, $seconds);
-        $date->setTimezone(new \DateTimeZone($this->_timezone->getDefaultTimezone()));
+        $date = $this->_timezone->date($date, null, false);
 
         $this->setValue(explode(',', $date->format('H,i,s')));
 
@@ -59,9 +60,9 @@ class StartTime extends \Magento\Framework\App\Config\Value
     public function afterLoad()
     {
         list($hours, $minutes, $seconds) = explode(',', $this->getValue());
-        $date = new \DateTime(null, new \DateTimeZone($this->_timezone->getDefaultTimezone()));
+        $date = $this->_timezone->date(null, null, false);
         $date->setTime($hours, $minutes, $seconds);
-        $date->setTimezone(new \DateTimeZone($this->_timezone->getConfigTimezone()));
+        $date = $this->_timezone->date($date);
 
         $this->setValue($date->format('H,i,s'));
 

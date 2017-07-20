@@ -7,7 +7,7 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
     /**
      * @var \Magento\Framework\App\Request\DataPersistorInterface
      */
-    protected $_dataPersistor;
+    private $_dataPersistor;
 
     /**
      * @param string $name
@@ -26,7 +26,7 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
         $primaryFieldName,
         $requestFieldName,
         \Magento\Framework\Api\Search\ReportingInterface $reporting,
-        \Magento\Framework\Api\Search\SearchCriteriaBuilder $searchCriteriaBuilder,
+        \Magento\Framework\Api\Search\SearchCriteriaBuilder $searchCritBuilder,
         \Magento\Framework\App\RequestInterface $request,
         \Magento\Framework\Api\FilterBuilder $filterBuilder,
         \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor,
@@ -40,7 +40,7 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
             $primaryFieldName,
             $requestFieldName,
             $reporting,
-            $searchCriteriaBuilder,
+            $searchCritBuilder,
             $request,
             $filterBuilder,
             $meta,
@@ -71,7 +71,7 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
      *
      * @return \Doofinder\Feed\Model\Cron
      */
-    protected function getProcess()
+    private function getProcess()
     {
         return $this->_dataPersistor->get('doofinder_feed_process');
     }

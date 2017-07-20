@@ -2,10 +2,11 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 
-class FetcherFactoryTest extends \PHPUnit_Framework_TestCase
+class FetcherFactoryTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\FetcherFactory
@@ -20,8 +21,10 @@ class FetcherFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
+        parent::setUp();
+
         $this->_objectManager = $this->getMock(
             '\Magento\Framework\ObjectManagerInterface',
             [],

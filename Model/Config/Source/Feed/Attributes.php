@@ -14,25 +14,25 @@ class Attributes implements \Magento\Framework\Option\ArrayInterface
      *
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    private $_scopeConfig;
     /**
      * Eav Model Config
      *
      * @var \Magento\Eav\Model\Config
      */
-    protected $_eavConfig;
+    private $_eavConfig;
     /**
      * Escaper
      *
      * @var \Magento\Framework\Escaper
      */
-    protected $_escaper;
+    private $_escaper;
     /**
      * Array with Doofinder Options and Product Attributes.
      *
      * @var array
      */
-    protected $_options;
+    private $_options;
 
     /**
      * Attributes constructor.
@@ -61,7 +61,8 @@ class Attributes implements \Magento\Framework\Option\ArrayInterface
         if (!$this->_options) {
             $this->_options = array_merge(
                 $this->_getDoofinderDirectivesOptionArray(),
-                $this->_getCatalogProductAttributes());
+                $this->_getCatalogProductAttributes()
+            );
         }
 
         return $this->_options;
@@ -95,9 +96,9 @@ class Attributes implements \Magento\Framework\Option\ArrayInterface
      *
      * @return array
      */
-    protected function _getCatalogProductAttributes()
+    private function _getCatalogProductAttributes()
     {
-        $attributes = array();
+        $attributes = [];
 
         $productEntity = \Magento\Catalog\Model\Product::ENTITY;
         $collection = $this->_eavConfig->getEntityType($productEntity)->getAttributeCollection();
@@ -117,9 +118,9 @@ class Attributes implements \Magento\Framework\Option\ArrayInterface
      *
      * @return array
      */
-    protected function _getDoofinderDirectivesOptionArray()
+    private function _getDoofinderDirectivesOptionArray()
     {
-        $options = array();
+        $options = [];
 
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $directives = $this->_scopeConfig->getValue('directives', $storeScope);

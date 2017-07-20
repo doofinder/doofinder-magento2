@@ -17,7 +17,7 @@
     },
     "#doofinder_feed_feed_feed_cron_generate": {
         "Doofinder_Feed/js/generateFeed": {
-            "ajaxUrl":"<?php echo $block->getAjaxUrl() ?>"
+            "ajaxUrl":"<?php echo $block->escapeUrl($block->getAjaxUrl()); ?>"
         }
     }
 }

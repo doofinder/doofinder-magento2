@@ -14,7 +14,7 @@ class AdditionalAttributes extends \Magento\Framework\View\Element\Html\Select
      *
      * @var \Doofinder\Feed\Model\Config\Source\Feed\Attributes
      */
-    protected $_feedAttributes;
+    private $_feedAttributes;
 
     /**
      * AdditionalAttributes constructor.

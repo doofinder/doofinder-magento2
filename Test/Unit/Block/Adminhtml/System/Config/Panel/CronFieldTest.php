@@ -2,74 +2,66 @@
 
 namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\System\Config\Panel;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class CronFieldTest
  *
  * @package Doofinder\Feed\Test\Unit\Block\Adminhtml\System\Config\Panel
  */
-class CronFieldTest extends \PHPUnit_Framework_TestCase
+class CronFieldTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    protected $_request;
+    private $_request;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    protected $_store;
+    private $_store;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Magento\Backend\Block\Template\Context
      */
-    protected $_context;
+    private $_context;
 
     /**
      * @var \Magento\Framework\Data\Form\Element\AbstractElement
      */
-    protected $_element;
+    private $_element;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\Timezone
      */
-    protected $_timezone;
-
-    /**
-     * @var \Magento\Framework\Stdlib\DateTime
-     */
-    protected $_datetime;
+    private $_timezone;
 
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    protected $_process;
+    private $_process;
 
     /**
      * @var \Doofinder\Feed\Block\Adminhtml\System\Config\Panel\Cron
      */
-    protected $_block;
+    private $_block;
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_request = $this->getMock(
             '\Magento\Framework\App\RequestInterface',
@@ -126,6 +118,14 @@ class CronFieldTest extends \PHPUnit_Framework_TestCase
             false
         );
 
+        $this->_date = $this->getMock(
+            '\DateTime',
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->_timezone = $this->getMock(
             '\Magento\Framework\Stdlib\DateTime\Timezone',
             [],
@@ -134,15 +134,8 @@ class CronFieldTest extends \PHPUnit_Framework_TestCase
             false
         );
         $this->_timezone->method('getConfigTimezone')->willReturn('UTC');
-
-        $this->_datetime = $this->getMock(
-            '\Magento\Framework\Stdlib\DateTime',
-            [],
-            [],
-            '',
-            false
-        );
-        $this->_datetime->method('formatDate')->willReturn('2000-10-05 14:20:00');
+        $this->_timezone->method('scopeDate')->willReturn($this->_date);
+        $this->_timezone->method('formatDateTime')->willReturn('2000-10-05 14:20:00');
 
         $this->_process = $this->getMock(
             '\Doofinder\Feed\Model\Cron',
@@ -153,13 +146,12 @@ class CronFieldTest extends \PHPUnit_Framework_TestCase
         );
         $this->_process->method('getId')->willReturn(5);
 
-        $this->_block = $this->_objectManager->getObject(
+        $this->_block = $this->objectManager->getObject(
             '\Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField',
             [
                 'context' => $this->_context,
                 'schedule' => $this->_schedule,
                 'timezone' => $this->_timezone,
-                'datetime' => $this->_datetime,
             ]
         );
     }

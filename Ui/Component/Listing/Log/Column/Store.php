@@ -15,7 +15,7 @@ class Store extends \Magento\Ui\Component\Listing\Columns\Column
     /**
      * @var \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory
      */
-    protected $_cronCollectionFactory;
+    private $_cronCollectionFactory;
 
     /**
      * @param ContextInterface $context
@@ -27,11 +27,11 @@ class Store extends \Magento\Ui\Component\Listing\Columns\Column
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory $cronCollectionFactory,
+        \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory $cronColFactory,
         array $components = [],
         array $data = []
     ) {
-        $this->_cronCollectionFactory = $cronCollectionFactory;
+        $this->_cronCollectionFactory = $cronColFactory;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 

@@ -7,48 +7,46 @@ namespace Doofinder\Feed\Controller\Feed;
  *
  * @package Doofinder\Feed\Controller\Feed
  */
-class Index extends \Doofinder\Feed\Controller\Base
+class Index extends \Magento\Framework\App\Action\Action
 {
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    protected $_helperData;
+    private $_helper;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    protected $_generatorFactory;
+    private $_generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    protected $_feedConfig;
+    private $_feedConfig;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInteface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * Index constructor.
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory
-     * @param \Doofinder\Feed\Helper\Data $helperData
+     * @param \Doofinder\Feed\Helper\Data $helper
      * @param \Doofinder\Feed\Model\GeneratorFactory $generatorFactory
      * @param \Doofinder\Feed\Helper\FeedConfig $feedConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $jsonResultFactory,
-        \Doofinder\Feed\Helper\Data $helperData,
+        \Doofinder\Feed\Helper\Data $helper,
         \Doofinder\Feed\Model\GeneratorFactory $generatorFactory,
         \Doofinder\Feed\Helper\FeedConfig $feedConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
-        parent::__construct($context, $jsonResultFactory);
+        parent::__construct($context);
 
-        $this->_helperData = $helperData;
+        $this->_helper = $helper;
         $this->_generatorFactory = $generatorFactory;
         $this->_feedConfig = $feedConfig;
         $this->_storeManager = $storeManager;
@@ -59,7 +57,7 @@ class Index extends \Doofinder\Feed\Controller\Base
      */
     public function execute()
     {
-        $storeCode = $this->getParamString('store');
+        $storeCode = $this->_helper->getParamString('store');
 
         // Do not proceed if password check fails
         if (!$this->checkPassword($storeCode)) {
@@ -83,7 +81,7 @@ class Index extends \Doofinder\Feed\Controller\Base
 
         $feed = $generator->getProcessor('Xml')->getFeed();
 
-        $this->_setXmlHeaders();
+        $this->_helper->setXmlHeaders($this->getResponse());
         $this->getResponse()->setBody($feed);
     }
 
@@ -92,15 +90,15 @@ class Index extends \Doofinder\Feed\Controller\Base
      *
      * @return array
      */
-    protected function getFeedCustomParams()
+    private function getFeedCustomParams()
     {
         $params = [
-            'offset' => $this->getParamInt('offset'),
-            'limit' => $this->getParamInt('limit'),
+            'offset' => $this->_helper->getParamInt('offset'),
+            'limit' => $this->_helper->getParamInt('limit'),
         ];
 
         return array_filter($params, function ($value) {
-            return !is_null($value);
+            return $value !== null;
         });
     }
 
@@ -110,9 +108,9 @@ class Index extends \Doofinder\Feed\Controller\Base
      * @param string $storeCode
      * @return boolean
      */
-    protected function checkPassword($storeCode)
+    private function checkPassword($storeCode)
     {
         $password = $this->_feedConfig->getFeedPassword($storeCode);
-        return !$password || $this->getParamString('password') == $password;
+        return !$password || $this->_helper->getParamString('password') == $password;
     }
 }

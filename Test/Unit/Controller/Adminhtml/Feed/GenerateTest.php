@@ -2,55 +2,47 @@
 
 namespace Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class GenerateTest
  * @package Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed
  */
-class GenerateTest extends \PHPUnit_Framework_TestCase
+class GenerateTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Magento\Backend\App\Action\Context
      */
-    protected $_contextMock;
+    private $_context;
 
     /**
      * @var \Magento\Framework\Controller\Result\JsonFactory
      */
-    protected $_resultJsonFactoryMock;
+    private $_resultJsonFactory;
 
     /**
      * @var \Magento\Framework\Controller\Result\Json
      */
-    protected $_resultJsonMock;
-
-    /**
-     * @var \Doofinder\Feed\Model\Cron\ScheduleFactory
-     */
-    protected $_scheduleFactoryMock;
+    private $_resultJson;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_scheduleMock;
+    private $_schedule;
 
     /**
      * @var \Doofinder\Feed\Controller\Adminhtml\Feed\Generate
      */
-    protected $_controller;
+    private $_controller;
 
     /**
-     *
+     * Set up
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
-        $this->_contextMock = $this->getMock(
+        $this->_context = $this->getMock(
             '\Magento\Backend\App\Action\Context',
             [],
             [],
@@ -58,7 +50,7 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_resultJsonFactoryMock = $this->getMock(
+        $this->_resultJsonFactory = $this->getMock(
             '\Magento\Framework\Controller\Result\JsonFactory',
             ['create'],
             [],
@@ -66,7 +58,7 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_resultJsonMock = $this->getMock(
+        $this->_resultJson = $this->getMock(
             '\Magento\Framework\Controller\Result\Json',
             ['setData'],
             [],
@@ -74,7 +66,7 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_scheduleMock = $this->getMock(
+        $this->_schedule = $this->getMock(
             '\Doofinder\Feed\Helper\Schedule',
             ['regenerateSchedule'],
             [],
@@ -82,23 +74,23 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_resultJsonFactoryMock->expects($this->once())
+        $this->_resultJsonFactory->expects($this->once())
             ->method('create')
-            ->willReturn($this->_resultJsonMock);
+            ->willReturn($this->_resultJson);
 
-        $this->_scheduleMock->expects($this->once())
+        $this->_schedule->expects($this->once())
             ->method('regenerateSchedule');
 
-        $this->_resultJsonMock->expects($this->once())
+        $this->_resultJson->expects($this->once())
             ->method('setData')
             ->with(['message' => \Doofinder\Feed\Controller\Adminhtml\Feed\Generate::FEED_GENERATION_MESSAGE]);
 
-        $this->_controller = $this->_objectManager->getObject(
+        $this->_controller = $this->objectManager->getObject(
             '\Doofinder\Feed\Controller\Adminhtml\Feed\Generate',
             [
-                'context'       => $this->_contextMock,
-                'resultJsonFactory'   => $this->_resultJsonFactoryMock,
-                'schedule' => $this->_scheduleMock,
+                'context'       => $this->_context,
+                'resultJsonFactory'   => $this->_resultJsonFactory,
+                'schedule' => $this->_schedule,
             ]
         );
     }
@@ -110,5 +102,4 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
     {
         $this->_controller->execute();
     }
-
 }

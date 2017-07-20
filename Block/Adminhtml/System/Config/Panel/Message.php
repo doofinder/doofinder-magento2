@@ -9,9 +9,11 @@ class Message extends \Magento\Config\Block\System\Config\Form\Field
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
+     * @codingStandardsIgnoreStart
      */
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
+    // @codingStandardsIgnoreEnd
         $element->setData('text', $this->getText($element));
         return parent::_getElementHtml($element);
     }
@@ -22,9 +24,11 @@ class Message extends \Magento\Config\Block\System\Config\Form\Field
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
+     * @codingStandardsIgnoreStart
      */
     protected function _renderScopeLabel(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
+    // @codingStandardsIgnoreEnd
         return '';
     }
 }

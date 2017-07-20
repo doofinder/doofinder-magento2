@@ -3,14 +3,14 @@
 namespace Doofinder\Feed\Model\Generator\Component\Processor;
 
 use \Doofinder\Feed\Model\Generator\Component;
-use \Doofinder\Feed\Model\Generator\Component\Processor;
+use \Doofinder\Feed\Model\Generator\Component\ProcessorInterface;
 
-class AtomicUpdater extends Component implements Processor
+class AtomicUpdater extends Component implements ProcessorInterface
 {
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
-    protected $_search;
+    private $_search;
 
     /**
      * Constructor

@@ -2,30 +2,27 @@
 
 namespace Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log\Column\Type;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class OptionsTest
  * @package Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log\Column\Type
  */
-class OptionsTest extends \PHPUnit_Framework_TestCase
+class OptionsTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Doofinder\Feed\Logger\Feed
      */
-    protected $_logger;
+    private $_logger;
 
     /**
      * @var \Doofinder\Feed\Ui\Component\Listing\Log\Column\Type\Options
      */
-    protected $_options;
+    private $_options;
 
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_logger = $this->getMock(
             '\Doofinder\Feed\Logger\Feed',
@@ -41,7 +38,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
             400 => 'ERROR',
         ]);
 
-        $this->_options = $this->_objectManager->getObject(
+        $this->_options = $this->objectManager->getObject(
             '\Doofinder\Feed\Ui\Component\Listing\Log\Column\Type\Options',
             [
                 'logger' => $this->_logger,
@@ -61,6 +58,9 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
             ['label' => 'error', 'value' => 'error'],
         ];
 
-        $this->_options->toOptionArray();
+        $this->assertEquals(
+            $expected,
+            $this->_options->toOptionArray()
+        );
     }
 }

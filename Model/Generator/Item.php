@@ -7,17 +7,17 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
     /**
      * @var \Magento\Framework\DataObject|null
      */
-    protected $_context = null;
+    private $_context = null;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item[]
      */
-    protected $_associates = [];
+    private $_associates = [];
 
     /**
      * @var boolean
      */
-    protected $_skip = false;
+    private $_skip = false;
 
     /**
      * Serialize item to an XML
@@ -38,14 +38,14 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
      * @param array
      * @return array
      */
-    protected function convertDataToXmlProperty($data)
+    private function convertDataToXmlProperty($data)
     {
         $properties = [];
 
         foreach ($data as $key => $value) {
             if (!$value) {
                 continue;
-            } else if (is_array($value)) {
+            } elseif (is_array($value)) {
                 if ($this->isAssocArray($value)) {
                     $value = $this->convertDataToXmlProperty($value);
                 } else {
@@ -54,7 +54,7 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
             }
 
             if (!is_array($value) && !is_a($value, '\Sabre\Xml\XmlSerializable')) {
-                $value = new \Sabre\Xml\Element\Cdata($value);
+                $value = $this->createCdata($value);
             }
 
             $properties[] = [
@@ -147,9 +147,22 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
      * @param array
      * @return boolean
      */
-    protected function isAssocArray(array $array)
+    private function isAssocArray(array $array)
     {
         $keys = array_keys($array);
         return $keys !== array_keys($keys);
+    }
+
+    /**
+     * Create Cdata element
+     *
+     * @param mixed $value
+     * @return \Sabre\Xml\Element\Cdata
+     */
+    private function createCdata($value)
+    {
+        // @codingStandardsIgnoreStart
+        return new \Sabre\Xml\Element\Cdata($value);
+        // @codingStandardsIgnoreEnd
     }
 }

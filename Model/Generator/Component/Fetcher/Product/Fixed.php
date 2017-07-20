@@ -11,13 +11,13 @@ class Fixed extends Product
      *
      * @return \Magento\Catalog\Model\Product[]
      */
-    protected function fetchProducts()
+    public function fetchProducts()
     {
         $products = $this->getData('products');
 
         $this->_isStarted = true;
         $this->_isDone = true;
-        $this->_lastProcessedEntityId = end($products)->getEntityId();
+        $this->_lastEntityId = end($products)->getEntityId();
         $this->_itemsLeftCount = 0;
 
         return $products;

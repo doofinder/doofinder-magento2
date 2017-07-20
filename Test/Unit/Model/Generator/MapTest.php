@@ -2,34 +2,31 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator;
 
-class MapTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+class MapTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map
      */
-    protected $_model;
+    private $_model;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    protected $_item;
+    private $_item;
 
     /**
      * @var \Magento\Framework\DataObject
      */
-    protected $_context;
-
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManagerHelper;
+    private $_context;
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_context = $this->getMock(
             '\Magento\Framework\DataObject',
@@ -53,7 +50,7 @@ class MapTest extends \PHPUnit_Framework_TestCase
         );
         $this->_item->method('getContext')->willReturn($this->_context);
 
-        $this->_model = $this->_objectManagerHelper->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Generator\Map',
             [
                 'item' => $this->_item,

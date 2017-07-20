@@ -2,17 +2,14 @@
 
 namespace Doofinder\Feed\Test\Unit\Observer\Processor\Xml;
 
-class ItemsFetchedTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+class ItemsFetchedTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Observer\Processor\Xml\ItemsFetched
      */
     private $_observer;
-
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    private $_objectManager;
 
     /**
      * @var \Magento\Framework\Event\Observer
@@ -30,17 +27,16 @@ class ItemsFetchedTest extends \PHPUnit_Framework_TestCase
     private $_xmlProcessor;
 
     /**
-     * @var \Doofinder\Feed\Model\Generator\Component\Fetcher
+     * @var \Doofinder\Feed\Model\Generator\Component\FetcherInterface
      */
     private $_fetcher;
-
 
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_xmlProcessor = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
@@ -51,7 +47,7 @@ class ItemsFetchedTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->_fetcher = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\Fetcher',
+            '\Doofinder\Feed\Model\Generator\Component\FetcherInterface',
             [],
             [],
             '',
@@ -76,7 +72,7 @@ class ItemsFetchedTest extends \PHPUnit_Framework_TestCase
         );
         $this->_invokedObserver->method('getGenerator')->willReturn($this->_generator);
 
-        $this->_observer = $this->_objectManager->getObject(
+        $this->_observer = $this->objectManager->getObject(
             '\Doofinder\Feed\Observer\Processor\Xml\ItemsFetched'
         );
     }

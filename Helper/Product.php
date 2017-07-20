@@ -14,36 +14,36 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory
      */
-    protected $_categoryCollectionFactory = null;
+    private $_categoryColFactory = null;
 
     /**
      * @var \Magento\Catalog\Helper\Image
      */
-    protected $_imageHelper = null;
+    private $_imageHelper = null;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Magento\CatalogInventory\Api\StockRegistryInterface
      */
-    protected $_stockRegistry;
+    private $_stockRegistry;
 
     /**
      * Static cache for category tree
      * @var \Magento\Catalog\Model\Category[][]
      */
-    protected $_categoryTree;
+    private $_categoryTree;
 
     /**
      * @var \Magento\Tax\Model\Config
      */
-    protected $_taxConfig;
+    private $_taxConfig;
 
     /**
-     * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory
+     * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory
      * @param \Magento\Catalog\Helper\Image $imageHelper
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
@@ -51,14 +51,14 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Tax\Model\Config $taxConfig
      */
     public function __construct(
-        \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollectionFactory,
+        \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory,
         \Magento\Catalog\Helper\Image $imageHelper,
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         \Magento\Tax\Model\Config $taxConfig
     ) {
-        $this->_categoryCollectionFactory = $categoryCollectionFactory;
+        $this->_categoryColFactory = $categoryColFactory;
         $this->_imageHelper = $imageHelper;
         $this->_storeManager = $storeManager;
         $this->_stockRegistry = $stockRegistry;
@@ -95,9 +95,9 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @param int[] $ids
      * @return \Magento\Catalog\Model\Category[]
      */
-    protected function getCategories(array $ids)
+    private function getCategories(array $ids)
     {
-        $categoryCollection = $this->_categoryCollectionFactory->create();
+        $categoryCollection = $this->_categoryColFactory->create();
         $categoryCollection
             ->addIdFilter($ids)
             ->addAttributeToSelect('name')
@@ -115,7 +115,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @param boolean $fromNavigation - exclude categories not in menu
      * @return \Magento\Catalog\Model\Category[][]
      */
-    protected function getCategoryTree(array $categories, $fromNavigation)
+    private function getCategoryTree(array $categories, $fromNavigation)
     {
         // Store all requested category ids
         $categoryIds = array_map(function ($category) {
@@ -220,7 +220,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         if (!$tax) {
             // No tax needed, use base amount
             $value = $amount->getBaseAmount();
-        } else if ($this->_taxConfig->priceIncludesTax()) {
+        } elseif ($this->_taxConfig->priceIncludesTax()) {
             // Tax already included, use value
             $value = $amount->getValue();
         } else {
@@ -329,7 +329,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @param int $productId
      * @return \Magento\CatalogInventory\Model\Stock\Item
      */
-    protected function getStockItem($productId)
+    private function getStockItem($productId)
     {
         return $this->_stockRegistry->getStockItem($productId);
     }

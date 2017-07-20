@@ -249,6 +249,4 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             $this->_helper->getCurrencyCode()
         );
     }
-
-
 }

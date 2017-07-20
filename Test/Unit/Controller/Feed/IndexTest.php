@@ -2,83 +2,67 @@
 
 namespace Doofinder\Feed\Test\Unit\Controller\Feed;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class IndexTest
  * @package Doofinder\Feed\Test\Unit\Controller\Feed
  */
-class IndexTest extends \PHPUnit_Framework_TestCase
+class IndexTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
     /**
      * @var \Magento\Framework\App\Action\Context
      */
-    protected $_contextMock;
-    /**
-     * @var \Magento\Framework\Controller\Result\JsonFactory
-     */
-    protected $_jsonFactoryMock;
+    private $_context;
+
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    protected $_helperDataMock;
+    private $_helper;
+
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    protected $_generatorFactoryMock;
+    private $_generatorFactory;
+
     /**
      * @var \Doofinder\Feed\Model\Generator
      */
-    protected $_generatorMock;
+    private $_generator;
+
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Xml
      */
-    protected $_xmlMock;
+    private $_xml;
+
     /**
-     * @var Magento\Framework\App\Response\Http
+     * @var Magento\Framework\App\ResponseInterface
      */
-    protected $_responseMock;
+    private $_response;
+
     /**
      * @var \Doofinder\Feed\Controller\Feed\Index
      */
-    protected $_controller;
+    private $_controller;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    protected $_feedConfigMock;
+    private $_feedConfig;
 
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    protected $_requestMock;
+    private $_request;
 
     /**
      * Prepares the environment before running a test.
      */
     public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
-        $this->_contextMock = $this->getMock(
-            '\Magento\Framework\App\Action\Context',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_jsonFactoryMock = $this->getMock(
-            '\Magento\Framework\Controller\Result\JsonFactory',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_helperDataMock = $this->getMock(
+        $this->_helper = $this->getMock(
             '\Doofinder\Feed\Helper\Data',
             [],
             [],
@@ -86,88 +70,78 @@ class IndexTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_generatorFactoryMock = $this->getMock(
-            '\Doofinder\Feed\Model\GeneratorFactory',
-            ['create'],
-            [],
-            '',
-            false
-        );
-
-        $this->_generatorMock = $this->getMock(
-            '\Doofinder\Feed\Model\Generator',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_xmlMock = $this->getMock(
+        $this->_xml = $this->getMock(
             '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
             [],
             [],
             '',
             false
         );
+        $this->_xml->expects($this->once())->method('getFeed');
 
-        $this->_responseMock = $this->getMock(
+        $this->_generator = $this->getMock(
+            '\Doofinder\Feed\Model\Generator',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_generator->expects($this->once())->method('getProcessor')
+            ->with('Xml')->willReturn($this->_xml);
+
+        $this->_generatorFactory = $this->getMock(
+            '\Doofinder\Feed\Model\GeneratorFactory',
+            ['create'],
+            [],
+            '',
+            false
+        );
+        $this->_generatorFactory->expects($this->once())
+            ->method('create')->willReturn($this->_generator);
+
+        $this->_response = $this->getMock(
             '\Magento\Framework\App\Response\Http',
             [],
             [],
             '',
             false
         );
+        $this->_response->expects($this->once())->method('setBody');
 
-        $this->_requestMock = $this->getMock(
+        $this->_request = $this->getMock(
             '\Magento\Framework\App\RequestInterface',
             [],
             [],
             ''
         );
 
-        $this->_feedConfigMock = $this->getMock(
+        $this->_feedConfig = $this->getMock(
             '\Doofinder\Feed\Helper\FeedConfig',
             [],
             [],
             '',
             false
         );
+        $this->_feedConfig->expects($this->once())
+            ->method('getFeedConfig')->willReturn(['test' => 'test']);
 
-        $this->_feedConfigMock->expects($this->once())
-            ->method('getFeedConfig')
-            ->willReturn(array('test' => 'test'));
+        $this->_context = $this->getMock(
+            '\Magento\Framework\App\Action\Context',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_context->method('getResponse')->willReturn($this->_response);
+        $this->_context->method('getRequest')->willReturn($this->_request);
 
-        $this->_contextMock->expects($this->any())
-            ->method('getResponse')
-            ->willReturn($this->_responseMock);
-
-        $this->_contextMock->expects($this->any())
-            ->method('getRequest')
-            ->willReturn($this->_requestMock);
-
-        $this->_generatorFactoryMock->expects($this->once())
-            ->method('create')
-            ->willReturn($this->_generatorMock);
-
-        $this->_generatorMock->expects($this->once())
-            ->method('getProcessor')
-            ->with('Xml')
-            ->willReturn($this->_xmlMock);
-
-        $this->_xmlMock->expects($this->once())
-            ->method('getFeed');
-
-        $this->_responseMock->expects($this->once())
-            ->method('setBody');
-
-        $this->_controller = $this->_objectManager->getObject(
+        $this->_controller = $this->objectManager->getObject(
             '\Doofinder\Feed\Controller\Feed\Index',
             [
-                'context'       => $this->_contextMock,
-                'jsonFactory'   => $this->_jsonFactoryMock,
-                'helperData'    => $this->_helperDataMock,
-                'generatorFactory' => $this->_generatorFactoryMock,
-                'feedConfig' => $this->_feedConfigMock
+                'context' => $this->_context,
+                'helper' => $this->_helper,
+                'generatorFactory' => $this->_generatorFactory,
+                'feedConfig' => $this->_feedConfig
             ]
         );
     }
@@ -177,11 +151,12 @@ class IndexTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteWithCustomParams()
     {
-        $this->_requestMock->expects($this->any())
-            ->method('getParam')
-            ->will($this->onConsecutiveCalls('default', '20', 1));
+        $this->_helper->expects($this->any())
+            ->method('getParamString')->willReturn('default');
+        $this->_helper->expects($this->any())
+            ->method('getParamInt')->will($this->onConsecutiveCalls(20, 1));
 
-        $this->_feedConfigMock->expects($this->once())
+        $this->_feedConfig->expects($this->once())
             ->method('getFeedConfig')
             ->with('default', [
                 'limit' => 1,

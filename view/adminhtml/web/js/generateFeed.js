@@ -1,7 +1,8 @@
+/*global define Ajax:false*/
 define([
     "jquery",
     "prototype"
-], function($, prototype) {
+], function() {
     var generate = function(config, node) {
 
         node.on('click', function() {
@@ -19,7 +20,7 @@ define([
                         }
                     } catch (e) {
                         alert('Something went wrong. See console for more information.');
-                        console.log(e);
+                        console.error(e);
                     }
                 }
             });

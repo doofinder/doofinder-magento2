@@ -47,17 +47,12 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    private $_scopeConfig;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $_logger;
+    private $_storeManager;
 
     /**
      * StoreConfig constructor.
@@ -65,17 +60,14 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Psr\Log\LoggerInterface $logger
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
-        $this->_logger = $logger;
         parent::__construct($context);
     }
 
@@ -135,7 +127,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         $currentStoreCode = $this->getStoreCode();
         $storeCodes = [];
 
-        if ($currentStoreCode == 'admin') {
+        if (in_array($currentStoreCode, ['admin', 'default'])) {
             $stores = $this->_storeManager->getStores();
 
             foreach ($stores as $store) {

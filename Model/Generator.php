@@ -13,45 +13,45 @@ class Generator extends \Magento\Framework\DataObject
      *
      * @var Generator\Component\FetcherFactory
      */
-    protected $_fetcherFactory = null;
+    private $_fetcherFactory = null;
 
     /**
      * Gernerator processor factory
      *
      * @var Generator\Component\ProcessorFactory
      */
-    protected $_processorFactory = null;
+    private $_processorFactory = null;
 
     /**
      * Generator fetchers
      *
      * @var Generator\Component\Fetcher[]
      */
-    protected $_fetchers = array();
+    private $_fetchers = [];
 
     /**
      * Generator processors
      *
      * @var Generator\Component\Processor[]
      */
-    protected $_processors = array();
+    private $_processors = [];
 
     /**
      * @var \Magento\Framework\Event\ManagerInteface
      */
-    protected $_eventManager = null;
+    private $_eventManager = null;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    protected $_logger = null;
+    private $_logger = null;
 
     /**
      * Generator items
      *
      * @var Generator\Item[]
      */
-    protected $_items = array();
+    private $_items = [];
 
     /**
      * @param Generator\Component\FetcherFactory $itemsFetcherFactory
@@ -73,7 +73,6 @@ class Generator extends \Magento\Framework\DataObject
         $this->_logger = $logger;
         parent::__construct($data);
     }
-
 
     /**
      * Run generator
@@ -98,7 +97,7 @@ class Generator extends \Magento\Framework\DataObject
      *
      * @return Generator
      */
-    protected function initialize()
+    private function initialize()
     {
         // Create fetchers
         foreach ($this->getData('config/fetchers') as $class => $data) {
@@ -128,9 +127,9 @@ class Generator extends \Magento\Framework\DataObject
      * @return Generator\Item[]
      * @return Generator
      */
-    protected function fetchItems()
+    private function fetchItems()
     {
-        $this->_items = array();
+        $this->_items = [];
 
         foreach ($this->_fetchers as $fetcher) {
             $this->_logger->debug(__('Fetching items with %1', get_class($fetcher)));
@@ -148,7 +147,7 @@ class Generator extends \Magento\Framework\DataObject
      *
      * @return Generator
      */
-    protected function processItems()
+    private function processItems()
     {
         foreach ($this->_processors as $processor) {
             $this->_logger->debug(__('Processing items with %1', get_class($processor)));
@@ -204,7 +203,7 @@ class Generator extends \Magento\Framework\DataObject
      *
      * @param string
      */
-    protected function dispatch($eventName)
+    private function dispatch($eventName)
     {
         $this->_eventManager->dispatch('doofinder_feed_generator_' . $eventName, [
             'generator' => $this,

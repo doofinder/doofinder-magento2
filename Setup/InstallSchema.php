@@ -13,12 +13,24 @@ class InstallSchema implements InstallSchemaInterface
     const CRON_TABLE_NAME = 'doofinder_feed_cron';
     const LOG_TABLE_NAME = 'doofinder_feed_log';
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @codingStandardsIgnoreStart
+     */
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
-        $installer = $setup;
-        $installer->startSetup();
+    // @codingStandardsIgnoreEnd
+        $setup->startSetup();
 
-        $table = $installer->getConnection()
+        $this->setupCronTable($setup);
+        $this->setupLogTable($setup);
+
+        $setup->endSetup();
+    }
+
+    private function setupCronTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
             ->newTable(self::CRON_TABLE_NAME)
             ->addColumn(
                 'id',
@@ -105,10 +117,12 @@ class InstallSchema implements InstallSchemaInterface
             ->setOption('type', 'InnoDB')
             ->setOption('charset', 'utf8');
 
-        $installer->getConnection()->createTable($table);
+        $setup->getConnection()->createTable($table);
+    }
 
-        // Add log table
-        $table = $installer->getConnection()
+    private function setupLogTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
             ->newTable(self::LOG_TABLE_NAME)
             ->addColumn(
                 'id',
@@ -153,7 +167,7 @@ class InstallSchema implements InstallSchemaInterface
 
         // Add indexes to log table
         $table->addIndex(
-            $installer->getIdxName(
+            $setup->getIdxName(
                 self::LOG_TABLE_NAME,
                 ['process_id', 'type'],
                 AdapterInterface::INDEX_TYPE_INDEX
@@ -162,7 +176,7 @@ class InstallSchema implements InstallSchemaInterface
             ['type' => AdapterInterface::INDEX_TYPE_INDEX]
         );
         $table->addIndex(
-            $installer->getIdxName(
+            $setup->getIdxName(
                 self::LOG_TABLE_NAME,
                 ['time'],
                 AdapterInterface::INDEX_TYPE_INDEX
@@ -173,21 +187,19 @@ class InstallSchema implements InstallSchemaInterface
 
         // Add foreign keys
         $table->addForeignKey(
-            $installer->getFkName(
+            $setup->getFkName(
                 self::LOG_TABLE_NAME,
                 'process_id',
                 self::CRON_TABLE_NAME,
                 'id'
             ),
             'process_id',
-            $installer->getTable(self::CRON_TABLE_NAME),
+            $setup->getTable(self::CRON_TABLE_NAME),
             'id',
             Table::ACTION_CASCADE,
             Table::ACTION_CASCADE
         );
 
-        $installer->getConnection()->createTable($table);
-
-        $installer->endSetup();
+        $setup->getConnection()->createTable($table);
     }
 }

@@ -2,26 +2,23 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\Password
  */
-class PasswordTest extends \PHPUnit_Framework_TestCase
+class PasswordTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Doofinder\Feed\Model\Config\Backend\Password
      */
-    protected $_model;
+    private $_model;
 
     public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
-        $this->_model = $this->_objectManager->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Config\Backend\Password'
         );
     }

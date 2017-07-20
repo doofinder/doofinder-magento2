@@ -2,7 +2,9 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Fetcher;
 
-class ProductTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+class ProductTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Fetcher\Product
@@ -35,16 +37,11 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     private $_item;
 
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    private $_objectManagerHelper;
-
-    /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_product = $this->getMock(
             '\Magento\Catalog\Model\Product',
@@ -70,7 +67,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->_productCollection->expects($this->any())->method('addAttributeToSort')
             ->willReturn($this->_productCollection);
         $this->_productCollection->expects($this->any())->method('getItems')
-            ->willReturn(array($this->_product));
+            ->willReturn([$this->_product]);
         $this->_productCollection->expects($this->any())->method('getLastItem')
             ->willReturn($this->_product);
 
@@ -102,10 +99,10 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->_generatorItemFactory->expects($this->any())->method('create')
             ->willReturn($this->_item);
 
-        $this->_model = $this->_objectManagerHelper->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Generator\Component\Fetcher\Product',
             [
-                'productCollectionFactory' => $this->_productCollectionFactory,
+                'productColFactory' => $this->_productCollectionFactory,
                 'generatorItemFactory' => $this->_generatorItemFactory
             ]
         );
@@ -133,7 +130,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->_productCollection->expects($this->once())->method('setPageSize')
             ->with(1)
-            ->willReturn(array($this->_product));
+            ->willReturn([$this->_product]);
         $this->_productCollection->expects($this->any())->method('addAttributeToFilter')
             ->withConsecutive(
                 ['status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED],
@@ -142,7 +139,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
                     \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH
                 ]],
                 ['entity_id', ['gt' => 2]]
-             )
+            )
             ->willReturn($this->_productCollection);
 
         $this->_model->fetch();
@@ -164,7 +161,6 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
-        $select->expects($this->once())->method('limit')->with(1, 29);
         $this->_productCollection->method('getSelect')->willReturn($select);
 
         $product = $this->getMock(
@@ -175,11 +171,10 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             false
         );
         $product->method('getEntityId')->willReturn(51);
-        $this->_productCollection->method('fetchItem')->willReturn($product);
 
-        $this->_productCollection->expects($this->once())->method('setPageSize')
-            ->with(10)
-            ->willReturn(array($this->_product));
+        $this->_productCollection->expects($this->once())->method('getAllIds')
+            ->with(1, 29)
+            ->willReturn([$product->getEntityId()]);
         $this->_productCollection->expects($this->any())->method('addAttributeToFilter')
             ->withConsecutive(
                 ['status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED],
@@ -193,7 +188,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
                     \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH
                 ]],
                 ['entity_id', ['gt' => 51]]
-             )
+            )
             ->willReturn($this->_productCollection);
 
         $this->_model->fetch();

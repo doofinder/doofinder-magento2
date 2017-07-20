@@ -334,15 +334,15 @@
                 showInWebsite="0"
                 showInStore="1">
                 <label>Feed Status</label>
-                <field id="cron_issue"
+                <field id="dynamic_feed_url"
                        translate="label"
                        type="note"
                        sortOrder="5"
                        showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Cron Issues</label>
-                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\Cron</frontend_model>
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Dynamic feed URL</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\DynamicFeedUrl</frontend_model>
                 </field>
                 <field id="status"
                        translate="label"
@@ -434,6 +434,17 @@
                        showInStore="1">
                     <button_label>View Log</button_label>
                     <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\ViewLogButton</frontend_model>
+                </field>
+
+                <field id="atomic_updates"
+                       translate="label"
+                       type="note"
+                       sortOrder="50"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Atomic Updates</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\AtomicUpdates</frontend_model>
                 </field>
             </group>
         </section>

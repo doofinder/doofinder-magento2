@@ -2,20 +2,18 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Test class for \Doofinder\Feed\Helper\Schedule
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ScheduleTest extends \PHPUnit_Framework_TestCase
+class ScheduleTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
     private $_helper;
-
-    /**
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    private $_objectManager;
 
     /**
      * @var \Doofinder\Feed\Model\Cron
@@ -40,51 +38,59 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    protected $_generatorFactory;
+    private $_generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Model\Generator
      */
-    protected $_generator;
+    private $_generator;
 
     /**
-     * @var \Doofinder\Feed\Model\Generator\Component\Fetcher
+     * @var \Doofinder\Feed\Model\Generator\Component\FetcherInterface
      */
-    protected $_fetcher;
+    private $_fetcher;
+
+    /**
+     * @var \DateTime
+     */
+    private $_date;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    protected $_timezone;
+    private $_timezone;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    protected $_store;
+    private $_store;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Doofinder\Feed\Logger\Feed
      */
-    protected $_feedLogger;
+    private $_feedLogger;
 
     /**
      * @var \Doofinder\Feed\Logger\FeedFactory
      */
-    protected $_feedLoggerFactory;
+    private $_feedLoggerFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_process = $this->getMock(
             '\Doofinder\Feed\Model\Cron',
@@ -128,7 +134,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->_filesystem->method('getDirectoryWrite')->willReturn($this->_directory);
 
         $this->_fetcher = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\Fetcher',
+            '\Doofinder\Feed\Model\Generator\Component\FetcherInterface',
             [],
             [],
             '',
@@ -154,6 +160,14 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         );
         $this->_generatorFactory->method('create')->willReturn($this->_generator);
 
+        $this->_date = $this->getMock(
+            '\DateTime',
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->_timezone = $this->getMock(
             '\Magento\Framework\Stdlib\DateTime\TimezoneInterface',
             [],
@@ -162,6 +176,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
             false
         );
         $this->_timezone->method('getConfigTimezone')->willReturn('America/Los_Angeles');
+        $this->_timezone->method('date')->willReturn($this->_date);
 
         $this->_store = $this->getMock(
             'Magento\Store\Model\Store',
@@ -207,7 +222,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->_helper = $this->_objectManager->getObject(
+        $this->_helper = $this->objectManager->getObject(
             '\Doofinder\Feed\Helper\Schedule',
             [
                 'filesystem' => $this->_filesystem,

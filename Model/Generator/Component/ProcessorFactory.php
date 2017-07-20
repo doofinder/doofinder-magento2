@@ -14,9 +14,8 @@ class ProcessorFactory extends \Doofinder\Feed\Model\Generator\ComponentFactory
      * @param string $componentName
      * @return \Doofinder\Feed\Model\Generator\Component\Processor
      */
-    public function create(array $data = array(), $componentName)
+    public function create(array $data = [], $componentName = '')
     {
         return parent::create($data, 'Processor\\' . $componentName);
     }
-
 }

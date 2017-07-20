@@ -11,7 +11,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    protected $_storeConfig;
+    private $_storeConfig;
 
     /**
      * HashIdValidation constructor.
@@ -62,7 +62,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
      * @return bool
      * @throws \Magento\Framework\Exception\ValidatorException
      */
-    protected function isUnique($hashId)
+    private function isUnique($hashId)
     {
         $currentStoreCode = $this->_storeConfig->getStoreCode();
 

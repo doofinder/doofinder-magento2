@@ -2,7 +2,9 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator;
 
-class ItemTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+class ItemTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
@@ -10,18 +12,13 @@ class ItemTest extends \PHPUnit_Framework_TestCase
     private $_model;
 
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    private $_objectManagerHelper;
-
-    /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
-        $this->_model = $this->_objectManagerHelper->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Generator\Item',
             [
                 'data' => [
@@ -42,7 +39,9 @@ class ItemTest extends \PHPUnit_Framework_TestCase
      */
     public function testXmlSerialize()
     {
+        // @codingStandardsIgnoreStart
         $service = new \Sabre\Xml\Service();
+        // @codingStandardsIgnoreEnd
         $output = $service->write('feed', $this->_model);
 
         $expected = <<<EOT

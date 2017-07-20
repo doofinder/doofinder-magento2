@@ -12,14 +12,14 @@ class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
     /**
      * @var $_attributesRenderer \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes;
      */
-    protected $_attributesRenderer;
+    private $_attributesRenderer;
 
     /**
      * Returns renderer for additional attributes.
      *
      * @return \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes
      */
-    protected function _getAttributesRenderer()
+    private function _getAttributesRenderer()
     {
         if (!$this->_attributesRenderer) {
             $this->_attributesRenderer = $this->getLayout()->createBlock(
@@ -33,14 +33,14 @@ class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
     }
 
     /**
-     * Prepare to render.
-     *
-     * @return void
+     * {@inheritDoc}
+     * @codingStandardsIgnoreStart
      */
     protected function _prepareToRender()
     {
-        $this->addColumn('label', array('label' => __('Label')));
-        $this->addColumn('field', array('label' => __('Field')));
+    // @codingStandardsIgnoreEnd
+        $this->addColumn('label', ['label' => __('Label')]);
+        $this->addColumn('field', ['label' => __('Field')]);
         $this->addColumn(
             'additional_attribute',
             ['label' => __('Attribute'), 'renderer' => $this->_getAttributesRenderer()]
@@ -51,13 +51,12 @@ class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
     }
 
     /**
-     * Prepare existing row data object.
-     *
-     * @param \Magento\Framework\DataObject $row
-     * @return void
+     * {@inheritDoc}
+     * @codingStandardsIgnoreStart
      */
     protected function _prepareArrayRow(\Magento\Framework\DataObject $row)
     {
+    // @codingStandardsIgnoreEnd
         $options = [];
         $customAttribute = $row->getData('additional_attribute');
 

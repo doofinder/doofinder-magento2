@@ -14,9 +14,16 @@ class ProductTest extends \PHPUnit_Framework_TestCase
      */
     private $_model;
 
+    /**
+     * @var \Magento\Framework\ObjectManagerInterface
+     */
+    private $_objectManager;
+
     public function setUp()
     {
-        $this->_model = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+        $this->_objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+
+        $this->_model = $this->_objectManager->create(
             '\Doofinder\Feed\Model\Generator\Component\Fetcher\Product'
         );
     }
@@ -24,9 +31,9 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     /**
      * Set products visible and in catalog
      */
-    protected function makeProductsFetchable()
+    private function makeProductsFetchable()
     {
-        $collection = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+        $collection = $this->_objectManager->create(
             '\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory'
         )->create();
 
@@ -34,7 +41,9 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             $product
                 ->setVisibility(\Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH)
                 ->setStatus(\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
+                // @codingStandardsIgnoreStart
                 ->save();
+                // @codingStandardsIgnoreEnd
         }
     }
 
@@ -93,7 +102,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     {
         $this->makeProductsFetchable();
 
-        $entityId = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+        $entityId = $this->_objectManager->create(
             '\Magento\Catalog\Api\ProductRepositoryInterface'
         )->get($sku)->getEntityId();
 
@@ -130,18 +139,18 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->makeProductsFetchable();
 
         /** @var \Magento\Store\Api\WebsiteRepositoryInterface $websiteRepositoryFactory */
-        $websiteRepositoryFactory = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+        $websiteRepFactory = $this->_objectManager->create(
             '\Magento\Store\Api\WebsiteRepositoryInterface'
         );
 
-        $website = $websiteRepositoryFactory->get('test');
+        $website = $websiteRepFactory->get('test');
 
-        /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryFactory */
-        $productRepositoryFactory = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+        /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepFactory */
+        $productRepFactory = $this->_objectManager->create(
             '\Magento\Catalog\Api\ProductRepositoryInterface'
         );
 
-        $product = $productRepositoryFactory->get('simple1');
+        $product = $productRepFactory->get('simple1');
         $product->setWebsiteIds([$website->getId()])
             ->save();
 
@@ -204,12 +213,12 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     {
         $this->makeProductsFetchable();
 
-        /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryFactory */
-        $productRepositoryFactory = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+        /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepFactory */
+        $productRepFactory = $this->_objectManager->create(
             '\Magento\Catalog\Api\ProductRepositoryInterface'
         );
 
-        $product = $productRepositoryFactory->get('simple3');
+        $product = $productRepFactory->get('simple3');
 
         $this->_model->fetch();
 

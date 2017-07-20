@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Model\Generator\Component;
 
-interface Processor
+interface ProcessorInterface
 {
     /**
      * Process generator items

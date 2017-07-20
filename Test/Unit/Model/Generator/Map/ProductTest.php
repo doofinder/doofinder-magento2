@@ -2,12 +2,14 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Map;
 
-class ProductTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+class ProductTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product
      */
-    protected $_model;
+    private $_model;
 
     /**
      * @var \Magento\Catalog\Model\Category
@@ -40,16 +42,11 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     private $_helper;
 
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManagerHelper;
-
-    /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_category = $this->getMock(
             '\Magento\Catalog\Model\Category',
@@ -81,7 +78,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
-        $this->_currency->method('format')->with(10.1234)->willReturn('10.12');
+        $this->_currency->method('format')->with(10.1234)->willReturn('10.1234');
 
         $this->_priceCurrency = $this->getMock(
             '\Magento\Framework\Pricing\PriceCurrencyInterface',
@@ -132,7 +129,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         );
         $this->_item->method('getContext')->willReturn($this->_product);
 
-        $this->_model = $this->_objectManagerHelper->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Generator\Map\Product',
             [
                 'helper' => $this->_helper,
@@ -153,7 +150,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Category 1>Category 1.1%%Category 2', $this->_model->get('category_ids'));
         $this->assertEquals('http://example.com/path/to/image.jpg', $this->_model->get('image'));
         $this->assertEquals('http://example.com/simple-product.html', $this->_model->get('url_key'));
-        $this->assertEquals('10.12', $this->_model->get('price'));
+        $this->assertEquals('10.1234', $this->_model->get('price'));
         $this->assertEquals(null, $this->_model->setExportProductPrices(false)->get('price'));
         $this->assertEquals('in stock', $this->_model->get('df_availability'));
         $this->assertEquals('USD', $this->_model->get('df_currency'));

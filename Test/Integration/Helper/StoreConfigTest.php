@@ -41,7 +41,6 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
 
         $storeManager->setCurrentStore($store);
         $stores = $this->_helper->getStoreCodes();
-        //$storeManager->setCurrentStore('default');
 
         $this->assertEquals($expected, $stores);
     }
@@ -49,7 +48,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
     public function testGetStoreCodesProvider()
     {
         return [
-            ['default', ['default']],
+            ['default', ['default', 'test']],
             ['test', ['test']],
         ];
     }

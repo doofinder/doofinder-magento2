@@ -11,9 +11,11 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
 {
     /**
      * Object initialization.
+     * @codingStandardsIgnoreStart
      */
     protected function _construct()
     {
+    // @codingStandardsIgnoreEnd
         $this->_init(
             '\Doofinder\Feed\Model\Cron',
             '\Doofinder\Feed\Model\ResourceModel\Cron'

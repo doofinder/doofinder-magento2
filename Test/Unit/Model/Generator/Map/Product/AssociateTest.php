@@ -2,12 +2,14 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Map\Product;
 
-class AssociateTest extends \PHPUnit_Framework_TestCase
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
+class AssociateTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product\Associate
      */
-    protected $_model;
+    private $_model;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
@@ -25,16 +27,11 @@ class AssociateTest extends \PHPUnit_Framework_TestCase
     private $_helper;
 
     /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManagerHelper;
-
-    /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    public function setUp()
     {
-        $this->_objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_helper = $this->getMock(
             '\Doofinder\Feed\Helper\Product',
@@ -62,7 +59,7 @@ class AssociateTest extends \PHPUnit_Framework_TestCase
         );
         $this->_item->method('getContext')->willReturn($this->_product);
 
-        $this->_model = $this->_objectManagerHelper->getObject(
+        $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Generator\Map\Product\Associate',
             [
                 'helper' => $this->_helper,

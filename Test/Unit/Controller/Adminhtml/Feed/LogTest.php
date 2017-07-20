@@ -2,90 +2,91 @@
 
 namespace Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed;
 
+use Magento\Framework\TestFramework\Unit\BaseTestCase;
+
 /**
  * Class LogTest
  * @package Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class LogTest extends \PHPUnit_Framework_TestCase
+class LogTest extends BaseTestCase
 {
-    /**
-     * @var \Magento\Framework\TestFramework\Unit\Helper\ObjectManager
-     */
-    protected $_objectManager;
-
     /**
      * @var \Magento\Backend\Model\View\Result\Redirect
      */
-    protected $_resultRedirect;
+    private $_resultRedirect;
 
     /**
      * @var \Magento\Backend\Model\View\Result\RedirectFactory
      */
-    protected $_resultRedirectFactory;
+    private $_resultRedirectFactory;
 
     /**
      * @var \Magento\Framework\Message\ManagerInterface
      */
-    protected $_messageManager;
+    private $_messageManager;
 
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    protected $_request;
+    private $_request;
 
     /**
      * @var \Magento\Backend\App\Action\Context
      */
-    protected $_context;
+    private $_context;
 
     /**
      * @var \Magento\Framework\View\Page\Title
      */
-    protected $_pageTitle;
+    private $_pageTitle;
 
     /**
      * @var \Magento\Framework\View\Page\Config
      */
-    protected $_pageConfig;
+    private $_pageConfig;
 
     /**
      * @var \Magento\Framework\View\Result\Page
      */
-    protected $_resultPage;
+    private $_resultPage;
 
     /**
      * @var \Magento\Framework\View\Result\PageFactory
      */
-    protected $_resultPageFactory;
+    private $_resultPageFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    protected $_schedule;
+    private $_schedule;
 
     /**
      * @var \Magento\Framework\App\Request\DataPersistorInterface
      */
-    protected $_dataPersistor;
+    private $_dataPersistor;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    protected $_store;
+    private $_store;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_storeManager;
+    private $_storeManager;
 
     /**
      * @var \Doofinder\Feed\Controller\Adminhtml\Feed\Log
      */
-    protected $_controller;
+    private $_controller;
 
-    protected function setUp()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function setUp()
     {
-        $this->_objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        parent::setUp();
 
         $this->_resultRedirect = $this->getMock(
             '\Magento\Backend\Model\View\Result\Redirect',
@@ -202,7 +203,7 @@ class LogTest extends \PHPUnit_Framework_TestCase
         $this->_storeManager->method('getStore')
             ->with(1)->willReturn($this->_store);
 
-        $this->_controller = $this->_objectManager->getObject(
+        $this->_controller = $this->objectManager->getObject(
             '\Doofinder\Feed\Controller\Adminhtml\Feed\Log',
             [
                 'context' => $this->_context,

@@ -3,29 +3,29 @@
 namespace Doofinder\Feed\Model\Generator\Component\Processor;
 
 use \Doofinder\Feed\Model\Generator\Component;
-use \Doofinder\Feed\Model\Generator\Component\Processor;
+use \Doofinder\Feed\Model\Generator\Component\ProcessorInterface;
 
-class Mapper extends Component implements Processor
+class Mapper extends Component implements ProcessorInterface
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    protected $_item = null;
+    private $_item = null;
 
     /**
      * @var \Magento\Framework\DataObject
      */
-    protected $_context = null;
+    private $_context = null;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Map
      */
-    protected $_map = null;
+    private $_map = null;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\MapFactory
      */
-    protected $_mapFactory = null;
+    private $_mapFactory = null;
 
     public function __construct(
         \Doofinder\Feed\Model\Generator\MapFactory $mapFactory,
@@ -53,7 +53,7 @@ class Mapper extends Component implements Processor
      *
      * @param \Doofinder\Feed\Model\Generator\Item
      */
-    protected function processItem(\Doofinder\Feed\Model\Generator\Item $item)
+    private function processItem(\Doofinder\Feed\Model\Generator\Item $item)
     {
         $this->_item = $item;
         $this->_context = $this->_item->getContext();
@@ -83,7 +83,7 @@ class Mapper extends Component implements Processor
      * @param array
      * @return mixed
      */
-    protected function processDefinition(array $definition)
+    private function processDefinition(array $definition)
     {
         $field = $definition['field'];
         $value = $this->_map->get($field);
@@ -103,7 +103,7 @@ class Mapper extends Component implements Processor
      * @param \Doofinder\Feed\Model\Generator\Item
      * @return \Doofinder\Feed\Model\Generator\Map
      */
-    protected function getMapInstance(\Doofinder\Feed\Model\Generator\Item $item)
+    private function getMapInstance(\Doofinder\Feed\Model\Generator\Item $item)
     {
         return $this->_mapFactory->create($item, $this->getData());
     }
