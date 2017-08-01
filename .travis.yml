@@ -62,3 +62,16 @@ install:
 script:
   - bash -c 'cd "$MAGENTO_PATH/dev/tests/unit" && php ../../../vendor/bin/phpunit'
   - bash -c 'cd "$MAGENTO_PATH/dev/tests/integration" && php ../../../vendor/bin/phpunit'
+
+before_deploy:
+  - git archive -o doofinder-magento2.zip $TRAVIS_TAG
+
+deploy:
+  provider: releases
+  api_key:
+    secure: NY99LD7CZoobwbGWsX3K+WHjxAv251rQY5IeEQ1PfIfbWzDknKcfG6n7w4v0Q2lH1xgOXfPeO2ZvP+pGIC9o9qyVR956goJxpUNb9pEk7bs+IgcnLFaMJ9fwQsDxf1ueMPaC3SMreqhH3lrFvgkAXXn4KfRUYGGqhkwiNLXpy5PTfYqv5PpZi2YHhV29ymrL2jnDy2X341PlnPcvtWWv8RhBzEEumlLvQba3TK30sA9heMA0VVb4v7N3ZYO/HJv55AthiYbmx70dtXWvsyt4cImXenMRd19qT9ZVsWD+5BRL1Uw4Tk8jNTb6+SsbX+yWm5h0CycnhFxfMwPOO5ZdLMDdz+bzOAEKQQXTQmnxbD32PYDi51mcOu2a0joczHE9g9TcmJt7uCblUVtfjWaUbJcyqRHZ4lBTImfI5BuPsARq0VqJuNmeTokWqiS3vfKIWuTcyU2D7SCAh0sQqJqei4mKAC5B9JULWlmMTBBS3lDZA2stIJaQ0NWWBRt3WpKTzBAGivDZsqrSrEDN6wAsgmrMSh2kHyJyavLPt25f4Ap+gXmq5viqaogKnl3e545UBtsxpFzP5D506JW/qVq2CUQNDFdWMylgAZn5VUcr+H4I7GVtZvgikB4O1+AW3g71MjwrujXgKo4ZiT9mWAFU7FBnDJhSk1q6QEI/Yo6sOn4=
+  file: doofinder-magento2.zip
+  skip_cleanup: true
+  on:
+    tags: true
+    condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$
