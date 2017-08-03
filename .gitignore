@@ -3,3 +3,6 @@
 
 # Travis files
 /*travis.log
+
+# Docker files
+/.env
