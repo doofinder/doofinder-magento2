@@ -64,7 +64,7 @@ script:
   - bash -c 'cd "$MAGENTO_PATH/dev/tests/integration" && php ../../../vendor/bin/phpunit'
 
 before_deploy:
-  - git archive -o doofinder-magento2.zip $TRAVIS_TAG
+  - git archive --format=zip -o doofinder-magento2.zip $TRAVIS_TAG
 
 deploy:
   provider: releases
