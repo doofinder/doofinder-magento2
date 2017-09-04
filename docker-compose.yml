@@ -7,8 +7,6 @@ services:
       - db
     ports:
       - ${EXTERNAL_HTTP_PORT}80
-    volumes:
-      - ./module/:/module
     environment:
       - MYSQL_HOST=db
       - MYSQL_USER=root
