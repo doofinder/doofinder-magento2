@@ -80,4 +80,16 @@
     <type name="Magento\Config\Model\Config">
       <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
     </type>
+
+    <type name="Doofinder\Feed\Console\Command\RescheduleProcessCommand">
+        <arguments>
+            <argument name="schedule" xsi:type="object">Doofinder\Feed\Helper\Schedule\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Doofinder\Feed\Console\Command\RunProcessCommand">
+        <arguments>
+            <argument name="schedule" xsi:type="object">Doofinder\Feed\Helper\Schedule\Proxy</argument>
+        </arguments>
+    </type>
 </config>
