@@ -229,8 +229,11 @@ class IndexerHandlerTest extends BaseTestCase
      */
     public function testSaveIndex()
     {
-        $this->_batch->expects($this->exactly(2))->method('getItems')
+        $this->_batch->expects($this->at(0))->method('getItems')
             ->with($this->_documents, 100)->willReturn([$this->_documents->getArrayCopy()]);
+        $this->_batch->expects($this->at(1))->method('getItems')
+            ->with($this->createIterator($this->_documents->getArrayCopy()), 100)
+            ->willReturn([$this->_documents->getArrayCopy()]);
 
         $this->_generator->expects($this->once())->method('run');
 
@@ -266,8 +269,11 @@ class IndexerHandlerTest extends BaseTestCase
      */
     public function testDeleteIndex()
     {
-        $this->_batch->expects($this->exactly(2))->method('getItems')
+        $this->_batch->expects($this->at(0))->method('getItems')
             ->with($this->_documents, 100)->willReturn([$this->_documents->getArrayCopy()]);
+        $this->_batch->expects($this->at(1))->method('getItems')
+            ->with($this->createIterator($this->_documents->getArrayCopy()), 100)
+            ->willReturn([$this->_documents->getArrayCopy()]);
 
         $this->_generator->expects($this->once())->method('run');
 
@@ -317,5 +323,17 @@ class IndexerHandlerTest extends BaseTestCase
     public function testIsAvailable()
     {
         $this->assertTrue($this->_indexer->isAvailable());
+    }
+
+    /**
+     * Create iterator for array
+     *
+     * @param array $arr
+     * @return \ArrayIterator
+     */
+    private function createIterator(array $arr)
+    {
+        // @codingStandardsIgnoreLine
+        return new \ArrayIterator($arr);
     }
 }
