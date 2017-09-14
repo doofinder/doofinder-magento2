@@ -112,11 +112,10 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      */
     public function saveIndex($dimensions, \Traversable $documents)
     {
-        foreach ($this->_batch->getItems(clone($documents), $this->_batchSize) as $batchDocuments) {
+        foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
             $this->insertDocuments($batchDocuments, $dimensions);
+            parent::saveIndex($dimensions, $this->createIterator($batchDocuments));
         }
-
-        parent::saveIndex($dimensions, $documents);
     }
 
     /**
@@ -124,11 +123,10 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      */
     public function deleteIndex($dimensions, \Traversable $documents)
     {
-        foreach ($this->_batch->getItems(clone($documents), $this->_batchSize) as $batchDocuments) {
+        foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
             $this->dropDocuments($batchDocuments, $dimensions);
+            parent::deleteIndex($dimensions, $this->createIterator($batchDocuments));
         }
-
-        parent::deleteIndex($dimensions, $documents);
     }
 
     /**
@@ -138,6 +136,18 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
     public function isAvailable()
     {
         return true;
+    }
+
+    /**
+     * Create iterator for array
+     *
+     * @param array $arr
+     * @return \ArrayIterator
+     */
+    private function createIterator(array $arr)
+    {
+        // @codingStandardsIgnoreLine
+        return new \ArrayIterator($arr);
     }
 
     /**

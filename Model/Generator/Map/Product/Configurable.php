@@ -133,12 +133,15 @@ class Configurable extends Product
         $value = array_merge($value, $associatesValues);
 
         // Remove duplicates
-        $value = array_values(array_unique($value));
+        $value = array_unique($value);
 
         // Filter out empty values (0 is not an empty value)
         $value = array_filter($value, function ($item) {
             return $item || $item === 0;
         });
+
+        // Reset keys
+        $value = array_values($value);
 
         if (!$value) {
             return $value;
