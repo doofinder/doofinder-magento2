@@ -12,27 +12,37 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Path to attributes config in config.xml/core_config_data
      */
-    const FEED_ATTRIBUTES_CONFIG = 'doofinder_feed_feed/feed_attributes';
+    const FEED_ATTRIBUTES_CONFIG = 'doofinder_config_index/feed_attributes';
 
     /**
      * Path to cron config in config.xml/core_config_data
      */
-    const FEED_CRON_CONFIG = 'doofinder_feed_feed/feed_cron';
+    const FEED_CRON_CONFIG = 'doofinder_config_data_feed/cron_settings';
 
     /**
      * Path to feed settings in config.xml/core_config_data
      */
-    const FEED_SETTINGS_CONFIG = 'doofinder_feed_feed/feed_settings';
+    const FEED_SETTINGS_CONFIG = 'doofinder_config_index/feed_settings';
 
     /**
      * Path to search layer settings in config.xml/core_config_data
      */
-    const SEARCH_LAYER_CONFIG = 'doofinder_feed_search/doofinder_layer';
+    const SEARCH_LAYER_CONFIG = 'doofinder_config_config/doofinder_layer';
 
     /**
      * Path to internal search settings in config.xml/core_config_data
      */
-    const INTERNAL_SEARCH_CONFIG = 'doofinder_feed_search/doofinder_internal_search';
+    const INTERNAL_SEARCH_CONFIG = 'doofinder_config_config/doofinder_internal_search';
+
+    /**
+     * Path to account settings in config.xml/core_config_data
+     */
+    const ACCOUNT_CONFIG = 'doofinder_config_config/doofinder_account';
+
+    /**
+     * Path to search engine settings in config.xml/core_config_data
+     */
+    const SEARCH_ENGINE_CONFIG = 'doofinder_config_config/doofinder_search_engine';
 
     /**
      * Path to catalog search engine setting
@@ -89,7 +99,8 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             ['store_code' => $storeCode],
             ['attributes' => $this->_scopeConfig->getValue(self::FEED_ATTRIBUTES_CONFIG, $scopeStore, $storeCode)],
             $this->_scopeConfig->getValue(self::FEED_CRON_CONFIG, $scopeStore, $storeCode),
-            $this->_scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode)
+            $this->_scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode),
+            ['atomic_updates_enabled' => $this->isAtomicUpdatesEnabled()]
         );
 
         /**
@@ -159,7 +170,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getApiKey()
     {
-        return $this->_scopeConfig->getValue(self::INTERNAL_SEARCH_CONFIG . '/api_key');
+        return $this->_scopeConfig->getValue(self::ACCOUNT_CONFIG . '/api_key');
     }
 
     /**
@@ -171,7 +182,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getHashId($storeCode = null)
     {
         return $this->_scopeConfig->getValue(
-            self::INTERNAL_SEARCH_CONFIG . '/hash_id',
+            self::SEARCH_ENGINE_CONFIG . '/hash_id',
             $this->getScopeStore(),
             $storeCode
         );
@@ -201,7 +212,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getSearchTotalLimit($storeCode = null)
     {
         $pageLimit = $this->_scopeConfig->getValue(
-            self::INTERNAL_SEARCH_CONFIG . '/page_limit',
+            self::SEARCH_ENGINE_CONFIG . '/page_limit',
             $this->getScopeStore(),
             $storeCode
         );
@@ -237,7 +248,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         $engineEnabled = $this->isInternalSearchEnabled($storeCode);
 
         $atomicUpdatesEnabled = $this->_scopeConfig->getValue(
-            self::FEED_SETTINGS_CONFIG . '/atomic_updates_enabled',
+            self::SEARCH_ENGINE_CONFIG . '/atomic_updates_enabled',
             $this->getScopeStore(),
             $storeCode
         );

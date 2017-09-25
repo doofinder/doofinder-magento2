@@ -2,49 +2,56 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
-        <doofinder_feed_feed>
+        <doofinder_config_config>
+            <doofinder_account>
+                <api_key></api_key>
+            </doofinder_account>
+            <doofinder_search_engine>
+                <hash_id></hash_id>
+                <internal_search_enabled>0</internal_search_enabled>
+                <page_limit>5</page_limit>
+                <atomic_updates_enabled>0</atomic_updates_enabled>
+                <request_limit>100</request_limit>
+            </doofinder_search_engine>
+            <doofinder_layer>
+                <enabled>0</enabled>
+                <script></script>
+            </doofinder_layer>
+        </doofinder_config_config>
+        <doofinder_config_index>
             <feed_attributes>
                 <id>df_id</id>
                 <title>name</title>
                 <description>short_description</description>
                 <brand>manufacturer</brand>
+                <categories>category_ids</categories>
                 <link>url_key</link>
                 <image_link>image</image_link>
                 <price>df_regular_price</price>
                 <sale_price>df_sale_price</sale_price>
                 <mpn>sku</mpn>
                 <availability>df_availability</availability>
-                <categories>category_ids</categories>
+                <additional_attributes>a:0:{}</additional_attributes>
             </feed_attributes>
             <feed_settings>
-                <password></password>
                 <export_product_prices>1</export_product_prices>
                 <price_tax_mode>0</price_tax_mode>
                 <image_size></image_size>
-                <split_configurable_products>0</split_configurable_products>
-                <atomic_updates_enabled>0</atomic_updates_enabled>
                 <categories_in_navigation>0</categories_in_navigation>
+                <split_configurable_products>0</split_configurable_products>
             </feed_settings>
-            <feed_cron>
+        </doofinder_config_index>
+        <doofinder_config_data_feed>
+            <cron_settings>
                 <enabled>0</enabled>
                 <start_time>0,0,0</start_time>
                 <frequency>D</frequency>
                 <step_size>1000</step_size>
                 <step_delay>5</step_delay>
-            </feed_cron>
-        </doofinder_feed_feed>
-        <doofinder_feed_search>
-            <doofinder_layer>
-                <enabled>0</enabled>
-            </doofinder_layer>
-            <doofinder_internal_search>
-                <enabled>0</enabled>
-                <apikey></apikey>
-                <hash_id></hash_id>
-                <request_limit>100</request_limit>
-                <page_limit>5</page_limit>
-            </doofinder_internal_search>
-        </doofinder_feed_search>
+                <password></password>
+            </cron_settings>
+            <feed_status></feed_status>
+        </doofinder_config_data_feed>
         <directives>
             <df_id><![CDATA[Product Id]]></df_id>
             <df_availability><![CDATA[Product Availability]]></df_availability>

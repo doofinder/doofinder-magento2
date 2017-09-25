@@ -7,7 +7,7 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @const CONFIG_SECTION_ID
      */
-    const CONFIG_SECTION_ID = 'doofinder_feed_feed';
+    const CONFIG_SECTION_ID = 'doofinder_config_config';
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -79,7 +79,7 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
      * Store old config doofinder section config
      *
      * This comes from a config plugin that
-     * loads 'doofinder_feed_feed' section config
+     * loads 'doofinder_config_config' section config
      * right before config update.
      */
     public function storeOldConfig()

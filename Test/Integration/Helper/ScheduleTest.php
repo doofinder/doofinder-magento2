@@ -71,7 +71,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 'image_size' => null,
                 'split_configurable_products' => '0',
                 'export_product_prices' => '1',
-                'price_tax_mode' => 0,
+                'price_tax_mode' => '0',
                 'attributes' => [
                     'id' => 'df_id',
                     'title' => 'name',
@@ -84,9 +84,10 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                     'mpn' => 'sku',
                     'availability' => 'df_availability',
                     'categories' => 'category_ids',
+                    'additional_attributes' => 'a:0:{}',
                 ],
-                'atomic_updates_enabled' => 0,
-                'categories_in_navigation' => 0,
+                'atomic_updates_enabled' => false,
+                'categories_in_navigation' => '0',
                 'password' => null,
             ],
             $this->_helper->getStoreConfig()
@@ -195,7 +196,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test regenerateSchedule() method
      *
      * @magentoDbIsolation enabled
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testRegenerateSchedule()
     {
@@ -210,7 +211,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test updateProcess() method
      *
      * @magentoDbIsolation enabled
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testUpdateProcess()
     {
@@ -244,8 +245,8 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test updateProcess() method weekly
      *
      * @magentoDbIsolation enabled
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/frequency W
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/frequency W
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testUpdateProcessWeekly()
     {
@@ -265,8 +266,8 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test updateProcess() method monthly
      *
      * @magentoDbIsolation enabled
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/frequency M
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/frequency M
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testUpdateProcessMonthly()
     {
@@ -286,8 +287,8 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test updateProcess() method custom time
      *
      * @magentoDbIsolation enabled
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/start_time 10,15,30
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/start_time 10,15,30
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testUpdateProcessCustomTime()
     {
@@ -327,7 +328,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test updateProcess() method rescheduling
      *
      * @magentoDataFixture processSuccess
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testUpdateProcessReschedule()
     {
@@ -368,7 +369,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      * Test getActiveProcess() method
      *
      * @magentoDbIsolation enabled
-     * @magentoConfigFixture default_store doofinder_feed_feed/feed_cron/enabled 1
+     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testGetActiveProcess()
     {

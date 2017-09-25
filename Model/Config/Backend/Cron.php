@@ -9,9 +9,9 @@ namespace Doofinder\Feed\Model\Config\Backend;
 class Cron extends \Magento\Framework\App\Config\Value
 {
     const CRON_STRING_PATH = 'crontab/default/jobs/feed_generate/schedule/cron_expr';
-    const XML_PATH_FEED_GENERATE_ENABLED = 'groups/feed_cron/fields/enabled/value';
-    const XML_PATH_FEED_GENERATE_BACKUP_TIME = 'groups/feed_cron/fields/start_time/value';
-    const XML_PATH_FEED_GENERATE_FREQUENCY = 'groups/feed_cron/fields/frequency/value';
+    const XML_PATH_FEED_GENERATE_ENABLED = 'groups/cron_settings/fields/enabled/value';
+    const XML_PATH_FEED_GENERATE_BACKUP_TIME = 'groups/cron_settings/fields/start_time/value';
+    const XML_PATH_FEED_GENERATE_FREQUENCY = 'groups/cron_settings/fields/frequency/value';
 
     /**
      * @var \Magento\Framework\App\Config\ValueFactory
