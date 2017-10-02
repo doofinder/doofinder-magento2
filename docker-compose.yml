@@ -2,7 +2,7 @@ version: '2'
 
 services:
   app:
-    image: magently/magento2
+    image: magently/magento2:${MAGENTO_VERSION}
     links:
       - db
     ports:
@@ -12,9 +12,8 @@ services:
       - MYSQL_USER=root
       - MYSQL_PASSWORD=secret
       - MYSQL_DATABASE=db
-      - MODULE_PATH=/module
     volumes:
-      - ./:/module
+      - ./:/app/packages/doofinder/doofinder-magento2
     env_file: .env
 
   # MySQL container
