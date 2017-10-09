@@ -45,7 +45,6 @@
             <cron_settings>
                 <enabled>0</enabled>
                 <start_time>0,0,0</start_time>
-                <frequency>D</frequency>
                 <step_size>1000</step_size>
                 <step_delay>5</step_delay>
                 <password></password>

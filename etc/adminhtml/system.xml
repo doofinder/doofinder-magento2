@@ -366,22 +366,6 @@
                         <![CDATA[ The time at which the feed generation starts.]]>
                     </comment>
                 </field>
-                <field id="frequency"
-                       translate="label"
-                       type="select"
-                       sortOrder="3"
-                       showInDefault="1"
-                       showInStore="1"
-                       showInWebsite="1">
-                    <label>Frequency</label>
-                    <source_model>Magento\Cron\Model\Config\Source\Frequency</source_model>
-                    <backend_model>Doofinder\Feed\Model\Config\Backend\Cron</backend_model>
-                    <comment>
-                        <![CDATA[
-                        Feed generating frequency (e.g. "monthly" means that the feed will be generated on the first day of each month at a given hour).
-                        ]]>
-                    </comment>
-                </field>
                 <field id="step_size"
                        translate="label"
                        type="text"
