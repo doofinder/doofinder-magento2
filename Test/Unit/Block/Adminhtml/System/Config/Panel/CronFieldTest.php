@@ -90,34 +90,6 @@ class CronFieldTest extends BaseTestCase
         );
         $this->_storeManager->method('getStore')->with(1)->willReturn($this->_store);
 
-        $this->_context = $this->getMock(
-            '\Magento\Backend\Block\Template\Context',
-            [],
-            [],
-            '',
-            false
-        );
-        $this->_context->method('getRequest')->willReturn($this->_request);
-        $this->_context->method('getStoreManager')->willReturn($this->_storeManager);
-
-        $this->_element = $this->getMock(
-            '\Magento\Framework\Data\Form\Element\AbstractElement',
-            [],
-            [],
-            '',
-            false
-        );
-        $this->_element->method('getHtmlId')->willReturn('sample_id');
-        $this->_element->method('getElementHtml')->willReturn('sample value');
-
-        $this->_schedule = $this->getMock(
-            '\Doofinder\Feed\Helper\Schedule',
-            [],
-            [],
-            '',
-            false
-        );
-
         $this->_date = $this->getMock(
             '\DateTime',
             [],
@@ -137,6 +109,35 @@ class CronFieldTest extends BaseTestCase
         $this->_timezone->method('scopeDate')->willReturn($this->_date);
         $this->_timezone->method('formatDateTime')->willReturn('2000-10-05 14:20:00');
 
+        $this->_context = $this->getMock(
+            '\Magento\Backend\Block\Template\Context',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_context->method('getRequest')->willReturn($this->_request);
+        $this->_context->method('getStoreManager')->willReturn($this->_storeManager);
+        $this->_context->method('getLocaleDate')->willReturn($this->_timezone);
+
+        $this->_element = $this->getMock(
+            '\Magento\Framework\Data\Form\Element\AbstractElement',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_element->method('getHtmlId')->willReturn('sample_id');
+        $this->_element->method('getElementHtml')->willReturn('sample value');
+
+        $this->_schedule = $this->getMock(
+            '\Doofinder\Feed\Helper\Schedule',
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->_process = $this->getMock(
             '\Doofinder\Feed\Model\Cron',
             [],
@@ -151,7 +152,6 @@ class CronFieldTest extends BaseTestCase
             [
                 'context' => $this->_context,
                 'schedule' => $this->_schedule,
-                'timezone' => $this->_timezone,
             ]
         );
     }

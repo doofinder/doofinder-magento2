@@ -34,18 +34,16 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
     ) {
         parent::__construct($context);
         $this->_storeConfig = $storeConfig;
-        $this->_scopeConfig = $scopeConfig;
+        $this->_scopeConfig = $context->getScopeConfig();
         $this->_indexerRegistry = $indexerRegistry;
     }
 

@@ -31,7 +31,6 @@ class CronFiles extends Message
 
     /**
      * @param \Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory $scheduleColFactory
-     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Doofinder\Feed\Helper\Schedule $schedule
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      * @param \Magento\Backend\Block\Template\Context $context
@@ -39,14 +38,13 @@ class CronFiles extends Message
      */
     public function __construct(
         \Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory $scheduleColFactory,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Doofinder\Feed\Helper\Schedule $schedule,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
         $this->_scheduleColFactory = $scheduleColFactory;
-        $this->_timezone = $timezone;
+        $this->_timezone = $context->getLocaleDate();
         $this->_schedule = $schedule;
         $this->_storeConfig = $storeConfig;
         parent::__construct($context, $data);
