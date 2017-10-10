@@ -121,7 +121,7 @@
                        translate="label"
                        type="textarea"
                        sortOrder="2"
-                       showInDefault="1"
+                       showInDefault="0"
                        showInStore="1"
                        showInWebsite="0">
                     <label>Script</label>
