@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../vendor/magento/mtf/Magento/Mtf/TestCase/etc/testcase.xsd">
+    <scenario name="SearchTest" firstStep="setupConfiguration">
+        <step name="setupConfiguration" module="Magento_Config" next="reindex" />
+        <step name="reindex" module="Magento_Indexer" next="performSearch" />
+        <step name="performSearch" module="Doofinder_Feed" />
+    </scenario>
+</config>
