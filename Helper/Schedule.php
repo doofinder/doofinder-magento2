@@ -145,32 +145,18 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
      * Get time for schedule.
      *
      * @param \DateTime $date
-     * @param string $frequency
      * @param null|\DateTime $now - Date used for testing purposes
      * @return \DateTime
      */
     public function getScheduleDate(
         \DateTime $date,
-        $frequency,
         \DateTime $now = null
     ) {
         $now = $now ? $now : $this->_timezone->date(null, null, false);
         $start = clone $date;
 
         if ($start < $now) {
-            switch ($frequency) {
-                case \Magento\Cron\Model\Config\Source\Frequency::CRON_MONTHLY:
-                    $start->modify('+1 month');
-                    break;
-
-                case \Magento\Cron\Model\Config\Source\Frequency::CRON_WEEKLY:
-                    $start->modify('+7 days');
-                    break;
-
-                case \Magento\Cron\Model\Config\Source\Frequency::CRON_DAILY:
-                    $start->modify('+1 day');
-                    break;
-            }
+            $start->modify('+1 day');
         }
 
         return $start;
@@ -268,7 +254,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
                 $date = $this->timeArrayToDate($config['start_time']);
             }
 
-            $this->rescheduleProcess($process, $this->getScheduleDate($date, $config['frequency']));
+            $this->rescheduleProcess($process, $this->getScheduleDate($date));
         }
 
         return $process;

@@ -65,7 +65,6 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
                 'store_code' => 'default',
                 'enabled' => '0',
                 'start_time' => ['0', '0', '0'],
-                'frequency' => 'D',
                 'step_size' => '1000',
                 'step_delay' => '5',
                 'image_size' => null,
@@ -141,9 +140,9 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider testGetScheduleDateProvider
      */
-    public function testGetScheduleDate($date, $frequency, $now, $expected)
+    public function testGetScheduleDate($date, $now, $expected)
     {
-        $date = $this->_helper->getScheduleDate($date, $frequency, $now);
+        $date = $this->_helper->getScheduleDate($date, $now);
 
         $this->assertEquals($expected, $date);
     }
@@ -154,39 +153,13 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 new \DateTime('2016-01-01 12:00:00'),
-                \Magento\Cron\Model\Config\Source\Frequency::CRON_DAILY,
                 new \DateTime('2016-01-01 06:00:00'),
                 new \DateTime('2016-01-01 12:00:00'),
             ],
             [
                 new \DateTime('2016-01-01 06:00:00', new \DateTimeZone('Europe/Berlin')),
-                \Magento\Cron\Model\Config\Source\Frequency::CRON_DAILY,
                 new \DateTime('2016-01-01 12:00:00'),
                 new \DateTime('2016-01-02 06:00:00', new \DateTimeZone('Europe/Berlin')),
-            ],
-            [
-                new \DateTime('2016-12-28 20:00:00'),
-                \Magento\Cron\Model\Config\Source\Frequency::CRON_WEEKLY,
-                new \DateTime('2016-12-28 10:00:00'),
-                new \DateTime('2016-12-28 20:00:00'),
-            ],
-            [
-                new \DateTime('2016-12-28 10:00:00'),
-                \Magento\Cron\Model\Config\Source\Frequency::CRON_WEEKLY,
-                new \DateTime('2016-12-28 20:00:00'),
-                new \DateTime('2017-01-04 10:00:00'),
-            ],
-            [
-                new \DateTime('2016-03-06 12:00:00'),
-                \Magento\Cron\Model\Config\Source\Frequency::CRON_MONTHLY,
-                new \DateTime('2016-03-06 06:00:00'),
-                new \DateTime('2016-03-06 12:00:00'),
-            ],
-            [
-                new \DateTime('2016-03-06 06:00:00'),
-                \Magento\Cron\Model\Config\Source\Frequency::CRON_MONTHLY,
-                new \DateTime('2016-03-06 12:00:00'),
-                new \DateTime('2016-04-06 06:00:00'),
             ],
         ];
         // @codingStandardsIgnoreEnd
@@ -239,48 +212,6 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $process->getOffset());
         $this->assertStringMatchesFormat('%d-%d-%d %d:%d:%d', $process->getCreatedAt());
         $this->assertNotEquals('0000-00-00 00:00:00', $process->getCreatedAt());
-    }
-
-    /**
-     * Test updateProcess() method weekly
-     *
-     * @magentoDbIsolation enabled
-     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/frequency W
-     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
-     */
-    public function testUpdateProcessWeekly()
-    {
-        $process = $this->_helper->updateProcess($this->_defaultStore);
-
-        $this->assertEquals(
-            $this->_timezone->date(null, null, false)->modify('+7 days')->setTime(0, 0, 0),
-            $this->_timezone->date($process->getNextRun(), null, false)
-        );
-        $this->assertEquals(
-            $this->_timezone->date(null, null, false)->modify('+7 days')->setTime(0, 0, 0),
-            $this->_timezone->date($process->getNextIteration(), null, false)
-        );
-    }
-
-    /**
-     * Test updateProcess() method monthly
-     *
-     * @magentoDbIsolation enabled
-     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/frequency M
-     * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
-     */
-    public function testUpdateProcessMonthly()
-    {
-        $process = $this->_helper->updateProcess($this->_defaultStore);
-
-        $this->assertEquals(
-            $this->_timezone->date(null, null, false)->modify('+1 month')->setTime(0, 0, 0),
-            $this->_timezone->date($process->getNextRun(), null, false)
-        );
-        $this->assertEquals(
-            $this->_timezone->date(null, null, false)->modify('+1 month')->setTime(0, 0, 0),
-            $this->_timezone->date($process->getNextIteration(), null, false)
-        );
     }
 
     /**

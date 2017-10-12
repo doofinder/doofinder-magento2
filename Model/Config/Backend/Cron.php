@@ -11,7 +11,6 @@ class Cron extends \Magento\Framework\App\Config\Value
     const CRON_STRING_PATH = 'crontab/default/jobs/feed_generate/schedule/cron_expr';
     const XML_PATH_FEED_GENERATE_ENABLED = 'groups/cron_settings/fields/enabled/value';
     const XML_PATH_FEED_GENERATE_BACKUP_TIME = 'groups/cron_settings/fields/start_time/value';
-    const XML_PATH_FEED_GENERATE_FREQUENCY = 'groups/cron_settings/fields/frequency/value';
 
     /**
      * @var \Magento\Framework\App\Config\ValueFactory
@@ -55,18 +54,14 @@ class Cron extends \Magento\Framework\App\Config\Value
     {
         $enabled = $this->getData(self::XML_PATH_FEED_GENERATE_ENABLED);
         $time = $this->getData(self::XML_PATH_FEED_GENERATE_BACKUP_TIME);
-        $frequency = $this->getData(self::XML_PATH_FEED_GENERATE_FREQUENCY);
-
-        $frequencyWeekly = \Magento\Cron\Model\Config\Source\Frequency::CRON_WEEKLY;
-        $frequencyMonthly = \Magento\Cron\Model\Config\Source\Frequency::CRON_MONTHLY;
 
         if ($enabled) {
             $cronExprArray = [
-                (int) $time[1],                                   # Minute
-                (int) $time[0],                                   # Hour
-                $frequency == $frequencyMonthly ? '1' : '*',      # Day of the Month
-                '*',                                              # Month of the Year
-                $frequency == $frequencyWeekly ? '1' : '*',       # Day of the Week
+                (int) $time[1],   # Minute
+                (int) $time[0],   # Hour
+                '*',              # Day of the Month
+                '*',              # Month of the Year
+                '*',              # Day of the Week
             ];
             $cronExprString = join(' ', $cronExprArray);
         } else {
