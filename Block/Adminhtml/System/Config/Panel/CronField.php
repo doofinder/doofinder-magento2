@@ -21,19 +21,16 @@ class CronField extends Message
 
     /**
      * @param \Doofinder\Feed\Helper\Schedule $schedule
-     * @param \Magento\Framework\Stdlib\DateTime $datetime
-     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Magento\Backend\Block\Template\Context $context
      * @param array $data
      */
     public function __construct(
         \Doofinder\Feed\Helper\Schedule $schedule,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
         $this->_schedule = $schedule;
-        $this->_timezone = $timezone;
+        $this->_timezone = $context->getLocaleDate();
         parent::__construct($context, $data);
     }
 

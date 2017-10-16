@@ -68,15 +68,13 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * StoreConfig constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
-        $this->_scopeConfig = $scopeConfig;
+        $this->_scopeConfig = $context->getScopeConfig();
         $this->_storeManager = $storeManager;
         parent::__construct($context);
     }
