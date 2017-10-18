@@ -4,7 +4,7 @@
     "require": {
         "magento/magento-composer-installer": "^0.1.0",
         "sabre/xml": "^1.4",
-        "doofinder/doofinder": "^5.5.2"
+        "doofinder/doofinder": "^5.6"
     },
     "type": "magento2-module",
     "license": [
