@@ -24,9 +24,4 @@
             </argument>
         </arguments>
     </type>
-    <type name="Doofinder\Feed\Block\Adminhtml\System\Config\Panel\DynamicFeedUrl">
-        <arguments>
-            <argument name="frontendUrlBuilder" xsi:type="object">Magento\Framework\Url</argument>
-        </arguments>
-    </type>
 </config>
