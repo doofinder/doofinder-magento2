@@ -30,11 +30,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const SEARCH_LAYER_CONFIG = 'doofinder_config_config/doofinder_layer';
 
     /**
-     * Path to internal search settings in config.xml/core_config_data
-     */
-    const INTERNAL_SEARCH_CONFIG = 'doofinder_config_config/doofinder_internal_search';
-
-    /**
      * Path to account settings in config.xml/core_config_data
      */
     const ACCOUNT_CONFIG = 'doofinder_config_config/doofinder_account';
@@ -195,7 +190,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getSearchRequestLimit($storeCode = null)
     {
         return $this->_scopeConfig->getValue(
-            self::INTERNAL_SEARCH_CONFIG . '/request_limit',
+            self::SEARCH_ENGINE_CONFIG . '/request_limit',
             $this->getScopeStore(),
             $storeCode
         );
