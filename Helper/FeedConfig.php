@@ -2,6 +2,8 @@
 
 namespace Doofinder\Feed\Helper;
 
+use \Zend\Serializer\Serializer;
+
 /**
  * Class FeedConfig
  * @package Doofinder\Feed\Helper
@@ -29,11 +31,6 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     private $_storeConfig;
 
     /**
-     * @var \Zend\Serializer\Adapter\PhpSerialize
-     */
-    private $_phpSerialize;
-
-    /**
      * FeedConfig constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -41,11 +38,9 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Zend\Serializer\Adapter\PhpSerialize $phpSerialize
+        \Doofinder\Feed\Helper\StoreConfig $storeConfig
     ) {
         $this->_storeConfig = $storeConfig;
-        $this->_phpSerialize = $phpSerialize;
         parent::__construct($context);
     }
 
@@ -150,6 +145,17 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Unserialize string
+     *
+     * @param string $str
+     * @return array
+     */
+    private function unserialize($str)
+    {
+        return Serializer::unserialize($str, 'phpserialize');
+    }
+
+    /**
      * Get feed attributes from config.
      *
      * @return array
@@ -159,7 +165,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
         $attributes = $this->_config['attributes'];
 
         if (array_key_exists('additional_attributes', $attributes)) {
-            $additionalKeys = $this->_phpSerialize->unserialize($attributes['additional_attributes']);
+            $additionalKeys = $this->unserialize($attributes['additional_attributes']);
             unset($attributes['additional_attributes']);
 
             $additionalAttributes = [];

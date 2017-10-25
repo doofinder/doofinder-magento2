@@ -16,17 +16,18 @@ class DynamicFeedUrl extends Message
 
     /**
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Magento\Framework\UrlInterface $frontendUrlBuilder
+     * @param \Magento\Framework\Url $frontendUrlBuilder
      * @param \Magento\Backend\Block\Template\Context $context
      * @param array $data
      */
     public function __construct(
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
+        \Magento\Framework\Url $frontendUrlBuilder,
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
         $this->_storeConfig = $storeConfig;
-        $this->_frontendUrlBuilder = $context->getUrlBuilder();
+        $this->_frontendUrlBuilder = $frontendUrlBuilder;
         parent::__construct($context, $data);
     }
 
