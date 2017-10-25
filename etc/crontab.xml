@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="doofinder">
+        <job name="doofinder_feed_reschedule_tasks" instance="Doofinder\Feed\Cron\RescheduleTasks" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="doofinder_feed_generate_feed" instance="Doofinder\Feed\Cron\GenerateFeed" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group>
+</config>
