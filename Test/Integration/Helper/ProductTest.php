@@ -159,7 +159,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 
         $this->assertRegExp(
             // @codingStandardsIgnoreStart
-            '/https?:\/\/[^\/]+(:\d+)?\/(.*\/)?pub\/media\/catalog\/product\/cache\/(\d+?\/)?image\/[^\/]+\/\w\/\w\/magento_image\.jpg/',
+            '/https?:\/\/[^\/]+(:\d+)?\/(.*\/)?pub\/media\/catalog\/product\/cache\/((\d+?\/)?image\/)?[^\/]+\/\w\/\w\/magento_image\.jpg/',
             // @codingStandardsIgnoreEnd
             $this->_helper->getProductImageUrl($product)
         );
