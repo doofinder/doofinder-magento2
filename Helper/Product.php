@@ -49,6 +49,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
      * @param \Magento\Tax\Model\Config $taxConfig
+     * @codingStandardsIgnoreStart
      */
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory,
@@ -58,6 +59,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         \Magento\Tax\Model\Config $taxConfig
     ) {
+        // * @codingStandardsIgnoreEnd
         $this->_categoryColFactory = $categoryColFactory;
         $this->_imageHelper = $imageHelper;
         $this->_storeManager = $storeManager;

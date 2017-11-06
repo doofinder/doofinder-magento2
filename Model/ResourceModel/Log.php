@@ -16,6 +16,6 @@ class Log extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     protected function _construct()
     {
     // @codingStandardsIgnoreEnd
-        $this->_init('doofinder_feed_log', 'id');
+        $this->_init('doofinder_feed_log', 'entity_id');
     }
 }
