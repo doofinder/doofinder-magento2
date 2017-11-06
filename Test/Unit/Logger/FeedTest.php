@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Logger;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 class FeedTest extends BaseTestCase

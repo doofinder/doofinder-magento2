@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Cron;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
  * Class GenerateFeedTest

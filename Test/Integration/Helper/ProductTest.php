@@ -2,10 +2,12 @@
 
 namespace Doofinder\Feed\Test\Integration\Helper;
 
+use Magento\TestFramework\TestCase\AbstractIntegrity;
+
 /**
  * Test class for \Doofinder\Feed\Helper\Product
  */
-class ProductTest extends \PHPUnit_Framework_TestCase
+class ProductTest extends AbstractIntegrity
 {
     /**
      * @var \Doofinder\Feed\Helper\Product

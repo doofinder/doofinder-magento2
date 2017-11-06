@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Search;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -207,7 +207,6 @@ class IndexerHandlerTest extends BaseTestCase
             '',
             false
         );
-        $this->_searchHelper->method('cleanDoofinderItems')->willReturn(true);
         $this->_searchHelper->method('getStoreIdFromDimensions')
             ->with([$this->_dimension])->willReturn('sample');
 

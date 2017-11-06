@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
  * Test class for \Doofinder\Feed\Helper\Schedule
@@ -317,7 +317,7 @@ class ScheduleTest extends BaseTestCase
     /**
      * Test isFeedFileExist() method
      *
-     * @dataProvider testIsFeedFileExistProvider
+     * @dataProvider providerTestIsFeedFileExist
      */
     public function testIsFeedFileExist($expected)
     {
@@ -330,7 +330,7 @@ class ScheduleTest extends BaseTestCase
         );
     }
 
-    public function testIsFeedFileExistProvider()
+    public function providerTestIsFeedFileExist()
     {
         return [
             [true],
@@ -341,7 +341,7 @@ class ScheduleTest extends BaseTestCase
     /**
      * Test getFeedFileUrl() method
      *
-     * @dataProvider testGetFeedFileUrlProvider
+     * @dataProvider providerTestGetFeedFileUrl
      */
     public function testGetFeedFileUrl($storeCode, $passwordConfig, $password, $expected)
     {
@@ -353,7 +353,7 @@ class ScheduleTest extends BaseTestCase
         );
     }
 
-    public function testGetFeedFileUrlProvider()
+    public function providerTestGetFeedFileUrl()
     {
         return [
             ['default', null, true, 'http://example.com/media/doofinder-default.xml'],

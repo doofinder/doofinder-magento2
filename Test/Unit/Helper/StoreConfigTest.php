@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
  * Class StoreConfigTest
@@ -149,7 +149,7 @@ class StoreConfigTest extends BaseTestCase
     /**
      * Test getStoreCodes() method.
      *
-     * @dataProvider testGetStoreCodesProvider
+     * @dataProvider providerTestGetStoreCodes
      */
     public function testGetStoreCodes($onlyActive, $current, $stores, $expected)
     {
@@ -167,7 +167,7 @@ class StoreConfigTest extends BaseTestCase
         $this->assertEquals($expected, $this->_helper->getStoreCodes($onlyActive));
     }
 
-    public function testGetStoreCodesProvider()
+    public function providerTestGetStoreCodes()
     {
         $stores = [];
 
@@ -236,7 +236,7 @@ class StoreConfigTest extends BaseTestCase
     /**
      * Test isInternalSearchEnabled() method.
      *
-     * @dataProvider testIsInternalSearchEnabledProvider
+     * @dataProvider providerTestIsInternalSearchEnabled
      */
     public function testIsInternalSearchEnabled($enabled, $expected)
     {
@@ -248,7 +248,7 @@ class StoreConfigTest extends BaseTestCase
         $this->assertEquals($expected, $this->_helper->isInternalSearchEnabled($storeCode));
     }
 
-    public function testIsInternalSearchEnabledProvider()
+    public function providerTestIsInternalSearchEnabled()
     {
         return [
             [true, true],
@@ -259,7 +259,7 @@ class StoreConfigTest extends BaseTestCase
     /**
      * Test isAtomicUpdatesEnabled() method.
      *
-     * @dataProvider testIsAtomicUpdatesEnabledProvider
+     * @dataProvider providerTestIsAtomicUpdatesEnabled
      */
     public function testIsAtomicUpdatesEnabled($engine, $atomic, $expected)
     {
@@ -273,7 +273,7 @@ class StoreConfigTest extends BaseTestCase
         $this->assertEquals($expected, $this->_helper->isAtomicUpdatesEnabled($storeCode));
     }
 
-    public function testIsAtomicUpdatesEnabledProvider()
+    public function providerTestIsAtomicUpdatesEnabled()
     {
         return [
             [true, true, true],
@@ -286,7 +286,7 @@ class StoreConfigTest extends BaseTestCase
     /**
      * Test isExportCategoriesInNavigation() method.
      *
-     * @dataProvider testIsExportCategoriesInNavigationProvider
+     * @dataProvider providerTestIsExportCategoriesInNavigation
      */
     public function testIsExportCategoriesInNavigation($value, $expected)
     {
@@ -299,7 +299,7 @@ class StoreConfigTest extends BaseTestCase
         $this->assertEquals($expected, $this->_helper->isExportCategoriesInNavigation($storeCode));
     }
 
-    public function testIsExportCategoriesInNavigationProvider()
+    public function providerTestIsExportCategoriesInNavigation()
     {
         return [
             [true,  true],

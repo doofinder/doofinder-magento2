@@ -2,10 +2,12 @@
 
 namespace Doofinder\Feed\Test\Integration\Helper;
 
+use Magento\TestFramework\TestCase\AbstractIntegrity;
+
 /**
  * Test class for \Doofinder\Feed\Helper\Schedule
  */
-class ScheduleTest extends \PHPUnit_Framework_TestCase
+class ScheduleTest extends AbstractIntegrity
 {
     /**
      * @var \Doofinder\Feed\Helper\Schedule
@@ -96,7 +98,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
     /**
      * Test for timeArrayToDate() method.
      *
-     * @dataProvider testTimeArrayToDateProvider
+     * @dataProvider providerTestTimeArrayToDate
      */
     public function testTimeArrayToDate($time, $useTimezone, $base, $expected)
     {
@@ -105,7 +107,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $date);
     }
 
-    public function testTimeArrayToDateProvider()
+    public function providerTestTimeArrayToDate()
     {
         $configTimezone = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
             ->get('Magento\Framework\Stdlib\DateTime\TimezoneInterface')
@@ -138,7 +140,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
     /**
      * Test for getScheduleDate() method.
      *
-     * @dataProvider testGetScheduleDateProvider
+     * @dataProvider providerTestGetScheduleDate
      */
     public function testGetScheduleDate($date, $now, $expected)
     {
@@ -147,7 +149,7 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $date);
     }
 
-    public function testGetScheduleDateProvider()
+    public function providerTestGetScheduleDate()
     {
         // @codingStandardsIgnoreStart
         return [

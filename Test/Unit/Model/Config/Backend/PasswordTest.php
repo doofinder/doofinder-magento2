@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\Password
@@ -26,7 +26,8 @@ class PasswordTest extends BaseTestCase
     /**
      * Test beforeSave()
      *
-     * @dataProvider testBeforeSaveDataProvider
+     * @dataProvider providerTestBeforeSaveData
+     * @doesNotPerformAssertions
      */
     public function testBeforeSave($value)
     {
@@ -34,7 +35,7 @@ class PasswordTest extends BaseTestCase
         $this->_model->beforeSave();
     }
 
-    public function testBeforeSaveDataProvider()
+    public function providerTestBeforeSaveData()
     {
         return [
             [''],
@@ -51,7 +52,7 @@ class PasswordTest extends BaseTestCase
      * @expectedException \Magento\Framework\Exception\LocalizedException
      * @expectedExceptionMessage Sample field value is invalid.
      *                           Only alphanumeric characters with underscores (_) and hyphens (-) are allowed.
-     * @dataProvider testBeforeSaveInvalidDataProvider
+     * @dataProvider providerTestBeforeSaveInvalidData
      */
     public function testBeforeSaveInvalid($value)
     {
@@ -62,7 +63,7 @@ class PasswordTest extends BaseTestCase
         $this->_model->beforeSave();
     }
 
-    public function testBeforeSaveInvalidDataProvider()
+    public function providerTestBeforeSaveInvalidData()
     {
         return [
             ['abc$'],

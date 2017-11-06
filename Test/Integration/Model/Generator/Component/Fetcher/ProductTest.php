@@ -2,12 +2,14 @@
 
 namespace Doofinder\Feed\Test\Integration\Model\Generator\Component\Fetcher;
 
+use Magento\TestFramework\TestCase\AbstractIntegrity;
+
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Component\Fetcher\Product
  *
  * @magentoDataFixture Magento/Catalog/_files/multiple_products.php
  */
-class ProductTest extends \PHPUnit_Framework_TestCase
+class ProductTest extends AbstractIntegrity
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Fetcher\Product
@@ -96,7 +98,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
     /**
      * Test fetch() method with pagination
      *
-     * @dataProvider testFetchWithPaginationProvider
+     * @dataProvider providerTestFetchWithPagination
      */
     public function testFetchWithPagination($useOffset, $sku, $isStarted, $isDone)
     {
@@ -118,7 +120,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($isDone, $this->_model->isDone());
     }
 
-    public function testFetchWithPaginationProvider()
+    public function providerTestFetchWithPagination()
     {
         return [
             [false, 'simple1', true, false],

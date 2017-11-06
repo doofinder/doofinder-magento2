@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Map\Product;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 class ConfigurableTest extends BaseTestCase
 {

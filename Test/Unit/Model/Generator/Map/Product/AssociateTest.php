@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Map\Product;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 class AssociateTest extends BaseTestCase
 {
@@ -71,7 +71,7 @@ class AssociateTest extends BaseTestCase
     /**
      * Test get() method
      *
-     * @dataProvider testGetProvider
+     * @dataProvider providerTestGet
      */
     public function testGet($key, $hasValue)
     {
@@ -81,7 +81,7 @@ class AssociateTest extends BaseTestCase
         );
     }
 
-    public function testGetProvider()
+    public function providerTestGet()
     {
         return [
             ['sample', true],

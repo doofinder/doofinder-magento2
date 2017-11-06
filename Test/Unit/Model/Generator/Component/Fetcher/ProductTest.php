@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Fetcher;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 class ProductTest extends BaseTestCase
 {
@@ -197,7 +197,7 @@ class ProductTest extends BaseTestCase
     /**
      * Test isStarted() and isDone() methods
      *
-     * @dataProvider testStartedDoneProvider
+     * @dataProvider providerTestStartedDone
      */
     public function testStartedDone($offset, $size, $isStarted, $isDone)
     {
@@ -212,7 +212,7 @@ class ProductTest extends BaseTestCase
         $this->assertEquals($isDone, $this->_model->isDone());
     }
 
-    public function testStartedDoneProvider()
+    public function providerTestStartedDone()
     {
         return [
             [0, 3, true, false],

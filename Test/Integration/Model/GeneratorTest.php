@@ -2,6 +2,8 @@
 
 namespace Doofinder\Feed\Test\Integration\Model;
 
+use Magento\TestFramework\TestCase\AbstractIntegrity;
+
 /**
  * Test class for \Doofinder\Feed\Model\Generator
  *
@@ -10,7 +12,7 @@ namespace Doofinder\Feed\Test\Integration\Model;
  * @magentoDbIsolation enabled
  * @magentoAppIsolation enabled
  */
-class GeneratorTest extends \PHPUnit_Framework_TestCase
+class GeneratorTest extends AbstractIntegrity
 {
     public function testRun()
     {

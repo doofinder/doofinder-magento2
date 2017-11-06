@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\Form\Field;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
  * Class AdditionalAttributesTest
