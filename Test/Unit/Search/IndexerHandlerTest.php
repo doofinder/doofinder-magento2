@@ -15,6 +15,16 @@ class IndexerHandlerTest extends BaseTestCase
     private $_indexer;
 
     /**
+     * @var \Magento\CatalogSearch\Model\Indexer\IndexerHandler
+     */
+    private $_indexerHandler;
+
+    /**
+     * @var \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory
+     */
+    private $_indexerHandlerFactory;
+
+    /**
      * @var \Magento\Framework\Indexer\SaveHandler\Batch
      */
     private $_batch;
@@ -78,16 +88,6 @@ class IndexerHandlerTest extends BaseTestCase
      * @var \Magento\Framework\Indexer\IndexStructureInterface
      */
     private $_indexStructure;
-
-    /**
-     * @var \Magento\Framework\DB\Adapter\AdapterInterface
-     */
-    private $_connection;
-
-    /**
-     * @var \Magento\Framework\App\ResourceConnection
-     */
-    private $_resource;
 
     /**
      * Prepares the environment before running a test.
@@ -218,22 +218,30 @@ class IndexerHandlerTest extends BaseTestCase
             false
         );
 
-        $this->_connection = $this->getMock(
-            '\Magento\Framework\DB\Adapter\AdapterInterface',
+        $this->_indexerHandler = $this->getMock(
+            '\Magento\CatalogSearch\Model\Indexer\IndexerHandler',
             [],
             [],
             '',
             false
         );
 
-        $this->_resource = $this->getMock(
-            '\Magento\Framework\App\ResourceConnection',
+        $this->_indexerHandlerFactory = $this->getMock(
+            '\Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory',
             [],
             [],
             '',
             false
         );
-        $this->_resource->method('getConnection')->willReturn($this->_connection);
+        $this->_indexerHandlerFactory->method('create')
+            ->with([
+                'data' => [
+                    'indexer_id' => 'sample-indexer',
+                    'fieldsets' => [],
+                ],
+                'batchSize' => 100,
+            ])
+            ->willReturn($this->_indexerHandler);
 
         $this->_indexer = $this->objectManager->getObject(
             '\Doofinder\Feed\Search\IndexerHandler',
@@ -245,11 +253,12 @@ class IndexerHandlerTest extends BaseTestCase
                 'feedConfig' => $this->_feedConfig,
                 'searchHelper' => $this->_searchHelper,
                 'indexStructure' => $this->_indexStructure,
-                'resource' => $this->_resource,
+                'indexerHandlerFactory' => $this->_indexerHandlerFactory,
                 'data' => [
                     'indexer_id' => 'sample-indexer',
                     'fieldsets' => [],
                 ],
+                'batchSize' => 100,
             ]
         );
     }
@@ -259,11 +268,9 @@ class IndexerHandlerTest extends BaseTestCase
      */
     public function testSaveIndex()
     {
+        $batch = $this->_documents->getArrayCopy();
         $this->_batch->expects($this->at(0))->method('getItems')
-            ->with($this->_documents, 100)->willReturn([$this->_documents->getArrayCopy()]);
-        $this->_batch->expects($this->at(1))->method('getItems')
-            ->with($this->createIterator($this->_documents->getArrayCopy()), 100)
-            ->willReturn([$this->_documents->getArrayCopy()]);
+            ->with($this->_documents, 100)->willReturn([$batch]);
 
         $this->_generator->expects($this->once())->method('run');
 
@@ -291,6 +298,9 @@ class IndexerHandlerTest extends BaseTestCase
             ])
             ->willReturn($this->_generator);
 
+        $this->_indexerHandler->expects($this->once())->method('saveIndex')
+            ->with([$this->_dimension], $this->createIterator($batch));
+
         $this->_indexer->saveIndex([$this->_dimension], $this->_documents);
     }
 
@@ -299,11 +309,9 @@ class IndexerHandlerTest extends BaseTestCase
      */
     public function testDeleteIndex()
     {
+        $batch = $this->_documents->getArrayCopy();
         $this->_batch->expects($this->at(0))->method('getItems')
-            ->with($this->_documents, 100)->willReturn([$this->_documents->getArrayCopy()]);
-        $this->_batch->expects($this->at(1))->method('getItems')
-            ->with($this->createIterator($this->_documents->getArrayCopy()), 100)
-            ->willReturn([$this->_documents->getArrayCopy()]);
+            ->with($this->_documents, 100)->willReturn([$batch]);
 
         $this->_generator->expects($this->once())->method('run');
 
@@ -331,6 +339,9 @@ class IndexerHandlerTest extends BaseTestCase
             ])
             ->willReturn($this->_generator);
 
+        $this->_indexerHandler->expects($this->once())->method('deleteIndex')
+            ->with([$this->_dimension], $this->createIterator($batch));
+
         $this->_indexer->deleteIndex([$this->_dimension], $this->_documents);
     }
 
@@ -339,10 +350,8 @@ class IndexerHandlerTest extends BaseTestCase
      */
     public function testCleanIndex()
     {
-        $this->_indexStructure->expects($this->once())->method('delete')
-            ->with('sample-indexer', [$this->_dimension]);
-        $this->_indexStructure->expects($this->once())->method('create')
-            ->with('sample-indexer', [], [$this->_dimension]);
+        $this->_indexerHandler->expects($this->once())->method('cleanIndex')
+            ->with([$this->_dimension]);
 
         $this->_indexer->cleanIndex([$this->_dimension]);
     }
