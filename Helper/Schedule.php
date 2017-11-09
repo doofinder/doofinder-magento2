@@ -186,7 +186,7 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
     public function getProcessByStoreCode($storeCode = 'default')
     {
         $process = $this->_cronFactory->create()->load($storeCode, 'store_code');
-        return $process->getId() ? $process : null;
+        return $process->getEntityId() ? $process : null;
     }
 
     /**

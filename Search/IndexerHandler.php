@@ -15,9 +15,14 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
     private $_indexStructure;
 
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
-    private $_productCollectionFactory;
+    private $_productRepository;
+
+    /**
+     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     */
+    private $_searchCriteriaBuilder;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
@@ -60,7 +65,8 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      * @param \Magento\Eav\Model\Config $eavConfig
      * @param \Magento\Framework\Indexer\SaveHandler\Batch $batch
      * @param \Magento\Framework\Indexer\ScopeResolver\IndexScopeResolver $indexScopeResolver
-     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      * @param \Doofinder\Feed\Helper\FeedConfig $feedConfig
@@ -76,7 +82,8 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
         \Magento\Eav\Model\Config $eavConfig,
         \Magento\Framework\Indexer\SaveHandler\Batch $batch,
         \Magento\Framework\Indexer\ScopeResolver\IndexScopeResolver $indexScopeResolver,
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productColFactory,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Doofinder\Feed\Helper\FeedConfig $feedConfig,
@@ -96,7 +103,8 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
         );
 
         $this->_batch = $batch;
-        $this->_productCollectionFactory = $productColFactory;
+        $this->_productRepository = $productRepository;
+        $this->_searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->_storeManager = $storeManager;
         $this->_storeConfig = $storeConfig;
         $this->_feedConfig = $feedConfig;
@@ -223,10 +231,13 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      */
     private function getProducts(array $ids)
     {
-        $collection = $this->_productCollectionFactory->create();
-        $collection->addAttributeToSelect('*');
-        $collection->addAttributeToFilter('entity_id', ['in' => $ids]);
-        $collection->addStoreFilter();
-        return $collection->getItems();
+        $builder = $this->_searchCriteriaBuilder;
+        $builder->addFilter('entity_id', $ids, 'in');
+
+        $results = $this->_productRepository->getList(
+            $builder->create()
+        );
+
+        return $results->getItems();
     }
 }

@@ -33,7 +33,7 @@ class InstallSchema implements InstallSchemaInterface
         $table = $setup->getConnection()
             ->newTable(self::CRON_TABLE_NAME)
             ->addColumn(
-                'id',
+                'entity_id',
                 Table::TYPE_INTEGER,
                 null,
                 [
@@ -42,7 +42,7 @@ class InstallSchema implements InstallSchemaInterface
                     'nullable' => false,
                     'primary' => true
                 ],
-                'ID'
+                'Entity ID'
             )
             ->addColumn(
                 'store_code',
@@ -125,7 +125,7 @@ class InstallSchema implements InstallSchemaInterface
         $table = $setup->getConnection()
             ->newTable(self::LOG_TABLE_NAME)
             ->addColumn(
-                'id',
+                'entity_id',
                 Table::TYPE_INTEGER,
                 null,
                 [
@@ -134,7 +134,7 @@ class InstallSchema implements InstallSchemaInterface
                     'nullable'  => false,
                     'primary'   => true,
                 ],
-                'ID'
+                'Entity ID'
             )
             ->addColumn(
                 'process_id',
@@ -191,11 +191,11 @@ class InstallSchema implements InstallSchemaInterface
                 self::LOG_TABLE_NAME,
                 'process_id',
                 self::CRON_TABLE_NAME,
-                'id'
+                'entity_id'
             ),
             'process_id',
             $setup->getTable(self::CRON_TABLE_NAME),
-            'id',
+            'entity_id',
             Table::ACTION_CASCADE,
             Table::ACTION_CASCADE
         );

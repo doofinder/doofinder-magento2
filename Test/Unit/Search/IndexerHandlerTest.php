@@ -40,14 +40,24 @@ class IndexerHandlerTest extends BaseTestCase
     private $_product;
 
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Product\Collection
+     * @var \Magento\Catalog\Api\Data\ProductSearchResultsInterface
      */
-    private $_productCollection;
+    private $_productSearchResults;
 
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
+     * @var \Magento\Catalog\Model\ProductRepository
      */
-    private $_productCollectionFactory;
+    private $_productRepository;
+
+    /**
+     * @var \Magento\Framework\Api\SearchCriteriaInterface
+     */
+    private $_searchCriteria;
+
+    /**
+     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     */
+    private $_searchCriteriaBuilder;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
@@ -123,23 +133,43 @@ class IndexerHandlerTest extends BaseTestCase
             false
         );
 
-        $this->_productCollection = $this->getMock(
-            '\Magento\Catalog\Model\ResourceModel\Product\Collection',
+        $this->_productSearchResults = $this->getMock(
+            '\Magento\Catalog\Api\Data\ProductSearchResultsInterface',
             [],
             [],
             '',
             false
         );
-        $this->_productCollection->method('getItems')->willReturn([$this->_product]);
+        $this->_productSearchResults->method('getItems')
+            ->willReturn([$this->_product]);
 
-        $this->_productCollectionFactory = $this->getMock(
-            '\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory',
-            ['create'],
+        $this->_productRepository = $this->getMock(
+            '\Magento\Catalog\Model\ProductRepository',
+            [],
             [],
             '',
             false
         );
-        $this->_productCollectionFactory->method('create')->willReturn($this->_productCollection);
+        $this->_productRepository->method('getList')
+            ->willReturn($this->_productSearchResults);
+
+        $this->_searchCriteria = $this->getMock(
+            '\Magento\Framework\Api\SearchCriteriaInterface',
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->_searchCriteriaBuilder = $this->getMock(
+            '\Magento\Framework\Api\SearchCriteriaBuilder',
+            [],
+            [],
+            '',
+            false
+        );
+        $this->_searchCriteriaBuilder->method('create')
+            ->willReturn($this->_searchCriteria);
 
         $this->_feedConfig = $this->getMock(
             '\Doofinder\Feed\Helper\FeedConfig',
@@ -211,7 +241,8 @@ class IndexerHandlerTest extends BaseTestCase
             [
                 'batch' => $this->_batch,
                 'generatorFactory' => $this->_generatorFactory,
-                'productColFactory' => $this->_productCollectionFactory,
+                'productRepository' => $this->_productRepository,
+                'searchCriteriaBuilder' => $this->_searchCriteriaBuilder,
                 'feedConfig' => $this->_feedConfig,
                 'searchHelper' => $this->_searchHelper,
                 'indexStructure' => $this->_indexStructure,
