@@ -123,6 +123,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return [
             'Mapper' => $this->getMapper(),
+            'Filter' => [],
             'Cleaner' => [],
         ];
     }
