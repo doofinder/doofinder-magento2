@@ -141,17 +141,31 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         foreach ($categories as $category) {
             $categoryId = $parentId = $category->getId();
 
-            while (isset($parents[$parentId])) {
+            while ($parentId) {
+                // Ignore category if one of parents is missing
+                // this means that parent is not active
+                if (!isset($parents[$parentId])) {
+                    $this->_categoryTree[$categoryId] = [];
+                    break;
+                }
+
                 // Do not process categories not in menu if $fromNavigation is set
                 if ($fromNavigation && !$parents[$parentId]->getIncludeInMenu()) {
                     break;
                 }
+
                 $this->_categoryTree[$categoryId][$parentId] = $parents[$parentId];
+
+                // Stop processing on 2nd level
+                if ($parents[$parentId]->getLevel() <= 2) {
+                    break;
+                }
+
                 $parentId = $parents[$parentId]->getParentId();
             }
 
             // Now reverse the order to make parents before children
-            if (isset($this->_categoryTree[$categoryId])) {
+            if (!empty($this->_categoryTree[$categoryId])) {
                 $this->_categoryTree[$categoryId] = array_reverse($this->_categoryTree[$categoryId], true);
             }
         }
