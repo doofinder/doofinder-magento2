@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Observer\Processor\Xml;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 class ItemsFetchedTest extends BaseTestCase
 {

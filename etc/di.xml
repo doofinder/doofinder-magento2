@@ -41,15 +41,39 @@
     <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
         <arguments>
             <argument name="handlers" xsi:type="array">
-                <item name="doofinder" xsi:type="string">\Doofinder\Feed\Search\IndexerHandler</item>
+                <item name="doofinder" xsi:type="string">Doofinder\Feed\Search\IndexerHandler</item>
             </argument>
+        </arguments>
+    </type>
+    <virtualType name="Doofinder\Feed\Search\BaseIndexerHandlerFactory" type="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\Indexer\IndexerHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Doofinder\Feed\Search\IndexerHandler">
+        <arguments>
+            <argument name="indexerHandlerFactory" xsi:type="object">Doofinder\Feed\Search\BaseIndexerHandlerFactory</argument>
         </arguments>
     </type>
     <type name="Magento\CatalogSearch\Model\Indexer\IndexStructureFactory">
         <arguments>
             <argument name="structures" xsi:type="array">
-                <item name="doofinder" xsi:type="string">\Doofinder\Feed\Search\IndexStructure</item>
+                <item name="doofinder" xsi:type="string">Doofinder\Feed\Search\IndexStructure</item>
             </argument>
+        </arguments>
+    </type>
+    <virtualType name="Doofinder\Feed\Search\BaseIndexStructureFactory" type="Magento\CatalogSearch\Model\Indexer\IndexStructureFactory">
+        <arguments>
+            <argument name="structures" xsi:type="array">
+                <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\Indexer\IndexStructure</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Doofinder\Feed\Search\IndexStructure">
+        <arguments>
+            <argument name="indexStructureFactory" xsi:type="object">Doofinder\Feed\Search\BaseIndexStructureFactory</argument>
         </arguments>
     </type>
     <type name="Magento\Framework\Search\Dynamic\IntervalFactory">

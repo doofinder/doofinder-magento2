@@ -2,17 +2,24 @@
 
 namespace Doofinder\Feed\Search;
 
-class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
+use Magento\Framework\Indexer\SaveHandler\IndexerInterface;
+
+class IndexerHandler implements IndexerInterface
 {
+    /**
+     * @var \Magento\CatalogSearch\Model\Indexer\IndexerHandler
+     */
+    private $_indexerHandler;
+
+    /**
+     * \Magento\Framework\Indexer\IndexStructureInterface
+     */
+    private $_indexStructure;
+
     /**
      * @var \Magento\Framework\Indexer\SaveHandler\Batch
      */
     private $_batch;
-
-    /**
-     * @var \Magento\Framework\Indexer\IndexStructureInterface
-     */
-    private $_indexStructure;
 
     /**
      * @var \Magento\Catalog\Api\ProductRepositoryInterface
@@ -50,38 +57,29 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
     private $_searchHelper;
 
     /**
-     * @var array
-     */
-    private $_data;
-
-    /**
      * @var int
      */
     private $_batchSize;
 
     /**
+     * @param \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory $indexerHandlerFactory
      * @param \Magento\Framework\Indexer\IndexStructureInterface $indexStructure
-     * @param \Magento\Framework\App\ResourceConnection $resource
-     * @param \Magento\Eav\Model\Config $eavConfig
      * @param \Magento\Framework\Indexer\SaveHandler\Batch $batch
-     * @param \Magento\Framework\Indexer\ScopeResolver\IndexScopeResolver $indexScopeResolver
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      * @param \Doofinder\Feed\Helper\FeedConfig $feedConfig
      * @param \Doofinder\Feed\Model\GeneratorFactory $generatorFactory
-     * @param \Doofinder\Feed\Helper\Search
+     * @param \Doofinder\Feed\Helper\Search $searchHelper
      * @param array $data
      * @param int $batchSize = 100
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
+        \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory $indexerHandlerFactory,
         \Magento\Framework\Indexer\IndexStructureInterface $indexStructure,
-        \Magento\Framework\App\ResourceConnection $resource,
-        \Magento\Eav\Model\Config $eavConfig,
         \Magento\Framework\Indexer\SaveHandler\Batch $batch,
-        \Magento\Framework\Indexer\ScopeResolver\IndexScopeResolver $indexScopeResolver,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
@@ -92,16 +90,11 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
         array $data,
         $batchSize = 100
     ) {
-        parent::__construct(
-            $indexStructure,
-            $resource,
-            $eavConfig,
-            $batch,
-            $indexScopeResolver,
-            $data,
-            $batchSize
-        );
-
+        $this->_indexerHandler = $indexerHandlerFactory->create([
+            'data' => $data,
+            'batchSize' => $batchSize
+        ]);
+        $this->_indexStructure = $indexStructure;
         $this->_batch = $batch;
         $this->_productRepository = $productRepository;
         $this->_searchCriteriaBuilder = $searchCriteriaBuilder;
@@ -110,8 +103,6 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
         $this->_feedConfig = $feedConfig;
         $this->_generatorFactory = $generatorFactory;
         $this->_searchHelper = $searchHelper;
-        $this->_indexStructure = $indexStructure;
-        $this->_data = $data;
         $this->_batchSize = $batchSize;
     }
 
@@ -122,7 +113,7 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
     {
         foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
             $this->insertDocuments($batchDocuments, $dimensions);
-            parent::saveIndex($dimensions, $this->createIterator($batchDocuments));
+            $this->_indexerHandler->saveIndex($dimensions, $this->createIterator($batchDocuments));
         }
     }
 
@@ -133,8 +124,16 @@ class IndexerHandler extends \Magento\CatalogSearch\Model\Indexer\IndexerHandler
     {
         foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
             $this->dropDocuments($batchDocuments, $dimensions);
-            parent::deleteIndex($dimensions, $this->createIterator($batchDocuments));
+            $this->_indexerHandler->deleteIndex($dimensions, $this->createIterator($batchDocuments));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function cleanIndex($dimensions)
+    {
+        $this->_indexerHandler->cleanIndex($dimensions);
     }
 
     /**

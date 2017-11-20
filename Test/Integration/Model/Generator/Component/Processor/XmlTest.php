@@ -2,10 +2,12 @@
 
 namespace Doofinder\Feed\Test\Integration\Model\Generator\Component\Processor;
 
+use Magento\TestFramework\TestCase\AbstractIntegrity;
+
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Component\Processor\Xml
  */
-class XmlTest extends \PHPUnit_Framework_TestCase
+class XmlTest extends AbstractIntegrity
 {
     const HEAD = <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>

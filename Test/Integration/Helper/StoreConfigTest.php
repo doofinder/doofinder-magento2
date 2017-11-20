@@ -2,10 +2,12 @@
 
 namespace Doofinder\Feed\Test\Integration\Helper;
 
+use Magento\TestFramework\TestCase\AbstractIntegrity;
+
 /**
  * Test class for \Doofinder\Feed\Helper\StoreConfig
  */
-class StoreConfigTest extends \PHPUnit_Framework_TestCase
+class StoreConfigTest extends AbstractIntegrity
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -29,7 +31,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * Test for getStoreCodes() method.
      *
-     * @dataProvider testGetStoreCodesProvider
+     * @dataProvider providerTestGetStoreCodes
      * @magentoDataFixture Magento/Store/_files/store.php
      * @magentoAppIsolation enabled
      */
@@ -45,7 +47,7 @@ class StoreConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $stores);
     }
 
-    public function testGetStoreCodesProvider()
+    public function providerTestGetStoreCodes()
     {
         return [
             ['default', ['default', 'test']],

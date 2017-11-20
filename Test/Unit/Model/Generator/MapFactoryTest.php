@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 
@@ -45,7 +45,7 @@ class MapFactoryTest extends BaseTestCase
     /**
      * Test create
      *
-     * @dataProvider testCreateProvider
+     * @dataProvider providerTestCreate
      */
     public function testCreate($class, $type, $subclassExists, $expected)
     {
@@ -56,7 +56,7 @@ class MapFactoryTest extends BaseTestCase
 
         $context = $this->getMock(
             $class,
-            [],
+            ['getTypeId'],
             [],
             '',
             false
@@ -78,7 +78,7 @@ class MapFactoryTest extends BaseTestCase
         $this->_model->create($item, ['sample' => 'data']);
     }
 
-    public function testCreateProvider()
+    public function providerTestCreate()
     {
         return [
             [

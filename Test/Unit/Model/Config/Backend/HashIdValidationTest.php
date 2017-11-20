@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Backend;
 
-use Magento\Framework\TestFramework\Unit\BaseTestCase;
+use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
  * Class HashIdValidationTest
@@ -66,6 +66,8 @@ class HashIdValidationTest extends BaseTestCase
 
     /**
      * Test save()
+     *
+     * @doesNotPerformAssertions
      */
     public function testSave()
     {
@@ -75,6 +77,8 @@ class HashIdValidationTest extends BaseTestCase
 
     /**
      * Test save()
+     *
+     * @doesNotPerformAssertions
      */
     public function testSaveSameAsCurrent()
     {
