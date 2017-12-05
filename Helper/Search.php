@@ -10,9 +10,14 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     private $_storeConfig;
 
     /**
-     * @var \Doofinder\Api\Search\ClientFactory
+     * @var \Doofinder\Feed\Search\SearchClientFactory
      */
     private $_searchFactory;
+
+    /**
+     * @var \Doofinder\Feed\Search\ManagementClientFactory
+     */
+    private $_dmaFactory;
 
     /**
      * @var \Doofinder\Feed\Wrapper\Throttle
@@ -40,8 +45,8 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Api\Search\ClientFactory $searchFactory,
-        \Doofinder\Api\Management\ClientFactory $dmaFactory,
+        \Doofinder\Feed\Search\SearchClientFactory $searchFactory,
+        \Doofinder\Feed\Search\ManagementClientFactory $dmaFactory,
         \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory
     ) {
         $this->_storeConfig = $storeConfig;
@@ -66,7 +71,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         $apiKey = $this->_storeConfig->getApiKey();
         $limit = $this->_storeConfig->getSearchRequestLimit($this->getStoreCode());
 
-        $client = $this->_searchFactory->create(['hashid' => $hashId, 'api_key' => $apiKey]);
+        $client = $this->_searchFactory->create($hashId, $apiKey);
 
         try {
             // @codingStandardsIgnoreStart
@@ -154,7 +159,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
 
             // Create DoofinderManagementApi instance
             $doofinderApi = $this->_throttleFactory->create([
-                'obj' => $this->_dmaFactory->create(['apiKey' => $this->_storeConfig->getApiKey()])
+                'obj' => $this->_dmaFactory->create($this->_storeConfig->getApiKey())
             ]);
 
             foreach ($doofinderApi->getSearchEngines() as $searchEngine) {
