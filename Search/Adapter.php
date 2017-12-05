@@ -109,7 +109,11 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
      */
     private function getDocuments($queryText)
     {
-        $results = $this->_search->performDoofinderSearch($queryText);
+        // Execute initial search
+        $this->_search->performDoofinderSearch($queryText);
+
+        // Fetch all results
+        $results = $this->_search->getAllResults();
         $score = count($results);
 
         $documents = [];
