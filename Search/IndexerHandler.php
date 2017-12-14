@@ -3,6 +3,7 @@
 namespace Doofinder\Feed\Search;
 
 use Magento\Framework\Indexer\SaveHandler\IndexerInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 class IndexerHandler implements IndexerInterface
 {
@@ -167,7 +168,7 @@ class IndexerHandler implements IndexerInterface
             return;
         }
 
-        $this->runGenerator(array_keys($documents), $dimensions, 'update');
+        $this->performAction(array_keys($documents), $dimensions, 'update');
     }
 
     /**
@@ -180,44 +181,45 @@ class IndexerHandler implements IndexerInterface
             return;
         }
 
-        $this->runGenerator($documents, $dimensions, 'delete');
+        $this->performAction(array_keys($documents), $dimensions, 'delete');
     }
 
     /**
-     * Run generator
+     * Perform action
+     *   - update - Run generator with AtomicUpdater
+     *   - delete - Delete items from index
      *
      * @param int[] $ids
      * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
      * @param string $action
      */
-    private function runGenerator(array $ids, array $dimensions, $action)
+    private function performAction(array $ids, array $dimensions, $action)
     {
         $originalStoreCode = $this->_storeConfig->getStoreCode();
 
         $storeId = $this->_searchHelper->getStoreIdFromDimensions($dimensions);
         $this->_storeManager->setCurrentStore($storeId);
 
-        $feedConfig = $this->_feedConfig->getLeanFeedConfig($storeId);
+        if ($action == 'update') {
+            $feedConfig = $this->_feedConfig->getLeanFeedConfig($storeId);
 
-        // Add fixed product fetcher
-        $feedConfig['data']['config']['fetchers']['Product\Fixed'] = [
-            'products' => $this->getProducts($ids),
-        ];
+            // Add fixed product fetcher
+            $feedConfig['data']['config']['fetchers']['Product\Fixed'] = [
+                'products' => $this->getProducts($ids),
+            ];
 
-        // Add atomic update processor
-        $feedConfig['data']['config']['processors']['AtomicUpdater'] = [
-            'action' => $action,
-        ];
+            // Add atomic update processor
+            $feedConfig['data']['config']['processors']['AtomicUpdater'] = [];
 
-        if ($action == 'delete') {
-            // We do not need fields other than id to delete items
-            $map = $feedConfig['data']['config']['processors']['Mapper']['map'];
-            $map = array_intersect_key($map, ['id' => '']);
-            $feedConfig['data']['config']['processors']['Mapper']['map'] = $map;
+            $generator = $this->_generatorFactory->create($feedConfig);
+            $generator->run();
+        } elseif ($action == 'delete') {
+            $this->_searchHelper->deleteDoofinderItems(array_map(function ($id) {
+                return ['id' => $id];
+            }, $ids));
+        } else {
+            throw new LocalizedException(__('Unknown Doofinder indexer action'));
         }
-
-        $generator = $this->_generatorFactory->create($feedConfig);
-        $generator->run();
 
         $this->_storeManager->setCurrentStore($originalStoreCode);
     }
