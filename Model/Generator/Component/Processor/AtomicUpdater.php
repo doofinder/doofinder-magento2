@@ -31,14 +31,12 @@ class AtomicUpdater extends Component implements ProcessorInterface
      */
     public function process(array $items)
     {
-        $method = $this->getData('action') . 'DoofinderItems';
-
         $data = array_map(function ($item) {
             return array_filter($item->getData());
         }, $items);
 
         try {
-            $this->_search->{$method}($data);
+            $this->_search->updateDoofinderItems($data);
         } catch (\Exception $e) {
             $this->_logger->debug($e->getMessage());
             throw $e;

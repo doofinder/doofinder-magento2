@@ -38,7 +38,7 @@ class AtomicUpdaterTest extends BaseTestCase
 
         $this->_search = $this->getMock(
             '\Doofinder\Feed\Helper\Search',
-            ['someActionDoofinderItems'],
+            [],
             [],
             '',
             false
@@ -50,7 +50,6 @@ class AtomicUpdaterTest extends BaseTestCase
                 'search' => $this->_search,
                 'data' => [
                     'api_key' => 'sample_api_key',
-                    'action' => 'someAction',
                 ],
             ]
         );
@@ -68,7 +67,7 @@ class AtomicUpdaterTest extends BaseTestCase
 
         $this->_item->method('getData')->willReturn($data);
 
-        $this->_search->expects($this->once())->method('someActionDoofinderItems')
+        $this->_search->expects($this->once())->method('updateDoofinderItems')
             ->with([$data]);
 
         $this->_model->process([$this->_item]);

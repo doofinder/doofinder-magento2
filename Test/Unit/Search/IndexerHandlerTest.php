@@ -98,7 +98,7 @@ class IndexerHandlerTest extends BaseTestCase
         parent::setUp();
 
         // @codingStandardsIgnoreStart
-        $this->_documents = new \ArrayObject([['sample' => 'item']]);
+        $this->_documents = new \ArrayObject([1234 => ['sample' => 'item']]);
         // @codingStandardsIgnoreEnd
 
         $this->_batch = $this->getMock(
@@ -286,9 +286,7 @@ class IndexerHandlerTest extends BaseTestCase
                             ],
                         ],
                         'processors' => [
-                            'AtomicUpdater' => [
-                                'action' => 'update',
-                            ],
+                            'AtomicUpdater' => [],
                             'Mapper' => [
                                 'map' => [],
                             ],
@@ -313,31 +311,11 @@ class IndexerHandlerTest extends BaseTestCase
         $this->_batch->expects($this->at(0))->method('getItems')
             ->with($this->_documents, 100)->willReturn([$batch]);
 
-        $this->_generator->expects($this->once())->method('run');
-
-        $this->_generatorFactory
-            ->expects($this->once())
-            ->method('create')
+        $this->_searchHelper->expects($this->once())
+            ->method('deleteDoofinderItems')
             ->with([
-                'data' => [
-                    'config' => [
-                        'fetchers' => [
-                            'Product\Fixed' => [
-                                'products' => [$this->_product],
-                            ],
-                        ],
-                        'processors' => [
-                            'AtomicUpdater' => [
-                                'action' => 'delete',
-                            ],
-                            'Mapper' => [
-                                'map' => [],
-                            ],
-                        ],
-                    ],
-                ],
-            ])
-            ->willReturn($this->_generator);
+                ['id' => 1234],
+            ]);
 
         $this->_indexerHandler->expects($this->once())->method('deleteIndex')
             ->with([$this->_dimension], $this->createIterator($batch));
