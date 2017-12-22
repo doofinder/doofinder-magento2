@@ -17,8 +17,12 @@ class Uninstall implements UninstallInterface
     // @codingStandardsIgnoreEnd
         $setup->startSetup();
 
-        $setup->getConnection()->dropTable(InstallSchema::CRON_TABLE_NAME);
-        $setup->getConnection()->dropTable(InstallSchema::LOG_TABLE_NAME);
+        $setup->getConnection()->dropTable(
+            $setup->getTable(InstallSchema::CRON_TABLE_NAME)
+        );
+        $setup->getConnection()->dropTable(
+            $setup->getTable(InstallSchema::LOG_TABLE_NAME)
+        );
 
         $setup->endSetup();
     }
