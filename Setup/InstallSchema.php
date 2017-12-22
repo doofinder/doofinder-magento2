@@ -31,7 +31,9 @@ class InstallSchema implements InstallSchemaInterface
     private function setupCronTable(SchemaSetupInterface $setup)
     {
         $table = $setup->getConnection()
-            ->newTable(self::CRON_TABLE_NAME)
+            ->newTable(
+                $setup->getTable(self::CRON_TABLE_NAME)
+            )
             ->addColumn(
                 'entity_id',
                 Table::TYPE_INTEGER,
@@ -123,7 +125,9 @@ class InstallSchema implements InstallSchemaInterface
     private function setupLogTable(SchemaSetupInterface $setup)
     {
         $table = $setup->getConnection()
-            ->newTable(self::LOG_TABLE_NAME)
+            ->newTable(
+                $setup->getTable(self::LOG_TABLE_NAME)
+            )
             ->addColumn(
                 'entity_id',
                 Table::TYPE_INTEGER,
