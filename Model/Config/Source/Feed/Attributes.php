@@ -10,12 +10,6 @@ namespace Doofinder\Feed\Model\Config\Source\Feed;
 class Attributes implements \Magento\Framework\Option\ArrayInterface
 {
     /**
-     * Scope config interface.
-     *
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    private $_scopeConfig;
-    /**
      * Eav Model Config
      *
      * @var \Magento\Eav\Model\Config
@@ -37,16 +31,13 @@ class Attributes implements \Magento\Framework\Option\ArrayInterface
     /**
      * Attributes constructor.
      *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Eav\Model\Config $eavConfig
      * @param \Magento\Framework\Escaper $escaper
      */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Eav\Model\Config $eavConfig,
         \Magento\Framework\Escaper $escaper
     ) {
-        $this->_scopeConfig = $scopeConfig;
         $this->_eavConfig = $eavConfig;
         $this->_escaper = $escaper;
     }
@@ -120,15 +111,12 @@ class Attributes implements \Magento\Framework\Option\ArrayInterface
      */
     private function _getDoofinderDirectivesOptionArray()
     {
-        $options = [];
-
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $directives = $this->_scopeConfig->getValue('directives', $storeScope);
-
-        foreach ($directives as $directive => $label) {
-            $options[$directive] = 'Doofinder: ' . $label;
-        }
-
-        return $options;
+        return [
+            'df_id' => __('Doofinder: Product Id'),
+            'df_availability' => __('Doofinder: Product Availability'),
+            'df_currency' => __('Doofinder: Product Currency'),
+            'df_regular_price' => __('Doofinder: Product Regular Price'),
+            'df_sale_price' => __('Doofinder: Product Sale Price'),
+        ];
     }
 }

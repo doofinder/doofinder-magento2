@@ -11,11 +11,6 @@ use Doofinder\Feed\Test\Unit\BaseTestCase;
 class AttributesTest extends BaseTestCase
 {
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    private $_scopeConfig;
-
-    /**
      * @var Magento\Eav\Model\Config
      */
     private $_eavConfig;
@@ -36,19 +31,24 @@ class AttributesTest extends BaseTestCase
     private $_model;
 
     /**
+     * Doofinder directives
+     */
+    private $directives;
+
+    /**
      * Set up
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_scopeConfig = $this->getMock(
-            '\Magento\Framework\App\Config\ScopeConfigInterface',
-            [],
-            [],
-            '',
-            false
-        );
+        $this->directives = [
+            'df_id' => 'Doofinder: Product Id',
+            'df_availability' => 'Doofinder: Product Availability',
+            'df_currency' => 'Doofinder: Product Currency',
+            'df_regular_price' => 'Doofinder: Product Regular Price',
+            'df_sale_price' => 'Doofinder: Product Sale Price',
+        ];
 
         $this->_eavConfig = $this->getMock(
             '\Magento\Eav\Model\Config',
@@ -73,10 +73,6 @@ class AttributesTest extends BaseTestCase
             '',
             false
         );
-
-        $this->_scopeConfig->expects($this->any())
-            ->method('getValue')
-            ->will($this->returnValue(['code' => 'label']));
 
         $eavAttribute = $this->getMockBuilder('\Magento\Catalog\Model\ResourceModel\Eav\Attribute')
             ->disableOriginalConstructor()
@@ -108,7 +104,6 @@ class AttributesTest extends BaseTestCase
         $this->_model = $this->objectManager->getObject(
             '\Doofinder\Feed\Model\Config\Source\Feed\Attributes',
             [
-                'scopeConfig' => $this->_scopeConfig,
                 'eavConfig' => $this->_eavConfig,
                 'escaper' => $this->_escaper
             ]
@@ -120,12 +115,11 @@ class AttributesTest extends BaseTestCase
      */
     public function testToOptionArray()
     {
-        $expected = [
-            'code' => 'Doofinder: label',
+        $expected = $this->directives + [
             'attr code' => 'Attribute: attr code'
         ];
 
-        $this->assertSame($expected, $this->_model->toOptionArray());
+        $this->assertEquals($expected, $this->_model->toOptionArray());
     }
 
     /**
@@ -133,11 +127,10 @@ class AttributesTest extends BaseTestCase
      */
     public function testGetAllAttributes()
     {
-        $expected = [
-            'code' => 'Doofinder: label',
+        $expected = $this->directives + [
             'attr code' => 'Attribute: attr code'
         ];
 
-        $this->assertSame($expected, $this->_model->getAllAttributes());
+        $this->assertEquals($expected, $this->_model->getAllAttributes());
     }
 }
