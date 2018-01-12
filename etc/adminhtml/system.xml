@@ -258,7 +258,7 @@
                     showInStore="1">
                     <label>Additional Attributes</label>
                     <frontend_model>Doofinder\Feed\Block\Adminhtml\Map\Additional</frontend_model>
-                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\ArraySerialized</backend_model>
                 </field>
             </group>
             <group id="feed_settings"

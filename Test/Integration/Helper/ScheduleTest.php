@@ -85,7 +85,6 @@ class ScheduleTest extends AbstractIntegrity
                     'mpn' => 'sku',
                     'availability' => 'df_availability',
                     'categories' => 'category_ids',
-                    'additional_attributes' => 'a:0:{}',
                 ],
                 'atomic_updates_enabled' => false,
                 'categories_in_navigation' => '0',
