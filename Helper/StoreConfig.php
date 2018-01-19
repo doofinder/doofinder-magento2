@@ -60,17 +60,25 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     private $_storeManager;
 
     /**
+     * @var \Doofinder\Feed\Helper\Serializer
+     */
+    private $_serializer;
+
+    /**
      * StoreConfig constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Doofinder\Feed\Helper\Serializer $serializer
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Doofinder\Feed\Helper\Serializer $serializer
     ) {
         $this->_scopeConfig = $context->getScopeConfig();
         $this->_storeManager = $storeManager;
+        $this->_serializer = $serializer;
         parent::__construct($context);
     }
 
@@ -95,6 +103,25 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             $this->_scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode),
             ['atomic_updates_enabled' => $this->isAtomicUpdatesEnabled()]
         );
+
+        /**
+         * @notice 'backend_model' does not process config value
+         *          so we need to unserialize value here.
+         * @see     MAGETWO-80296
+         */
+        if (!empty($config['attributes']['additional_attributes'])) {
+            $additionalAttributesConfig = $this->_serializer->unserialize(
+                $config['attributes']['additional_attributes']
+            );
+            unset($config['attributes']['additional_attributes']);
+
+            $additionalAttributes = [];
+            foreach ($additionalAttributesConfig as $data) {
+                $additionalAttributes[$data['field']] = $data['additional_attribute'];
+            }
+
+            $config['attributes'] = array_merge($config['attributes'], $additionalAttributes);
+        }
 
         /**
          * @notice There is a bug in PHP 7.0.7 and Magento 2.1.3+

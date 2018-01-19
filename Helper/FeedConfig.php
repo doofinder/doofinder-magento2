@@ -2,8 +2,6 @@
 
 namespace Doofinder\Feed\Helper;
 
-use \Zend\Serializer\Serializer;
-
 /**
  * Class FeedConfig
  * @package Doofinder\Feed\Helper
@@ -146,38 +144,13 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Unserialize string
-     *
-     * @param string $str
-     * @return array
-     */
-    private function unserialize($str)
-    {
-        return Serializer::unserialize($str, 'phpserialize');
-    }
-
-    /**
      * Get feed attributes from config.
      *
      * @return array
      */
     private function getFeedAttributes()
     {
-        $attributes = $this->_config['attributes'];
-
-        if (array_key_exists('additional_attributes', $attributes)) {
-            $additionalKeys = $this->unserialize($attributes['additional_attributes']);
-            unset($attributes['additional_attributes']);
-
-            $additionalAttributes = [];
-            foreach ($additionalKeys as $key) {
-                $additionalAttributes[$key['field']] = $key['additional_attribute'];
-            }
-
-            return array_merge($attributes, $additionalAttributes);
-        }
-
-        return $attributes;
+        return $this->_config['attributes'];
     }
 
     /**
