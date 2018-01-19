@@ -5,9 +5,7 @@ namespace Doofinder\Feed\Model\Generator\Map\Product;
 use \Doofinder\Feed\Model\Generator\Map\Product;
 
 /**
- * Class Associate
- *
- * @package Doofinder\Feed\Model\Generator\Map\Product
+ * Associate product map
  */
 class Associate extends Product
 {
@@ -21,7 +19,7 @@ class Associate extends Product
     {
         switch ($field) {
             case 'url_key':
-                if ($this->_context->isVisibleInSiteVisibility()) {
+                if ($this->context->isVisibleInSiteVisibility()) {
                     break;
                 }
                 // nobreak;

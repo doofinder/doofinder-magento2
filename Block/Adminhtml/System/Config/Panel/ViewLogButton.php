@@ -3,11 +3,8 @@
 namespace Doofinder\Feed\Block\Adminhtml\System\Config\Panel;
 
 /**
- * Class ViewLogButton
- *
- * @package Doofinder\Feed\Block\Adminhtml\System\Config\Panel
+ * View log button
  */
-
 class ViewLogButton extends \Magento\Config\Block\System\Config\Form\Field
 {
     const VIEW_LOG_URL = 'doofinder/feed/log';

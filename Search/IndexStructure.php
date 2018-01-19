@@ -4,33 +4,39 @@ namespace Doofinder\Feed\Search;
 
 use Magento\Framework\Indexer\IndexStructureInterface;
 
+/**
+ * Index structure
+ */
 class IndexStructure implements IndexStructureInterface
 {
     /**
      * @var \Magento\CatalogSearch\Model\Indexer\IndexStructure
      */
-    private $_indexStructure;
+    private $indexStructure;
 
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
-    private $_search;
+    private $search;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @param \Magento\CatalogSearch\Model\Indexer\IndexStructureFactory $indexStructureFactory
      * @param \Doofinder\Feed\Helper\Search $search
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @SuppressWarnings(PHPMD.LongVariable)
+     * @codingStandardsIgnoreStart
+     * Ignore MEQP2.Classes.ConstructorOperations.CustomOperationsFound
      */
     public function __construct(
         \Magento\CatalogSearch\Model\Indexer\IndexStructureFactory $indexStructureFactory,
@@ -38,10 +44,11 @@ class IndexStructure implements IndexStructureInterface
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
-        $this->_indexStructure = $indexStructureFactory->create();
-        $this->_search = $search;
-        $this->_storeConfig = $storeConfig;
-        $this->_storeManager = $storeManager;
+    // @codingStandardsIgnoreEnd
+        $this->indexStructure = $indexStructureFactory->create();
+        $this->search = $search;
+        $this->storeConfig = $storeConfig;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -52,7 +59,7 @@ class IndexStructure implements IndexStructureInterface
     public function delete($index, array $dimensions = [])
     {
         $this->action('deleteDoofinderIndex', $dimensions);
-        $this->_indexStructure->delete($index, $dimensions);
+        $this->indexStructure->delete($index, $dimensions);
     }
 
     /**
@@ -65,7 +72,7 @@ class IndexStructure implements IndexStructureInterface
     public function create($index, array $fields, array $dimensions = [])
     {
         $this->action('createDoofinderIndex', $dimensions);
-        $this->_indexStructure->create($index, $fields, $dimensions);
+        $this->indexStructure->create($index, $fields, $dimensions);
     }
 
     /**
@@ -73,15 +80,16 @@ class IndexStructure implements IndexStructureInterface
      *
      * @param string $method
      * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @return void
      */
     private function action($method, array $dimensions)
     {
-        $originalStoreCode = $this->_storeConfig->getStoreCode();
-        $storeId = $this->_search->getStoreIdFromDimensions($dimensions);
-        $this->_storeManager->setCurrentStore($storeId);
+        $originalStoreCode = $this->storeConfig->getStoreCode();
+        $storeId = $this->search->getStoreIdFromDimensions($dimensions);
+        $this->storeManager->setCurrentStore($storeId);
 
-        $this->_search->{$method}();
+        $this->search->{$method}();
 
-        $this->_storeManager->setCurrentStore($originalStoreCode);
+        $this->storeManager->setCurrentStore($originalStoreCode);
     }
 }

@@ -3,8 +3,7 @@
 namespace Doofinder\Feed\Helper;
 
 /**
- * Class Data
- * @package Doofinder\Feed\Helper
+ * Basic helper
  */
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -16,12 +15,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Magento\Framework\Module\ModuleListInterface
      */
-    private $_moduleList;
+    private $moduleList;
 
     /**
      * Data constructor.
@@ -35,16 +34,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Module\ModuleListInterface $moduleList
     ) {
-        $this->_storeManager = $storeManager;
-        $this->_moduleList = $moduleList;
+        $this->storeManager = $storeManager;
+        $this->moduleList = $moduleList;
         parent::__construct($context);
     }
 
     /**
      * Get value as int
      *
-     * @param string|int $value Value
-     * @param mixed $defaultValue Default value
+     * @param string|integer $value
+     * @param mixed $defaultValue
      *
      * @return int Value as int
      */
@@ -60,8 +59,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get value as boolean
      *
-     * @param string|int $value Value
-     * @param mixed $defaultValue Default value
+     * @param string|integer $value
+     * @param mixed $defaultValue
      *
      * @return bool Value as bool
      */
@@ -92,7 +91,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getBaseUrl()
     {
-        return $this->_storeManager->getStore()->getBaseUrl();
+        return $this->storeManager->getStore()->getBaseUrl();
     }
 
     /**
@@ -102,13 +101,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getModuleVersion()
     {
-        return $this->_moduleList->getOne(self::MODULE_NAME)['setup_version'];
+        return $this->moduleList->getOne(self::MODULE_NAME)['setup_version'];
     }
 
     /**
      * Set content type as xml.
      *
      * @param \Magento\Framework\App\ResponseInterface $response
+     * @return void
      */
     public function setXmlHeaders(\Magento\Framework\App\ResponseInterface $response)
     {
@@ -119,7 +119,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Set content type as json.
      *
      * @param \Magento\Framework\App\ResponseInterface $response
-     * @return mixed
+     * @return void
      */
     public function setJsonHeaders(\Magento\Framework\App\ResponseInterface $response)
     {
@@ -141,7 +141,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Get int param.
      *
      * @param string $paramName
-     * @return int|null
+     * @return integer|null
      */
     public function getParamInt($paramName)
     {

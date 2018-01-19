@@ -4,58 +4,63 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Map;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Map\Product
+ */
 class ProductTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Magento\Catalog\Model\Category
      */
-    private $_category;
+    private $category;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
      * @var \Magento\Catalog\Model\Product
      */
-    private $_product;
+    private $product;
 
     /**
      * @var \Magento\Directory\Model\Currency
      */
-    private $_currency;
+    private $currency;
 
     /**
      * @var \Magento\Framework\Pricing\PriceCurrencyInterface
      */
-    private $_priceCurrency;
+    private $priceCurrency;
 
     /**
      * @var \Doofinder\Feed\Helper\Product
      */
-    private $_helper;
+    private $helper;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_category = $this->getMock(
-            '\Magento\Catalog\Model\Category',
+        $this->category = $this->getMock(
+            \Magento\Catalog\Model\Category::class,
             [],
             [],
             '',
             false
         );
-        $this->_category->method('getName')->will(
+        $this->category->method('getName')->will(
             $this->onConsecutiveCalls(
                 'Category 1',
                 'Category 1.1',
@@ -63,100 +68,102 @@ class ProductTest extends BaseTestCase
             )
         );
 
-        $this->_product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
+        $this->product = $this->getMock(
+            \Magento\Catalog\Model\Product::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_currency = $this->getMock(
-            '\Magento\Directory\Model\Currency',
+        $this->currency = $this->getMock(
+            \Magento\Directory\Model\Currency::class,
             [],
             [],
             '',
             false
         );
-        $this->_currency->method('format')->with(10.1234)->willReturn('10.1234');
+        $this->currency->method('format')->with(10.1234)->willReturn('10.1234');
 
-        $this->_priceCurrency = $this->getMock(
-            '\Magento\Framework\Pricing\PriceCurrencyInterface',
+        $this->priceCurrency = $this->getMock(
+            \Magento\Framework\Pricing\PriceCurrencyInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_priceCurrency->method('getCurrency')->willReturn($this->_currency);
+        $this->priceCurrency->method('getCurrency')->willReturn($this->currency);
 
-        $this->_helper = $this->getMock(
-            '\Doofinder\Feed\Helper\Product',
+        $this->helper = $this->getMock(
+            \Doofinder\Feed\Helper\Product::class,
             [],
             [],
             '',
             false
         );
-        $this->_helper->method('getProductUrl')->willReturn('http://example.com/simple-product.html');
-        $this->_helper->method('getProductCategoriesWithParents')->willReturn([
+        $this->helper->method('getProductUrl')->willReturn('http://example.com/simple-product.html');
+        $this->helper->method('getProductCategoriesWithParents')->willReturn([
             [
-                $this->_category,
-                $this->_category,
+                $this->category,
+                $this->category,
             ],
             [
-                $this->_category,
+                $this->category,
             ]
         ]);
-        $this->_helper->method('getProductImageUrl')->willReturn('http://example.com/path/to/image.jpg');
-        $this->_helper->method('getProductPrice')->willReturn(10.1234);
-        $this->_helper->method('getProductAvailability')->willReturn('in stock');
-        $this->_helper->method('getCurrencyCode')->willReturn('USD');
-        $this->_helper->method('getQuantityAndStockStatus')->willReturn('5 - in stock');
+        $this->helper->method('getProductImageUrl')->willReturn('http://example.com/path/to/image.jpg');
+        $this->helper->method('getProductPrice')->willReturn(10.1234);
+        $this->helper->method('getProductAvailability')->willReturn('in stock');
+        $this->helper->method('getCurrencyCode')->willReturn('USD');
+        $this->helper->method('getQuantityAndStockStatus')->willReturn('5 - in stock');
         $map = [
-            [$this->_product, 'title', 'Sample title',],
-            [$this->_product, 'description', 'Sample description',],
-            [$this->_product, 'color', 'blue'],
-            [$this->_product, 'tax_class_id', 'Taxable'],
-            [$this->_product, 'manufacturer', 'Company'],
+            [$this->product, 'title', 'Sample title',],
+            [$this->product, 'description', 'Sample description',],
+            [$this->product, 'color', 'blue'],
+            [$this->product, 'tax_class_id', 'Taxable'],
+            [$this->product, 'manufacturer', 'Company'],
         ];
-        $this->_helper->method('getAttributeText')->will($this->returnValueMap($map));
+        $this->helper->method('getAttributeText')->will($this->returnValueMap($map));
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
             false
         );
-        $this->_item->method('getContext')->willReturn($this->_product);
+        $this->item->method('getContext')->willReturn($this->product);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Map\Product',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Map\Product::class,
             [
-                'helper' => $this->_helper,
-                'item' => $this->_item,
-                'priceCurrency' => $this->_priceCurrency,
+                'helper' => $this->helper,
+                'item' => $this->item,
+                'priceCurrency' => $this->priceCurrency,
             ]
         );
-        $this->_model->setExportProductPrices(true);
+        $this->model->setExportProductPrices(true);
     }
 
     /**
      * Test get() method
+     *
+     * @return void
      */
     public function testGet()
     {
-        $this->assertEquals('Sample title', $this->_model->get('title'));
-        $this->assertEquals('Sample description', $this->_model->get('description'));
-        $this->assertEquals('Category 1>Category 1.1%%Category 2', $this->_model->get('category_ids'));
-        $this->assertEquals('http://example.com/path/to/image.jpg', $this->_model->get('image'));
-        $this->assertEquals('http://example.com/simple-product.html', $this->_model->get('url_key'));
-        $this->assertEquals('10.1234', $this->_model->get('price'));
-        $this->assertEquals(null, $this->_model->setExportProductPrices(false)->get('price'));
-        $this->assertEquals('in stock', $this->_model->get('df_availability'));
-        $this->assertEquals('USD', $this->_model->get('df_currency'));
-        $this->assertEquals('blue', $this->_model->get('color'));
-        $this->assertEquals('Taxable', $this->_model->get('tax_class_id'));
-        $this->assertEquals('Company', $this->_model->get('manufacturer'));
-        $this->assertEquals('5 - in stock', $this->_model->get('quantity_and_stock_status'));
+        $this->assertEquals('Sample title', $this->model->get('title'));
+        $this->assertEquals('Sample description', $this->model->get('description'));
+        $this->assertEquals('Category 1>Category 1.1%%Category 2', $this->model->get('category_ids'));
+        $this->assertEquals('http://example.com/path/to/image.jpg', $this->model->get('image'));
+        $this->assertEquals('http://example.com/simple-product.html', $this->model->get('url_key'));
+        $this->assertEquals('10.1234', $this->model->get('price'));
+        $this->assertEquals(null, $this->model->setExportProductPrices(false)->get('price'));
+        $this->assertEquals('in stock', $this->model->get('df_availability'));
+        $this->assertEquals('USD', $this->model->get('df_currency'));
+        $this->assertEquals('blue', $this->model->get('color'));
+        $this->assertEquals('Taxable', $this->model->get('tax_class_id'));
+        $this->assertEquals('Company', $this->model->get('manufacturer'));
+        $this->assertEquals('5 - in stock', $this->model->get('quantity_and_stock_status'));
     }
 }

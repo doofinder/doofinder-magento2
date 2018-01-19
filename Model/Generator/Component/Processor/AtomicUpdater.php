@@ -5,29 +5,37 @@ namespace Doofinder\Feed\Model\Generator\Component\Processor;
 use \Doofinder\Feed\Model\Generator\Component;
 use \Doofinder\Feed\Model\Generator\Component\ProcessorInterface;
 
+/**
+ * Atomic updater component
+ */
 class AtomicUpdater extends Component implements ProcessorInterface
 {
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
-    private $_search;
+    private $search;
 
     /**
      * Constructor
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Doofinder\Feed\Helper\Search $search
+     * @param array $data
      */
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
         \Doofinder\Feed\Helper\Search $search,
         array $data = []
     ) {
-        $this->_search = $search;
+        $this->search = $search;
         parent::__construct($logger, $data);
     }
 
     /**
      * Process items
      *
-     * @param \Doofinder\Feed\Model\Generator\Item[]
+     * @param  \Doofinder\Feed\Model\Generator\Item[] $items
+     * @return void
+     * @throws \Exception Error.
      */
     public function process(array $items)
     {
@@ -36,9 +44,9 @@ class AtomicUpdater extends Component implements ProcessorInterface
         }, $items);
 
         try {
-            $this->_search->updateDoofinderItems($data);
+            $this->search->updateDoofinderItems($data);
         } catch (\Exception $e) {
-            $this->_logger->debug($e->getMessage());
+            $this->logger->debug($e->getMessage());
             throw $e;
         }
     }

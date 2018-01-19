@@ -4,22 +4,27 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Item
+ */
 class ItemTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_model;
+    private $model;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [
                 'data' => [
                     'name' => 'Sample product',
@@ -35,14 +40,16 @@ class ItemTest extends BaseTestCase
     }
 
     /**
-     * Test xmlSerialize
+     * Test xmlSerialize() method
+     *
+     * @return void
      */
     public function testXmlSerialize()
     {
         // @codingStandardsIgnoreStart
         $service = new \Sabre\Xml\Service();
         // @codingStandardsIgnoreEnd
-        $output = $service->write('feed', $this->_model);
+        $output = $service->write('feed', $this->model);
 
         $expected = <<<EOT
 <?xml version="1.0"?>

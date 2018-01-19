@@ -5,86 +5,88 @@ namespace Doofinder\Feed\Test\Unit\Console\Command;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class RunProcessCommandTest
- *
- * @package Doofinder\Feed\Test\Unit\Console\Command
+ * Test class for \Doofinder\Feed\Console\Command\RunProcessCommand
  */
 class RunProcessCommandTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\CronFactory
      */
-    private $_cronFactory;
+    private $cronFactory;
 
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    private $_process;
+    private $process;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Doofinder\Feed\Console\Command\RunProcessCommand
      */
-    private $_command;
+    private $command;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_process = $this->getMock(
-            '\Doofinder\Feed\Model\Cron',
+        $this->process = $this->getMock(
+            \Doofinder\Feed\Model\Cron::class,
             [],
             [],
             '',
             false
         );
-        $this->_process->method('load')->willReturn($this->_process);
+        $this->process->method('load')->willReturn($this->process);
 
-        $this->_cronFactory = $this->getMock(
-            '\Doofinder\Feed\Model\CronFactory',
+        $this->cronFactory = $this->getMock(
+            \Doofinder\Feed\Model\CronFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_cronFactory->method('create')->willReturn($this->_process);
+        $this->cronFactory->method('create')->willReturn($this->process);
 
-        $this->_schedule = $this->getMock(
-            '\Doofinder\Feed\Helper\Schedule',
+        $this->schedule = $this->getMock(
+            \Doofinder\Feed\Helper\Schedule::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_command = $this->objectManager->getObject(
-            '\Doofinder\Feed\Console\Command\RunProcessCommand',
+        $this->command = $this->objectManager->getObject(
+            \Doofinder\Feed\Console\Command\RunProcessCommand::class,
             [
-                'cronFactory'  => $this->_cronFactory,
-                'schedule' => $this->_schedule,
+                'cronFactory'  => $this->cronFactory,
+                'schedule' => $this->schedule,
             ]
         );
     }
 
     /**
      * Test execute() method
+     *
+     * @return void
      */
     public function testExecute()
     {
         // @codingStandardsIgnoreStart
         $commandTester = new \Symfony\Component\Console\Tester\CommandTester(
-            $this->_command
+            $this->command
         );
         // @codingStandardsIgnoreEnd
 
-        $this->_schedule->expects($this->once())->method('runProcess')->with($this->_process);
+        $this->schedule->expects($this->once())->method('runProcess')->with($this->process);
 
         $commandTester->execute(['store' => 'default']);
     }

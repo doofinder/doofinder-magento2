@@ -4,66 +4,71 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Map\Product;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Map\Product\Associate
+ */
 class AssociateTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product\Associate
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
      * @var \Magento\Catalog\Model\Product
      */
-    private $_product;
+    private $product;
 
     /**
      * @var \Doofinder\Feed\Helper\Product
      */
-    private $_helper;
+    private $helper;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_helper = $this->getMock(
-            '\Doofinder\Feed\Helper\Product',
+        $this->helper = $this->getMock(
+            \Doofinder\Feed\Helper\Product::class,
             [],
             [],
             '',
             false
         );
-        $this->_helper->method('getAttributeText')->willReturn('sample value');
+        $this->helper->method('getAttributeText')->willReturn('sample value');
 
-        $this->_product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
+        $this->product = $this->getMock(
+            \Magento\Catalog\Model\Product::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
             false
         );
-        $this->_item->method('getContext')->willReturn($this->_product);
+        $this->item->method('getContext')->willReturn($this->product);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Map\Product\Associate',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Map\Product\Associate::class,
             [
-                'helper' => $this->_helper,
-                'item' => $this->_item,
+                'helper' => $this->helper,
+                'item' => $this->item,
             ]
         );
     }
@@ -71,16 +76,24 @@ class AssociateTest extends BaseTestCase
     /**
      * Test get() method
      *
+     * @param  string $key
+     * @param  boolean $hasValue
+     * @return void
      * @dataProvider providerTestGet
      */
     public function testGet($key, $hasValue)
     {
         $this->assertEquals(
             $hasValue ? 'sample value' : null,
-            $this->_model->get($key)
+            $this->model->get($key)
         );
     }
 
+    /**
+     * Data provider for testGet() test
+     *
+     * @return array
+     */
     public function providerTestGet()
     {
         return [
@@ -96,23 +109,25 @@ class AssociateTest extends BaseTestCase
 
     /**
      * Test get() method
+     *
+     * @return void
      */
     public function testGetUrlKey()
     {
-        $this->_product->method('isVisibleInSiteVisibility')->will(
+        $this->product->method('isVisibleInSiteVisibility')->will(
             $this->onConsecutiveCalls(true, false)
         );
-        $this->_helper->method('getProductUrl')->with($this->_product)
+        $this->helper->method('getProductUrl')->with($this->product)
             ->willReturn('http://example.com/path/to/product');
 
         $this->assertEquals(
             'http://example.com/path/to/product',
-            $this->_model->get('url_key')
+            $this->model->get('url_key')
         );
 
         $this->assertEquals(
             null,
-            $this->_model->get('url_key')
+            $this->model->get('url_key')
         );
     }
 }

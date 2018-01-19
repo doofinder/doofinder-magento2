@@ -6,38 +6,43 @@ use Doofinder\Feed\Test\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\MapFactory
+ */
 class MapFactoryTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\MapFactory
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $_objectManager;
+    private $objectManagerMock;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_objectManager = $this->getMock(
-            '\Magento\Framework\ObjectManagerInterface',
+        $this->objectManagerMock = $this->getMock(
+            \Magento\Framework\ObjectManagerInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_model = $this->getMock(
-            'Doofinder\Feed\Model\Generator\MapFactory',
+        $this->model = $this->getMock(
+            \Doofinder\Feed\Model\Generator\MapFactory::class,
             null,
             [
-                'objectManager' => $this->_objectManager,
+                'objectManager' => $this->objectManagerMock,
             ]
         );
     }
@@ -45,6 +50,11 @@ class MapFactoryTest extends BaseTestCase
     /**
      * Test create
      *
+     * @param  string $class
+     * @param  string $type
+     * @param  boolean $subclassExists
+     * @param  string $expected
+     * @return void
      * @dataProvider providerTestCreate
      */
     public function testCreate($class, $type, $subclassExists, $expected)
@@ -64,7 +74,7 @@ class MapFactoryTest extends BaseTestCase
         $context->method('getTypeId')->willReturn($type);
 
         $item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
@@ -72,38 +82,43 @@ class MapFactoryTest extends BaseTestCase
         );
         $item->method('getContext')->willReturn($context);
 
-        $this->_objectManager->expects($this->once())->method('create')
+        $this->objectManagerMock->expects($this->once())->method('create')
             ->with($expected, ['item' => $item, 'data' => ['sample' => 'data']]);
 
-        $this->_model->create($item, ['sample' => 'data']);
+        $this->model->create($item, ['sample' => 'data']);
     }
 
+    /**
+     * Data provider for testCreate() test
+     *
+     * @return array
+     */
     public function providerTestCreate()
     {
         return [
             [
-                '\Magento\Framework\DataObject',
+                \Magento\Framework\DataObject::class,
                 null,
                 false,
-                '\Doofinder\Feed\Model\Generator\Map',
+                \Doofinder\Feed\Model\Generator\Map::class,
             ],
             [
-                '\Magento\Catalog\Model\Product',
+                \Magento\Catalog\Model\Product::class,
                  'simple',
                  true,
-                 '\Doofinder\Feed\Model\Generator\Map\Product\Simple',
+                 \Doofinder\Feed\Model\Generator\Map\Product\Simple::class,
             ],
             [
-                '\Magento\Catalog\Model\Product',
+                \Magento\Catalog\Model\Product::class,
                  'configurable',
                  true,
-                 '\Doofinder\Feed\Model\Generator\Map\Product\Configurable',
+                 \Doofinder\Feed\Model\Generator\Map\Product\Configurable::class,
             ],
             [
-                '\Magento\Catalog\Model\Product',
+                \Magento\Catalog\Model\Product::class,
                  'configurable',
                  false,
-                 '\Doofinder\Feed\Model\Generator\Map\Product\Configurable',
+                 \Doofinder\Feed\Model\Generator\Map\Product\Configurable::class,
             ],
         ];
     }

@@ -3,9 +3,7 @@
 namespace Doofinder\Feed\Model;
 
 /**
- * Class Cron
- *
- * @package Doofinder\Feed\Model
+ * Cron model
  */
 class Cron extends \Magento\Framework\Model\AbstractModel
 {
@@ -30,13 +28,13 @@ class Cron extends \Magento\Framework\Model\AbstractModel
     protected function _construct()
     {
     // @codingStandardsIgnoreEnd
-        $this->_init('\Doofinder\Feed\Model\ResourceModel\Cron');
+        $this->_init(\Doofinder\Feed\Model\ResourceModel\Cron::class);
     }
 
     /**
      * Check if cronjob is enabled.
      *
-     * @return bool
+     * @return boolean
      */
     public function isEnabled()
     {
@@ -50,7 +48,7 @@ class Cron extends \Magento\Framework\Model\AbstractModel
     /**
      * Check if cronjob is waiting.
      *
-     * @return bool
+     * @return boolean
      */
     public function isWaiting()
     {

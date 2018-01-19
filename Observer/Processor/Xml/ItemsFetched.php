@@ -4,10 +4,13 @@ namespace Doofinder\Feed\Observer\Processor\Xml;
 
 use \Magento\Framework\Event\ObserverInterface;
 
+/**
+ * Items fetched observer
+ */
 class ItemsFetched implements ObserverInterface
 {
     /**
-     * @param Observer $observer
+     * @param \Magento\Framework\Event\Observer $observer
      * @return void
      */
     public function execute(\Magento\Framework\Event\Observer $observer)

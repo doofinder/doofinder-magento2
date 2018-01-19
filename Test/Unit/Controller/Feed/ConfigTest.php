@@ -5,208 +5,213 @@ namespace Doofinder\Feed\Test\Unit\Controller\Feed;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class ConfigTest
- * @package Doofinder\Feed\Test\Unit\Controller\Feed
+ * Test class for \Doofinder\Feed\Controller\Feed\Config
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ConfigTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Controller\Feed\Config
      */
-    private $_controller;
+    private $controller;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Magento\Framework\Controller\Result\Json
      */
-    private $_jsonResult;
+    private $jsonResult;
 
     /**
      * @var \Magento\Framework\Controller\ResultFactory
      */
-    private $_resultFactory;
+    private $resultFactory;
 
     /**
-     * @var Magento\Framework\App\ResponseInterface
+     * @var \Magento\Framework\App\ResponseInterface
      */
-    private $_response;
+    private $response;
 
     /**
      * @var \Magento\Framework\App\Action\Context
      */
-    private $_context;
+    private $context;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    private $_store;
+    private $store;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Magento\Framework\App\ProductMetadataInterface
      */
-    private $_productMetadata;
+    private $productMetadata;
 
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    private $_helper;
+    private $helper;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    private $_scopeConfig;
+    private $scopeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_storeConfig = $this->getMock(
-            '\Doofinder\Feed\Helper\StoreConfig',
+        $this->storeConfig = $this->getMock(
+            \Doofinder\Feed\Helper\StoreConfig::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_jsonResult = $this->getMock(
-            '\Magento\Framework\Controller\Result\Json',
+        $this->jsonResult = $this->getMock(
+            \Magento\Framework\Controller\Result\Json::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_resultFactory = $this->getMock(
-            '\Magento\Framework\Controller\ResultFactory',
+        $this->resultFactory = $this->getMock(
+            \Magento\Framework\Controller\ResultFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_resultFactory->method('create')
-            ->with('json')->willReturn($this->_jsonResult);
+        $this->resultFactory->method('create')
+            ->with('json')->willReturn($this->jsonResult);
 
-        $this->_response = $this->getMock(
-            'Magento\Framework\App\ResponseInterface',
+        $this->response = $this->getMock(
+            \Magento\Framework\App\ResponseInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_context = $this->getMock(
-            'Magento\Framework\App\Action\Context',
+        $this->context = $this->getMock(
+            \Magento\Framework\App\Action\Context::class,
             [],
             [],
             '',
             false
         );
-        $this->_context->method('getResponse')->willReturn($this->_response);
-        $this->_context->method('getResultFactory')->willReturn($this->_resultFactory);
+        $this->context->method('getResponse')->willReturn($this->response);
+        $this->context->method('getResultFactory')->willReturn($this->resultFactory);
 
-        $this->_store = $this->getMock(
-            '\Magento\Store\Model\Store',
+        $this->store = $this->getMock(
+            \Magento\Store\Model\Store::class,
             [],
             [],
             '',
             false
         );
-        $this->_store->method('getCode')->willReturn('default');
-        $this->_store->method('getUrl')->with('doofinder/feed')->willReturn(
+        $this->store->method('getCode')->willReturn('default');
+        $this->store->method('getUrl')->with('doofinder/feed')->willReturn(
             'http://example.com/index.php/doofinder/feed/'
         );
-        $this->_store->method('getCurrentCurrencyCode')->willReturn('USD');
+        $this->store->method('getCurrentCurrencyCode')->willReturn('USD');
 
-        $this->_storeManager = $this->getMock(
-            '\Magento\Store\Model\StoreManagerInterface',
+        $this->storeManager = $this->getMock(
+            \Magento\Store\Model\StoreManagerInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_storeManager->method('getStore')->willReturn($this->_store);
-        $this->_storeManager->method('getStores')->willReturn([$this->_store]);
+        $this->storeManager->method('getStore')->willReturn($this->store);
+        $this->storeManager->method('getStores')->willReturn([$this->store]);
 
-        $this->_productMetadata = $this->getMock(
-            '\Magento\Framework\App\ProductMetadataInterface',
+        $this->productMetadata = $this->getMock(
+            \Magento\Framework\App\ProductMetadataInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_productMetadata->method('getVersion')->willReturn('x.y.z');
-        $this->_productMetadata->method('getEdition')->willReturn('Community');
+        $this->productMetadata->method('getVersion')->willReturn('x.y.z');
+        $this->productMetadata->method('getEdition')->willReturn('Community');
 
-        $this->_helper = $this->getMock(
-            '\Doofinder\Feed\Helper\Data',
+        $this->helper = $this->getMock(
+            \Doofinder\Feed\Helper\Data::class,
             [],
             [],
             '',
             false
         );
-        $this->_helper->method('getModuleVersion')->willReturn('k.l.m');
+        $this->helper->method('getModuleVersion')->willReturn('k.l.m');
 
-        $this->_scopeConfig = $scopeConfig = $this->getMock(
-            '\Magento\Framework\App\Config\ScopeConfigInterface',
+        $this->scopeConfig = $scopeConfig = $this->getMock(
+            \Magento\Framework\App\Config\ScopeConfigInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_scopeConfig->method('getValue')->will($this->returnValueMap([
+        $this->scopeConfig->method('getValue')->will($this->returnValueMap([
             ['general/locale/code', $scopeConfig::SCOPE_TYPE_DEFAULT, null, 'EN'],
         ]));
 
-        $this->_schedule = $this->getMock(
-            '\Doofinder\Feed\Helper\Schedule',
+        $this->schedule = $this->getMock(
+            \Doofinder\Feed\Helper\Schedule::class,
             [],
             [],
             '',
             false
         );
-        $this->_schedule->method('isFeedFileExist')->willReturn(false);
-        $this->_schedule->method('getFeedFileUrl')->with('default', false)
+        $this->schedule->method('isFeedFileExist')->willReturn(false);
+        $this->schedule->method('getFeedFileUrl')->with('default', false)
             ->willReturn('http://example.com/pub/media//doofinder-default.xml');
 
-        $this->_controller = $this->objectManager->getObject(
-            '\Doofinder\Feed\Controller\Feed\Config',
+        $this->controller = $this->objectManager->getObject(
+            \Doofinder\Feed\Controller\Feed\Config::class,
             [
-                'storeConfig' => $this->_storeConfig,
-                'resultFactory' => $this->_resultFactory,
-                'storeManager' => $this->_storeManager,
-                'productMetadata' => $this->_productMetadata,
-                'helper' => $this->_helper,
-                'scopeConfig' => $this->_scopeConfig,
-                'schedule' => $this->_schedule,
-                'context' => $this->_context,
+                'storeConfig' => $this->storeConfig,
+                'resultFactory' => $this->resultFactory,
+                'storeManager' => $this->storeManager,
+                'productMetadata' => $this->productMetadata,
+                'helper' => $this->helper,
+                'scopeConfig' => $this->scopeConfig,
+                'schedule' => $this->schedule,
+                'context' => $this->context,
             ]
         );
     }
 
     /**
-     * Test execute() method.
+     * Test execute() method
+     *
+     * @return void
      */
     public function testExecuteEnabled()
     {
-        $this->_storeConfig->method('getStoreConfig')->willReturn([
+        $this->storeConfig->method('getStoreConfig')->willReturn([
             'enabled' => true,
         ]);
 
@@ -235,7 +240,7 @@ class ConfigTest extends BaseTestCase
             ],
         ];
 
-        $this->_jsonResult->expects($this->once())->method('setData')->with($config);
-        $this->_controller->execute();
+        $this->jsonResult->expects($this->once())->method('setData')->with($config);
+        $this->controller->execute();
     }
 }

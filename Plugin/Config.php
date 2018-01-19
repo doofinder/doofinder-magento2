@@ -3,14 +3,14 @@
 namespace Doofinder\Feed\Plugin;
 
 /**
- * @class Config
+ * Config plugin
  */
 class Config
 {
     /**
      * @var \Doofinder\Feed\Helper\Indexer
      */
-    private $_indexer;
+    private $indexer;
 
     /**
      * Constructor
@@ -20,7 +20,7 @@ class Config
     public function __construct(
         \Doofinder\Feed\Helper\Indexer $indexer
     ) {
-        $this->_indexer = $indexer;
+        $this->indexer = $indexer;
     }
 
     /**
@@ -30,13 +30,17 @@ class Config
      * right before config update, so Indexer helper is able
      * to check if index needs invalidating.
      *
-     * @param \Magento\Config\Model\Config $config
+     * @param  \Magento\Config\Model\Config $config
+     * @param  mixed $value
+     * @return mixed
      */
-    public function beforeSave(\Magento\Config\Model\Config $config)
+    public function beforeSave(\Magento\Config\Model\Config $config, $value = null)
     {
-        $indexer = $this->_indexer;
+        $indexer = $this->indexer;
         if ($config->getSection() == $indexer::CONFIG_SECTION_ID) {
-            $this->_indexer->storeOldConfig();
+            $this->indexer->storeOldConfig();
         }
+
+        return $value;
     }
 }

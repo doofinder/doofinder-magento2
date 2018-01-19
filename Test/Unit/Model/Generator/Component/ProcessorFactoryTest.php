@@ -6,51 +6,58 @@ use Doofinder\Feed\Test\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Component\ProcessorFactory
+ */
 class ProcessorFactoryTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\ProcessorFactory
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $_objectManager;
+    private $objectManagerMock;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_objectManager = $this->getMock(
-            '\Magento\Framework\ObjectManagerInterface',
+        $this->objectManagerMock = $this->getMock(
+            \Magento\Framework\ObjectManagerInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_model = $this->getMock(
-            'Doofinder\Feed\Model\Generator\Component\ProcessorFactory',
+        $this->model = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\ProcessorFactory::class,
             null,
             [
-                'objectManager' => $this->_objectManager,
-                'instanceName' => '\Test\Unit\Doofinder\Feed'
+                'objectManager' => $this->objectManagerMock,
+                'instanceName' => \Test\Unit\Doofinder\Feed::class
             ]
         );
     }
 
     /**
-     * Test create
+     * Test create() method
+     *
+     * @return void
      */
     public function testCreate()
     {
-        $this->_objectManager->expects($this->once())->method('create')
-            ->with('\Test\Unit\Doofinder\Feed\Processor\Test', ['sample' => 'data']);
+        $this->objectManagerMock->expects($this->once())->method('create')
+            ->with(\Test\Unit\Doofinder\Feed\Processor\Test::class, ['sample' => 'data']);
 
-        $this->_model->create(['sample' => 'data'], 'Test');
+        $this->model->create(['sample' => 'data'], 'Test');
     }
 }

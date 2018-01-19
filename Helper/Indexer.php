@@ -2,6 +2,9 @@
 
 namespace Doofinder\Feed\Helper;
 
+/**
+ * Indexer helper
+ */
 class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
@@ -12,24 +15,19 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    private $_scopeConfig;
+    private $storeConfig;
 
     /**
      * @var \Magento\Framework\Indexer\IndexerRegistry
      */
-    private $_indexerRegistry;
+    private $indexerRegistry;
 
     /**
      * Old doofinder section configs before save
      *
      * @var array
      */
-    private $_oldConfigs = [];
+    private $oldConfigs = [];
 
     /**
      * @param \Magento\Framework\App\Helper\Context $context
@@ -42,9 +40,8 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
     ) {
         parent::__construct($context);
-        $this->_storeConfig = $storeConfig;
-        $this->_scopeConfig = $context->getScopeConfig();
-        $this->_indexerRegistry = $indexerRegistry;
+        $this->storeConfig = $storeConfig;
+        $this->indexerRegistry = $indexerRegistry;
     }
 
     /**
@@ -54,16 +51,16 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private function getConfigs()
     {
-        $scope = $this->_storeConfig->getScopeStore();
-        $storeCodes = $this->_storeConfig->getStoreCodes();
-        $storeConfig = $this->_storeConfig;
+        $scope = $this->storeConfig->getScopeStore();
+        $storeCodes = $this->storeConfig->getStoreCodes();
+        $storeConfig = $this->storeConfig;
 
         $configs = [];
         $ignore = ['password', 'categories_in_navigation'];
         foreach ($storeCodes as $storeCode) {
             $config = array_merge(
-                $this->_scopeConfig->getValue($storeConfig::FEED_ATTRIBUTES_CONFIG, $scope, $storeCode),
-                $this->_scopeConfig->getValue($storeConfig::FEED_SETTINGS_CONFIG, $scope, $storeCode)
+                $this->scopeConfig->getValue($storeConfig::FEED_ATTRIBUTES_CONFIG, $scope, $storeCode),
+                $this->scopeConfig->getValue($storeConfig::FEED_SETTINGS_CONFIG, $scope, $storeCode)
             );
 
             $config = array_diff_key($config, array_flip($ignore));
@@ -79,40 +76,40 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
      * This comes from a config plugin that
      * loads 'doofinder_config_config' section config
      * right before config update.
+     *
+     * @return void
      */
     public function storeOldConfig()
     {
-        $this->_oldConfigs = $this->getConfigs();
+        $this->oldConfigs = $this->getConfigs();
     }
 
     /**
      * Check if index should be invalidated
      *
-     * @param string $scope
-     * @param int $scopeId
      * @return boolean
      */
     public function shouldIndexInvalidate()
     {
-        if (empty($this->_oldConfigs)) {
+        if (empty($this->oldConfigs)) {
             // No old config - assume index should invalidate
             return true;
         }
 
         $configs = $this->getConfigs();
 
-        if (array_keys($configs) != array_keys($this->_oldConfigs)) {
+        if (array_keys($configs) != array_keys($this->oldConfigs)) {
             // Configs keys should match - assume index should invalidate
             return true;
         }
 
         foreach (array_keys($configs) as $storeCode) {
-            if (!$this->_storeConfig->isInternalSearchEnabled($storeCode)) {
+            if (!$this->storeConfig->isInternalSearchEnabled($storeCode)) {
                 // Doofinder internal search disabled, proceed
                 continue;
             }
 
-            if ($configs[$storeCode] != $this->_oldConfigs[$storeCode]) {
+            if ($configs[$storeCode] != $this->oldConfigs[$storeCode]) {
                 // Configs does not match - invalidate
                 return true;
             }
@@ -124,10 +121,12 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Invalidate index
+     *
+     * @return void
      */
     public function invalidate()
     {
-        $indexer = $this->_indexerRegistry->get(\Magento\CatalogSearch\Model\Indexer\Fulltext::INDEXER_ID);
+        $indexer = $this->indexerRegistry->get(\Magento\CatalogSearch\Model\Indexer\Fulltext::INDEXER_ID);
         $indexer->invalidate();
     }
 }

@@ -7,7 +7,8 @@ interface ProcessorInterface
     /**
      * Process generator items
      *
-     * @param Doofinder\Feed\Model\Generator\Item[]
+     * @param  \Doofinder\Feed\Model\Generator\Item[] $items
+     * @return void
      */
     public function process(array $items);
 }

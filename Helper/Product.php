@@ -5,42 +5,40 @@ namespace Doofinder\Feed\Helper;
 use Magento\Framework\UrlInterface;
 
 /**
- * Product class
- *
- * @package Doofinder\Feed\Helper
+ * Product helper
  */
 class Product extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory
      */
-    private $_categoryColFactory = null;
+    private $categoryColFactory = null;
 
     /**
      * @var \Magento\Catalog\Helper\Image
      */
-    private $_imageHelper = null;
+    private $imageHelper = null;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Magento\CatalogInventory\Api\StockRegistryInterface
      */
-    private $_stockRegistry;
+    private $stockRegistry;
 
     /**
      * Static cache for category tree
      * @var \Magento\Catalog\Model\Category[][]
      */
-    private $_categoryTree;
+    private $categoryTree;
 
     /**
      * @var \Magento\Tax\Model\Config
      */
-    private $_taxConfig;
+    private $taxConfig;
 
     /**
      * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory
@@ -60,12 +58,12 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Tax\Model\Config $taxConfig
     ) {
         // * @codingStandardsIgnoreEnd
-        $this->_categoryColFactory = $categoryColFactory;
-        $this->_imageHelper = $imageHelper;
-        $this->_storeManager = $storeManager;
-        $this->_stockRegistry = $stockRegistry;
-        $this->_categoryTree = [];
-        $this->_taxConfig = $taxConfig;
+        $this->categoryColFactory = $categoryColFactory;
+        $this->imageHelper = $imageHelper;
+        $this->storeManager = $storeManager;
+        $this->stockRegistry = $stockRegistry;
+        $this->categoryTree = [];
+        $this->taxConfig = $taxConfig;
         parent::__construct($context);
     }
 
@@ -73,7 +71,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get product id
      *
      * @param \Magento\Catalog\Model\Product $product
-     * @return int
+     * @return integer
      */
     public function getProductId(\Magento\Catalog\Model\Product $product)
     {
@@ -99,7 +97,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private function getCategories(array $ids)
     {
-        $categoryCollection = $this->_categoryColFactory->create();
+        $categoryCollection = $this->categoryColFactory->create();
         $categoryCollection
             ->addIdFilter($ids)
             ->addAttributeToSelect('name')
@@ -114,7 +112,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get category tree
      *
      * @param \Magento\Catalog\Model\Category[] $categories
-     * @param boolean $fromNavigation - exclude categories not in menu
+     * @param boolean $fromNavigation Exclude categories not in menu.
      * @return \Magento\Catalog\Model\Category[][]
      */
     private function getCategoryTree(array $categories, $fromNavigation)
@@ -125,7 +123,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         }, $categories);
 
         // Exclude previously processed categories
-        $categories = array_diff_key($categories, $this->_categoryTree);
+        $categories = array_diff_key($categories, $this->categoryTree);
 
         // Grab ids of all parent categories of all product categories
         $parentIds = [];
@@ -145,7 +143,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
                 // Ignore category if one of parents is missing
                 // this means that parent is not active
                 if (!isset($parents[$parentId])) {
-                    $this->_categoryTree[$categoryId] = [];
+                    $this->categoryTree[$categoryId] = [];
                     break;
                 }
 
@@ -154,7 +152,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
                     break;
                 }
 
-                $this->_categoryTree[$categoryId][$parentId] = $parents[$parentId];
+                $this->categoryTree[$categoryId][$parentId] = $parents[$parentId];
 
                 // Stop processing on 2nd level
                 if ($parents[$parentId]->getLevel() <= 2) {
@@ -165,24 +163,26 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             }
 
             // Now reverse the order to make parents before children
-            if (!empty($this->_categoryTree[$categoryId])) {
-                $this->_categoryTree[$categoryId] = array_reverse($this->_categoryTree[$categoryId], true);
+            if (!empty($this->categoryTree[$categoryId])) {
+                $this->categoryTree[$categoryId] = array_reverse($this->categoryTree[$categoryId], true);
             }
         }
 
         // Return tree
-        return array_intersect_key($this->_categoryTree, array_flip($categoryIds));
+        return array_intersect_key($this->categoryTree, array_flip($categoryIds));
     }
 
     /**
      * Get product categories tree
      *
-     * @param \Magento\Catalog\Model\Product
-     * @param boolean $fromNavigation - exclude categories not in menu
+     * @param \Magento\Catalog\Model\Product $product
+     * @param boolean $fromNavigation Exclude categories not in menu.
      * @return \Magento\Catalog\Model\Category[][]
      */
-    public function getProductCategoriesWithParents(\Magento\Catalog\Model\Product $product, $fromNavigation = false)
-    {
+    public function getProductCategoriesWithParents(
+        \Magento\Catalog\Model\Product $product,
+        $fromNavigation = false
+    ) {
         $categories = $this->getCategories($product->getCategoryIds());
         return $this->getCategoryTree($categories, $fromNavigation);
     }
@@ -197,7 +197,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     public function getProductImageUrl(\Magento\Catalog\Model\Product $product, $size = null)
     {
         if ($product->hasImage()) {
-            return $this->_imageHelper
+            return $this->imageHelper
                 ->init($product, 'doofinder_image')
                 ->resize($size)
                 ->getUrl();
@@ -208,12 +208,15 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get product price
      *
      * @param \Magento\Catalog\Model\Product $product
-     * @param string $attribute = 'price'
-     * @param boolean|null $tax = null
+     * @param string $attribute
+     * @param boolean|null $tax
      * @return float
      */
-    public function getProductPrice(\Magento\Catalog\Model\Product $product, $attribute = 'price', $tax = null)
-    {
+    public function getProductPrice(
+        \Magento\Catalog\Model\Product $product,
+        $attribute = 'price',
+        $tax = null
+    ) {
         switch ($attribute) {
             case 'special_price':
             case 'tier_price':
@@ -229,14 +232,14 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $amount = $price->getAmount();
 
         if ($tax === null) {
-            $taxConfig = $this->_taxConfig;
-            $tax = $this->_taxConfig->getPriceDisplayType() != $taxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
+            $taxConfig = $this->taxConfig;
+            $tax = $this->taxConfig->getPriceDisplayType() != $taxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
         }
 
         if (!$tax) {
             // No tax needed, use base amount
             $value = $amount->getBaseAmount();
-        } elseif ($this->_taxConfig->priceIncludesTax()) {
+        } elseif ($this->taxConfig->priceIncludesTax()) {
             // Tax already included, use value
             $value = $amount->getValue();
         } else {
@@ -291,7 +294,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCurrencyCode()
     {
-        return $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+        return $this->storeManager->getStore()->getCurrentCurrency()->getCode();
     }
 
     /**
@@ -316,7 +319,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             $value = $frontend->getValue($product);
         }
 
-        if (is_a($value, '\Magento\Framework\Phrase')) {
+        if (is_a($value, \Magento\Framework\Phrase::class)) {
             $value = $value->render();
         }
 
@@ -342,11 +345,11 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get stock item
      *
-     * @param int $productId
+     * @param integer $productId
      * @return \Magento\CatalogInventory\Model\Stock\Item
      */
     private function getStockItem($productId)
     {
-        return $this->_stockRegistry->getStockItem($productId);
+        return $this->stockRegistry->getStockItem($productId);
     }
 }

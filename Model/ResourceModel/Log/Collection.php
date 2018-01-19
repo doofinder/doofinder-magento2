@@ -3,9 +3,7 @@
 namespace Doofinder\Feed\Model\ResourceModel\Log;
 
 /**
- * Class Collection
- *
- * @package Doofinder\Feed\Model\ResourceModel\Log
+ * Log collection
  */
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
@@ -17,8 +15,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     {
     // @codingStandardsIgnoreEnd
         $this->_init(
-            '\Doofinder\Feed\Model\Log',
-            '\Doofinder\Feed\Model\ResourceModel\Log'
+            \Doofinder\Feed\Model\Log::class,
+            \Doofinder\Feed\Model\ResourceModel\Log::class
         );
     }
 }

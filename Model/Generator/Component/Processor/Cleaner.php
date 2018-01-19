@@ -5,12 +5,16 @@ namespace Doofinder\Feed\Model\Generator\Component\Processor;
 use \Doofinder\Feed\Model\Generator\Component;
 use \Doofinder\Feed\Model\Generator\Component\ProcessorInterface;
 
+/**
+ * Cleaner component
+ */
 class Cleaner extends Component implements ProcessorInterface
 {
     /**
      * Process items
      *
-     * @param \Doofinder\Feed\Model\Generator\Item[]
+     * @param  \Doofinder\Feed\Model\Generator\Item[] $items
+     * @return void
      */
     public function process(array $items)
     {
@@ -22,7 +26,8 @@ class Cleaner extends Component implements ProcessorInterface
     /**
      * Process item
      *
-     * @param \Doofinder\Feed\Model\Generator\Item
+     * @param  \Doofinder\Feed\Model\Generator\Item $item
+     * @return void
      */
     private function processItem(\Doofinder\Feed\Model\Generator\Item $item)
     {
@@ -34,7 +39,7 @@ class Cleaner extends Component implements ProcessorInterface
     /**
      * Clean field
      *
-     * @param string|array
+     * @param  string|array $field
      * @return string|array
      */
     private function clean($field)
@@ -51,7 +56,7 @@ class Cleaner extends Component implements ProcessorInterface
     /**
      * Clean string
      *
-     * @param string
+     * @param  string $field
      * @return string
      */
     public function cleanString($field)
@@ -69,7 +74,7 @@ class Cleaner extends Component implements ProcessorInterface
     /**
      * Clean new lines
      *
-     * @param string
+     * @param  string $field
      * @return string
      */
     private function cleanNewlines($field)
@@ -80,7 +85,7 @@ class Cleaner extends Component implements ProcessorInterface
     /**
      * Clean tags
      *
-     * @param string
+     * @param  string $field
      * @return string
      */
     private function cleanTags($field)
@@ -91,7 +96,7 @@ class Cleaner extends Component implements ProcessorInterface
     /**
      * Clean duplicated spaces
      *
-     * @param string
+     * @param  string $field
      * @return string
      */
     private function cleanDuplicatedSpaces($field)
@@ -102,7 +107,7 @@ class Cleaner extends Component implements ProcessorInterface
     /**
      * Trim
      *
-     * @param string
+     * @param  string $field
      * @return string
      */
     private function trim($field)
@@ -113,7 +118,7 @@ class Cleaner extends Component implements ProcessorInterface
     /**
      * Decode HTML entities
      *
-     * @param string
+     * @param  string $field
      * @return string
      */
     private function decodeHtmlEntities($field)
@@ -128,7 +133,7 @@ class Cleaner extends Component implements ProcessorInterface
      *
      * @see http://stackoverflow.com/questions/4224141/php-removing-invalid-utf-8-characters-in-xml-using-filter
      *
-     * @param string
+     * @param  string $field
      * @return string
      */
     private function cleanInvalidUTF($field)

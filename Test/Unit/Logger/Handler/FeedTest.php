@@ -5,99 +5,106 @@ namespace Doofinder\Feed\Test\Unit\Logger\Handler;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 
+/**
+ * Test class for \Doofinder\Feed\Logger\Feed\Handler
+ */
 class FeedTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Logger\Feed\Handler
      */
-    private $_handler;
+    private $handler;
 
     /**
      * @var \Doofinder\Feed\Model\Log
      */
-    private $_logEntry;
+    private $logEntry;
 
     /**
      * @var \Doofinder\Feed\Model\LogFactory
      */
-    private $_logFactory;
+    private $logFactory;
 
     /**
      * @var \Doofinder\Feed\Model\ResourceModel\Log
      */
-    private $_logResource;
+    private $logResource;
 
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    private $_process;
+    private $process;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime
      */
-    private $_datetime;
+    private $datetime;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_process = $this->getMock(
-            '\Doofinder\Feed\Model\Cron',
+        $this->process = $this->getMock(
+            \Doofinder\Feed\Model\Cron::class,
             [],
             [],
             '',
             false
         );
-        $this->_process->method('getId')->willReturn(15);
+        $this->process->method('getId')->willReturn(15);
 
-        $this->_logResource = $this->getMock(
-            '\Doofinder\Feed\Model\ResourceModel\Log',
+        $this->logResource = $this->getMock(
+            \Doofinder\Feed\Model\ResourceModel\Log::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_logEntry = $this->getMock(
-            '\Doofinder\Feed\Model\Log',
+        $this->logEntry = $this->getMock(
+            \Doofinder\Feed\Model\Log::class,
             [],
             [],
             '',
             false
         );
-        $this->_logEntry->method('getResource')->willReturn($this->_logResource);
+        $this->logEntry->method('getResource')->willReturn($this->logResource);
 
-        $this->_logFactory = $this->getMock(
-            '\Doofinder\Feed\Model\LogFactory',
+        $this->logFactory = $this->getMock(
+            \Doofinder\Feed\Model\LogFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_logFactory->method('create')->willReturn($this->_logEntry);
+        $this->logFactory->method('create')->willReturn($this->logEntry);
 
-        $this->_datetime = $this->getMock(
-            '\Magento\Framework\Stdlib\DateTime',
+        $this->datetime = $this->getMock(
+            \Magento\Framework\Stdlib\DateTime::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_handler = $this->objectManager->getObject(
-            '\Doofinder\Feed\Logger\Handler\Feed',
+        $this->handler = $this->objectManager->getObject(
+            \Doofinder\Feed\Logger\Handler\Feed::class,
             [
-                'logFactory' => $this->_logFactory,
-                'datetime' => $this->_datetime,
+                'logFactory' => $this->logFactory,
+                'datetime' => $this->datetime,
             ]
         );
     }
 
     /**
-     * Test write() method.
+     * Test write() method
+     *
+     * @return void
      */
     public function testWrite()
     {
@@ -110,20 +117,20 @@ class FeedTest extends BaseTestCase
             'level_name' => 'DEBUG',
             'message' => 'Sample message',
             'extra' => [],
-            'context' => ['process' => $this->_process],
+            'context' => ['process' => $this->process],
             'datetime' => $date,
         ];
 
-        $this->_logEntry->expects($this->once())->method('setData')->with([
+        $this->logEntry->expects($this->once())->method('setData')->with([
             'message' => 'Sample message',
             'type' => 'debug',
             'process_id' => 15,
             'time' => '2000-10-10 10:10',
         ]);
 
-        $this->_datetime->expects($this->once())->method('formatDate')
+        $this->datetime->expects($this->once())->method('formatDate')
             ->with($date)->willReturn('2000-10-10 10:10');
 
-        $this->_handler->handle($record);
+        $this->handler->handle($record);
     }
 }

@@ -12,79 +12,87 @@ class ProductTest extends AbstractIntegrity
     /**
      * @var \Doofinder\Feed\Helper\Product
      */
-    private $_helper;
+    private $helper;
 
     /**
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $_objectManager;
+    private $objectManager;
 
     /**
      * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
-    private $_productRepository;
+    private $productRepository;
 
     /**
      * @var \Magento\Catalog\Api\CategoryRepositoryInterface
      */
-    private $_categoryRepository;
+    private $categoryRepository;
 
+    /**
+     * Set up test
+     *
+     * @return void
+     */
     public function setUp()
     {
-        $this->_objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+        $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
-        $this->_productRepository = $this->_objectManager
-            ->create('\Magento\Catalog\Api\ProductRepositoryInterface');
+        $this->productRepository = $this->objectManager
+            ->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
 
-        $this->_categoryRepository = $this->_objectManager
-            ->create('\Magento\Catalog\Api\CategoryRepositoryInterface');
+        $this->categoryRepository = $this->objectManager
+            ->create(\Magento\Catalog\Api\CategoryRepositoryInterface::class);
 
-        $this->_helper = $this->_objectManager->create(
-            '\Doofinder\Feed\Helper\Product'
+        $this->helper = $this->objectManager->create(
+            \Doofinder\Feed\Helper\Product::class
         );
     }
 
     /**
-     * Test getProductId
+     * Test getProductId() method
      *
+     * @return void
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      * @magentoAppIsolation enabled
      */
     public function testGetProductId()
     {
-        $product = $this->_productRepository->get('simple');
+        $product = $this->productRepository->get('simple');
 
         $this->assertEquals(
             1,
-            $this->_helper->getProductId($product)
+            $this->helper->getProductId($product)
         );
     }
 
     /**
-     * Test getProductUrl
+     * Test getProductUrl() method
      *
+     * @return void
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      * @magentoAppIsolation enabled
      */
     public function testGetProductUrl()
     {
-        $product = $this->_productRepository->get('simple');
+        $product = $this->productRepository->get('simple');
 
         $this->assertRegExp(
             '/https?:\/\/[^\/]+(:\d+)?\/(.*\/)?simple-product\.html/',
-            $this->_helper->getProductUrl($product)
+            $this->helper->getProductUrl($product)
         );
     }
 
     /**
-     * Test getProductCategoriesWithParents
+     * Test getProductCategoriesWithParents() method
      *
+     * @return void
      * @magentoDataFixture Magento/Catalog/_files/categories.php
      * @magentoAppIsolation enabled
      */
     public function testGetProductCategoriesWithParents()
     {
-        $product = $this->_productRepository->get('simple');
+        $product = $this->productRepository->get('simple');
 
         $this->assertEquals(
             [
@@ -109,20 +117,21 @@ class ProductTest extends AbstractIntegrity
                         $element
                     );
                 },
-                $this->_helper->getProductCategoriesWithParents($product)
+                $this->helper->getProductCategoriesWithParents($product)
             )
         );
     }
 
     /**
-     * Test getProductCategoriesWithParentsInNavigation
+     * Test getProductCategoriesWithParentsInNavigation() method
      *
+     * @return void
      * @magentoDataFixture Magento/Catalog/_files/categories.php
      */
     public function testGetProductCategoriesWithParentsNavigation()
     {
-        $product = $this->_productRepository->get('simple');
-        $category = $this->_categoryRepository->get(3);
+        $product = $this->productRepository->get('simple');
+        $category = $this->categoryRepository->get(3);
         $category->setIncludeInMenu(0);
         $category->save();
 
@@ -144,111 +153,117 @@ class ProductTest extends AbstractIntegrity
                         $element
                     );
                 },
-                $this->_helper->getProductCategoriesWithParents($product, true)
+                $this->helper->getProductCategoriesWithParents($product, true)
             )
         );
     }
 
     /**
-     * Test getProductImageUrl
+     * Test getProductImageUrl() method
      *
+     * @return void
      * @magentoDataFixture Magento/Catalog/_files/product_with_image.php
      * @magentoAppIsolation enabled
      */
     public function testGetProductImageUrl()
     {
-        $product = $this->_productRepository->get('simple');
+        $product = $this->productRepository->get('simple');
 
         $this->assertRegExp(
             // @codingStandardsIgnoreStart
             '/https?:\/\/[^\/]+(:\d+)?\/(.*\/)?pub\/media\/catalog\/product\/cache\/((\d+?\/)?image\/)?[^\/]+\/\w\/\w\/magento_image\.jpg/',
             // @codingStandardsIgnoreEnd
-            $this->_helper->getProductImageUrl($product)
+            $this->helper->getProductImageUrl($product)
         );
     }
 
     /**
-     * Test getProductPrice
+     * Test getProductPrice() method
      *
+     * @return void
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      * @magentoAppIsolation enabled
      */
     public function testGetProductPrice()
     {
-        $product = $this->_productRepository->get('simple');
+        $product = $this->productRepository->get('simple');
 
         $this->assertEquals(
             10,
-            $this->_helper->getProductPrice($product)
+            $this->helper->getProductPrice($product)
         );
     }
 
     /**
-     * Test getProductAvailability
+     * Test getProductAvailability() method
      *
+     * @return void
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      */
     public function testGetProductAvailability()
     {
-        $product = $this->_productRepository->get('simple');
+        $product = $this->productRepository->get('simple');
 
         $this->assertEquals(
             'in stock',
-            $this->_helper->getProductAvailability($product)
+            $this->helper->getProductAvailability($product)
         );
     }
 
     /**
-     * Test getAttributeText
+     * Test getAttributeText() method
      *
+     * @return void
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      * @magentoAppIsolation enabled
      */
-
     public function testGetAttributeText()
     {
-        $product = $this->_productRepository->get('simple');
+        $product = $this->productRepository->get('simple');
 
         $this->assertEquals(
             null,
-            $this->_helper->getAttributeText($product, 'tax_class_id')
+            $this->helper->getAttributeText($product, 'tax_class_id')
         );
 
         $this->assertEquals(
             'Simple Product',
-            $this->_helper->getAttributeText($product, 'name')
+            $this->helper->getAttributeText($product, 'name')
         );
 
         $this->assertEquals(
             'Description with <b>html tag</b>',
-            $this->_helper->getAttributeText($product, 'description')
+            $this->helper->getAttributeText($product, 'description')
         );
     }
 
     /**
-     * Test getQuantityAndStockStatus
+     * Test getQuantityAndStockStatus() method
      *
+     * @return void
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      * @magentoAppIsolation enabled
      */
     public function testGetQuantityAndStockStatus()
     {
-        $product = $this->_productRepository->get('simple');
+        $product = $this->productRepository->get('simple');
 
         $this->assertEquals(
             '100 - in stock',
-            $this->_helper->getQuantityAndStockStatus($product)
+            $this->helper->getQuantityAndStockStatus($product)
         );
     }
 
     /**
-     * Test getCurrencyCode() method.
+     * Test getCurrencyCode() method
+     *
+     * @return void
      */
     public function testGetCurrencyCode()
     {
         $this->assertEquals(
             'USD',
-            $this->_helper->getCurrencyCode()
+            $this->helper->getCurrencyCode()
         );
     }
 }

@@ -5,158 +5,161 @@ namespace Doofinder\Feed\Test\Unit\Controller\Feed;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class IndexTest
- * @package Doofinder\Feed\Test\Unit\Controller\Feed
+ * Test class for \Doofinder\Feed\Controller\Feed\Index
  */
 class IndexTest extends BaseTestCase
 {
     /**
      * @var \Magento\Framework\App\Action\Context
      */
-    private $_context;
+    private $context;
 
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    private $_helper;
+    private $helper;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    private $_generatorFactory;
+    private $generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Model\Generator
      */
-    private $_generator;
+    private $generator;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Xml
      */
-    private $_xml;
+    private $xml;
 
     /**
      * @var Magento\Framework\App\ResponseInterface
      */
-    private $_response;
+    private $response;
 
     /**
      * @var \Doofinder\Feed\Controller\Feed\Index
      */
-    private $_controller;
+    private $controller;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    private $_feedConfig;
+    private $feedConfig;
 
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    private $_request;
+    private $request;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_helper = $this->getMock(
-            '\Doofinder\Feed\Helper\Data',
+        $this->helper = $this->getMock(
+            \Doofinder\Feed\Helper\Data::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_xml = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
+        $this->xml = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Xml::class,
             [],
             [],
             '',
             false
         );
-        $this->_xml->expects($this->once())->method('getFeed');
+        $this->xml->expects($this->once())->method('getFeed');
 
-        $this->_generator = $this->getMock(
-            '\Doofinder\Feed\Model\Generator',
+        $this->generator = $this->getMock(
+            \Doofinder\Feed\Model\Generator::class,
             [],
             [],
             '',
             false
         );
-        $this->_generator->expects($this->once())->method('getProcessor')
-            ->with('Xml')->willReturn($this->_xml);
+        $this->generator->expects($this->once())->method('getProcessor')
+            ->with('Xml')->willReturn($this->xml);
 
-        $this->_generatorFactory = $this->getMock(
-            '\Doofinder\Feed\Model\GeneratorFactory',
+        $this->generatorFactory = $this->getMock(
+            \Doofinder\Feed\Model\GeneratorFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_generatorFactory->expects($this->once())
-            ->method('create')->willReturn($this->_generator);
+        $this->generatorFactory->expects($this->once())
+            ->method('create')->willReturn($this->generator);
 
-        $this->_response = $this->getMock(
-            '\Magento\Framework\App\Response\Http',
+        $this->response = $this->getMock(
+            \Magento\Framework\App\Response\Http::class,
             [],
             [],
             '',
             false
         );
-        $this->_response->expects($this->once())->method('setBody');
+        $this->response->expects($this->once())->method('setBody');
 
-        $this->_request = $this->getMock(
-            '\Magento\Framework\App\RequestInterface',
+        $this->request = $this->getMock(
+            \Magento\Framework\App\RequestInterface::class,
             [],
             [],
             ''
         );
 
-        $this->_feedConfig = $this->getMock(
-            '\Doofinder\Feed\Helper\FeedConfig',
+        $this->feedConfig = $this->getMock(
+            \Doofinder\Feed\Helper\FeedConfig::class,
             [],
             [],
             '',
             false
         );
-        $this->_feedConfig->expects($this->once())
+        $this->feedConfig->expects($this->once())
             ->method('getFeedConfig')->willReturn(['test' => 'test']);
 
-        $this->_context = $this->getMock(
-            '\Magento\Framework\App\Action\Context',
+        $this->context = $this->getMock(
+            \Magento\Framework\App\Action\Context::class,
             [],
             [],
             '',
             false
         );
-        $this->_context->method('getResponse')->willReturn($this->_response);
-        $this->_context->method('getRequest')->willReturn($this->_request);
+        $this->context->method('getResponse')->willReturn($this->response);
+        $this->context->method('getRequest')->willReturn($this->request);
 
-        $this->_controller = $this->objectManager->getObject(
-            '\Doofinder\Feed\Controller\Feed\Index',
+        $this->controller = $this->objectManager->getObject(
+            \Doofinder\Feed\Controller\Feed\Index::class,
             [
-                'context' => $this->_context,
-                'helper' => $this->_helper,
-                'generatorFactory' => $this->_generatorFactory,
-                'feedConfig' => $this->_feedConfig
+                'context' => $this->context,
+                'helper' => $this->helper,
+                'generatorFactory' => $this->generatorFactory,
+                'feedConfig' => $this->feedConfig
             ]
         );
     }
 
     /**
-     * Test execute() with custom feed params method.
+     * Test execute() method with custom feed params
+     *
+     * @return void
      */
     public function testExecuteWithCustomParams()
     {
-        $this->_helper->expects($this->any())
+        $this->helper->expects($this->any())
             ->method('getParamString')->willReturn('default');
-        $this->_helper->expects($this->any())
+        $this->helper->expects($this->any())
             ->method('getParamInt')->will($this->onConsecutiveCalls(20, 1));
 
-        $this->_feedConfig->expects($this->once())
+        $this->feedConfig->expects($this->once())
             ->method('getFeedConfig')
             ->with('default', [
                 'limit' => 1,
@@ -164,6 +167,6 @@ class IndexTest extends BaseTestCase
             ])
             ->willReturnSelf();
 
-        $this->_controller->execute();
+        $this->controller->execute();
     }
 }

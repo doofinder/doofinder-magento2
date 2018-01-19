@@ -3,9 +3,7 @@
 namespace Doofinder\Feed\Helper;
 
 /**
- * Class StoreConfig
- *
- * @package Doofinder\Feed\Helper
+ * Store config helper
  */
 class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -50,19 +48,14 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const DOOFINDER_SEARCH_ENGINE_NAME = 'doofinder';
 
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    private $_scopeConfig;
-
-    /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Doofinder\Feed\Helper\Serializer
      */
-    private $_serializer;
+    private $serializer;
 
     /**
      * StoreConfig constructor.
@@ -76,9 +69,8 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Doofinder\Feed\Helper\Serializer $serializer
     ) {
-        $this->_scopeConfig = $context->getScopeConfig();
-        $this->_storeManager = $storeManager;
-        $this->_serializer = $serializer;
+        $this->storeManager = $storeManager;
+        $this->serializer = $serializer;
         parent::__construct($context);
     }
 
@@ -98,9 +90,9 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
 
         $config = array_merge(
             ['store_code' => $storeCode],
-            ['attributes' => $this->_scopeConfig->getValue(self::FEED_ATTRIBUTES_CONFIG, $scopeStore, $storeCode)],
-            $this->_scopeConfig->getValue(self::FEED_CRON_CONFIG, $scopeStore, $storeCode),
-            $this->_scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode),
+            ['attributes' => $this->scopeConfig->getValue(self::FEED_ATTRIBUTES_CONFIG, $scopeStore, $storeCode)],
+            $this->scopeConfig->getValue(self::FEED_CRON_CONFIG, $scopeStore, $storeCode),
+            $this->scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode),
             ['atomic_updates_enabled' => $this->isAtomicUpdatesEnabled()]
         );
 
@@ -110,16 +102,14 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
          * @see     MAGETWO-80296
          */
         if (!empty($config['attributes']['additional_attributes'])) {
-            $additionalAttributesConfig = $this->_serializer->unserialize(
-                $config['attributes']['additional_attributes']
-            );
-            unset($config['attributes']['additional_attributes']);
-
             $additionalAttributes = [];
-            foreach ($additionalAttributesConfig as $data) {
+            foreach ($this->serializer->unserialize(
+                $config['attributes']['additional_attributes']
+            ) as $data) {
                 $additionalAttributes[$data['field']] = $data['additional_attribute'];
             }
 
+            unset($config['attributes']['additional_attributes']);
             $config['attributes'] = array_merge($config['attributes'], $additionalAttributes);
         }
 
@@ -140,17 +130,18 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get store code.
      *
-     * @return string Store code
+     * @param string $store
+     * @return string Store code.
      */
     public function getStoreCode($store = null)
     {
-        return $this->_storeManager->getStore($store)->getCode();
+        return $this->storeManager->getStore($store)->getCode();
     }
 
     /**
      * Get active/all store codes
      *
-     * @param boolean $onlyActive = true
+     * @param boolean $onlyActive
      * @return string[]
      */
     public function getStoreCodes($onlyActive = true)
@@ -159,7 +150,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         $storeCodes = [];
 
         if (in_array($currentStoreCode, ['admin', 'default'])) {
-            $stores = $this->_storeManager->getStores();
+            $stores = $this->storeManager->getStores();
 
             foreach ($stores as $store) {
                 if (!$onlyActive || $store->isActive()) {
@@ -190,7 +181,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getApiKey()
     {
-        return $this->_scopeConfig->getValue(self::ACCOUNT_CONFIG . '/api_key');
+        return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/api_key');
     }
 
     /**
@@ -201,7 +192,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getHashId($storeCode = null)
     {
-        return $this->_scopeConfig->getValue(
+        return $this->scopeConfig->getValue(
             self::SEARCH_ENGINE_CONFIG . '/hash_id',
             $this->getScopeStore(),
             $storeCode
@@ -216,7 +207,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSearchRequestLimit($storeCode = null)
     {
-        return $this->_scopeConfig->getValue(
+        return $this->scopeConfig->getValue(
             self::SEARCH_ENGINE_CONFIG . '/request_limit',
             $this->getScopeStore(),
             $storeCode
@@ -231,7 +222,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSearchTotalLimit($storeCode = null)
     {
-        $pageLimit = $this->_scopeConfig->getValue(
+        $pageLimit = $this->scopeConfig->getValue(
             self::SEARCH_ENGINE_CONFIG . '/page_limit',
             $this->getScopeStore(),
             $storeCode
@@ -248,7 +239,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isInternalSearchEnabled($storeCode = null)
     {
-        $engine = $this->_scopeConfig->getValue(
+        $engine = $this->scopeConfig->getValue(
             self::CATALOG_SEARCH_ENGINE_CONFIG,
             $this->getScopeStore(),
             $storeCode
@@ -267,7 +258,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $engineEnabled = $this->isInternalSearchEnabled($storeCode);
 
-        $atomicUpdatesEnabled = $this->_scopeConfig->getValue(
+        $atomicUpdatesEnabled = $this->scopeConfig->getValue(
             self::SEARCH_ENGINE_CONFIG . '/atomic_updates_enabled',
             $this->getScopeStore(),
             $storeCode
@@ -284,7 +275,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isExportCategoriesInNavigation($storeCode = null)
     {
-        return $this->_scopeConfig->getValue(
+        return $this->scopeConfig->getValue(
             self::FEED_SETTINGS_CONFIG . '/categories_in_navigation',
             $this->getScopeStore(),
             $storeCode
@@ -299,7 +290,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSearchLayerScript($storeCode = null)
     {
-        return $this->_scopeConfig->getValue(
+        return $this->scopeConfig->getValue(
             self::SEARCH_LAYER_CONFIG . '/script',
             $this->getScopeStore(),
             $storeCode

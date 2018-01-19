@@ -4,15 +4,13 @@ namespace Doofinder\Feed\Block\Adminhtml\Map;
 
 /**
  * Class Additional
- *
- * @package Doofinder\Feed\Block\Adminhtml\Map
  */
 class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
 {
     /**
-     * @var $_attributesRenderer \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes;
+     * @var \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes
      */
-    private $_attributesRenderer;
+    private $attributesRenderer;
 
     /**
      * Returns renderer for additional attributes.
@@ -21,15 +19,15 @@ class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
      */
     private function _getAttributesRenderer()
     {
-        if (!$this->_attributesRenderer) {
-            $this->_attributesRenderer = $this->getLayout()->createBlock(
-                '\Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes',
+        if (!$this->attributesRenderer) {
+            $this->attributesRenderer = $this->getLayout()->createBlock(
+                \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes::class,
                 '',
                 ['data' => ['is_render_to_js_template' => true]]
             );
         }
 
-        return $this->_attributesRenderer;
+        return $this->attributesRenderer;
     }
 
     /**
@@ -52,6 +50,8 @@ class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
 
     /**
      * {@inheritDoc}
+     *
+     * @param \Magento\Framework\DataObject $row
      * @codingStandardsIgnoreStart
      */
     protected function _prepareArrayRow(\Magento\Framework\DataObject $row)

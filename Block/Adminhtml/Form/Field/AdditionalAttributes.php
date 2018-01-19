@@ -4,8 +4,6 @@ namespace Doofinder\Feed\Block\Adminhtml\Form\Field;
 
 /**
  * Class AdditionalAttributes
- *
- * @package Doofinder\Feed\Block\Adminhtml\Form\Field
  */
 class AdditionalAttributes extends \Magento\Framework\View\Element\Html\Select
 {
@@ -14,7 +12,7 @@ class AdditionalAttributes extends \Magento\Framework\View\Element\Html\Select
      *
      * @var \Doofinder\Feed\Model\Config\Source\Feed\Attributes
      */
-    private $_feedAttributes;
+    private $feedAttributes;
 
     /**
      * AdditionalAttributes constructor.
@@ -30,7 +28,7 @@ class AdditionalAttributes extends \Magento\Framework\View\Element\Html\Select
     ) {
         parent::__construct($context, $data);
 
-        $this->_feedAttributes = $feedAttributes;
+        $this->feedAttributes = $feedAttributes;
     }
 
     /**
@@ -50,7 +48,7 @@ class AdditionalAttributes extends \Magento\Framework\View\Element\Html\Select
     public function _toHtml()
     {
         if (!$this->getOptions()) {
-            $attributes = $this->_feedAttributes->getAllAttributes();
+            $attributes = $this->feedAttributes->getAllAttributes();
 
             foreach ($attributes as $code => $label) {
                 $this->addOption($code, $label);

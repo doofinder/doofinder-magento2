@@ -5,37 +5,38 @@ namespace Doofinder\Feed\Test\Unit\Helper;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class FeedConfigTest
- * @package Doofinder\Feed\Test\Unit\Helper
+ * Test class for \Doofinder\Feed\Helper\FeedConfig
  */
 class FeedConfigTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    private $_helper;
+    private $helper;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_storeConfig = $this->getMock(
-            '\Doofinder\Feed\Helper\StoreConfig',
+        $this->storeConfig = $this->getMock(
+            \Doofinder\Feed\Helper\StoreConfig::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_storeConfig->method('getStoreConfig')->willReturn([
+        $this->storeConfig->method('getStoreConfig')->willReturn([
             'store_code' => 'default',
             'attributes' => [
                 'attr1' => 'value1',
@@ -48,16 +49,18 @@ class FeedConfigTest extends BaseTestCase
             'categories_in_navigation' => 0,
         ]);
 
-        $this->_helper = $this->objectManager->getObject(
-            '\Doofinder\Feed\Helper\FeedConfig',
+        $this->helper = $this->objectManager->getObject(
+            \Doofinder\Feed\Helper\FeedConfig::class,
             [
-                'storeConfig'   => $this->_storeConfig,
+                'storeConfig'   => $this->storeConfig,
             ]
         );
     }
 
     /**
-     * Test get lean feed config.
+     * Test getLeanFeedConfig() method
+     *
+     * @return void
      */
     public function testGetLeanFeedConfig()
     {
@@ -84,13 +87,15 @@ class FeedConfigTest extends BaseTestCase
             ],
         ];
 
-        $result = $this->_helper->getLeanFeedConfig();
+        $result = $this->helper->getLeanFeedConfig();
 
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * Test get feed config.
+     * Test getFeedConfig() method
+     *
+     * @return void
      */
     public function testGetFeedConfig()
     {
@@ -123,13 +128,15 @@ class FeedConfigTest extends BaseTestCase
             ],
         ];
 
-        $result = $this->_helper->getFeedConfig();
+        $result = $this->helper->getFeedConfig();
 
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * Test set custom params.
+     * Test getFeedConfig() method with custom parameters
+     *
+     * @return void
      */
     public function testGetFeedConfigWithCustomParams()
     {
@@ -168,7 +175,7 @@ class FeedConfigTest extends BaseTestCase
             ],
         ];
 
-        $result = $this->_helper->getFeedConfig(null, $customParams);
+        $result = $this->helper->getFeedConfig(null, $customParams);
 
         $this->assertEquals($expected, $result);
     }

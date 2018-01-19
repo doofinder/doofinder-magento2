@@ -10,30 +10,29 @@ use Magento\Framework\Data\OptionSourceInterface;
 use Magento\Store\Model\System\Store as SystemStore;
 
 /**
- * Class Options
+ * Options UI component class
  */
 class Options implements OptionSourceInterface
 {
     /**
      * @var array
      */
-    private $_options;
+    private $options;
 
     /**
      * @var \Doofinder\Feed\Logger\Feed
      */
-    private $_logger;
+    private $logger;
 
     /**
      * Constructor
      *
-     * @param SystemStore $systemStore
-     * @param Escaper $escaper
+     * @param \Doofinder\Feed\Logger\Feed $logger
      */
     public function __construct(
         \Doofinder\Feed\Logger\Feed $logger
     ) {
-        $this->_logger = $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -43,18 +42,18 @@ class Options implements OptionSourceInterface
      */
     public function toOptionArray()
     {
-        if (!$this->_options) {
-            $this->_options = [];
+        if (!$this->options) {
+            $this->options = [];
 
-            foreach (array_values($this->_logger->getLevelOptions()) as $name) {
+            foreach (array_values($this->logger->getLevelOptions()) as $name) {
                 $name = strtolower($name);
-                $this->_options[] = [
+                $this->options[] = [
                     'label' => $name,
                     'value' => $name,
                 ];
             }
         }
 
-        return $this->_options;
+        return $this->options;
     }
 }

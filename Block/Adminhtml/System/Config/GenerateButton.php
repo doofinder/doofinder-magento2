@@ -4,10 +4,7 @@ namespace Doofinder\Feed\Block\Adminhtml\System\Config;
 
 /**
  * Class GenerateButton
- *
- * @package Doofinder\Feed\Block\Adminhtml\System\Config
  */
-
 class GenerateButton extends \Magento\Config\Block\System\Config\Form\Field
 {
     const GENERATE_URL = 'doofinder/feed/generate';
@@ -67,6 +64,7 @@ class GenerateButton extends \Magento\Config\Block\System\Config\Form\Field
      * Get button label
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @return string
      */
     private function getButtonLabel(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {

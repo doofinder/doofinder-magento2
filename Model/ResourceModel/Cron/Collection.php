@@ -3,9 +3,7 @@
 namespace Doofinder\Feed\Model\ResourceModel\Cron;
 
 /**
- * Class Collection
- *
- * @package Doofinder\Feed\Model\ResourceModel\Cron
+ * Cron collection
  */
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
@@ -17,8 +15,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     {
     // @codingStandardsIgnoreEnd
         $this->_init(
-            '\Doofinder\Feed\Model\Cron',
-            '\Doofinder\Feed\Model\ResourceModel\Cron'
+            \Doofinder\Feed\Model\Cron::class,
+            \Doofinder\Feed\Model\ResourceModel\Cron::class
         );
     }
 }

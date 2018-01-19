@@ -2,6 +2,9 @@
 
 namespace Doofinder\Feed\Wrapper;
 
+/**
+ * Throttle wrapper
+ */
 class Throttle
 {
     /** Max allowed throttle retries **/
@@ -13,21 +16,29 @@ class Throttle
     /**
      * Throttled object
      *
-     * @var Object
+     * @var object
      */
-    private $_obj;
+    private $obj;
 
     /**
-     * @param Object $obj
+     * @param object $obj
      */
     public function __construct($obj)
     {
-        $this->_obj = $obj;
+        $this->obj = $obj;
     }
 
+    /**
+     * Throttle every method
+     *
+     * @param  string $name
+     * @param  array|null $args
+     * @return mixed
+     * @throws \BadMethodCallException Unknown method.
+     */
     public function __call($name, $args)
     {
-        if (method_exists($this->_obj, $name)) {
+        if (method_exists($this->obj, $name)) {
             return $this->throttle($name, $args);
         }
 
@@ -37,7 +48,8 @@ class Throttle
     /**
      * Wait specified amount of time
      *
-     * @param int $seconds
+     * @param  integer $seconds
+     * @return void
      */
     private function wait($seconds)
     {
@@ -49,15 +61,18 @@ class Throttle
     /**
      * Throttle requests to search engine in case of ThrottledResponse error
      *
-     * @param string $name Method name
-     * @param array $args Method args
-     * @param int $counter = 1 Throttle counter
+     * @param  string     $name    Method name.
+     * @param  array|null $args    Method args.
+     * @param  integer    $counter Throttle counter.
+     * @return mixed
+     * @throws \Doofinder\Api\Management\Errors\ThrottledResponse Response throttled.
+     * @throws \Doofinder\Api\Management\Errors\IndexingInProgress Indexing in progress.
      */
     private function throttle($name, $args, $counter = 1)
     {
         try {
             // @codingStandardsIgnoreStart
-            return call_user_func_array([$this->_obj, $name], $args);
+            return call_user_func_array([$this->obj, $name], $args);
             // @codingStandardsIgnoreEnd
         } catch (\Doofinder\Api\Management\Errors\ThrottledResponse $e) {
             if ($counter >= self::THROTTLE_RETRIES) {

@@ -5,108 +5,111 @@ namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class ArraySerializedTest
- * @package Doofinder\Feed\Test\Unit\Model\Backend
+ * Test class for \Doofinder\Feed\Model\Config\Backend\ArraySerialized
  */
 class ArraySerializedTest extends BaseTestCase
 {
     /**
      * @var \Magento\Framework\Model\Context
      */
-    private $_context;
+    private $context;
 
     /**
      * @var \Magento\Framework\Registry
      */
-    private $_registry;
+    private $registry;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    private $_configScope;
+    private $configScope;
 
     /**
      * @var \Magento\Framework\App\Cache\TypeListInterface
      */
-    private $_cacheTypeList;
+    private $cacheTypeList;
 
     /**
      * @var \Magento\Framework\Event\ManagerInterface
      */
-    private $_managerInterface;
+    private $managerInterface;
 
     /**
      * @var \Doofinder\Feed\Model\Config\Backend\ArraySerialized
      */
-    private $_model;
+    private $model;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_context = $this->getMock(
-            '\Magento\Framework\Model\Context',
+        $this->context = $this->getMock(
+            \Magento\Framework\Model\Context::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_registry = $this->getMock(
-            '\Magento\Framework\Registry',
+        $this->registry = $this->getMock(
+            \Magento\Framework\Registry::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_configScope = $this->getMock(
-            '\Magento\Framework\App\Config\ScopeConfigInterface',
+        $this->configScope = $this->getMock(
+            \Magento\Framework\App\Config\ScopeConfigInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_cacheTypeList = $this->getMock(
-            '\Magento\Framework\App\Cache\TypeListInterface',
+        $this->cacheTypeList = $this->getMock(
+            \Magento\Framework\App\Cache\TypeListInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_managerInterface = $this->getMock(
-            '\Magento\Framework\Event\ManagerInterface',
+        $this->managerInterface = $this->getMock(
+            \Magento\Framework\Event\ManagerInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_context->expects($this->once())
+        $this->context->expects($this->once())
             ->method('getEventDispatcher')
-            ->willReturn($this->_managerInterface);
+            ->willReturn($this->managerInterface);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Config\Backend\ArraySerialized',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Config\Backend\ArraySerialized::class,
             [
-                'context' => $this->_context,
-                'registry' => $this->_registry,
-                'config' => $this->_configScope,
-                'cacheTypeList' => $this->_cacheTypeList,
+                'context' => $this->context,
+                'registry' => $this->registry,
+                'config' => $this->configScope,
+                'cacheTypeList' => $this->cacheTypeList,
             ]
         );
     }
 
     /**
-     * Test afterSave()
+     * Test afterSave() method
+     *
+     * @return void
      */
     public function testAfterSave()
     {
-        $this->_model->afterSave();
+        $this->model->afterSave();
     }
 }

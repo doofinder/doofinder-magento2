@@ -4,138 +4,149 @@ namespace Doofinder\Feed\Test\Unit\Observer\Processor\Xml;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Observer\Processor\Xml\ItemsFetched
+ */
 class ItemsFetchedTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Observer\Processor\Xml\ItemsFetched
      */
-    private $_observer;
+    private $observer;
 
     /**
      * @var \Magento\Framework\Event\Observer
      */
-    private $_invokedObserver;
+    private $invokedObserver;
 
     /**
      * @var \Doofinder\Feed\Model\Generator
      */
-    private $_generator;
+    private $generator;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Xml
      */
-    private $_xmlProcessor;
+    private $xmlProcessor;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\FetcherInterface
      */
-    private $_fetcher;
+    private $fetcher;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_xmlProcessor = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
+        $this->xmlProcessor = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Xml::class,
             ['setStart', 'setEnd'],
             [],
             '',
             false
         );
 
-        $this->_fetcher = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\FetcherInterface',
+        $this->fetcher = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\FetcherInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_generator = $this->getMock(
-            '\Doofinder\Feed\Model\Generator',
+        $this->generator = $this->getMock(
+            \Doofinder\Feed\Model\Generator::class,
             ['getProcessor', 'getFetcher'],
             [],
             '',
             false
         );
-        $this->_generator->method('getProcessor')->with('Xml')->willReturn($this->_xmlProcessor);
+        $this->generator->method('getProcessor')->with('Xml')->willReturn($this->xmlProcessor);
 
-        $this->_invokedObserver = $this->getMock(
-            '\Magento\Framework\Event\Observer',
+        $this->invokedObserver = $this->getMock(
+            \Magento\Framework\Event\Observer::class,
             ['getGenerator'],
             [],
             '',
             false
         );
-        $this->_invokedObserver->method('getGenerator')->willReturn($this->_generator);
+        $this->invokedObserver->method('getGenerator')->willReturn($this->generator);
 
-        $this->_observer = $this->objectManager->getObject(
-            '\Doofinder\Feed\Observer\Processor\Xml\ItemsFetched'
+        $this->observer = $this->objectManager->getObject(
+            \Doofinder\Feed\Observer\Processor\Xml\ItemsFetched::class
         );
     }
 
     /**
      * Test execute() method
+     *
+     * @return void
      */
     public function testExecute()
     {
-        $this->_generator->method('getFetcher')->willReturn([$this->_fetcher]);
-        $this->_fetcher->method('isStarted')->willReturn(false);
-        $this->_fetcher->method('isDone')->willReturn(false);
+        $this->generator->method('getFetcher')->willReturn([$this->fetcher]);
+        $this->fetcher->method('isStarted')->willReturn(false);
+        $this->fetcher->method('isDone')->willReturn(false);
 
-        $this->_xmlProcessor->expects($this->once())
+        $this->xmlProcessor->expects($this->once())
             ->method('setStart')
             ->with(false);
 
-        $this->_xmlProcessor->expects($this->once())
+        $this->xmlProcessor->expects($this->once())
             ->method('setEnd')
             ->with(false);
 
-        $this->_observer->execute($this->_invokedObserver);
+        $this->observer->execute($this->invokedObserver);
     }
 
     /**
      * Test execute() method with no fetchers
+     *
+     * @return void
      */
     public function testExecuteNoFetchers()
     {
-        $this->_generator->method('getFetcher')->willReturn([]);
+        $this->generator->method('getFetcher')->willReturn([]);
 
-        $this->_xmlProcessor->expects($this->once())
+        $this->xmlProcessor->expects($this->once())
             ->method('setStart')
             ->with(true);
 
-        $this->_xmlProcessor->expects($this->once())
+        $this->xmlProcessor->expects($this->once())
             ->method('setEnd')
             ->with(true);
 
-        $this->_observer->execute($this->_invokedObserver);
+        $this->observer->execute($this->invokedObserver);
     }
 
     /**
-     * Test execute() method for multiple Fetchers
+     * Test execute() method for multiple fetchers
+     *
+     * @return void
      */
     public function testExecuteMultipleFetchers()
     {
-        $this->_generator->method('getFetcher')->willReturn([$this->_fetcher, $this->_fetcher]);
-        $this->_fetcher->method('isStarted')->will(
+        $this->generator->method('getFetcher')->willReturn([$this->fetcher, $this->fetcher]);
+        $this->fetcher->method('isStarted')->will(
             $this->onConsecutiveCalls(true, false)
         );
-        $this->_fetcher->method('isDone')->will(
+        $this->fetcher->method('isDone')->will(
             $this->onConsecutiveCalls(false, true)
         );
 
-        $this->_xmlProcessor->expects($this->once())
+        $this->xmlProcessor->expects($this->once())
             ->method('setStart')
             ->with(false);
 
-        $this->_xmlProcessor->expects($this->once())
+        $this->xmlProcessor->expects($this->once())
             ->method('setEnd')
             ->with(false);
 
-        $this->_observer->execute($this->_invokedObserver);
+        $this->observer->execute($this->invokedObserver);
     }
 }

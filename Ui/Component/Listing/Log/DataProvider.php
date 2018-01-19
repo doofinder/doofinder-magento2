@@ -2,24 +2,28 @@
 
 namespace Doofinder\Feed\Ui\Component\Listing\Log;
 
+/**
+ * Data provider UI component
+ */
 class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider
 {
     /**
      * @var \Magento\Framework\App\Request\DataPersistorInterface
      */
-    private $_dataPersistor;
+    private $dataPersistor;
 
     /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param \Magento\Framework\Api\Search\ReportingInterface $reporting
-     * @param \Magento\Framework\Api\Search\SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \Magento\Framework\Api\Search\SearchCriteriaBuilder $searchCritBuilder
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Magento\Framework\Api\FilterBuilder $filterBuilder
      * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
      * @param array $meta
      * @param array $data
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         $name,
@@ -33,7 +37,7 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
         array $meta = [],
         array $data = []
     ) {
-        $this->_dataPersistor = $dataPersistor;
+        $this->dataPersistor = $dataPersistor;
 
         parent::__construct(
             $name,
@@ -73,6 +77,6 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
      */
     private function getProcess()
     {
-        return $this->_dataPersistor->get('doofinder_feed_process');
+        return $this->dataPersistor->get('doofinder_feed_process');
     }
 }

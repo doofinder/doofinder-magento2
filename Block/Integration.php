@@ -4,14 +4,13 @@ namespace Doofinder\Feed\Block;
 
 /**
  * Class Integration
- * @package Doofinder\Feed\Block
  */
 class Integration extends \Magento\Framework\View\Element\AbstractBlock
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
@@ -23,7 +22,7 @@ class Integration extends \Magento\Framework\View\Element\AbstractBlock
         \Magento\Framework\View\Element\Context $context,
         array $data = []
     ) {
-        $this->_storeConfig = $storeConfig;
+        $this->storeConfig = $storeConfig;
         parent::__construct($context, $data);
     }
 
@@ -34,7 +33,7 @@ class Integration extends \Magento\Framework\View\Element\AbstractBlock
      */
     public function toHtml()
     {
-        $script = $this->_storeConfig->getSearchLayerScript();
+        $script = $this->storeConfig->getSearchLayerScript();
 
         /**
          * Disable search autocomplete

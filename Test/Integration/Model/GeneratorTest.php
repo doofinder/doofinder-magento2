@@ -7,17 +7,24 @@ use Magento\TestFramework\TestCase\AbstractIntegrity;
 /**
  * Test class for \Doofinder\Feed\Model\Generator
  *
+ * @codingStandardsIgnoreStart
  * @magentoDataFixture Magento/Catalog/_files/product_simple.php
  * @magentoDataFixture Magento/Catalog/_files/product_virtual.php
  * @magentoDbIsolation enabled
  * @magentoAppIsolation enabled
+ * @codingStandardsIgnoreEnd
  */
 class GeneratorTest extends AbstractIntegrity
 {
+    /**
+     * Test run() method
+     *
+     * @return void
+     */
     public function testRun()
     {
         $generator = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
-            '\Doofinder\Feed\Model\Generator',
+            \Doofinder\Feed\Model\Generator::class,
             [
                 'data' => [
                     'config' => [

@@ -5,6 +5,9 @@ namespace Doofinder\Feed\Ui\Component\Listing\Log\Column;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 
+/**
+ * Store UI component
+ */
 class Store extends \Magento\Ui\Component\Listing\Columns\Column
 {
     /**
@@ -15,12 +18,12 @@ class Store extends \Magento\Ui\Component\Listing\Columns\Column
     /**
      * @var \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory
      */
-    private $_cronCollectionFactory;
+    private $cronCollectionFactory;
 
     /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
-     * @param \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory $cronCollectionFactory
+     * @param \Doofinder\Feed\Model\ResourceModel\Cron\CollectionFactory $cronColFactory
      * @param array $components
      * @param array $data
      */
@@ -31,7 +34,7 @@ class Store extends \Magento\Ui\Component\Listing\Columns\Column
         array $components = [],
         array $data = []
     ) {
-        $this->_cronCollectionFactory = $cronColFactory;
+        $this->cronCollectionFactory = $cronColFactory;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
@@ -44,7 +47,7 @@ class Store extends \Magento\Ui\Component\Listing\Columns\Column
     public function prepareDataSource(array $dataSource)
     {
         if (isset($dataSource['data']['items'])) {
-            $processes = $this->_cronCollectionFactory->create()->getItems();
+            $processes = $this->cronCollectionFactory->create()->getItems();
 
             $fieldName = $this->getData('name');
             foreach ($dataSource['data']['items'] as & $item) {

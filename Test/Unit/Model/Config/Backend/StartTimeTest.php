@@ -5,99 +5,104 @@ namespace Doofinder\Feed\Test\Unit\Model\Backend;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class StartTimeTest
- * @package Doofinder\Feed\Test\Unit\Model\Backend
+ * Test class for \Doofinder\Feed\Model\Config\Backend\StartTime
  */
 class StartTimeTest extends BaseTestCase
 {
     /**
      * @var \DateTime
      */
-    private $_date;
+    private $date;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\Timezone $timezone
      */
-    private $_timezone;
+    private $timezone;
 
     /**
      * @var int $offset
      */
-    private $_offset;
+    private $offset;
 
     /**
      * @var \Doofinder\Feed\Model\Config\Backend\StartTime
      */
-    private $_model;
+    private $model;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_date = $this->getMock(
-            '\DateTime',
+        $this->date = $this->getMock(
+            \DateTime::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_timezone = $this->getMock(
-            '\Magento\Framework\Stdlib\DateTime\Timezone',
+        $this->timezone = $this->getMock(
+            \Magento\Framework\Stdlib\DateTime\Timezone::class,
             [],
             [],
             '',
             false
         );
-        $this->_timezone->method('getDefaultTimezone')->willReturn('UTC');
-        $this->_timezone->method('getConfigTimezone')->willReturn('America/Los_Angeles');
-        $this->_timezone->method('date')->willReturn($this->_date);
+        $this->timezone->method('getDefaultTimezone')->willReturn('UTC');
+        $this->timezone->method('getConfigTimezone')->willReturn('America/Los_Angeles');
+        $this->timezone->method('date')->willReturn($this->date);
         // @codingStandardsIgnoreStart
-        $this->_offset = (new \DateTimeZone('America/Los_Angeles'))->getOffset(
+        $this->offset = (new \DateTimeZone('America/Los_Angeles'))->getOffset(
             new \DateTime(null, new \DateTimeZone('UTC'))
         ) / 3600;
         // @codingStandardsIgnoreEnd
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Config\Backend\StartTime',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Config\Backend\StartTime::class,
             [
-                'timezone' => $this->_timezone,
+                'timezone' => $this->timezone,
             ]
         );
     }
 
     /**
-     * Test afterLoad()
+     * Test afterLoad() method
+     *
+     * @return void
      */
     public function testAfterLoad()
     {
-        $this->_date->expects($this->once())
+        $this->date->expects($this->once())
             ->method('setTime')->with(10, 30, 0);
-        $this->_date->method('format')
-            ->with('H,i,s')->willReturn('0' . (10 + $this->_offset) . ',30,00');
+        $this->date->method('format')
+            ->with('H,i,s')->willReturn('0' . (10 + $this->offset) . ',30,00');
 
-        $this->_model->setValue('10,30,00');
-        $this->_model->afterLoad();
+        $this->model->setValue('10,30,00');
+        $this->model->afterLoad();
 
-        $this->assertEquals('0' . (10 + $this->_offset) . ',30,00', $this->_model->getValue());
+        $this->assertEquals('0' . (10 + $this->offset) . ',30,00', $this->model->getValue());
     }
 
     /**
-     * Test beforeSave()
+     * Test beforeSave() method
+     *
+     * @return void
      */
     public function testBeforeSave()
     {
-        $this->_date->expects($this->once())
+        $this->date->expects($this->once())
             ->method('setTime')->with(10, 30, 0);
-        $this->_date->method('format')
-            ->with('H,i,s')->willReturn('0' . (10 - $this->_offset) . ',30,00');
+        $this->date->method('format')
+            ->with('H,i,s')->willReturn('0' . (10 - $this->offset) . ',30,00');
 
-        $this->_model->setValue(['10', '30', '00']);
-        $this->_model->beforeSave();
+        $this->model->setValue(['10', '30', '00']);
+        $this->model->beforeSave();
 
-        $this->assertEquals([10 - $this->_offset, '30', '00'], $this->_model->getValue());
+        $this->assertEquals([10 - $this->offset, '30', '00'], $this->model->getValue());
     }
 }

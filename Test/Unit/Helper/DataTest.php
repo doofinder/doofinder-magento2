@@ -5,95 +5,105 @@ namespace Doofinder\Feed\Test\Unit\Helper;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class DataTest
- * @package Doofinder\Feed\Test\Unit\Helper
+ * Test class for \Doofinder\Feed\Helper\Data
  */
 class DataTest extends BaseTestCase
 {
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Magento\Framework\Module\ModuleListInterface
      */
-    private $_module;
+    private $module;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $_logger;
+    private $logger;
 
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    private $_helper;
+    private $helper;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_storeManager = $this->getMock(
-            '\Magento\Store\Model\StoreManagerInterface',
+        $this->storeManager = $this->getMock(
+            \Magento\Store\Model\StoreManagerInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_storeConfig = $this->getMock(
-            'Magento\Store\Api\Data\StoreConfigInterface',
+        $this->storeConfig = $this->getMock(
+            \Magento\Store\Api\Data\StoreConfigInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_module = $this->getMock(
-            '\Magento\Framework\Module\ModuleListInterface',
+        $this->module = $this->getMock(
+            \Magento\Framework\Module\ModuleListInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_logger = $this->getMock(
-            '\Psr\Log\LoggerInterface',
+        $this->logger = $this->getMock(
+            \Psr\Log\LoggerInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_helper = $this->objectManager->getObject(
-            '\Doofinder\Feed\Helper\Data',
+        $this->helper = $this->objectManager->getObject(
+            \Doofinder\Feed\Helper\Data::class,
             [
-                'storeManager'  => $this->_storeManager,
-                'moduleList'    => $this->_module,
-                'logger'        => $this->_logger,
+                'storeManager'  => $this->storeManager,
+                'moduleList'    => $this->module,
+                'logger'        => $this->logger,
             ]
         );
     }
 
     /**
-     * Test getInteger() method.
+     * Test getInteger() method
      *
+     * @param mixed $param
+     * @param boolean $defaultValue
+     * @param boolean $expected
+     * @return void
      * @dataProvider integerProvider
      */
     public function testGetInteger($param, $defaultValue, $expected)
     {
-        $this->assertSame($expected, $this->_helper->getInteger($param, $defaultValue));
+        $this->assertSame($expected, $this->helper->getInteger($param, $defaultValue));
     }
 
+    /**
+     * Data provider for testGetInteger() test
+     *
+     * @return array
+     */
     public function integerProvider()
     {
         return [
@@ -105,15 +115,24 @@ class DataTest extends BaseTestCase
     }
 
     /**
-     * Test isBoolean() method.
+     * Test isBoolean() method
      *
+     * @param mixed $value
+     * @param boolean $defaultValue
+     * @param boolean $expected
+     * @return void
      * @dataProvider booleanProvider
      */
     public function testIsBoolean($value, $defaultValue, $expected)
     {
-        $this->assertSame($expected, $this->_helper->isBoolean($value, $defaultValue));
+        $this->assertSame($expected, $this->helper->isBoolean($value, $defaultValue));
     }
 
+    /**
+     * Data provider for testIsBoolean() test
+     *
+     * @return array
+     */
     public function booleanProvider()
     {
         return [
@@ -136,19 +155,29 @@ class DataTest extends BaseTestCase
         ];
     }
 
+    /**
+     * Test getBaseUrl() method
+     *
+     * @return void
+     */
     public function testGetBaseUrl()
     {
-        $this->_storeManager->expects($this->once())
+        $this->storeManager->expects($this->once())
             ->method('getStore')
-            ->willReturn($this->_storeConfig);
+            ->willReturn($this->storeConfig);
 
-        $this->_storeConfig->expects($this->once())
+        $this->storeConfig->expects($this->once())
             ->method('getBaseUrl')
             ->will($this->returnValue('localhost'));
 
-        $this->assertSame('localhost', $this->_helper->getBaseUrl());
+        $this->assertSame('localhost', $this->helper->getBaseUrl());
     }
 
+    /**
+     * Test getModuleVersion() module
+     *
+     * @return void
+     */
     public function testGetModuleVersion()
     {
         $moduleInfo = [
@@ -157,11 +186,11 @@ class DataTest extends BaseTestCase
             'sequence' => []
         ];
 
-        $this->_module->expects($this->once())
+        $this->module->expects($this->once())
             ->method('getOne')
             ->with(\Doofinder\Feed\Helper\Data::MODULE_NAME)
             ->willReturn($moduleInfo);
 
-        $this->assertSame($moduleInfo['setup_version'], $this->_helper->getModuleVersion());
+        $this->assertSame($moduleInfo['setup_version'], $this->helper->getModuleVersion());
     }
 }

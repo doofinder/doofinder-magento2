@@ -4,91 +4,98 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Processor;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Component\Processor\Xml
+ */
 class XmlTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Xml
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Sabre\Xml\Writer
      */
-    private $_xmlWriter;
+    private $xmlWriter;
 
     /**
      * @var \Sabre\Xml\Service
      */
-    private $_xmlService;
+    private $xmlService;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    private $_helper;
+    private $helper;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_xmlWriter = $this->getMock(
-            '\Sabre\Xml\Writer',
+        $this->xmlWriter = $this->getMock(
+            \Sabre\Xml\Writer::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_xmlService = $this->getMock(
-            '\Sabre\Xml\Service',
+        $this->xmlService = $this->getMock(
+            \Sabre\Xml\Service::class,
             ['getWriter'],
             [],
             '',
             false
         );
-        $this->_xmlService->method('getWriter')->willReturn($this->_xmlWriter);
+        $this->xmlService->method('getWriter')->willReturn($this->xmlWriter);
 
-        $this->_helper = $this->getMock(
-            '\Doofinder\Feed\Helper\Data',
+        $this->helper = $this->getMock(
+            \Doofinder\Feed\Helper\Data::class,
             ['getBaseUrl', 'getModuleVersion'],
             [],
             '',
             false
         );
-        $this->_xmlService->method('getWriter')->willReturn($this->_xmlWriter);
+        $this->xmlService->method('getWriter')->willReturn($this->xmlWriter);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Xml::class,
             [
-                'xmlService' => $this->_xmlService,
-                'helper' => $this->_helper,
+                'xmlService' => $this->xmlService,
+                'helper' => $this->helper,
             ]
         );
     }
 
     /**
-     * Test process open/output
+     * Test process() method with open/output memory
+     *
+     * @return void
      */
     public function testProcess()
     {
-        $this->_xmlWriter->expects($this->once())->method('openMemory');
-        $this->_xmlWriter->expects($this->once())->method('outputMemory');
+        $this->xmlWriter->expects($this->once())->method('openMemory');
+        $this->xmlWriter->expects($this->once())->method('outputMemory');
 
-        $this->_model->process([$this->_item]);
+        $this->model->process([$this->item]);
     }
 }

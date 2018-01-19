@@ -5,177 +5,187 @@ namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\System\Config\Panel;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class CronFieldTest
- *
- * @package Doofinder\Feed\Test\Unit\Block\Adminhtml\System\Config\Panel
+ * Test class for \Doofinder\Feed\Block\Adminhtml\System\Config\Panel\Cron
  */
 class CronFieldTest extends BaseTestCase
 {
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    private $_request;
+    private $request;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    private $_store;
+    private $store;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Magento\Backend\Block\Template\Context
      */
-    private $_context;
+    private $context;
 
     /**
      * @var \Magento\Framework\Data\Form\Element\AbstractElement
      */
-    private $_element;
+    private $element;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\Timezone
      */
-    private $_timezone;
+    private $timezone;
 
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    private $_process;
+    private $process;
 
     /**
      * @var \Doofinder\Feed\Block\Adminhtml\System\Config\Panel\Cron
      */
-    private $_block;
+    private $block;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_request = $this->getMock(
-            '\Magento\Framework\App\RequestInterface',
+        $this->request = $this->getMock(
+            \Magento\Framework\App\RequestInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_request->method('getParam')->with('store')->willReturn(1);
+        $this->request->method('getParam')->with('store')->willReturn(1);
 
-        $this->_store =  $this->getMock(
-            '\Magento\Store\Model\Store',
+        $this->store =  $this->getMock(
+            \Magento\Store\Model\Store::class,
             [],
             [],
             '',
             false
         );
-        $this->_store->method('getCode')->willReturn('sample');
+        $this->store->method('getCode')->willReturn('sample');
 
-        $this->_storeManager =  $this->getMock(
-            '\Magento\Store\Model\StoreManagerInterface',
+        $this->storeManager =  $this->getMock(
+            \Magento\Store\Model\StoreManagerInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_storeManager->method('getStore')->with(1)->willReturn($this->_store);
+        $this->storeManager->method('getStore')->with(1)->willReturn($this->store);
 
-        $this->_date = $this->getMock(
-            '\DateTime',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_timezone = $this->getMock(
-            '\Magento\Framework\Stdlib\DateTime\Timezone',
-            [],
-            [],
-            '',
-            false
-        );
-        $this->_timezone->method('getConfigTimezone')->willReturn('UTC');
-        $this->_timezone->method('scopeDate')->willReturn($this->_date);
-        $this->_timezone->method('formatDateTime')->willReturn('2000-10-05 14:20:00');
-
-        $this->_context = $this->getMock(
-            '\Magento\Backend\Block\Template\Context',
-            [],
-            [],
-            '',
-            false
-        );
-        $this->_context->method('getRequest')->willReturn($this->_request);
-        $this->_context->method('getStoreManager')->willReturn($this->_storeManager);
-        $this->_context->method('getLocaleDate')->willReturn($this->_timezone);
-
-        $this->_element = $this->getMock(
-            '\Magento\Framework\Data\Form\Element\AbstractElement',
-            [],
-            [],
-            '',
-            false
-        );
-        $this->_element->method('getHtmlId')->willReturn('sample_id');
-        $this->_element->method('getElementHtml')->willReturn('sample value');
-
-        $this->_schedule = $this->getMock(
-            '\Doofinder\Feed\Helper\Schedule',
+        $this->date = $this->getMock(
+            \DateTime::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_process = $this->getMock(
-            '\Doofinder\Feed\Model\Cron',
+        $this->timezone = $this->getMock(
+            \Magento\Framework\Stdlib\DateTime\Timezone::class,
             [],
             [],
             '',
             false
         );
-        $this->_process->method('getId')->willReturn(5);
+        $this->timezone->method('getConfigTimezone')->willReturn('UTC');
+        $this->timezone->method('scopeDate')->willReturn($this->date);
+        $this->timezone->method('formatDateTime')->willReturn('2000-10-05 14:20:00');
 
-        $this->_block = $this->objectManager->getObject(
-            '\Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField',
+        $this->context = $this->getMock(
+            \Magento\Backend\Block\Template\Context::class,
+            [],
+            [],
+            '',
+            false
+        );
+        $this->context->method('getRequest')->willReturn($this->request);
+        $this->context->method('getStoreManager')->willReturn($this->storeManager);
+        $this->context->method('getLocaleDate')->willReturn($this->timezone);
+
+        $this->element = $this->getMock(
+            \Magento\Framework\Data\Form\Element\AbstractElement::class,
+            [],
+            [],
+            '',
+            false
+        );
+        $this->element->method('getHtmlId')->willReturn('sample_id');
+        $this->element->method('getElementHtml')->willReturn('sample value');
+
+        $this->schedule = $this->getMock(
+            \Doofinder\Feed\Helper\Schedule::class,
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->process = $this->getMock(
+            \Doofinder\Feed\Model\Cron::class,
+            [],
+            [],
+            '',
+            false
+        );
+        $this->process->method('getId')->willReturn(5);
+
+        $this->block = $this->objectManager->getObject(
+            \Doofinder\Feed\Block\Adminhtml\System\Config\Panel\CronField::class,
             [
-                'context' => $this->_context,
-                'schedule' => $this->_schedule,
+                'context' => $this->context,
+                'schedule' => $this->schedule,
             ]
         );
     }
 
     /**
-     * Test render() method.
+     * Test render() method
      *
+     * @param  string $name
+     * @param  string $field
+     * @param  string $value
+     * @param  string $expected
+     * @return void
      * @dataProvider renderProvider
      */
     public function testRender($name, $field, $value, $expected)
     {
-        $this->_process->method('getData')->with($field)->willReturn($value);
+        $this->process->method('getData')->with($field)->willReturn($value);
 
-        $this->_schedule->expects($this->once())->method('getProcessByStoreCode')
-            ->with('sample')->willReturn($this->_process);
+        $this->schedule->expects($this->once())->method('getProcessByStoreCode')
+            ->with('sample')->willReturn($this->process);
 
-        $this->_element->method('getName')->willReturn($name);
-        $this->_element->expects($this->once())->method('setData')->with('text', $expected);
+        $this->element->method('getName')->willReturn($name);
+        $this->element->expects($this->once())->method('setData')->with('text', $expected);
 
         $expected = '<tr id="row_sample_id"><td class="label"><label for="sample_id"><span>' .
                     '</span></label></td><td class="value">sample value</td><td class=""></td></tr>';
-        $this->assertSame($expected, $this->_block->render($this->_element));
+        $this->assertSame($expected, $this->block->render($this->element));
     }
 
+    /**
+     * Data provider for render() test
+     *
+     * @return array
+     */
     public function renderProvider()
     {
         return [
@@ -221,18 +231,26 @@ class CronFieldTest extends BaseTestCase
     /**
      * Test render() method when no process.
      *
+     * @param  string $name
+     * @param  string $expected
+     * @return void
      * @dataProvider renderNoProcessProvider
      */
     public function testRenderNoProcess($name, $expected)
     {
-        $this->_element->method('getName')->willReturn($name);
-        $this->_element->expects($this->once())->method('setData')->with('text', $expected);
+        $this->element->method('getName')->willReturn($name);
+        $this->element->expects($this->once())->method('setData')->with('text', $expected);
 
         $expected = '<tr id="row_sample_id"><td class="label"><label for="sample_id"><span></span>' .
                     '</label></td><td class="value">sample value</td><td class=""></td></tr>';
-        $this->assertSame($expected, $this->_block->render($this->_element));
+        $this->assertSame($expected, $this->block->render($this->element));
     }
 
+    /**
+     * Data provider for render() test when no process
+     *
+     * @return array
+     */
     public function renderNoProcessProvider()
     {
         return [
@@ -254,25 +272,27 @@ class CronFieldTest extends BaseTestCase
 
     /**
      * Test render() method for last feed name.
+     *
+     * @return void
      */
     public function testRenderLastFeedName()
     {
-        $this->_process->method('getData')->with('last_feed_name')->willReturn('feed-name');
+        $this->process->method('getData')->with('last_feed_name')->willReturn('feed-name');
 
-        $this->_schedule->expects($this->once())->method('getProcessByStoreCode')
-            ->with('sample')->willReturn($this->_process);
+        $this->schedule->expects($this->once())->method('getProcessByStoreCode')
+            ->with('sample')->willReturn($this->process);
 
-        $this->_schedule->method('isFeedFileExist')->with('sample')->willReturn(true);
-        $this->_schedule->method('getFeedFileUrl')->with('sample')->willReturn('http://example/path/to/feed');
+        $this->schedule->method('isFeedFileExist')->with('sample')->willReturn(true);
+        $this->schedule->method('getFeedFileUrl')->with('sample')->willReturn('http://example/path/to/feed');
 
-        $this->_element->method('getName')->willReturn('groups[some_name][fields][last_feed_name][value]');
-        $this->_element->expects($this->once())->method('setData')->with(
+        $this->element->method('getName')->willReturn('groups[some_name][fields][last_feed_name][value]');
+        $this->element->expects($this->once())->method('setData')->with(
             'text',
             '<span class="feed-message"><a href="http://example/path/to/feed target="_blank">Get feed-name</a></span>'
         );
 
         $expected = '<tr id="row_sample_id"><td class="label"><label for="sample_id"><span></span>' .
                     '</label></td><td class="value">sample value</td><td class=""></td></tr>';
-        $this->assertSame($expected, $this->_block->render($this->_element));
+        $this->assertSame($expected, $this->block->render($this->element));
     }
 }

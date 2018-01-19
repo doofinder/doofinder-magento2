@@ -4,6 +4,9 @@ namespace Doofinder\Feed\Model\Generator\Component\Fetcher\Product;
 
 use \Doofinder\Feed\Model\Generator\Component\Fetcher\Product;
 
+/**
+ * Fixed product fetcher
+ */
 class Fixed extends Product
 {
     /**
@@ -15,10 +18,10 @@ class Fixed extends Product
     {
         $products = $this->getData('products');
 
-        $this->_isStarted = true;
-        $this->_isDone = true;
-        $this->_lastEntityId = end($products)->getEntityId();
-        $this->_itemsLeftCount = 0;
+        $this->isStarted = true;
+        $this->isDone = true;
+        $this->lastEntityId = end($products)->getEntityId();
+        $this->itemsLeftCount = 0;
 
         return $products;
     }

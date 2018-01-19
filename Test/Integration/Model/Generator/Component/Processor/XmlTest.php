@@ -44,24 +44,29 @@ EOT;
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Xml
      */
-    private $_xml;
+    private $xml;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item[]
      */
-    private $_items;
+    private $items;
 
     /**
      * @var string|null
      */
-    private $_currentFile;
+    private $currentFile;
 
+    /**
+     * Set up test
+     *
+     * @return void
+     */
     public function setUp()
     {
-        $this->_items = [];
+        $this->items = [];
 
-        $this->_items[] = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->items[] = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [
                 'data' => [
                     'title' => 'Sample title',
@@ -69,8 +74,8 @@ EOT;
             ]
         );
 
-        $this->_items[] = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->items[] = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [
                 'data' => [
                     'title' => 'Sample title 2',
@@ -78,8 +83,8 @@ EOT;
             ]
         );
 
-        $this->_xml = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Xml'
+        $this->xml = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Xml::class
         );
 
         /**
@@ -87,99 +92,134 @@ EOT;
          * @notice For some reason without it tests fails
          */
         $filesystem = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
-            '\Magento\TestFramework\App\Filesystem'
+            \Magento\TestFramework\App\Filesystem::class
         );
         $dir = $filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::TMP);
         $dir->create();
     }
 
+    /**
+     * Tear down test
+     *
+     * @return void
+     */
     public function tearDown()
     {
-        if ($this->_currentFile) {
+        if ($this->currentFile) {
             // @codingStandardsIgnoreStart
-            unlink($this->_currentFile);
+            unlink($this->currentFile);
             // @codingStandardsIgnoreEnd
-            $this->_currentFile = null;
+            $this->currentFile = null;
         }
     }
 
+    /**
+     * Test whole feed
+     *
+     * @return void
+     */
     public function testWholeFeed()
     {
-        $this->_xml->process($this->_items);
+        $this->xml->process($this->items);
 
         $expected = $this::HEAD . $this::ITEM_1 . $this::ITEM_2 . $this::FOOT;
 
-        $this->assertStringMatchesFormat($expected, $this->_xml->getFeed());
+        $this->assertStringMatchesFormat($expected, $this->xml->getFeed());
     }
 
+    /**
+     * Test feed body
+     *
+     * @return void
+     */
     public function testFeedBody()
     {
-        $this->_xml->setStart(false);
-        $this->_xml->setEnd(false);
-        $this->_xml->process($this->_items);
+        $this->xml->setStart(false);
+        $this->xml->setEnd(false);
+        $this->xml->process($this->items);
 
         $expected = $this::ITEM_1 . $this::ITEM_2;
 
-        $this->assertStringMatchesFormat($expected, $this->_xml->getFeed());
+        $this->assertStringMatchesFormat($expected, $this->xml->getFeed());
     }
 
+    /**
+     * Test feed open
+     *
+     * @return void
+     */
     public function testFeedOpen()
     {
-        $this->_xml->setEnd(false);
-        $this->_xml->process([]);
+        $this->xml->setEnd(false);
+        $this->xml->process([]);
 
         $expected = $this::HEAD;
 
-        $this->assertStringMatchesFormat($expected, $this->_xml->getFeed());
+        $this->assertStringMatchesFormat($expected, $this->xml->getFeed());
     }
 
+    /**
+     * Test feed close
+     *
+     * @return void
+     */
     public function testFeedClose()
     {
-        $this->_xml->setStart(false);
-        $this->_xml->process([]);
+        $this->xml->setStart(false);
+        $this->xml->process([]);
 
         $expected = $this::FOOT;
 
-        $this->assertStringMatchesFormat($expected, $this->_xml->getFeed());
+        $this->assertStringMatchesFormat($expected, $this->xml->getFeed());
     }
 
+    /**
+     * Test whole feed file
+     *
+     * @return void
+     */
     public function testWholeFeedFile()
     {
         $filesystem = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
-            '\Magento\TestFramework\App\Filesystem'
+            \Magento\TestFramework\App\Filesystem::class
         );
         $dir = $filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::TMP);
 
-        $this->_currentFile = $dir->getAbsolutePath('test.xml');
-        $this->_xml->setDestinationFile($this->_currentFile);
+        $this->currentFile = $dir->getAbsolutePath('test.xml');
+        $this->xml->setDestinationFile($this->currentFile);
 
-        $this->_xml->process($this->_items);
+        $this->xml->process($this->items);
 
         $expected = $this::HEAD . $this::ITEM_1 . $this::ITEM_2 . $this::FOOT;
 
         $this->assertStringMatchesFormat($expected, $dir->readFile('test.xml'));
     }
 
+    /**
+     * Test feed file
+     *
+     * @return void
+     */
     public function testFeedFile()
     {
         $filesystem = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
-            '\Magento\TestFramework\App\Filesystem'
+            \Magento\TestFramework\App\Filesystem::class
         );
         $dir = $filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::TMP);
 
-        $this->_currentFile = $dir->getAbsolutePath('test.xml');
-        $this->_xml->setDestinationFile($this->_currentFile);
+        $this->currentFile = $dir->getAbsolutePath('test.xml');
+        $this->xml->setDestinationFile($this->currentFile);
 
-        $this->_xml->setEnd(false);
-        $this->_xml->process([$this->_items[0]]);
+        $this->xml->setEnd(false);
+        $this->xml->process([$this->items[0]]);
 
         $expected = $this::HEAD . $this::ITEM_1;
 
         $this->assertStringMatchesFormat($expected, $dir->readFile('test.xml'));
 
-        $this->_xml->setStart(false);
-        $this->_xml->setEnd(true);
-        $this->_xml->process([$this->_items[1]]);
+        $this->xml->setStart(false);
+        $this->xml->setEnd(true);
+        $this->xml->process([$this->items[1]]);
 
         $expected = $this::HEAD . $this::ITEM_1 . $this::ITEM_2 . $this::FOOT;
 

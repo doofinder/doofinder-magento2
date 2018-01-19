@@ -7,36 +7,45 @@ use Magento\TestFramework\TestCase\AbstractIntegrity;
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Component\Fetcher\Product
  *
+ * @codingStandardsIgnoreStart
  * @magentoDataFixture Magento/Catalog/_files/multiple_products.php
+ * @codingStandardsIgnoreEnd
  */
 class ProductTest extends AbstractIntegrity
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Fetcher\Product
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $_objectManager;
+    private $objectManager;
 
+    /**
+     * Set up test
+     *
+     * @return void
+     */
     public function setUp()
     {
-        $this->_objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+        $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
-        $this->_model = $this->_objectManager->create(
-            '\Doofinder\Feed\Model\Generator\Component\Fetcher\Product'
+        $this->model = $this->objectManager->create(
+            \Doofinder\Feed\Model\Generator\Component\Fetcher\Product::class
         );
     }
 
     /**
      * Set products visible and in catalog
+     *
+     * @return void
      */
     private function makeProductsFetchable()
     {
-        $collection = $this->_objectManager->create(
-            '\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory'
+        $collection = $this->objectManager->create(
+            \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class
         )->create();
 
         foreach ($collection->load() as $product) {
@@ -51,10 +60,12 @@ class ProductTest extends AbstractIntegrity
 
     /**
      * Test fetch() method filtering
+     *
+     * @return void
      */
     public function testFetchFilters()
     {
-        $items = $this->_model->fetch();
+        $items = $this->model->fetch();
 
         $this->assertEquals(1, count($items));
         $this->assertEquals(
@@ -66,18 +77,20 @@ class ProductTest extends AbstractIntegrity
             }, $items)
         );
 
-        $this->assertEquals(true, $this->_model->isStarted());
-        $this->assertEquals(true, $this->_model->isDone());
+        $this->assertEquals(true, $this->model->isStarted());
+        $this->assertEquals(true, $this->model->isDone());
     }
 
     /**
      * Test fetch() method
+     *
+     * @return void
      */
     public function testFetch()
     {
         $this->makeProductsFetchable();
 
-        $items = $this->_model->fetch();
+        $items = $this->model->fetch();
 
         $this->assertEquals(3, count($items));
         $this->assertEquals(
@@ -91,36 +104,46 @@ class ProductTest extends AbstractIntegrity
             }, $items)
         );
 
-        $this->assertEquals(true, $this->_model->isStarted());
-        $this->assertEquals(true, $this->_model->isDone());
+        $this->assertEquals(true, $this->model->isStarted());
+        $this->assertEquals(true, $this->model->isDone());
     }
 
     /**
      * Test fetch() method with pagination
      *
-     * @dataProvider providerTestFetchWithPagination
+     * @param  boolean $useOffset
+     * @param  string $sku
+     * @param  boolean $isStarted
+     * @param  boolean $isDone
+     * @return void
+     * @dataProvider providerFetchWithPagination
      */
     public function testFetchWithPagination($useOffset, $sku, $isStarted, $isDone)
     {
         $this->makeProductsFetchable();
 
-        $entityId = $this->_objectManager->create(
-            '\Magento\Catalog\Api\ProductRepositoryInterface'
+        $entityId = $this->objectManager->create(
+            \Magento\Catalog\Api\ProductRepositoryInterface::class
         )->get($sku)->getEntityId();
 
-        $this->_model->setOffset($useOffset ? $entityId - 1 : null);
-        $this->_model->setLimit(1);
+        $this->model->setOffset($useOffset ? $entityId - 1 : null);
+        $this->model->setLimit(1);
 
-        $items = $this->_model->fetch();
+        $items = $this->model->fetch();
 
         $this->assertEquals(1, count($items));
         $this->assertEquals($sku, $items[0]->getContext()->getSku());
 
-        $this->assertEquals($isStarted, $this->_model->isStarted());
-        $this->assertEquals($isDone, $this->_model->isDone());
+        $this->assertEquals($isStarted, $this->model->isStarted());
+        $this->assertEquals($isDone, $this->model->isDone());
     }
 
-    public function providerTestFetchWithPagination()
+    /**
+     * Data provider for fetchWithPagination() test
+     *
+     * @return array
+     */
+    public function providerFetchWithPagination()
     {
         return [
             [false, 'simple1', true, false],
@@ -132,6 +155,7 @@ class ProductTest extends AbstractIntegrity
     /**
      * Test fetch() method with multiple websites
      *
+     * @return void
      * @magentoDataFixtureBeforeTransaction Magento/Catalog/_files/enable_reindex_schedule.php
      * @magentoDataFixture Magento/Store/_files/website.php
      * @magentoDataFixture Magento/Catalog/_files/multiple_products.php
@@ -141,22 +165,22 @@ class ProductTest extends AbstractIntegrity
         $this->makeProductsFetchable();
 
         /** @var \Magento\Store\Api\WebsiteRepositoryInterface $websiteRepositoryFactory */
-        $websiteRepFactory = $this->_objectManager->create(
-            '\Magento\Store\Api\WebsiteRepositoryInterface'
+        $websiteRepFactory = $this->objectManager->create(
+            \Magento\Store\Api\WebsiteRepositoryInterface::class
         );
 
         $website = $websiteRepFactory->get('test');
 
         /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepFactory */
-        $productRepFactory = $this->_objectManager->create(
-            '\Magento\Catalog\Api\ProductRepositoryInterface'
+        $productRepFactory = $this->objectManager->create(
+            \Magento\Catalog\Api\ProductRepositoryInterface::class
         );
 
         $product = $productRepFactory->get('simple1');
         $product->setWebsiteIds([$website->getId()])
             ->save();
 
-        $items = $this->_model->fetch();
+        $items = $this->model->fetch();
 
         $this->assertEquals(2, count($items));
         $this->assertEquals(
@@ -169,18 +193,19 @@ class ProductTest extends AbstractIntegrity
             }, $items)
         );
 
-        $this->assertEquals(true, $this->_model->isStarted());
-        $this->assertEquals(true, $this->_model->isDone());
+        $this->assertEquals(true, $this->model->isStarted());
+        $this->assertEquals(true, $this->model->isDone());
     }
 
     /**
      * Test fetch() method with configurable product
      *
+     * @return void
      * @magentoDataFixture Magento/ConfigurableProduct/_files/product_configurable.php
      */
     public function testFetchConfigurable()
     {
-        $items = $this->_model->fetch();
+        $items = $this->model->fetch();
 
         $this->assertEquals(3, count($items));
         $this->assertEquals(
@@ -204,39 +229,43 @@ class ProductTest extends AbstractIntegrity
             }, $items[0]->getAssociates())
         );
 
-        $this->assertEquals(true, $this->_model->isStarted());
-        $this->assertEquals(true, $this->_model->isDone());
+        $this->assertEquals(true, $this->model->isStarted());
+        $this->assertEquals(true, $this->model->isDone());
     }
 
     /**
      * Test getLastProcessedEntityId() method
+     *
+     * @return void
      */
     public function testGetLastProcessedEntityId()
     {
         $this->makeProductsFetchable();
 
         /** @var \Magento\Catalog\Api\ProductRepositoryInterface $productRepFactory */
-        $productRepFactory = $this->_objectManager->create(
-            '\Magento\Catalog\Api\ProductRepositoryInterface'
+        $productRepFactory = $this->objectManager->create(
+            \Magento\Catalog\Api\ProductRepositoryInterface::class
         );
 
         $product = $productRepFactory->get('simple3');
 
-        $this->_model->fetch();
+        $this->model->fetch();
 
-        $this->assertEquals($product->getEntityId(), $this->_model->getLastProcessedEntityId());
+        $this->assertEquals($product->getEntityId(), $this->model->getLastProcessedEntityId());
     }
 
     /**
      * Test getProgress() method
+     *
+     * @return void
      */
     public function testGetProgress()
     {
         $this->makeProductsFetchable();
 
-        $this->_model->setLimit(2);
-        $this->_model->fetch();
+        $this->model->setLimit(2);
+        $this->model->fetch();
 
-        $this->assertEquals(0.67, $this->_model->getProgress());
+        $this->assertEquals(0.67, $this->model->getProgress());
     }
 }

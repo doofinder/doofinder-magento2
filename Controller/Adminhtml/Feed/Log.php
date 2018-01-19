@@ -3,32 +3,39 @@
 namespace Doofinder\Feed\Controller\Adminhtml\Feed;
 
 /**
- * Class Log
- *
- * @package Doofinder\Feed\Controller\Adminhtml\Feed
+ * Log controller
  */
 class Log extends \Magento\Backend\App\Action
 {
     /**
      * @var \Magento\Framework\View\Result\PageFactory
      */
-    private $_resultPageFactory = false;
+    private $resultPageFactory = false;
 
     /**
      * @var \Magento\Framework\App\Request\DataPersistorInterface
      */
-    private $_dataPersistor;
+    private $dataPersistor;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
+     * @param \Doofinder\Feed\Helper\Schedule $schedule
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
@@ -37,17 +44,22 @@ class Log extends \Magento\Backend\App\Action
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         parent::__construct($context);
-        $this->_resultPageFactory = $resultPageFactory;
-        $this->_dataPersistor = $dataPersistor;
-        $this->_schedule = $schedule;
-        $this->_storeManager = $storeManager;
+        $this->resultPageFactory = $resultPageFactory;
+        $this->dataPersistor = $dataPersistor;
+        $this->schedule = $schedule;
+        $this->storeManager = $storeManager;
     }
 
+    /**
+     * Returns log page
+     *
+     * @return \Magento\Framework\Controller\ResultInterface
+     */
     public function execute()
     {
         if ($storeId = $this->getRequest()->getParam('store')) {
-            $store = $this->_storeManager->getStore($storeId);
-            $process = $this->_schedule->getProcessByStoreCode($store->getCode());
+            $store = $this->storeManager->getStore($storeId);
+            $process = $this->schedule->getProcessByStoreCode($store->getCode());
             if (!$process) {
                 $this->messageManager->addError(__('Feed process does not exists.'));
                 /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
@@ -55,10 +67,10 @@ class Log extends \Magento\Backend\App\Action
                 return $resultRedirect->setPath('admin');
             }
 
-            $this->_dataPersistor->set('doofinder_feed_process', $process);
+            $this->dataPersistor->set('doofinder_feed_process', $process);
         }
 
-        $resultPage = $this->_resultPageFactory->create();
+        $resultPage = $this->resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->prepend(__('Doofinder Feed Log'));
 
         return $resultPage;

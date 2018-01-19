@@ -3,46 +3,44 @@
 namespace Doofinder\Feed\Controller\Feed;
 
 /**
- * Class Config
- *
- * @package Doofinder\Feed\Controller\Feed
+ * Config controller
  */
 class Config extends \Magento\Framework\App\Action\Action
 {
     /**
      * @var \Magento\Framework\App\ProductMetadataInterface
      */
-    private $_productMetadata;
+    private $productMetadata;
 
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    private $_helper;
+    private $helper;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Magento\Framework\Filesystem
      */
-    private $_filesystem;
+    private $filesystem;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    private $_scopeConfig;
+    private $scopeConfig;
 
     /**
      * Config constructor.
@@ -66,32 +64,34 @@ class Config extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\Action\Context $context
     ) {
-        $this->_productMetadata = $productMetadata;
-        $this->_helper = $helper;
-        $this->_storeManager = $storeManager;
-        $this->_storeConfig = $storeConfig;
-        $this->_schedule = $schedule;
-        $this->_filesystem = $filesystem;
-        $this->_scopeConfig = $scopeConfig;
+        $this->productMetadata = $productMetadata;
+        $this->helper = $helper;
+        $this->storeManager = $storeManager;
+        $this->storeConfig = $storeConfig;
+        $this->schedule = $schedule;
+        $this->filesystem = $filesystem;
+        $this->scopeConfig = $scopeConfig;
         parent::__construct($context);
     }
 
     /**
-     * Execute.
+     * Returns config json
+     *
+     * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
     {
-        $this->_helper->setJsonHeaders($this->getResponse());
+        $this->helper->setJsonHeaders($this->getResponse());
 
         $config = [
             'platform' => [
                 'name' => 'Magento',
-                'edition' => $this->_productMetadata->getEdition(),
-                'version' => $this->_productMetadata->getVersion(),
+                'edition' => $this->productMetadata->getEdition(),
+                'version' => $this->productMetadata->getVersion(),
             ],
             'module' => [
-                'version' => $this->_helper->getModuleVersion(),
-                'feed' => $this->_storeManager->getStore()->getUrl('doofinder/feed'),
+                'version' => $this->helper->getModuleVersion(),
+                'feed' => $this->storeManager->getStore()->getUrl('doofinder/feed'),
                 'options' => [
                     'language' => [],
                 ],
@@ -99,13 +99,13 @@ class Config extends \Magento\Framework\App\Action\Action
             ],
         ];
 
-        foreach ($this->_storeManager->getStores() as $store) {
+        foreach ($this->storeManager->getStores() as $store) {
             $storeCode = $store->getCode();
-            $settings = $this->_storeConfig->getStoreConfig($storeCode);
+            $settings = $this->storeConfig->getStoreConfig($storeCode);
 
             if ($settings['enabled']) {
-                $feedUrl = $this->_schedule->getFeedFileUrl($storeCode, false);
-                $feedExists = $this->_schedule->isFeedFileExist($storeCode);
+                $feedUrl = $this->schedule->getFeedFileUrl($storeCode, false);
+                $feedExists = $this->schedule->isFeedFileExist($storeCode);
             } else {
                 $feedUrl = $store->getUrl('doofinder/feed');
                 $feedExists = true;
@@ -113,7 +113,7 @@ class Config extends \Magento\Framework\App\Action\Action
 
             $config['module']['options']['language'][] = $storeCode;
             $config['module']['configuration'][$storeCode] = [
-                'language' => strtoupper(substr($this->_scopeConfig->getValue('general/locale/code'), 0, 2)),
+                'language' => strtoupper(substr($this->scopeConfig->getValue('general/locale/code'), 0, 2)),
                 'currency' => $store->getCurrentCurrencyCode(),
                 'feed_url' => $feedUrl,
                 'feed_exists' => $feedExists,
