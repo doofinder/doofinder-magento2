@@ -11,6 +11,11 @@ use \Doofinder\Feed\Model\Generator\Component\FetcherInterface;
 class Product extends Component implements FetcherInterface
 {
     /**
+     * @var \Magento\CatalogInventory\Model\ResourceModel\Stock\Status
+     */
+    private $stockStatusResource;
+
+    /**
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
     private $productColFactory = null;
@@ -49,11 +54,13 @@ class Product extends Component implements FetcherInterface
      * Constructor
      */
     public function __construct(
+        \Magento\CatalogInventory\Model\ResourceModel\Stock\Status $stockStatusResource,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productColFactory,
         \Doofinder\Feed\Model\Generator\ItemFactory $generatorItemFactory,
         \Psr\Log\LoggerInterface $logger,
         array $data = []
     ) {
+        $this->stockStatusResource = $stockStatusResource;
         $this->productColFactory = $productColFactory;
         $this->generatorItemFactory = $generatorItemFactory;
         parent::__construct($logger, $data);
@@ -150,6 +157,14 @@ class Product extends Component implements FetcherInterface
                 \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH
             ])
             ->addAttributeToSort('id', 'asc');
+
+        /**
+         * @notice Magento 2.2.x included a default stock filter
+         *         so that 'out of stock' products are excluded by default.
+         *         We override this behavior here.
+         */
+         $collection->setFlag('has_stock_status_filter', true);
+         $this->stockStatusResource->addStockDataToCollection($collection, false);
 
         if ($limit) {
             $collection->setPageSize($limit);
