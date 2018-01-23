@@ -225,11 +225,11 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
 
         // Enable/disable process if it needs to
         if ($config['enabled'] || $force) {
-            if ($process->isEnabled()) {
+            if (!$process->isEnabled()) {
                 $this->enableProcess($process);
             }
         } else {
-            if (!$process->isEnabled()) {
+            if ($process->isEnabled()) {
                 $this->messageManager->addSuccess(__(
                     'Process for store "%1" has been disabled',
                     $store->getName()
