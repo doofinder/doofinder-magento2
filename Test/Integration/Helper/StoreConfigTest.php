@@ -12,42 +12,55 @@ class StoreConfigTest extends AbstractIntegrity
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_helper;
+    private $helper;
 
     /**
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $_objectManager;
+    private $objectManager;
 
+    /**
+     * Set up test
+     *
+     * @return void
+     */
     public function setUp()
     {
-        $this->_objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+        $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
-        $this->_helper = $this->_objectManager->create(
-            '\Doofinder\Feed\Helper\StoreConfig'
+        $this->helper = $this->objectManager->create(
+            \Doofinder\Feed\Helper\StoreConfig::class
         );
     }
 
     /**
-     * Test for getStoreCodes() method.
+     * Test for getStoreCodes() method
      *
-     * @dataProvider providerTestGetStoreCodes
+     * @param  string $store
+     * @param  array $expected
+     * @return void
+     * @dataProvider providerGetStoreCodes
      * @magentoDataFixture Magento/Store/_files/store.php
      * @magentoAppIsolation enabled
      */
-    public function testGetStores($store, $expected)
+    public function testGetStores($store, array $expected)
     {
-        $storeManager = $this->_objectManager->get(
-            '\Magento\Store\Model\StoreManagerInterface'
+        $storeManager = $this->objectManager->get(
+            \Magento\Store\Model\StoreManagerInterface::class
         );
 
         $storeManager->setCurrentStore($store);
-        $stores = $this->_helper->getStoreCodes();
+        $stores = $this->helper->getStoreCodes();
 
         $this->assertEquals($expected, $stores);
     }
 
-    public function providerTestGetStoreCodes()
+    /**
+     * Data provider for getStoreCodes() test
+     *
+     * @return array
+     */
+    public function providerGetStoreCodes()
     {
         return [
             ['default', ['default', 'test']],

@@ -3,28 +3,32 @@
 namespace Doofinder\Feed\Observer;
 
 /**
- * Class Schedule
- *
- * @package Doofinder\Feed\Observer
+ * Schedule observer
  */
 class Schedule implements \Magento\Framework\Event\ObserverInterface
 {
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    private $_request;
+    private $request;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\App\RequestInterface $request
+     * @param \Doofinder\Feed\Helper\Schedule $schedule
+     */
     public function __construct(
         \Magento\Framework\App\RequestInterface $request,
         \Doofinder\Feed\Helper\Schedule $schedule
     ) {
-        $this->_request = $request;
-        $this->_schedule = $schedule;
+        $this->request = $request;
+        $this->schedule = $schedule;
     }
 
     /**
@@ -38,8 +42,8 @@ class Schedule implements \Magento\Framework\Event\ObserverInterface
     {
     // @codingStandardsIgnoreEnd
         // Check if user wants to reset the schedule
-        $reset = (bool) $this->_request->getParam('reset');
+        $reset = (bool) $this->request->getParam('reset');
 
-        $this->_schedule->regenerateSchedule($reset, $reset);
+        $this->schedule->regenerateSchedule($reset, $reset);
     }
 }

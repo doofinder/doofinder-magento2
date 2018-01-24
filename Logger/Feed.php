@@ -2,17 +2,20 @@
 
 namespace Doofinder\Feed\Logger;
 
+/**
+ * Feed logger
+ */
 class Feed extends \Monolog\Logger
 {
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    private $_process;
+    private $process;
 
     /**
      * @var \Psr\Log\LoggerInterface $logger
      */
-    private $_logger;
+    private $logger;
 
     /**
      * @param \Doofinder\Feed\Model\Cron $process
@@ -28,34 +31,39 @@ class Feed extends \Monolog\Logger
         array $handlers = [],
         array $processors = []
     ) {
-        $this->_process = $process;
-        $this->_logger = $logger;
+        $this->process = $process;
+        $this->logger = $logger;
         parent::__construct($name, $handlers, $processors);
     }
 
     /**
      * Adds a log record.
      *
-     * @param  integer $level   The logging level
-     * @param  string  $message The log message
-     * @param  array   $context The log context
-     * @return Boolean Whether the record has been processed
+     * @param  integer $level   The logging level.
+     * @param  string  $message The log message.
+     * @param  array   $context The log context.
+     * @return void
      */
     public function addRecord($level, $message, array $context = [])
     {
         if (!isset($context['process'])) {
-            $context['process'] = $this->_process;
+            $context['process'] = $this->process;
         }
 
         // Pass record to main logger
-        $this->_logger->addRecord($level, $message, $context);
+        $this->logger->addRecord($level, $message, $context);
 
         // Handle custom logging
-        if (is_a($context['process'], '\Doofinder\Feed\Model\Cron')) {
+        if (is_a($context['process'], \Doofinder\Feed\Model\Cron::class)) {
             parent::addRecord($level, $message, $context);
         }
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
     public function getLevelOptions()
     {
         return static::getLevels();

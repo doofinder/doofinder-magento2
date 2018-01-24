@@ -4,154 +4,167 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Map\Product;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Map\Product\Configurable
+ */
 class ConfigurableTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product\Configurable
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
      * @var \Magento\Catalog\Model\Product
      */
-    private $_product;
+    private $product;
 
     /**
      * @var \Doofinder\Feed\Helper\Product
      */
-    private $_helper;
+    private $helper;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_helper = $this->getMock(
-            '\Doofinder\Feed\Helper\Product',
+        $this->helper = $this->getMock(
+            \Doofinder\Feed\Helper\Product::class,
             [],
             [],
             '',
             false
         );
-        $this->_productAttributeValue = 'sample parent value';
-        $this->_helper->method('getAttributeText')->will($this->returnCallback(function () {
-            return $this->_productAttributeValue;
+        $this->productAttributeValue = 'sample parent value';
+        $this->helper->method('getAttributeText')->will($this->returnCallback(function () {
+            return $this->productAttributeValue;
         }));
 
-        $this->_product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
+        $this->product = $this->getMock(
+            \Magento\Catalog\Model\Product::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_associate = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->associate = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
             false
         );
-        $this->_item->method('getContext')->willReturn($this->_product);
-        $this->_item->method('getAssociates')->willReturn([
-            $this->_associate,
-            $this->_associate,
-            $this->_associate,
-            $this->_associate,
+        $this->item->method('getContext')->willReturn($this->product);
+        $this->item->method('getAssociates')->willReturn([
+            $this->associate,
+            $this->associate,
+            $this->associate,
+            $this->associate,
         ]);
 
-        $this->_map = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Map\Product\Associate',
+        $this->map = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Map\Product\Associate::class,
             [],
             [],
             '',
             false
         );
-        $this->_map->method('get')->will($this->onConsecutiveCalls(
+        $this->map->method('get')->will($this->onConsecutiveCalls(
             'sample associate value 1',
             'sample associate value 2',
             null,
             'sample associate value 2'
         ));
 
-        $this->_mapFactory = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Map\Product\AssociateFactory',
+        $this->mapFactory = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Map\Product\AssociateFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_mapFactory->method('create')->willReturn($this->_map);
+        $this->mapFactory->method('create')->willReturn($this->map);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Map\Product\Configurable',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Map\Product\Configurable::class,
             [
-                'mapFactory' => $this->_mapFactory,
-                'helper' => $this->_helper,
-                'item' => $this->_item,
+                'mapFactory' => $this->mapFactory,
+                'helper' => $this->helper,
+                'item' => $this->item,
             ]
         );
     }
 
     /**
      * Test before() method with split option
+     *
+     * @return void
      */
     public function testBeforeSplit()
     {
-        $this->_associate->expects($this->never())->method('skip');
+        $this->associate->expects($this->never())->method('skip');
 
-        $this->_model->setSplitConfigurableProducts(true);
-        $this->_model->before();
+        $this->model->setSplitConfigurableProducts(true);
+        $this->model->before();
     }
 
     /**
      * Test before() method without split option
+     *
+     * @return void
      */
     public function testBeforeNoSplit()
     {
-        $this->_associate->expects($this->exactly(4))->method('skip');
+        $this->associate->expects($this->exactly(4))->method('skip');
 
-        $this->_model->setSplitConfigurableProducts(false);
-        $this->_model->before();
+        $this->model->setSplitConfigurableProducts(false);
+        $this->model->before();
     }
 
     /**
      * Test get() method with split option
+     *
+     * @return void
      */
     public function testGetSplit()
     {
-        $this->_model->setSplitConfigurableProducts(true);
-        $this->_model->before();
+        $this->model->setSplitConfigurableProducts(true);
+        $this->model->before();
 
         $this->assertEquals(
             'sample parent value',
-            $this->_model->get('sample')
+            $this->model->get('sample')
         );
     }
 
     /**
      * Test get() method without split option
+     *
+     * @return void
      */
     public function testGetNoSplit()
     {
-        $this->_model->setSplitConfigurableProducts(false);
-        $this->_model->before();
+        $this->model->setSplitConfigurableProducts(false);
+        $this->model->before();
 
         $this->assertEquals(
             [
@@ -159,19 +172,21 @@ class ConfigurableTest extends BaseTestCase
                 'sample associate value 1',
                 'sample associate value 2',
             ],
-            $this->_model->get('sample')
+            $this->model->get('sample')
         );
     }
 
     /**
      * Test get() method without split option, when parents value is array
+     *
+     * @return void
      */
     public function testGetNoSplitParentArray()
     {
-        $this->_productAttributeValue = ['sample parent value 1', 'sample parent value 2'];
+        $this->productAttributeValue = ['sample parent value 1', 'sample parent value 2'];
 
-        $this->_model->setSplitConfigurableProducts(false);
-        $this->_model->before();
+        $this->model->setSplitConfigurableProducts(false);
+        $this->model->before();
 
         $this->assertEquals(
             [
@@ -180,7 +195,7 @@ class ConfigurableTest extends BaseTestCase
                 'sample associate value 1',
                 'sample associate value 2',
             ],
-            $this->_model->get('sample')
+            $this->model->get('sample')
         );
     }
 }

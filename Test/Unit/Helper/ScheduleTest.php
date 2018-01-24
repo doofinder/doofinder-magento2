@@ -6,6 +6,7 @@ use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
  * Test class for \Doofinder\Feed\Helper\Schedule
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ScheduleTest extends BaseTestCase
@@ -13,323 +14,339 @@ class ScheduleTest extends BaseTestCase
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_helper;
+    private $helper;
 
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    private $_process;
+    private $process;
 
     /**
      * @var \Magento\Framework\Filesystem
      */
-    private $_filesystem;
+    private $filesystem;
 
     /**
      * @var \Magento\Framework\Filesystem\Directory\Write
      */
-    private $_directory;
+    private $directory;
 
     /**
      * @var \Magento\Framework\Filesystem\DriverInterface
      */
-    private $_driver;
+    private $driver;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    private $_generatorFactory;
+    private $generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Model\Generator
      */
-    private $_generator;
+    private $generator;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\FetcherInterface
      */
-    private $_fetcher;
+    private $fetcher;
 
     /**
      * @var \DateTime
      */
-    private $_date;
+    private $date;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    private $_timezone;
+    private $timezone;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    private $_store;
+    private $store;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Doofinder\Feed\Logger\Feed
      */
-    private $_feedLogger;
+    private $feedLogger;
 
     /**
      * @var \Doofinder\Feed\Logger\FeedFactory
      */
-    private $_feedLoggerFactory;
+    private $feedLoggerFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
+     * Set up test
+     *
+     * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_process = $this->getMock(
-            '\Doofinder\Feed\Model\Cron',
+        $this->process = $this->getMock(
+            \Doofinder\Feed\Model\Cron::class,
             ['getStoreCode', 'save', 'setOffset', 'setComplete', 'setLastFeedName', 'setMessage', 'setErrorStack'],
             [],
             '',
             false
         );
-        $this->_process->method('getStoreCode')->willReturn('feed');
+        $this->process->method('getStoreCode')->willReturn('feed');
 
-        $this->_driver = $this->getMock(
-            '\Magento\Framework\Filesystem\DriverInterface',
+        $this->driver = $this->getMock(
+            \Magento\Framework\Filesystem\DriverInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_directory = $this->getMock(
-            '\Magento\Framework\Filesystem\Directory\Write',
+        $this->directory = $this->getMock(
+            \Magento\Framework\Filesystem\Directory\Write::class,
             [],
             [],
             '',
             false
         );
-        $this->_directory->method('getAbsolutePath')->will($this->onConsecutiveCalls(
+        $this->directory->method('getAbsolutePath')->will($this->onConsecutiveCalls(
             '/tmp/doofinder-feed.xml.tmp',
             '/tmp/doofinder-feed.xml.tmp',
             '/media/doofinder-feed.xml'
         ));
-        $this->_directory->method('getDriver')->willReturn($this->_driver);
+        $this->directory->method('getDriver')->willReturn($this->driver);
 
-        $this->_filesystem = $this->getMock(
-            '\Magento\Framework\Filesystem',
+        $this->filesystem = $this->getMock(
+            \Magento\Framework\Filesystem::class,
             [],
             [],
             '',
             false
         );
-        $this->_filesystem->method('getDirectoryRead')->willReturn($this->_directory);
-        $this->_filesystem->method('getDirectoryWrite')->willReturn($this->_directory);
+        $this->filesystem->method('getDirectoryRead')->willReturn($this->directory);
+        $this->filesystem->method('getDirectoryWrite')->willReturn($this->directory);
 
-        $this->_fetcher = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\FetcherInterface',
+        $this->fetcher = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\FetcherInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_fetcher->method('getLastProcessedEntityId')->will($this->onConsecutiveCalls(9, 21));
+        $this->fetcher->method('getLastProcessedEntityId')->will($this->onConsecutiveCalls(9, 21));
 
-        $this->_generator = $this->getMock(
-            '\Doofinder\Feed\Model\Generator',
+        $this->generator = $this->getMock(
+            \Doofinder\Feed\Model\Generator::class,
             [],
             [],
             '',
             false
         );
-        $this->_generator->method('getFetcher')->willReturn($this->_fetcher);
+        $this->generator->method('getFetcher')->willReturn($this->fetcher);
 
-        $this->_generatorFactory = $this->getMock(
-            '\Doofinder\Feed\Model\GeneratorFactory',
+        $this->generatorFactory = $this->getMock(
+            \Doofinder\Feed\Model\GeneratorFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_generatorFactory->method('create')->willReturn($this->_generator);
+        $this->generatorFactory->method('create')->willReturn($this->generator);
 
-        $this->_date = $this->getMock(
-            '\DateTime',
+        $this->date = $this->getMock(
+            \DateTime::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_timezone = $this->getMock(
-            '\Magento\Framework\Stdlib\DateTime\TimezoneInterface',
+        $this->timezone = $this->getMock(
+            \Magento\Framework\Stdlib\DateTime\TimezoneInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_timezone->method('getConfigTimezone')->willReturn('America/Los_Angeles');
-        $this->_timezone->method('date')->willReturn($this->_date);
+        $this->timezone->method('getConfigTimezone')->willReturn('America/Los_Angeles');
+        $this->timezone->method('date')->willReturn($this->date);
 
-        $this->_store = $this->getMock(
-            'Magento\Store\Model\Store',
+        $this->store = $this->getMock(
+            \Magento\Store\Model\Store::class,
             [],
             [],
             '',
             false
         );
-        $this->_store->method('getBaseUrl')->with(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
+        $this->store->method('getBaseUrl')->with(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
             ->willReturn('http://example.com/media/');
 
-        $this->_storeManager = $this->getMock(
-            '\Magento\Store\Model\StoreManagerInterface',
+        $this->storeManager = $this->getMock(
+            \Magento\Store\Model\StoreManagerInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_storeManager->method('getStore')->with('default')->willReturn($this->_store);
+        $this->storeManager->method('getStore')->with('default')->willReturn($this->store);
 
-        $this->_feedLogger = $this->getMock(
-            '\Doofinder\Feed\Logger\Feed',
+        $this->feedLogger = $this->getMock(
+            \Doofinder\Feed\Logger\Feed::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_feedLoggerFactory = $this->getMock(
-            '\Doofinder\Feed\Logger\FeedFactory',
+        $this->feedLoggerFactory = $this->getMock(
+            \Doofinder\Feed\Logger\FeedFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_feedLoggerFactory->method('create')->willReturn($this->_feedLogger);
+        $this->feedLoggerFactory->method('create')->willReturn($this->feedLogger);
 
-        $this->_storeConfig = $this->getMock(
-            '\Doofinder\Feed\Helper\StoreConfig',
+        $this->storeConfig = $this->getMock(
+            \Doofinder\Feed\Helper\StoreConfig::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_helper = $this->objectManager->getObject(
-            '\Doofinder\Feed\Helper\Schedule',
+        $this->helper = $this->objectManager->getObject(
+            \Doofinder\Feed\Helper\Schedule::class,
             [
-                'filesystem' => $this->_filesystem,
-                'generatorFactory' => $this->_generatorFactory,
-                'timezone' => $this->_timezone,
-                'storeManager' => $this->_storeManager,
-                'feedLoggerFactory' => $this->_feedLoggerFactory,
-                'storeConfig' => $this->_storeConfig,
+                'filesystem' => $this->filesystem,
+                'generatorFactory' => $this->generatorFactory,
+                'timezone' => $this->timezone,
+                'storeManager' => $this->storeManager,
+                'feedLoggerFactory' => $this->feedLoggerFactory,
+                'storeConfig' => $this->storeConfig,
             ]
         );
     }
 
     /**
      * Test runProcess() method
+     *
+     * @return void
      */
     public function testRunProcess()
     {
-        $this->_fetcher->method('getProgress')->willReturn(0.49);
+        $this->fetcher->method('getProgress')->willReturn(0.49);
 
-        $this->_fetcher->method('isDone')->willReturn(false);
+        $this->fetcher->method('isDone')->willReturn(false);
 
-        $this->_driver->expects($this->never())->method('rename');
+        $this->driver->expects($this->never())->method('rename');
 
-        $this->_process->expects($this->once())->method('setOffset')
+        $this->process->expects($this->once())->method('setOffset')
             ->with(9);
 
-        $this->_process->expects($this->once())->method('setComplete')
+        $this->process->expects($this->once())->method('setComplete')
             ->with('49.0%');
 
-        $this->_process->expects($this->never())->method('setLastFeedName');
+        $this->process->expects($this->never())->method('setLastFeedName');
 
-        $this->_process->expects($this->never())->method('setMessage');
+        $this->process->expects($this->never())->method('setMessage');
 
-        $this->_process->expects($this->once())->method('save');
+        $this->process->expects($this->once())->method('save');
 
-        $this->_helper->runProcess($this->_process);
+        $this->helper->runProcess($this->process);
     }
 
     /**
      * Test runProcess() method
+     *
+     * @return void
      */
     public function testRunProcessDone()
     {
-        $this->_fetcher->method('getProgress')->willReturn(1.0);
+        $this->fetcher->method('getProgress')->willReturn(1.0);
 
-        $this->_fetcher->method('isDone')->willReturn(true);
+        $this->fetcher->method('isDone')->willReturn(true);
 
-        $this->_driver->expects($this->once())->method('rename')
-            ->with('/tmp/doofinder-feed.xml.tmp', '/media/doofinder-feed.xml', $this->_driver)
+        $this->driver->expects($this->once())->method('rename')
+            ->with('/tmp/doofinder-feed.xml.tmp', '/media/doofinder-feed.xml', $this->driver)
             ->willReturn(true);
 
-        $this->_process->expects($this->once())->method('setOffset')
+        $this->process->expects($this->once())->method('setOffset')
             ->with(9);
 
-        $this->_process->expects($this->once())->method('setComplete')
+        $this->process->expects($this->once())->method('setComplete')
             ->with('100.0%');
 
-        $this->_process->expects($this->once())->method('setLastFeedName')
+        $this->process->expects($this->once())->method('setLastFeedName')
             ->with('doofinder-feed.xml');
 
-        $this->_process->expects($this->once())->method('setMessage')
+        $this->process->expects($this->once())->method('setMessage')
             ->with('Last process successfully completed. Now waiting for new schedule.');
 
-        $this->_process->expects($this->once())->method('save');
+        $this->process->expects($this->once())->method('save');
 
-        $this->_helper->runProcess($this->_process);
+        $this->helper->runProcess($this->process);
     }
 
     /**
      * Test runProcess() method
+     *
+     * @return void
      */
     public function testRunProcessRenameError()
     {
-        $this->_fetcher->method('isDone')->willReturn(true);
+        $this->fetcher->method('isDone')->willReturn(true);
 
-        $this->_driver->expects($this->once())->method('rename')
-            ->with('/tmp/doofinder-feed.xml.tmp', '/media/doofinder-feed.xml', $this->_driver)
+        $this->driver->expects($this->once())->method('rename')
+            ->with('/tmp/doofinder-feed.xml.tmp', '/media/doofinder-feed.xml', $this->driver)
             ->willReturn(false);
 
-        $this->_process->expects($this->never())->method('setLastFeedName');
+        $this->process->expects($this->never())->method('setLastFeedName');
 
-        $this->_process->expects($this->once())->method('setMessage')
+        $this->process->expects($this->once())->method('setMessage')
             ->with('#error#Cannot rename doofinder-feed.xml.tmp to doofinder-feed.xml');
 
-        $this->_process->expects($this->once())->method('setErrorStack')->with(1);
+        $this->process->expects($this->once())->method('setErrorStack')->with(1);
 
-        $this->_process->expects($this->once())->method('save');
+        $this->process->expects($this->once())->method('save');
 
-        $this->_helper->runProcess($this->_process);
+        $this->helper->runProcess($this->process);
     }
 
     /**
      * Test isFeedFileExist() method
      *
+     * @param  boolean $expected
+     * @return void
      * @dataProvider providerTestIsFeedFileExist
      */
     public function testIsFeedFileExist($expected)
     {
-        $this->_directory->expects($this->once())->method('isExist')
+        $this->directory->expects($this->once())->method('isExist')
             ->with('doofinder-default.xml')->willReturn($expected);
 
         $this->assertEquals(
             $expected,
-            $this->_helper->isFeedFileExist('default')
+            $this->helper->isFeedFileExist('default')
         );
     }
 
+    /**
+     * Data provider for testIsFeedFileExist() test
+     *
+     * @return array
+     */
     public function providerTestIsFeedFileExist()
     {
         return [
@@ -341,18 +358,28 @@ class ScheduleTest extends BaseTestCase
     /**
      * Test getFeedFileUrl() method
      *
+     * @param  string $storeCode
+     * @param  string $passwordConfig
+     * @param  string $password
+     * @param  string $expected
+     * @return void
      * @dataProvider providerTestGetFeedFileUrl
      */
     public function testGetFeedFileUrl($storeCode, $passwordConfig, $password, $expected)
     {
-        $this->_storeConfig->method('getStoreConfig')->with($storeCode)->willReturn(['password' => $passwordConfig]);
+        $this->storeConfig->method('getStoreConfig')->with($storeCode)->willReturn(['password' => $passwordConfig]);
 
         $this->assertEquals(
             $expected,
-            $this->_helper->getFeedFileUrl($storeCode, $password)
+            $this->helper->getFeedFileUrl($storeCode, $password)
         );
     }
 
+    /**
+     * Data provider for testGetFeedFileUrl() method
+     *
+     * @return array
+     */
     public function providerTestGetFeedFileUrl()
     {
         return [

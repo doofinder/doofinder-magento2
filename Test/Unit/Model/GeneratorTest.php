@@ -6,116 +6,122 @@ use Doofinder\Feed\Test\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class GeneratorTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\FetcherInterface
      */
-    private $_fetcher;
+    private $fetcher;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\FetcherFactory
      */
-    private $_fetcherFactory;
+    private $fetcherFactory;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Mapper
      */
-    private $_mapperProcessor;
+    private $mapperProcessor;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Cleaner
      */
-    private $_cleanerProcessor;
+    private $cleanerProcessor;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Xml
      */
-    private $_xmlProcessor;
+    private $xmlProcessor;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\ProcessorFactory
      */
-    private $_processorFactory;
+    private $processorFactory;
 
     /**
      * @var \Magento\Catalog\Model\Product
      */
-    private $_product;
+    private $product;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
      * @var \Sabre\Xml\Writer
      */
-    private $_xmlWriter;
+    private $xmlWriter;
 
     /**
      * @var \Sabre\Xml\Service
      */
-    private $_xmlService;
+    private $xmlService;
 
     /**
      * @var \Magento\Framework\Event\ManagerInterface
      */
-    private $_eventManager;
+    private $eventManager;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
      *
+     * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_xmlWriter = $this->getMock(
-            '\Sabre\Xml\Writer',
+        $this->xmlWriter = $this->getMock(
+            \Sabre\Xml\Writer::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_xmlService = $this->getMock(
-            '\Sabre\Xml\Service',
+        $this->xmlService = $this->getMock(
+            \Sabre\Xml\Service::class,
             ['getWriter'],
             [],
             '',
             false
         );
-        $this->_xmlService->method('getWriter')->willReturn($this->_xmlWriter);
+        $this->xmlService->method('getWriter')->willReturn($this->xmlWriter);
 
-        $this->_product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
+        $this->product = $this->getMock(
+            \Magento\Catalog\Model\Product::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
             false
         );
-        $this->_item->method('getData')
+        $this->item->method('getData')
             ->willReturn([
                 'name' => 'Sample product name',
                 'description' => 'Sample product description'
             ]);
-        $this->_item->method('getContext')->willReturn($this->_product);
-        $this->_item->method('isSkip')->will($this->onConsecutiveCalls(
+        $this->item->method('getContext')->willReturn($this->product);
+        $this->item->method('isSkip')->will($this->onConsecutiveCalls(
             false,
             true,
             false,
@@ -124,82 +130,82 @@ class GeneratorTest extends BaseTestCase
             true
         ));
 
-        $this->_fetcher = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\FetcherInterface',
+        $this->fetcher = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\FetcherInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_fetcher->method('fetch')
-            ->willReturn([$this->_item, $this->_item]);
+        $this->fetcher->method('fetch')
+            ->willReturn([$this->item, $this->item]);
 
-        $this->_fetcherFactory = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\FetcherFactory',
+        $this->fetcherFactory = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\FetcherFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_fetcherFactory->method('create')
-            ->willReturn($this->_fetcher);
+        $this->fetcherFactory->method('create')
+            ->willReturn($this->fetcher);
 
-        $this->_mapperProcessor = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Mapper',
+        $this->mapperProcessor = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Mapper::class,
             [],
             [],
             '',
             false
         );
-        $this->_mapperProcessor->expects($this->once())->method('process')->with([$this->_item]);
-        $this->_cleanerProcessor = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Cleaner',
+        $this->mapperProcessor->expects($this->once())->method('process')->with([$this->item]);
+        $this->cleanerProcessor = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Cleaner::class,
             [],
             [],
             '',
             false
         );
-        $this->_cleanerProcessor->expects($this->once())->method('process')->with([$this->_item, $this->_item]);
-        $this->_xmlProcessor = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Xml',
+        $this->cleanerProcessor->expects($this->once())->method('process')->with([$this->item, $this->item]);
+        $this->xmlProcessor = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Xml::class,
             [],
             [],
             '',
             false
         );
-        $this->_xmlProcessor->expects($this->once())->method('process')->with([$this->_item]);
+        $this->xmlProcessor->expects($this->once())->method('process')->with([$this->item]);
 
-        $this->_processorFactory = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Component\ProcessorFactory',
+        $this->processorFactory = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Component\ProcessorFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_processorFactory->expects($this->at(0))->method('create')
+        $this->processorFactory->expects($this->at(0))->method('create')
             ->with($this->anything(), 'Mapper')
-            ->willReturn($this->_mapperProcessor);
-        $this->_processorFactory->expects($this->at(1))->method('create')
+            ->willReturn($this->mapperProcessor);
+        $this->processorFactory->expects($this->at(1))->method('create')
             ->with($this->anything(), 'Cleaner')
-            ->willReturn($this->_cleanerProcessor);
-        $this->_processorFactory->expects($this->at(2))->method('create')
+            ->willReturn($this->cleanerProcessor);
+        $this->processorFactory->expects($this->at(2))->method('create')
             ->with($this->anything(), 'Xml')
-            ->willReturn($this->_xmlProcessor);
+            ->willReturn($this->xmlProcessor);
 
-        $this->_eventManager = $this->getMock(
-            '\Magento\Framework\Event\ManagerInterface',
+        $this->eventManager = $this->getMock(
+            \Magento\Framework\Event\ManagerInterface::class,
             ['dispatch'],
             [],
             '',
             false
         );
 
-        $this->_model = $this->objectManager->getObject(
-            'Doofinder\Feed\Model\Generator',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator::class,
             [
-                'fetcherFactory' => $this->_fetcherFactory,
-                'processorFactory' => $this->_processorFactory,
-                'eventManager' => $this->_eventManager,
+                'fetcherFactory' => $this->fetcherFactory,
+                'processorFactory' => $this->processorFactory,
+                'eventManager' => $this->eventManager,
                 'data' => [
                     'config' => [
                         'fetchers' => [
@@ -221,11 +227,13 @@ class GeneratorTest extends BaseTestCase
     }
 
     /**
-     * Test run
+     * Test run() method
+     *
+     * @return void
      */
     public function testRun()
     {
-        $this->_eventManager->expects($this->exactly(3))
+        $this->eventManager->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
                 ['doofinder_feed_generator_initialized'],
@@ -233,6 +241,6 @@ class GeneratorTest extends BaseTestCase
                 ['doofinder_feed_generator_items_processed']
             );
 
-        $this->_model->run();
+        $this->model->run();
     }
 }

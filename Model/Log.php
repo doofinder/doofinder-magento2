@@ -3,9 +3,7 @@
 namespace Doofinder\Feed\Model;
 
 /**
- * Class Log
- *
- * @package Doofinder\Feed\Model
+ * Log model
  */
 class Log extends \Magento\Framework\Model\AbstractModel
 {
@@ -16,6 +14,6 @@ class Log extends \Magento\Framework\Model\AbstractModel
     protected function _construct()
     {
     // @codingStandardsIgnoreEnd
-        $this->_init('\Doofinder\Feed\Model\ResourceModel\Log');
+        $this->_init(\Doofinder\Feed\Model\ResourceModel\Log::class);
     }
 }

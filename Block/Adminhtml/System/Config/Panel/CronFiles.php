@@ -2,6 +2,9 @@
 
 namespace Doofinder\Feed\Block\Adminhtml\System\Config\Panel;
 
+/**
+ * Cron files
+ */
 class CronFiles extends Message
 {
     /**
@@ -12,22 +15,22 @@ class CronFiles extends Message
     /**
      * @var \Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory
      */
-    private $_scheduleColFactory;
+    private $scheduleColFactory;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    private $_timezone;
+    private $timezone;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @param \Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory $scheduleColFactory
@@ -43,10 +46,10 @@ class CronFiles extends Message
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
-        $this->_scheduleColFactory = $scheduleColFactory;
-        $this->_timezone = $context->getLocaleDate();
-        $this->_schedule = $schedule;
-        $this->_storeConfig = $storeConfig;
+        $this->scheduleColFactory = $scheduleColFactory;
+        $this->timezone = $context->getLocaleDate();
+        $this->schedule = $schedule;
+        $this->storeConfig = $storeConfig;
         parent::__construct($context, $data);
     }
 
@@ -57,7 +60,7 @@ class CronFiles extends Message
      */
     private function getCronMessage()
     {
-        $collection = $this->_scheduleColFactory->create();
+        $collection = $this->scheduleColFactory->create();
         $collection->setOrder('finished_at', 'desc');
         $collection->setPageSize(1);
 
@@ -82,7 +85,7 @@ class CronFiles extends Message
          * Get finished time in config timezone
          * Magento transform cron time's to config scope timezone
          */
-        $finishedTime = $this->_timezone->date($finishedAt);
+        $finishedTime = $this->timezone->date($finishedAt);
 
         // If difference in seconds is bigger than allowed, display message
         if ((time() - $finishedTime->getTimestamp()) > self::ALLOWED_TIME) {
@@ -104,30 +107,30 @@ class CronFiles extends Message
      */
     public function getText()
     {
-        $storeCodes = $this->_storeConfig->getStoreCodes();
+        $storeCodes = $this->storeConfig->getStoreCodes();
 
         $enabled = false;
         $messages = [];
 
         foreach ($storeCodes as $storeCode) {
             $store = $this->_storeManager->getStore($storeCode);
-            $config = $this->_storeConfig->getStoreConfig($storeCode);
+            $config = $this->storeConfig->getStoreConfig($storeCode);
 
             if (!$config['enabled']) {
                 $message = __('Cron-based feed generation is <strong>disabled</strong>.');
             } elseif ($config['enabled']) {
                 $enabled = true;
 
-                if ($this->_schedule->isFeedFileExist($storeCode)) {
-                    $url = $this->_schedule->getFeedFileUrl($storeCode);
+                if ($this->schedule->isFeedFileExist($storeCode)) {
+                    $url = $this->schedule->getFeedFileUrl($storeCode);
                     $message = '<a href="' . $url . '" target="_blank">' . $url . '</a>';
                 } else {
                     $message = __('Currently there is no file to preview.');
                 }
 
-                $date = $this->_timezone->date(null, null, false);
+                $date = $this->timezone->date(null, null, false);
                 $date->setTime(...$config['start_time']);
-                $date = $this->_timezone->date($date);
+                $date = $this->timezone->date($date);
 
                 $message .= '<p>';
                 $message .= __(

@@ -5,6 +5,11 @@ namespace Doofinder\Feed\Test\Unit;
 use Magento\Framework\TestFramework\Unit\BaseTestCase as FrameworkBaseTestCase;
 use PHPUnit_Framework_MockObject_Generator;
 
+/**
+ * Base test class
+ *
+ * @SuppressWarnings(PHPMD.NumberOfChildren)
+ */
 class BaseTestCase extends FrameworkBaseTestCase
 {
     /**
@@ -17,6 +22,16 @@ class BaseTestCase extends FrameworkBaseTestCase
      *
      * Fallback for PHPUnit 4 present in Magento 2.1.x
      *
+     * @param  string $originalClassName
+     * @param  array|null $methods
+     * @param  array $arguments
+     * @param  string $mockClassName
+     * @param  boolean $callOriginalConstructor
+     * @param  boolean $callOriginalClone
+     * @param  boolean $callAutoload
+     * @param  boolean $cloneArguments
+     * @param  boolean $callOriginalMethods
+     * @return PHPUnit_Framework_MockObject
      * @depracated
      * @see PHPUnit_Framework_TestCase
      * @SuppressWarnings(PHPMD.LongVariable)

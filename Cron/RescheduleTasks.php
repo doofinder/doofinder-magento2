@@ -3,16 +3,14 @@
 namespace Doofinder\Feed\Cron;
 
 /**
- * Class RescheduleTasks
- *
- * @package Doofinder\Feed\Cron
+ * Reschedule cron action
  */
 class RescheduleTasks
 {
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * GenerateFeed constructor.
@@ -22,7 +20,7 @@ class RescheduleTasks
     public function __construct(
         \Doofinder\Feed\Helper\Schedule $schedule
     ) {
-        $this->_schedule = $schedule;
+        $this->schedule = $schedule;
     }
 
     /**
@@ -32,7 +30,7 @@ class RescheduleTasks
      */
     public function execute()
     {
-        $this->_schedule->regenerateSchedule();
+        $this->schedule->regenerateSchedule();
 
         return $this;
     }

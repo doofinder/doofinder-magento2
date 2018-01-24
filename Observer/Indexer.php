@@ -3,21 +3,24 @@
 namespace Doofinder\Feed\Observer;
 
 /**
- * Class Indexer
- *
- * @package Doofinder\Feed\Observer
+ * Indexer observer
  */
 class Indexer implements \Magento\Framework\Event\ObserverInterface
 {
     /**
      * @var \Doofinder\Feed\Helper\Indexer
      */
-    private $_indexer;
+    private $indexer;
 
+    /**
+     * Constructor
+     *
+     * @param \Doofinder\Feed\Helper\Indexer $indexer
+     */
     public function __construct(
         \Doofinder\Feed\Helper\Indexer $indexer
     ) {
-        $this->_indexer = $indexer;
+        $this->indexer = $indexer;
     }
 
     /**
@@ -30,8 +33,8 @@ class Indexer implements \Magento\Framework\Event\ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
     // @codingStandardsIgnoreEnd
-        if ($this->_indexer->shouldIndexInvalidate()) {
-            $this->_indexer->invalidate();
+        if ($this->indexer->shouldIndexInvalidate()) {
+            $this->indexer->invalidate();
         }
     }
 }

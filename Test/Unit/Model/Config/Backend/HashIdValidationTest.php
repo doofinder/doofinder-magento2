@@ -5,95 +5,99 @@ namespace Doofinder\Feed\Test\Unit\Model\Backend;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class HashIdValidationTest
- * @package Doofinder\Feed\Test\Unit\Model\Backend
+ * Test class for \Doofinder\Feed\Model\Config\Backend\HashIdValidation
  */
 class HashIdValidationTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
-    private $_resource;
+    private $resource;
 
     /**
      * @var \Doofinder\Feed\Model\Config\Backend\HashIdValidation
      */
-    private $_model;
+    private $model;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_storeConfig = $this->getMock(
-            '\Doofinder\Feed\Helper\StoreConfig',
+        $this->storeConfig = $this->getMock(
+            \Doofinder\Feed\Helper\StoreConfig::class,
             [],
             [],
             '',
             false
         );
-        $this->_storeConfig->method('getStoreCode')->willReturn('current');
-        $this->_storeConfig->method('getStoreCodes')->willReturn(['sample1', 'current', 'sample2']);
-        $this->_storeConfig->method('getHashId')->will($this->returnValueMap([
+        $this->storeConfig->method('getStoreCode')->willReturn('current');
+        $this->storeConfig->method('getStoreCodes')->willReturn(['sample1', 'current', 'sample2']);
+        $this->storeConfig->method('getHashId')->will($this->returnValueMap([
             ['current', 'sample_current_hash_id'],
             ['sample1', 'sample_hash_id_1'],
             ['sample2', 'sample_hash_id_2'],
         ]));
 
-        $this->_resource = $this->getMock(
-            '\Magento\Framework\Model\ResourceModel\Db\AbstractDb',
+        $this->resource = $this->getMock(
+            \Magento\Framework\Model\ResourceModel\Db\AbstractDb::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Config\Backend\HashIdValidation',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Config\Backend\HashIdValidation::class,
             [
-                'storeConfig' => $this->_storeConfig,
-                'resource' => $this->_resource,
+                'storeConfig' => $this->storeConfig,
+                'resource' => $this->resource,
             ]
         );
     }
 
     /**
-     * Test save()
+     * Test save() method
      *
+     * @return void
      * @doesNotPerformAssertions
      */
     public function testSave()
     {
-        $this->_model->setValue('sample_hash_id');
-        $this->_model->save();
+        $this->model->setValue('sample_hash_id');
+        $this->model->save();
     }
 
     /**
-     * Test save()
+     * Test save() method
      *
+     * @return void
      * @doesNotPerformAssertions
      */
     public function testSaveSameAsCurrent()
     {
-        $this->_model->setValue('sample_current_hash_id');
-        $this->_model->save();
+        $this->model->setValue('sample_current_hash_id');
+        $this->model->save();
     }
 
     /**
-     * Test save()
+     * Test save() method
      *
+     * @return void
      * @expectedException \Magento\Framework\Exception\ValidatorException
      */
     public function testSaveInvalid()
     {
-        $this->_model->setValue('sample_hash_id_2');
-        $this->_model->save();
+        $this->model->setValue('sample_hash_id_2');
+        $this->model->save();
     }
 }

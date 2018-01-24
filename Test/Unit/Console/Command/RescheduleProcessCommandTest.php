@@ -5,85 +5,87 @@ namespace Doofinder\Feed\Test\Unit\Console\Command;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class RecheduleProcessCommandTest
- *
- * @package Doofinder\Feed\Test\Unit\Console\Command
+ * Test class for \Doofinder\Feed\Console\Command\RescheduleProcessCommand
  */
 class RescheduleProcessCommandTest extends BaseTestCase
 {
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    private $_store;
+    private $store;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Doofinder\Feed\Console\Command\RescheduleProcessCommand
      */
-    private $_command;
+    private $command;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_store = $this->getMock(
-            '\Magento\Store\Model\Store',
+        $this->store = $this->getMock(
+            \Magento\Store\Model\Store::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_storeManager = $this->getMock(
-            '\Magento\Store\Model\StoreManagerInterface',
+        $this->storeManager = $this->getMock(
+            \Magento\Store\Model\StoreManagerInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_storeManager->expects($this->once())->method('getStore')->with('default')->willReturn($this->_store);
+        $this->storeManager->expects($this->once())->method('getStore')->with('default')->willReturn($this->store);
 
-        $this->_schedule = $this->getMock(
-            '\Doofinder\Feed\Helper\Schedule',
+        $this->schedule = $this->getMock(
+            \Doofinder\Feed\Helper\Schedule::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_command = $this->objectManager->getObject(
-            '\Doofinder\Feed\Console\Command\RescheduleProcessCommand',
+        $this->command = $this->objectManager->getObject(
+            \Doofinder\Feed\Console\Command\RescheduleProcessCommand::class,
             [
-                'storeManager'  => $this->_storeManager,
-                'schedule' => $this->_schedule,
+                'storeManager'  => $this->storeManager,
+                'schedule' => $this->schedule,
             ]
         );
     }
 
     /**
      * Test execute() method
+     *
+     * @return void
      */
     public function testExecute()
     {
         // @codingStandardsIgnoreStart
         $commandTester = new \Symfony\Component\Console\Tester\CommandTester(
-            $this->_command
+            $this->command
         );
         // @codingStandardsIgnoreEnd
 
-        $this->_schedule->expects($this->once())->method('updateProcess')->with($this->_store, true, true);
+        $this->schedule->expects($this->once())->method('updateProcess')->with($this->store, true, true);
 
         $commandTester->execute(['store' => 'default']);
     }

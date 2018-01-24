@@ -6,6 +6,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Reschedule process command
+ */
 class RescheduleProcessCommand extends \Symfony\Component\Console\Command\Command
 {
     /**
@@ -16,22 +19,22 @@ class RescheduleProcessCommand extends \Symfony\Component\Console\Command\Comman
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Magento\Framework\App\State
      */
-    private $_state;
+    private $state;
 
     /**
      * @var \Symfony\Component\Console\Input\InputArgumentFactory
      */
-    private $_inputArgFactory;
+    private $inputArgFactory;
 
     /**
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
@@ -45,10 +48,10 @@ class RescheduleProcessCommand extends \Symfony\Component\Console\Command\Comman
         \Magento\Framework\App\State $state,
         \Symfony\Component\Console\Input\InputArgumentFactory $inputArgFactory
     ) {
-        $this->_storeManager = $storeManager;
-        $this->_schedule = $schedule;
-        $this->_state = $state;
-        $this->_inputArgFactory = $inputArgFactory;
+        $this->storeManager = $storeManager;
+        $this->schedule = $schedule;
+        $this->state = $state;
+        $this->inputArgFactory = $inputArgFactory;
         parent::__construct();
     }
 
@@ -72,19 +75,22 @@ class RescheduleProcessCommand extends \Symfony\Component\Console\Command\Comman
 
     /**
      * {@inheritdoc}
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
      * @codingStandardsIgnoreStart
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
     // @codingStandardsIgnoreEnd
-        $this->_state->setAreaCode('frontend');
+        $this->state->setAreaCode('frontend');
 
         $store = $input->getArgument(self::STORE_ARGUMENT);
         if ($store === null) {
             throw new \InvalidArgumentException('Argument ' . self::STORE_ARGUMENT . ' is missing.');
         }
 
-        $store = $this->_storeManager->getStore($store);
-        $this->_schedule->updateProcess($store, true, true);
+        $store = $this->storeManager->getStore($store);
+        $this->schedule->updateProcess($store, true, true);
     }
 }

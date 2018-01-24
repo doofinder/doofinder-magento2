@@ -28,7 +28,7 @@ interface FetcherInterface
     /**
      * Get last processed entity id
      *
-     * @return int
+     * @return integer
      */
     public function getLastProcessedEntityId();
 

@@ -6,9 +6,16 @@ use Magento\Framework\Setup\UninstallInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 
+/**
+ * Uninstall
+ */
 class Uninstall implements UninstallInterface
 {
     /**
+     * Uninstall
+     *
+     * @param SchemaSetupInterface $setup
+     * @param ModuleContextInterface $context
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @codingStandardsIgnoreStart
      */
@@ -17,8 +24,12 @@ class Uninstall implements UninstallInterface
     // @codingStandardsIgnoreEnd
         $setup->startSetup();
 
-        $setup->getConnection()->dropTable(InstallSchema::CRON_TABLE_NAME);
-        $setup->getConnection()->dropTable(InstallSchema::LOG_TABLE_NAME);
+        $setup->getConnection()->dropTable(
+            $setup->getTable(InstallSchema::CRON_TABLE_NAME)
+        );
+        $setup->getConnection()->dropTable(
+            $setup->getTable(InstallSchema::LOG_TABLE_NAME)
+        );
 
         $setup->endSetup();
     }

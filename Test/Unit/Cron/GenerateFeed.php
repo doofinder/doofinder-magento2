@@ -5,65 +5,68 @@ namespace Doofinder\Feed\Test\Unit\Cron;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class GenerateFeedTest
- * @package Doofinder\Feed\Test\Unit\Helper
+ * Test class for \Doofinder\Feed\Cron\GenerateFeed
  */
 class GenerateFeedTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    private $_process;
+    private $process;
 
     /**
      * @var \Doofinder\Feed\Cron\GenerateFeed
      */
-    private $_cron;
+    private $cron;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_schedule = $this->getMock(
-            '\Doofinder\Feed\Helper\Schedule',
+        $this->schedule = $this->getMock(
+            \Doofinder\Feed\Helper\Schedule::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_process = $this->getMock(
-            '\Doofinder\Feed\Model\Cron',
+        $this->process = $this->getMock(
+            \Doofinder\Feed\Model\Cron::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_cron = $this->objectManager->getObject(
-            '\Doofinder\Feed\Cron\GenerateFeed',
+        $this->cron = $this->objectManager->getObject(
+            \Doofinder\Feed\Cron\GenerateFeed::class,
             [
-                'schedule'  => $this->_schedule,
+                'schedule'  => $this->schedule,
             ]
         );
     }
 
     /**
      * Test execute() method
+     *
+     * @return void
      */
     public function testExecute()
     {
-        $this->_schedule->expects($this->once())->method('getActiveProcess')->willReturn($this->_process);
-        $this->_schedule->expects($this->once())->method('runProcess')->with($this->_process);
+        $this->schedule->expects($this->once())->method('getActiveProcess')->willReturn($this->process);
+        $this->schedule->expects($this->once())->method('runProcess')->with($this->process);
 
-        $this->_cron->execute();
+        $this->cron->execute();
     }
 }

@@ -4,32 +4,37 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Map
+ */
 class MapTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
      * @var \Magento\Framework\DataObject
      */
-    private $_context;
+    private $context;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_context = $this->getMock(
-            '\Magento\Framework\DataObject',
+        $this->context = $this->getMock(
+            \Magento\Framework\DataObject::class,
             [],
             [],
             '',
@@ -39,31 +44,33 @@ class MapTest extends BaseTestCase
             ['title', null, 'Sample title'],
             ['description', null, 'Sample description'],
         ];
-        $this->_context->method('getData')->will($this->returnValueMap($map));
+        $this->context->method('getData')->will($this->returnValueMap($map));
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
             false
         );
-        $this->_item->method('getContext')->willReturn($this->_context);
+        $this->item->method('getContext')->willReturn($this->context);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Map',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Map::class,
             [
-                'item' => $this->_item,
+                'item' => $this->item,
             ]
         );
     }
 
     /**
      * Test get() method
+     *
+     * @return void
      */
     public function testGet()
     {
-        $this->assertEquals('Sample title', $this->_model->get('title'));
-        $this->assertEquals('Sample description', $this->_model->get('description'));
+        $this->assertEquals('Sample title', $this->model->get('title'));
+        $this->assertEquals('Sample description', $this->model->get('description'));
     }
 }

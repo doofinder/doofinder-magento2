@@ -2,33 +2,30 @@
 
 namespace Doofinder\Feed\Helper;
 
-use \Zend\Serializer\Serializer;
-
 /**
- * Class FeedConfig
- * @package Doofinder\Feed\Helper
+ * Feed config helper
  */
 class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      * @var array Feed attribute config
      */
-    private $_feedConfig;
+    private $feedConfig;
 
     /**
      * @var array Config for given store code
      */
-    private $_config;
+    private $config;
 
     /**
      * @var array Config parameters
      */
-    private $_params;
+    private $params;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * FeedConfig constructor.
@@ -40,7 +37,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\Helper\Context $context,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig
     ) {
-        $this->_storeConfig = $storeConfig;
+        $this->storeConfig = $storeConfig;
         parent::__construct($context);
     }
 
@@ -52,7 +49,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getLeanFeedConfig($storeCode = null)
     {
-        $this->_config = $this->_storeConfig->getStoreConfig($storeCode);
+        $this->config = $this->storeConfig->getStoreConfig($storeCode);
 
         return [
             'data' => [
@@ -68,23 +65,24 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * Get feed attribute config.
      *
      * @param string $storeCode
-     * @param array $params = []
+     * @param array $params
      * @return array
      */
     public function getFeedConfig($storeCode = null, array $params = [])
     {
-        if (!isset($this->_feedConfig[$storeCode])) {
-            $this->_params = $params;
+        if (!isset($this->feedConfig[$storeCode])) {
+            $this->params = $params;
             $this->setFeedConfig($storeCode);
         }
 
-        return $this->_feedConfig[$storeCode];
+        return $this->feedConfig[$storeCode];
     }
 
     /**
      * Set feed config
      *
      * @param string $storeCode
+     * @return void
      */
     private function setFeedConfig($storeCode)
     {
@@ -96,7 +94,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
         // Add basic xml processor
         $config['data']['config']['processors']['Xml'] = [];
 
-        $this->_feedConfig[$storeCode] = $config;
+        $this->feedConfig[$storeCode] = $config;
     }
 
     /**
@@ -136,24 +134,13 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
     private function getMapper()
     {
         return [
-            'image_size' => $this->_config['image_size'],
-            'split_configurable_products' => $this->_config['split_configurable_products'],
-            'export_product_prices' => $this->_config['export_product_prices'],
-            'price_tax_mode' => $this->_config['price_tax_mode'],
-            'categories_in_navigation' => $this->_config['categories_in_navigation'],
+            'image_size' => $this->config['image_size'],
+            'split_configurable_products' => $this->config['split_configurable_products'],
+            'export_product_prices' => $this->config['export_product_prices'],
+            'price_tax_mode' => $this->config['price_tax_mode'],
+            'categories_in_navigation' => $this->config['categories_in_navigation'],
             'map' => $this->getFeedAttributes()
         ];
-    }
-
-    /**
-     * Unserialize string
-     *
-     * @param string $str
-     * @return array
-     */
-    private function unserialize($str)
-    {
-        return Serializer::unserialize($str, 'phpserialize');
     }
 
     /**
@@ -163,21 +150,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private function getFeedAttributes()
     {
-        $attributes = $this->_config['attributes'];
-
-        if (array_key_exists('additional_attributes', $attributes)) {
-            $additionalKeys = $this->unserialize($attributes['additional_attributes']);
-            unset($attributes['additional_attributes']);
-
-            $additionalAttributes = [];
-            foreach ($additionalKeys as $key) {
-                $additionalAttributes[$key['field']] = $key['additional_attribute'];
-            }
-
-            return array_merge($attributes, $additionalAttributes);
-        }
-
-        return $attributes;
+        return $this->config['attributes'];
     }
 
     /**
@@ -188,7 +161,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private function getParam($key)
     {
-        return isset($this->_params[$key]) ? $this->_params[$key] : null;
+        return isset($this->params[$key]) ? $this->params[$key] : null;
     }
 
     /**
@@ -199,7 +172,7 @@ class FeedConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getFeedPassword($storeCode = null)
     {
-        $storeConfig = $this->_storeConfig->getStoreConfig($storeCode);
+        $storeConfig = $this->storeConfig->getStoreConfig($storeCode);
         return isset($storeConfig['password']) ? $storeConfig['password'] : null;
     }
 }

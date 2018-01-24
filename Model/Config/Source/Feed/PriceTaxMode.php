@@ -3,7 +3,7 @@
 namespace Doofinder\Feed\Model\Config\Source\Feed;
 
 /**
- * @class PriceTaxMode
+ * Price tax mode source
  */
 class PriceTaxMode implements \Magento\Framework\Option\ArrayInterface
 {

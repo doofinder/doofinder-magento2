@@ -2,7 +2,7 @@
     <event name="doofinder_feed_generator_items_fetched">
         <observer name="doofinder_feed_processor_xml_items_fetched" instance="Doofinder\Feed\Observer\Processor\Xml\ItemsFetched" />
     </event>
-    <event name="admin_system_config_changed_section_doofinder_feed_feed">
+    <event name="admin_system_config_changed_section_doofinder_config_data_feed">
         <observer name="doofinder_feed_update_schedule" instance="Doofinder\Feed\Observer\Schedule" />
         <observer name="doofinder_feed_invalidate_index" instance="Doofinder\Feed\Observer\Indexer" />
     </event>

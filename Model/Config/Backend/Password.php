@@ -3,25 +3,24 @@
 namespace Doofinder\Feed\Model\Config\Backend;
 
 /**
- * Class Password
- * @package Doofinder\Feed\Model\Config\Backend
+ * Password backend
  */
 class Password extends \Magento\Framework\App\Config\Value
 {
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Magento\Framework\Filesystem
      */
-    private $_filesystem;
+    private $filesystem;
 
     /**
      * @param \Doofinder\Feed\Helper\Schedule $schedule
@@ -34,6 +33,7 @@ class Password extends \Magento\Framework\App\Config\Value
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
      * @param array $data
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         \Doofinder\Feed\Helper\Schedule $schedule,
@@ -47,9 +47,9 @@ class Password extends \Magento\Framework\App\Config\Value
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        $this->_schedule = $schedule;
-        $this->_storeConfig = $storeConfig;
-        $this->_filesystem = $filesystem;
+        $this->schedule = $schedule;
+        $this->storeConfig = $storeConfig;
+        $this->filesystem = $filesystem;
 
         parent::__construct(
             $context,
@@ -63,8 +63,10 @@ class Password extends \Magento\Framework\App\Config\Value
     }
 
     /**
-     * @return $this
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * Validate password
+     *
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException Password invalid.
      */
     public function beforeSave()
     {
@@ -81,17 +83,19 @@ class Password extends \Magento\Framework\App\Config\Value
     }
 
     /**
-     * @return $this
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * Rename feed
+     *
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException Feed file could not be renamed.
      */
     public function afterSave()
     {
         if ($this->isValueChanged()) {
-            foreach ($this->_storeConfig->getStoreCodes(false) as $storeCode) {
-                $oldFilename = $this->_schedule->getFeedFilename($storeCode, $this->getOldValue());
-                $newFilename = $this->_schedule->getFeedFilename($storeCode, $this->getValue());
+            foreach ($this->storeConfig->getStoreCodes(false) as $storeCode) {
+                $oldFilename = $this->schedule->getFeedFilename($storeCode, $this->getOldValue());
+                $newFilename = $this->schedule->getFeedFilename($storeCode, $this->getValue());
 
-                $directory = $this->_filesystem->getDirectoryWrite(
+                $directory = $this->filesystem->getDirectoryWrite(
                     \Magento\Framework\App\Filesystem\DirectoryList::MEDIA
                 );
 

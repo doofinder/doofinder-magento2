@@ -17,11 +17,4 @@
             <argument name="resourceModel" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Log</argument>
         </arguments>
     </virtualType>
-    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
-        <arguments>
-            <argument name="collections" xsi:type="array">
-                <item name="feed_log_grid_data_source" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Log\Grid\Collection</item>
-            </argument>
-        </arguments>
-    </type>
 </config>

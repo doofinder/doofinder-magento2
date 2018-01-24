@@ -2,32 +2,35 @@
 
 namespace Doofinder\Feed\Model\Generator;
 
+/**
+ * Map
+ */
 class Map extends \Magento\Framework\DataObject
 {
     // @codingStandardsIgnoreStart
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    protected $_item;
+    protected $item;
 
     /**
      * @var \Magento\Framework\DataObject
      */
-    protected $_context;
+    protected $context;
     // @codingStandardsIgnoreEnd
 
     /**
      * Class constructor
      *
-     * @param \Doofinder\Feed\Model\Generator\Item $context
-     * @param array $data = []
+     * @param \Doofinder\Feed\Model\Generator\Item $item
+     * @param array $data
      */
     public function __construct(
         \Doofinder\Feed\Model\Generator\Item $item,
         array $data = []
     ) {
-        $this->_item = $item;
-        $this->_context = $this->_item->getContext();
+        $this->item = $item;
+        $this->context = $this->item->getContext();
         parent::__construct($data);
     }
 
@@ -39,11 +42,13 @@ class Map extends \Magento\Framework\DataObject
      */
     public function get($field)
     {
-        return $this->_context->getData($field);
+        return $this->context->getData($field);
     }
 
     /**
      * Before map
+     *
+     * @return null
      */
     public function before()
     {
@@ -52,6 +57,8 @@ class Map extends \Magento\Framework\DataObject
 
     /**
      * After map
+     *
+     * @return null
      */
     public function after()
     {

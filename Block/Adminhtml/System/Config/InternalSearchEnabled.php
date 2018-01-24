@@ -2,6 +2,9 @@
 
 namespace Doofinder\Feed\Block\Adminhtml\System\Config;
 
+/**
+ * Internal search enabled
+ */
 class InternalSearchEnabled extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
@@ -17,7 +20,7 @@ class InternalSearchEnabled extends \Magento\Config\Block\System\Config\Form\Fie
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
@@ -29,7 +32,7 @@ class InternalSearchEnabled extends \Magento\Config\Block\System\Config\Form\Fie
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
-        $this->_storeConfig = $storeConfig;
+        $this->storeConfig = $storeConfig;
         parent::__construct($context, $data);
     }
 
@@ -43,7 +46,7 @@ class InternalSearchEnabled extends \Magento\Config\Block\System\Config\Form\Fie
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
     // @codingStandardsIgnoreEnd
-        $enabled = $this->_storeConfig->isInternalSearchEnabled();
+        $enabled = $this->storeConfig->isInternalSearchEnabled();
         $element->setText(__('Internal search is ' . ($enabled ? 'enabled' : 'disabled') . '.'));
 
         if (!$enabled) {

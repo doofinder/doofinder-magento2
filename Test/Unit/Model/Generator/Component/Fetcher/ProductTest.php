@@ -4,134 +4,143 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Fetcher;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Component\Fetcher\Product
+ */
 class ProductTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Fetcher\Product
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Product\Collection
      */
-    private $_productCollection;
+    private $productCollection;
 
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
-    private $_productCollectionFactory;
+    private $productCollectionFactory;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\ItemFactory
      */
-    private $_generatorItemFactory;
+    private $generatorItemFactory;
 
     /**
      * @var \Magento\Catalog\Model\Product
      */
-    private $_product;
+    private $product;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
+        $this->product = $this->getMock(
+            \Magento\Catalog\Model\Product::class,
             ['getEntityId'],
             [],
             '',
             false
         );
 
-        $this->_productCollection = $this->getMock(
-            '\Magento\Catalog\Model\ResourceModel\Product\Collection',
+        $this->productCollection = $this->getMock(
+            \Magento\Catalog\Model\ResourceModel\Product\Collection::class,
             [],
             [],
             '',
             false
         );
-        $this->_productCollection->expects($this->any())->method('addAttributeToSelect')
-            ->willReturn($this->_productCollection);
-        $this->_productCollection->expects($this->any())->method('addStoreFilter')
-            ->willReturn($this->_productCollection);
-        $this->_productCollection->expects($this->any())->method('addAttributeToFilter')
-            ->willReturn($this->_productCollection);
-        $this->_productCollection->expects($this->any())->method('addAttributeToSort')
-            ->willReturn($this->_productCollection);
-        $this->_productCollection->expects($this->any())->method('getItems')
-            ->willReturn([$this->_product]);
-        $this->_productCollection->expects($this->any())->method('getLastItem')
-            ->willReturn($this->_product);
+        $this->productCollection->expects($this->any())->method('addAttributeToSelect')
+            ->willReturn($this->productCollection);
+        $this->productCollection->expects($this->any())->method('addStoreFilter')
+            ->willReturn($this->productCollection);
+        $this->productCollection->expects($this->any())->method('addAttributeToFilter')
+            ->willReturn($this->productCollection);
+        $this->productCollection->expects($this->any())->method('addAttributeToSort')
+            ->willReturn($this->productCollection);
+        $this->productCollection->expects($this->any())->method('getItems')
+            ->willReturn([$this->product]);
+        $this->productCollection->expects($this->any())->method('getLastItem')
+            ->willReturn($this->product);
 
-        $this->_productCollectionFactory = $this->getMock(
-            '\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory',
+        $this->productCollectionFactory = $this->getMock(
+            \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_productCollectionFactory->expects($this->any())->method('create')
-            ->willReturn($this->_productCollection);
+        $this->productCollectionFactory->expects($this->any())->method('create')
+            ->willReturn($this->productCollection);
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_generatorItemFactory = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\ItemFactory',
+        $this->generatorItemFactory = $this->getMock(
+            \Doofinder\Feed\Model\Generator\ItemFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_generatorItemFactory->expects($this->any())->method('create')
-            ->willReturn($this->_item);
+        $this->generatorItemFactory->expects($this->any())->method('create')
+            ->willReturn($this->item);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Component\Fetcher\Product',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Component\Fetcher\Product::class,
             [
-                'productColFactory' => $this->_productCollectionFactory,
-                'generatorItemFactory' => $this->_generatorItemFactory
+                'productColFactory' => $this->productCollectionFactory,
+                'generatorItemFactory' => $this->generatorItemFactory
             ]
         );
     }
 
     /**
-     * Test fetch
+     * Test fetch() method
+     *
+     * @return void
      */
     public function testFetch()
     {
-        $items = $this->_model->fetch();
+        $items = $this->model->fetch();
 
-        $this->assertEquals([$this->_item], $items);
-        $this->assertEquals(true, $this->_model->isStarted());
-        $this->assertEquals(true, $this->_model->isDone());
+        $this->assertEquals([$this->item], $items);
+        $this->assertEquals(true, $this->model->isStarted());
+        $this->assertEquals(true, $this->model->isDone());
     }
 
     /**
-     * Test fetch with pagination
+     * Test fetch() method with pagination
+     *
+     * @return void
      */
     public function testFetchWithPagination()
     {
-        $this->_model->setLimit(1);
-        $this->_model->setOffset(2);
+        $this->model->setLimit(1);
+        $this->model->setOffset(2);
 
-        $this->_productCollection->expects($this->once())->method('setPageSize')
+        $this->productCollection->expects($this->once())->method('setPageSize')
             ->with(1)
-            ->willReturn([$this->_product]);
-        $this->_productCollection->expects($this->any())->method('addAttributeToFilter')
+            ->willReturn([$this->product]);
+        $this->productCollection->expects($this->any())->method('addAttributeToFilter')
             ->withConsecutive(
                 ['status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED],
                 ['visibility', [
@@ -140,31 +149,33 @@ class ProductTest extends BaseTestCase
                 ]],
                 ['entity_id', ['gt' => 2]]
             )
-            ->willReturn($this->_productCollection);
+            ->willReturn($this->productCollection);
 
-        $this->_model->fetch();
+        $this->model->fetch();
     }
 
     /**
-     * Test fetch with offset transform
+     * Test fetch() method with offset transform
+     *
+     * @return void
      */
     public function testFetchWithOffsetTransform()
     {
-        $this->_model->setLimit(10);
-        $this->_model->setOffset(30);
-        $this->_model->setTransformOffset(true);
+        $this->model->setLimit(10);
+        $this->model->setOffset(30);
+        $this->model->setTransformOffset(true);
 
         $select = $this->getMock(
-            '\Magento\Framework\DB\Select',
+            \Magento\Framework\DB\Select::class,
             [],
             [],
             '',
             false
         );
-        $this->_productCollection->method('getSelect')->willReturn($select);
+        $this->productCollection->method('getSelect')->willReturn($select);
 
         $product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
+            \Magento\Catalog\Model\Product::class,
             [],
             [],
             '',
@@ -172,10 +183,10 @@ class ProductTest extends BaseTestCase
         );
         $product->method('getEntityId')->willReturn(51);
 
-        $this->_productCollection->expects($this->once())->method('getAllIds')
+        $this->productCollection->expects($this->once())->method('getAllIds')
             ->with(1, 29)
             ->willReturn([$product->getEntityId()]);
-        $this->_productCollection->expects($this->any())->method('addAttributeToFilter')
+        $this->productCollection->expects($this->any())->method('addAttributeToFilter')
             ->withConsecutive(
                 ['status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED],
                 ['visibility', [
@@ -189,29 +200,39 @@ class ProductTest extends BaseTestCase
                 ]],
                 ['entity_id', ['gt' => 51]]
             )
-            ->willReturn($this->_productCollection);
+            ->willReturn($this->productCollection);
 
-        $this->_model->fetch();
+        $this->model->fetch();
     }
 
     /**
      * Test isStarted() and isDone() methods
      *
+     * @param  integer $offset
+     * @param  integer $size
+     * @param  boolean $isStarted
+     * @param  boolean $isDone
+     * @return void
      * @dataProvider providerTestStartedDone
      */
     public function testStartedDone($offset, $size, $isStarted, $isDone)
     {
-        $this->_productCollection->method('getSize')->willReturn($size);
+        $this->productCollection->method('getSize')->willReturn($size);
 
-        $this->_model->setLimit(1);
-        $this->_model->setOffset($offset);
+        $this->model->setLimit(1);
+        $this->model->setOffset($offset);
 
-        $this->_model->fetch();
+        $this->model->fetch();
 
-        $this->assertEquals($isStarted, $this->_model->isStarted());
-        $this->assertEquals($isDone, $this->_model->isDone());
+        $this->assertEquals($isStarted, $this->model->isStarted());
+        $this->assertEquals($isDone, $this->model->isDone());
     }
 
+    /**
+     * Data provider for testStartedDone() test
+     *
+     * @return array
+     */
     public function providerTestStartedDone()
     {
         return [
@@ -223,28 +244,32 @@ class ProductTest extends BaseTestCase
 
     /**
      * Test getLastProcessedEntityId() method
+     *
+     * @return void
      */
     public function testGetLastProcessedEntityId()
     {
-        $this->_product->method('getEntityId')->willReturn(11);
-        $this->_productCollection->method('getSize')->willReturn(1);
+        $this->product->method('getEntityId')->willReturn(11);
+        $this->productCollection->method('getSize')->willReturn(1);
 
-        $this->_model->fetch();
+        $this->model->fetch();
 
-        $this->assertEquals(11, $this->_model->getLastProcessedEntityId());
+        $this->assertEquals(11, $this->model->getLastProcessedEntityId());
     }
 
     /**
      * Test getProgress() method
+     *
+     * @return void
      */
     public function testGetProgress()
     {
-        $this->_productCollection->method('getSize')->willReturn(20);
+        $this->productCollection->method('getSize')->willReturn(20);
 
-        $this->_model->setLimit(10);
-        $this->_model->fetch();
+        $this->model->setLimit(10);
+        $this->model->fetch();
 
-        $this->_productCollection->method('getSize')->willReturn(10);
-        $this->assertEquals(0.5, $this->_model->getProgress());
+        $this->productCollection->method('getSize')->willReturn(10);
+        $this->assertEquals(0.5, $this->model->getProgress());
     }
 }

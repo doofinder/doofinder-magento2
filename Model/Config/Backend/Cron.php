@@ -3,8 +3,7 @@
 namespace Doofinder\Feed\Model\Config\Backend;
 
 /**
- * Class Cron
- * @package Doofinder\Feed\Model\Config\Backend
+ * Cron schedule backend
  */
 class Cron extends \Magento\Framework\App\Config\Value
 {
@@ -15,7 +14,7 @@ class Cron extends \Magento\Framework\App\Config\Value
     /**
      * @var \Magento\Framework\App\Config\ValueFactory
      */
-    private $_configValueFactory;
+    private $configValueFactory;
 
     /**
      * Cron constructor.
@@ -39,7 +38,7 @@ class Cron extends \Magento\Framework\App\Config\Value
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        $this->_configValueFactory = $configValueFactory;
+        $this->configValueFactory = $configValueFactory;
 
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
@@ -48,7 +47,7 @@ class Cron extends \Magento\Framework\App\Config\Value
      * Save cron expression.
      *
      * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\LocalizedException Cron job could not be saved.
      */
     public function afterSave()
     {
@@ -69,7 +68,7 @@ class Cron extends \Magento\Framework\App\Config\Value
         }
 
         try {
-            $this->_configValueFactory->create()->load(
+            $this->configValueFactory->create()->load(
                 self::CRON_STRING_PATH,
                 'path'
             )->setValue(

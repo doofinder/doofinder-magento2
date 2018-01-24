@@ -11,21 +11,27 @@ class MapFactory
      *
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $_objectManager = null;
+    private $objectManager = null;
 
     /**
      * Instance name to create
      *
      * @var string
      */
-    private $_instanceName = null;
+    private $instanceName = null;
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param string $instanceName
+     */
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $objectManager,
-        $instanceName = '\Doofinder\Feed\Model\Generator\Map'
+        $instanceName = \Doofinder\Feed\Model\Generator\Map::class
     ) {
-        $this->_objectManager = $objectManager;
-        $this->_instanceName = $instanceName;
+        $this->objectManager = $objectManager;
+        $this->instanceName = $instanceName;
     }
 
     /**
@@ -37,10 +43,10 @@ class MapFactory
      */
     public function create(\Doofinder\Feed\Model\Generator\Item $item, array $data = [])
     {
-        $class = $this->_instanceName;
+        $class = $this->instanceName;
         $context = $item->getContext();
 
-        if (is_a($context, '\Magento\Catalog\Model\Product')) {
+        if (is_a($context, \Magento\Catalog\Model\Product::class)) {
             $class .= '\\Product';
             $typeName = ucwords($context->getTypeId());
             if (class_exists($class . '\\' . $typeName)) {
@@ -49,7 +55,7 @@ class MapFactory
         }
 
         // @codingStandardsIgnoreStart
-        return $this->_objectManager->create($class, [
+        return $this->objectManager->create($class, [
             'item' => $item,
             'data' => $data,
         ]);

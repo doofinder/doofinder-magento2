@@ -3,14 +3,14 @@
 namespace Doofinder\Feed\Model\Tax\Plugin;
 
 /**
- * @class Config
+ * Tax config plugin
  */
 class Config
 {
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    private $_scopeConfig;
+    private $scopeConfig;
 
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -18,7 +18,7 @@ class Config
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
-        $this->_scopeConfig = $scopeConfig;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -29,8 +29,10 @@ class Config
      * price export mode is set to 'with tax'.
      * All other tax setting combinations are fine.
      *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param  \Magento\Tax\Model\Config $taxConfig
+     * @param  \Closure $closure
      * @return boolean
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @codingStandardsIgnoreStart
      */
     public function aroundNeedPriceConversion(\Magento\Tax\Model\Config $taxConfig, \Closure $closure)
@@ -43,7 +45,7 @@ class Config
             return $needPriceConversion;
         }
 
-        $taxMode = $this->_scopeConfig->getValue(
+        $taxMode = $this->scopeConfig->getValue(
             \Doofinder\Feed\Helper\StoreConfig::FEED_SETTINGS_CONFIG . '/price_tax_mode'
         );
 

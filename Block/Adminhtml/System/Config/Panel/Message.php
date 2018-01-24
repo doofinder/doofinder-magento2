@@ -2,6 +2,9 @@
 
 namespace Doofinder\Feed\Block\Adminhtml\System\Config\Panel;
 
+/**
+ * Generic message
+ */
 class Message extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**

@@ -2,17 +2,20 @@
 
 namespace Doofinder\Feed\Block\Adminhtml\System\Config\Panel;
 
+/**
+ * Dynamic feed url
+ */
 class DynamicFeedUrl extends Message
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Magento\Framework\UrlInterface
      */
-    private $_frontendUrlBuilder;
+    private $frontendUrlBuilder;
 
     /**
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
@@ -26,8 +29,8 @@ class DynamicFeedUrl extends Message
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
-        $this->_storeConfig = $storeConfig;
-        $this->_frontendUrlBuilder = $frontendUrlBuilder;
+        $this->storeConfig = $storeConfig;
+        $this->frontendUrlBuilder = $frontendUrlBuilder;
         parent::__construct($context, $data);
     }
 
@@ -38,12 +41,12 @@ class DynamicFeedUrl extends Message
      */
     public function getText()
     {
-        $storeCodes = $this->_storeConfig->getStoreCodes();
+        $storeCodes = $this->storeConfig->getStoreCodes();
 
         $html = '';
         foreach ($storeCodes as $storeCode) {
             $store = $this->_storeManager->getStore($storeCode);
-            $config = $this->_storeConfig->getStoreConfig($storeCode);
+            $config = $this->storeConfig->getStoreConfig($storeCode);
 
             $password = $config['password'];
             $params = ['language' => $store->getCode()];
@@ -52,8 +55,8 @@ class DynamicFeedUrl extends Message
                 $params['password'] = $password;
             }
 
-            $this->_frontendUrlBuilder->setScope($store->getId());
-            $url = $this->_frontendUrlBuilder->getUrl('doofinder/feed', [
+            $this->frontendUrlBuilder->setScope($store->getId());
+            $url = $this->frontendUrlBuilder->getUrl('doofinder/feed', [
                 '_nosid' => true
             ] + $params);
             $anchor = '<a href="' . $url . '">' . $url . '</a>';

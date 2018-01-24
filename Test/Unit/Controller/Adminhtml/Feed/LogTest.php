@@ -5,8 +5,8 @@ namespace Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class LogTest
- * @package Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed
+ * Test class for \Doofinder\Feed\Controller\Adminhtml\Feed\Log
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class LogTest extends BaseTestCase
@@ -14,254 +14,263 @@ class LogTest extends BaseTestCase
     /**
      * @var \Magento\Backend\Model\View\Result\Redirect
      */
-    private $_resultRedirect;
+    private $resultRedirect;
 
     /**
      * @var \Magento\Backend\Model\View\Result\RedirectFactory
      */
-    private $_resultRedirectFactory;
+    private $resultRedirectFactory;
 
     /**
      * @var \Magento\Framework\Message\ManagerInterface
      */
-    private $_messageManager;
+    private $messageManager;
 
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    private $_request;
+    private $request;
 
     /**
      * @var \Magento\Backend\App\Action\Context
      */
-    private $_context;
+    private $context;
 
     /**
      * @var \Magento\Framework\View\Page\Title
      */
-    private $_pageTitle;
+    private $pageTitle;
 
     /**
      * @var \Magento\Framework\View\Page\Config
      */
-    private $_pageConfig;
+    private $pageConfig;
 
     /**
      * @var \Magento\Framework\View\Result\Page
      */
-    private $_resultPage;
+    private $resultPage;
 
     /**
      * @var \Magento\Framework\View\Result\PageFactory
      */
-    private $_resultPageFactory;
+    private $resultPageFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Magento\Framework\App\Request\DataPersistorInterface
      */
-    private $_dataPersistor;
+    private $dataPersistor;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    private $_store;
+    private $store;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Doofinder\Feed\Controller\Adminhtml\Feed\Log
      */
-    private $_controller;
+    private $controller;
 
     /**
+     * Set up test
+     *
+     * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_resultRedirect = $this->getMock(
-            '\Magento\Backend\Model\View\Result\Redirect',
+        $this->resultRedirect = $this->getMock(
+            \Magento\Backend\Model\View\Result\Redirect::class,
             [],
             [],
             '',
             false
         );
-        $this->_resultRedirect->method('setPath')->willReturn($this->_resultRedirect);
+        $this->resultRedirect->method('setPath')->willReturn($this->resultRedirect);
 
-        $this->_resultRedirectFactory = $this->getMock(
-            '\Magento\Backend\Model\View\Result\RedirectFactory',
+        $this->resultRedirectFactory = $this->getMock(
+            \Magento\Backend\Model\View\Result\RedirectFactory::class,
             [],
             [],
             '',
             false
         );
-        $this->_resultRedirectFactory->method('create')->willReturn($this->_resultRedirect);
+        $this->resultRedirectFactory->method('create')->willReturn($this->resultRedirect);
 
-        $this->_messageManager = $this->getMock(
-            '\Magento\Framework\Message\ManagerInterface',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_request = $this->getMock(
-            '\Magento\Framework\App\RequestInterface',
+        $this->messageManager = $this->getMock(
+            \Magento\Framework\Message\ManagerInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_context = $this->getMock(
-            '\Magento\Backend\App\Action\Context',
-            [],
-            [],
-            '',
-            false
-        );
-        $this->_context->method('getResultRedirectFactory')->willReturn($this->_resultRedirectFactory);
-        $this->_context->method('getMessageManager')->willReturn($this->_messageManager);
-        $this->_context->method('getRequest')->willReturn($this->_request);
-
-        $this->_pageTitle = $this->getMock(
-            'Magento\Framework\View\Page\Title',
+        $this->request = $this->getMock(
+            \Magento\Framework\App\RequestInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_pageConfig = $this->getMock(
-            '\Magento\Framework\View\Page\Config',
+        $this->context = $this->getMock(
+            \Magento\Backend\App\Action\Context::class,
             [],
             [],
             '',
             false
         );
-        $this->_pageConfig->method('getTitle')->willReturn($this->_pageTitle);
+        $this->context->method('getResultRedirectFactory')->willReturn($this->resultRedirectFactory);
+        $this->context->method('getMessageManager')->willReturn($this->messageManager);
+        $this->context->method('getRequest')->willReturn($this->request);
 
-        $this->_resultPage = $this->getMock(
-            '\Magento\Framework\View\Result\Page',
+        $this->pageTitle = $this->getMock(
+            \Magento\Framework\View\Page\Title::class,
             [],
             [],
             '',
             false
         );
-        $this->_resultPage->method('getConfig')->willReturn($this->_pageConfig);
 
-        $this->_resultPageFactory = $this->getMock(
-            '\Magento\Framework\View\Result\PageFactory',
+        $this->pageConfig = $this->getMock(
+            \Magento\Framework\View\Page\Config::class,
+            [],
+            [],
+            '',
+            false
+        );
+        $this->pageConfig->method('getTitle')->willReturn($this->pageTitle);
+
+        $this->resultPage = $this->getMock(
+            \Magento\Framework\View\Result\Page::class,
+            [],
+            [],
+            '',
+            false
+        );
+        $this->resultPage->method('getConfig')->willReturn($this->pageConfig);
+
+        $this->resultPageFactory = $this->getMock(
+            \Magento\Framework\View\Result\PageFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_resultPageFactory->method('create')->willReturn($this->_resultPage);
+        $this->resultPageFactory->method('create')->willReturn($this->resultPage);
 
-        $this->_schedule = $this->getMock(
-            '\Doofinder\Feed\Helper\Schedule',
+        $this->schedule = $this->getMock(
+            \Doofinder\Feed\Helper\Schedule::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_dataPersistor = $this->getMock(
-            '\Magento\Framework\App\Request\DataPersistorInterface',
+        $this->dataPersistor = $this->getMock(
+            \Magento\Framework\App\Request\DataPersistorInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_store = $this->getMock(
-            '\Magento\Store\Model\Store',
+        $this->store = $this->getMock(
+            \Magento\Store\Model\Store::class,
             [],
             [],
             '',
             false
         );
-        $this->_store->method('getCode')->willReturn('sample');
+        $this->store->method('getCode')->willReturn('sample');
 
-        $this->_storeManager = $this->getMock(
-            '\Magento\Store\Model\StoreManagerInterface',
+        $this->storeManager = $this->getMock(
+            \Magento\Store\Model\StoreManagerInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_storeManager->method('getStore')
-            ->with(1)->willReturn($this->_store);
+        $this->storeManager->method('getStore')
+            ->with(1)->willReturn($this->store);
 
-        $this->_controller = $this->objectManager->getObject(
-            '\Doofinder\Feed\Controller\Adminhtml\Feed\Log',
+        $this->controller = $this->objectManager->getObject(
+            \Doofinder\Feed\Controller\Adminhtml\Feed\Log::class,
             [
-                'context' => $this->_context,
-                'resultPageFactory'   => $this->_resultPageFactory,
-                'schedule' => $this->_schedule,
-                'dataPersistor' => $this->_dataPersistor,
-                'storeManager' => $this->_storeManager,
+                'context' => $this->context,
+                'resultPageFactory'   => $this->resultPageFactory,
+                'schedule' => $this->schedule,
+                'dataPersistor' => $this->dataPersistor,
+                'storeManager' => $this->storeManager,
             ]
         );
     }
 
     /**
-     * Test execute()
+     * Test execute() method
+     *
+     * @return void
      */
     public function testExecute()
     {
         $process = $this->getMock(
-            '\Doofinder\Feed\Model\Cron',
+            \Doofinder\Feed\Model\Cron::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_schedule->expects($this->once())->method('getProcessByStoreCode')
+        $this->schedule->expects($this->once())->method('getProcessByStoreCode')
             ->with('sample')->willReturn($process);
 
-        $this->_dataPersistor->expects($this->once())->method('set')
+        $this->dataPersistor->expects($this->once())->method('set')
             ->with('doofinder_feed_process', $process);
 
-        $this->_request->method('getParam')->will($this->returnValueMap([
+        $this->request->method('getParam')->will($this->returnValueMap([
             ['store', null, 1],
         ]));
 
-        $this->assertEquals($this->_resultPage, $this->_controller->execute());
+        $this->assertEquals($this->resultPage, $this->controller->execute());
     }
 
     /**
-     * Test execute() without process
+     * Test execute() method without process
+     *
+     * @return void
      */
     public function testExecuteWithoutProcess()
     {
-        $this->_dataPersistor->expects($this->never())->method('set');
+        $this->dataPersistor->expects($this->never())->method('set');
 
-        $this->_request->method('getParam')->will($this->returnValueMap([
+        $this->request->method('getParam')->will($this->returnValueMap([
             ['store', null, 1],
         ]));
 
-        $this->assertEquals($this->_resultRedirect, $this->_controller->execute());
+        $this->assertEquals($this->resultRedirect, $this->controller->execute());
     }
 
     /**
-     * Test execute() without store param
+     * Test execute() method without store param
+     *
+     * @return void
      */
     public function testExecuteWithoutStore()
     {
-        $this->_dataPersistor->expects($this->never())->method('set');
+        $this->dataPersistor->expects($this->never())->method('set');
 
-        $this->assertEquals($this->_resultPage, $this->_controller->execute());
+        $this->assertEquals($this->resultPage, $this->controller->execute());
     }
 }

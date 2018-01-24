@@ -8,12 +8,19 @@ use \Magento\Framework\Setup\SchemaSetupInterface;
 use \Magento\Framework\DB\Ddl\Table;
 use \Magento\Framework\DB\Adapter\AdapterInterface;
 
+/**
+ * Install schema
+ */
 class InstallSchema implements InstallSchemaInterface
 {
     const CRON_TABLE_NAME = 'doofinder_feed_cron';
     const LOG_TABLE_NAME = 'doofinder_feed_log';
 
     /**
+     * Install
+     *
+     * @param SchemaSetupInterface $setup
+     * @param ModuleContextInterface $context
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @codingStandardsIgnoreStart
      */
@@ -28,12 +35,20 @@ class InstallSchema implements InstallSchemaInterface
         $setup->endSetup();
     }
 
+    /**
+     * Setup cron table
+     *
+     * @param  SchemaSetupInterface $setup
+     * @return void
+     */
     private function setupCronTable(SchemaSetupInterface $setup)
     {
         $table = $setup->getConnection()
-            ->newTable(self::CRON_TABLE_NAME)
+            ->newTable(
+                $setup->getTable(self::CRON_TABLE_NAME)
+            )
             ->addColumn(
-                'entity_id',
+                'entity_id', // @codingStandardsIgnoreLine
                 Table::TYPE_INTEGER,
                 null,
                 [
@@ -120,12 +135,20 @@ class InstallSchema implements InstallSchemaInterface
         $setup->getConnection()->createTable($table);
     }
 
+    /**
+     * Setup log table
+     *
+     * @param  SchemaSetupInterface $setup
+     * @return void
+     */
     private function setupLogTable(SchemaSetupInterface $setup)
     {
         $table = $setup->getConnection()
-            ->newTable(self::LOG_TABLE_NAME)
+            ->newTable(
+                $setup->getTable(self::LOG_TABLE_NAME)
+            )
             ->addColumn(
-                'entity_id',
+                'entity_id',  // @codingStandardsIgnoreLine
                 Table::TYPE_INTEGER,
                 null,
                 [

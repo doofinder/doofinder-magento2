@@ -3,63 +3,69 @@
 namespace Doofinder\Feed\Search;
 
 use Magento\Framework\Indexer\SaveHandler\IndexerInterface;
+use Magento\Framework\Exception\LocalizedException;
 
+/**
+ * Indexer handler
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class IndexerHandler implements IndexerInterface
 {
     /**
      * @var \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      */
-    private $_indexerHandler;
+    private $indexerHandler;
 
     /**
-     * \Magento\Framework\Indexer\IndexStructureInterface
+     * @var \Magento\Framework\Indexer\IndexStructureInterface
      */
-    private $_indexStructure;
+    private $indexStructure;
 
     /**
      * @var \Magento\Framework\Indexer\SaveHandler\Batch
      */
-    private $_batch;
+    private $batch;
 
     /**
      * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
-    private $_productRepository;
+    private $productRepository;
 
     /**
      * @var \Magento\Framework\Api\SearchCriteriaBuilder
      */
-    private $_searchCriteriaBuilder;
+    private $searchCriteriaBuilder;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    private $_feedConfig;
+    private $feedConfig;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    private $_generatorFactory;
+    private $generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
-    private $_searchHelper;
+    private $searchHelper;
 
     /**
-     * @var int
+     * @var integer
      */
-    private $_batchSize;
+    private $batchSize;
 
     /**
      * @param \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory $indexerHandlerFactory
@@ -73,8 +79,11 @@ class IndexerHandler implements IndexerInterface
      * @param \Doofinder\Feed\Model\GeneratorFactory $generatorFactory
      * @param \Doofinder\Feed\Helper\Search $searchHelper
      * @param array $data
-     * @param int $batchSize = 100
+     * @param integer $batchSize
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @SuppressWarnings(PHPMD.LongVariable)
+     * @codingStandardsIgnoreStart
+     * Ignore MEQP2.Classes.ConstructorOperations.CustomOperationsFound
      */
     public function __construct(
         \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory $indexerHandlerFactory,
@@ -90,55 +99,69 @@ class IndexerHandler implements IndexerInterface
         array $data,
         $batchSize = 100
     ) {
-        $this->_indexerHandler = $indexerHandlerFactory->create([
+    // @codingStandardsIgnoreEnd
+        $this->indexerHandler = $indexerHandlerFactory->create([
             'data' => $data,
             'batchSize' => $batchSize
         ]);
-        $this->_indexStructure = $indexStructure;
-        $this->_batch = $batch;
-        $this->_productRepository = $productRepository;
-        $this->_searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->_storeManager = $storeManager;
-        $this->_storeConfig = $storeConfig;
-        $this->_feedConfig = $feedConfig;
-        $this->_generatorFactory = $generatorFactory;
-        $this->_searchHelper = $searchHelper;
-        $this->_batchSize = $batchSize;
+        $this->indexStructure = $indexStructure;
+        $this->batch = $batch;
+        $this->productRepository = $productRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->storeManager = $storeManager;
+        $this->storeConfig = $storeConfig;
+        $this->feedConfig = $feedConfig;
+        $this->generatorFactory = $generatorFactory;
+        $this->searchHelper = $searchHelper;
+        $this->batchSize = $batchSize;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param  mixed $dimensions
+     * @param  \Traversable $documents
+     * @return void
      */
     public function saveIndex($dimensions, \Traversable $documents)
     {
-        foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
+        foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
             $this->insertDocuments($batchDocuments, $dimensions);
-            $this->_indexerHandler->saveIndex($dimensions, $this->createIterator($batchDocuments));
+            $this->indexerHandler->saveIndex($dimensions, $this->createIterator($batchDocuments));
         }
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param  mixed $dimensions
+     * @param  \Traversable $documents
+     * @return void
      */
     public function deleteIndex($dimensions, \Traversable $documents)
     {
-        foreach ($this->_batch->getItems($documents, $this->_batchSize) as $batchDocuments) {
+        foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
             $this->dropDocuments($batchDocuments, $dimensions);
-            $this->_indexerHandler->deleteIndex($dimensions, $this->createIterator($batchDocuments));
+            $this->indexerHandler->deleteIndex($dimensions, $this->createIterator($batchDocuments));
         }
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param  mixed $dimensions
+     * @return void
      */
     public function cleanIndex($dimensions)
     {
-        $this->_indexerHandler->cleanIndex($dimensions);
+        $this->indexerHandler->cleanIndex($dimensions);
     }
 
     /**
      * {@inheritdoc}
-     * NOTICE Add hash id verification
+     *
+     * NOTICE: Add hash id verification
+     * @return boolean
      */
     public function isAvailable()
     {
@@ -158,68 +181,69 @@ class IndexerHandler implements IndexerInterface
     }
 
     /**
-     * @param array $documents
-     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @param  array $documents
+     * @param  \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @return void
      */
     private function insertDocuments(array $documents, array $dimensions)
     {
-        if (empty($documents)) {
-            return;
+        if (!empty($documents)) {
+            $this->performAction(array_keys($documents), $dimensions, 'update');
         }
-
-        $this->runGenerator(array_keys($documents), $dimensions, 'update');
     }
 
     /**
-     * @param array $documents
-     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @param  array $documents
+     * @param  \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @return void
      */
     private function dropDocuments(array $documents, array $dimensions)
     {
-        if (empty($documents)) {
-            return;
+        if (!empty($documents)) {
+            $this->performAction(array_keys($documents), $dimensions, 'delete');
         }
-
-        $this->runGenerator($documents, $dimensions, 'delete');
     }
 
     /**
-     * Run generator
+     * Perform action
+     *   - update - Run generator with AtomicUpdater
+     *   - delete - Delete items from index
      *
-     * @param int[] $ids
-     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
-     * @param string $action
+     * @param  int[] $ids
+     * @param  \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @param  string $action
+     * @return void
+     * @throws LocalizedException Unknown action.
      */
-    private function runGenerator(array $ids, array $dimensions, $action)
+    private function performAction(array $ids, array $dimensions, $action)
     {
-        $originalStoreCode = $this->_storeConfig->getStoreCode();
+        $originalStoreCode = $this->storeConfig->getStoreCode();
 
-        $storeId = $this->_searchHelper->getStoreIdFromDimensions($dimensions);
-        $this->_storeManager->setCurrentStore($storeId);
+        $storeId = $this->searchHelper->getStoreIdFromDimensions($dimensions);
+        $this->storeManager->setCurrentStore($storeId);
 
-        $feedConfig = $this->_feedConfig->getLeanFeedConfig($storeId);
+        if ($action == 'update') {
+            $feedConfig = $this->feedConfig->getLeanFeedConfig($storeId);
 
-        // Add fixed product fetcher
-        $feedConfig['data']['config']['fetchers']['Product\Fixed'] = [
-            'products' => $this->getProducts($ids),
-        ];
+            // Add fixed product fetcher
+            $feedConfig['data']['config']['fetchers']['Product\Fixed'] = [
+                'products' => $this->getProducts($ids),
+            ];
 
-        // Add atomic update processor
-        $feedConfig['data']['config']['processors']['AtomicUpdater'] = [
-            'action' => $action,
-        ];
+            // Add atomic update processor
+            $feedConfig['data']['config']['processors']['AtomicUpdater'] = [];
 
-        if ($action == 'delete') {
-            // We do not need fields other than id to delete items
-            $map = $feedConfig['data']['config']['processors']['Mapper']['map'];
-            $map = array_intersect_key($map, ['id' => '']);
-            $feedConfig['data']['config']['processors']['Mapper']['map'] = $map;
+            $generator = $this->generatorFactory->create($feedConfig);
+            $generator->run();
+        } elseif ($action == 'delete') {
+            $this->searchHelper->deleteDoofinderItems(array_map(function ($id) {
+                return ['id' => $id];
+            }, $ids));
+        } else {
+            throw new LocalizedException(__('Unknown Doofinder indexer action'));
         }
 
-        $generator = $this->_generatorFactory->create($feedConfig);
-        $generator->run();
-
-        $this->_storeManager->setCurrentStore($originalStoreCode);
+        $this->storeManager->setCurrentStore($originalStoreCode);
     }
 
     /**
@@ -230,10 +254,10 @@ class IndexerHandler implements IndexerInterface
      */
     private function getProducts(array $ids)
     {
-        $builder = $this->_searchCriteriaBuilder;
+        $builder = $this->searchCriteriaBuilder;
         $builder->addFilter('entity_id', $ids, 'in');
 
-        $results = $this->_productRepository->getList(
+        $results = $this->productRepository->getList(
             $builder->create()
         );
 

@@ -4,27 +4,32 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Processor;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Component\Processor\Cleaner
+ */
 class CleanerTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Cleaner
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             null,
             [
                 'data' => [
@@ -34,21 +39,23 @@ class CleanerTest extends BaseTestCase
             ]
         );
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Cleaner',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Cleaner::class,
             [
             ]
         );
     }
 
     /**
-     * Test process
+     * Test process() method
+     *
+     * @return void
      */
     public function testProcess()
     {
-        $this->_model->process([$this->_item]);
+        $this->model->process([$this->item]);
 
-        $this->assertEquals('Sample product', $this->_item->getData('title'));
-        $this->assertEquals('Brand new product. Check it out.', $this->_item->getDescription());
+        $this->assertEquals('Sample product', $this->item->getData('title'));
+        $this->assertEquals('Brand new product. Check it out.', $this->item->getDescription());
     }
 }
