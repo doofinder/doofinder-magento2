@@ -6,6 +6,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Run process command
+ */
 class RunProcessCommand extends \Symfony\Component\Console\Command\Command
 {
     /**
@@ -16,22 +19,22 @@ class RunProcessCommand extends \Symfony\Component\Console\Command\Command
     /**
      * @var \Doofinder\Feed\Model\CronFactory
      */
-    private $_cronFactory;
+    private $cronFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Magento\Framework\App\State
      */
-    private $_state;
+    private $state;
 
     /**
      * @var \Symfony\Component\Console\Input\InputArgumentFactory
      */
-    private $_inputArgFactory;
+    private $inputArgFactory;
 
     /**
      * @param \Doofinder\Feed\Model\CronFactory $cronFactory
@@ -45,10 +48,10 @@ class RunProcessCommand extends \Symfony\Component\Console\Command\Command
         \Magento\Framework\App\State $state,
         \Symfony\Component\Console\Input\InputArgumentFactory $inputArgFactory
     ) {
-        $this->_cronFactory = $cronFactory;
-        $this->_schedule = $schedule;
-        $this->_state = $state;
-        $this->_inputArgFactory = $inputArgFactory;
+        $this->cronFactory = $cronFactory;
+        $this->schedule = $schedule;
+        $this->state = $state;
+        $this->inputArgFactory = $inputArgFactory;
         parent::__construct();
     }
 
@@ -72,19 +75,22 @@ class RunProcessCommand extends \Symfony\Component\Console\Command\Command
 
     /**
      * {@inheritdoc}
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
      * @codingStandardsIgnoreStart
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
     // @codingStandardsIgnoreEnd
-        $this->_state->setAreaCode('frontend');
+        $this->state->setAreaCode('frontend');
 
         $store = $input->getArgument(self::STORE_ARGUMENT);
         if ($store === null) {
             throw new \InvalidArgumentException('Argument ' . self::STORE_ARGUMENT . ' is missing.');
         }
 
-        $process = $this->_cronFactory->create()->load($store, 'store_code');
-        $this->_schedule->runProcess($process);
+        $process = $this->cronFactory->create()->load($store, 'store_code');
+        $this->schedule->runProcess($process);
     }
 }

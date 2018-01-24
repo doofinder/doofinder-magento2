@@ -5,53 +5,64 @@ namespace Doofinder\Feed\Model\Generator\Component\Fetcher;
 use \Doofinder\Feed\Model\Generator\Component;
 use \Doofinder\Feed\Model\Generator\Component\FetcherInterface;
 
+/**
+ * Product fetcher
+ */
 class Product extends Component implements FetcherInterface
 {
     /**
+     * @var \Magento\CatalogInventory\Model\ResourceModel\Stock\Status
+     */
+    private $stockStatusResource;
+
+    /**
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
-    private $_productColFactory = null;
+    private $productColFactory = null;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\ItemFactory
      */
-    private $_generatorItemFactory = null;
+    private $generatorItemFactory = null;
 
+    // Ignore protected properties
     // @codingStandardsIgnoreStart
     /**
      * @var boolean
      */
-    protected $_isStarted = null;
+    protected $isStarted = null;
 
     /**
      * @var boolean
      */
-    protected $_isDone = null;
+    protected $isDone = null;
 
     /**
      * @var int
      */
-    protected $_lastEntityId = null;
+    protected $lastEntityId = null;
 
     /**
      * Amount of all products left in current fetch
      *
      * @var int
      */
-    protected $_itemsLeftCount = null;
+    protected $itemsLeftCount = null;
     // @codingStandardsEnd
 
     /**
      * Constructor
      */
     public function __construct(
+        \Magento\CatalogInventory\Model\ResourceModel\Stock\Status $stockStatusResource,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productColFactory,
         \Doofinder\Feed\Model\Generator\ItemFactory $generatorItemFactory,
         \Psr\Log\LoggerInterface $logger,
         array $data = []
     ) {
-        $this->_productColFactory = $productColFactory;
-        $this->_generatorItemFactory = $generatorItemFactory;
+        $this->stockStatusResource = $stockStatusResource;
+        $this->productColFactory = $productColFactory;
+        $this->generatorItemFactory = $generatorItemFactory;
         parent::__construct($logger, $data);
     }
 
@@ -66,24 +77,24 @@ class Product extends Component implements FetcherInterface
         $collection->load();
 
         // Check if fetcher is started
-        $this->_isStarted = !$this->getOffset();
+        $this->isStarted = !$this->getOffset();
 
         // Check if fetcher is done
         if ($collection->getSize() > 0) {
-            $this->_isDone = !$this->getLimit() || $this->getLimit() >= $collection->getSize();
+            $this->isDone = !$this->getLimit() || $this->getLimit() >= $collection->getSize();
         } else {
             // Done if not items fetched but fetcher is started
-            $this->_isDone = $this->_isStarted;
+            $this->isDone = $this->isStarted;
         }
 
         // Set the last processed entity id
-        $this->_lastEntityId = $this->getOffset();
+        $this->lastEntityId = $this->getOffset();
         if ($collection->getSize()) {
-            $this->_lastEntityId = $collection->getLastItem()->getEntityId();
+            $this->lastEntityId = $collection->getLastItem()->getEntityId();
         }
 
         // Set fetched size
-        $this->_itemsLeftCount = $this->getLimit() ? max(0, $collection->getSize() - $this->getLimit()) : 0;
+        $this->itemsLeftCount = $this->getLimit() ? max(0, $collection->getSize() - $this->getLimit()) : 0;
 
         return $collection->getItems();
     }
@@ -137,7 +148,7 @@ class Product extends Component implements FetcherInterface
      */
     private function getProductCollection($limit = null, $offset = null)
     {
-        $collection = $this->_productColFactory->create()
+        $collection = $this->productColFactory->create()
             ->addAttributeToSelect('*')
             ->addStoreFilter()
             ->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
@@ -146,6 +157,14 @@ class Product extends Component implements FetcherInterface
                 \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH
             ])
             ->addAttributeToSort('id', 'asc');
+
+        /**
+         * @notice Magento 2.2.x included a default stock filter
+         *         so that 'out of stock' products are excluded by default.
+         *         We override this behavior here.
+         */
+         $collection->setFlag('has_stock_status_filter', true);
+         $this->stockStatusResource->addStockDataToCollection($collection, false);
 
         if ($limit) {
             $collection->setPageSize($limit);
@@ -170,7 +189,7 @@ class Product extends Component implements FetcherInterface
      */
     private function createItem(\Magento\Catalog\Model\Product $product)
     {
-        $item = $this->_generatorItemFactory->create();
+        $item = $this->generatorItemFactory->create();
         $item->setContext($product);
 
         if ($product->getTypeId() == \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
@@ -187,7 +206,7 @@ class Product extends Component implements FetcherInterface
      */
     public function isStarted()
     {
-        return $this->_isStarted;
+        return $this->isStarted;
     }
 
     /**
@@ -197,7 +216,7 @@ class Product extends Component implements FetcherInterface
      */
     public function isDone()
     {
-        return $this->_isDone;
+        return $this->isDone;
     }
 
     /**
@@ -207,7 +226,7 @@ class Product extends Component implements FetcherInterface
      */
     public function getLastProcessedEntityId()
     {
-        return $this->_lastEntityId;
+        return $this->lastEntityId;
     }
 
     /**
@@ -220,7 +239,7 @@ class Product extends Component implements FetcherInterface
         $collection = $this->getProductCollection();
         $total = $collection->getSize();
 
-        return $total ? (1 - round(1.0 * $this->_itemsLeftCount / $total, 2)) : 1.0;
+        return $total ? (1 - round(1.0 * $this->itemsLeftCount / $total, 2)) : 1.0;
     }
 
     /**

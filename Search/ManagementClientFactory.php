@@ -2,6 +2,9 @@
 
 namespace Doofinder\Feed\Search;
 
+/**
+ * Managemenet client factory
+ */
 class ManagementClientFactory
 {
     /**

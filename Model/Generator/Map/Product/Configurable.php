@@ -5,26 +5,24 @@ namespace Doofinder\Feed\Model\Generator\Map\Product;
 use \Doofinder\Feed\Model\Generator\Map\Product;
 
 /**
- * Class Configurable
- *
- * @package Doofinder\Feed\Model\Generator\Map\Product
+ * Configurable product map
  */
 class Configurable extends Product
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product\AssociateFactory
      */
-    private $_mapFactory;
+    private $mapFactory;
 
     /**
      * @var boolean
      */
-    private $_grouped;
+    private $grouped;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Map[]
      */
-    private $_associatesMaps = [];
+    private $associatesMaps = [];
 
     /**
      * Class constructor
@@ -34,7 +32,7 @@ class Configurable extends Product
      * @param \Doofinder\Feed\Model\Generator\Item $item
      * @param \Magento\Tax\Model\Config $taxConfig
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
-     * @param array $data = []
+     * @param array $data
      */
     public function __construct(
         \Doofinder\Feed\Model\Generator\Map\Product\AssociateFactory $mapFactory,
@@ -44,19 +42,21 @@ class Configurable extends Product
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         array $data = []
     ) {
-        $this->_mapFactory = $mapFactory;
+        $this->mapFactory = $mapFactory;
         parent::__construct($helper, $item, $taxConfig, $priceCurrency, $data);
     }
 
     /**
      * Handle associate items skip before basic mapping
+     *
+     * @return void
      */
     public function before()
     {
-        $this->_grouped = !$this->getSplitConfigurableProducts();
+        $this->grouped = !$this->getSplitConfigurableProducts();
 
-        if ($this->_grouped) {
-            $associates = $this->_item->getAssociates();
+        if ($this->grouped) {
+            $associates = $this->item->getAssociates();
             /**
             * Set all items as skipped
             * @notice Compatible with PHP5.3+
@@ -76,7 +76,7 @@ class Configurable extends Product
     public function get($field)
     {
         // Only merge associated items values if option is enabled
-        if ($this->_grouped) {
+        if ($this->grouped) {
             switch ($field) {
                 case 'df_availability':
                     return $this->getAssociatesAvailability();
@@ -98,14 +98,14 @@ class Configurable extends Product
         $value = parent::get('df_availability');
 
         // Return out of stock if configurable product is out of stock
-        if ($value == $this->_helper->getOutOfStockLabel()) {
+        if ($value == $this->helper->getOutOfStockLabel()) {
             return $value;
         }
 
         // Return out of stock label if all associated products are out of stock
         $associatesValues = $this->getAssociatesValues('df_availability');
-        if (array_unique($associatesValues) == [$this->_helper->getOutOfStockLabel()]) {
-            return $this->_helper->getOutOfStockLabel();
+        if (array_unique($associatesValues) == [$this->helper->getOutOfStockLabel()]) {
+            return $this->helper->getOutOfStockLabel();
         }
 
         // Return in stock otherwise
@@ -165,7 +165,7 @@ class Configurable extends Product
     {
         $associatesValues = [];
 
-        foreach ($this->_item->getAssociates() as $associate) {
+        foreach ($this->item->getAssociates() as $associate) {
             $associatesValues[] = $this->getAssociateMap($associate)->get($field);
         }
 
@@ -197,13 +197,13 @@ class Configurable extends Product
     {
         $hash = spl_object_hash($associate);
 
-        if (!isset($this->_associatesMaps[$hash])) {
-            $this->_associatesMaps[$hash] = $this->_mapFactory->create([
+        if (!isset($this->associatesMaps[$hash])) {
+            $this->associatesMaps[$hash] = $this->mapFactory->create([
                 'item' => $associate,
                 'data' => $this->getData(),
             ]);
         }
 
-        return $this->_associatesMaps[$hash];
+        return $this->associatesMaps[$hash];
     }
 }

@@ -2,16 +2,20 @@
 
 namespace Doofinder\Feed\Block\Adminhtml\System\Config\Panel;
 
+/**
+ * Atomic updates
+ */
 class AtomicUpdates extends Message
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
+     * Constructor
+     *
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Backend\Block\Template\Context $context
      * @param array $data
      */
@@ -20,7 +24,7 @@ class AtomicUpdates extends Message
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
-        $this->_storeConfig = $storeConfig;
+        $this->storeConfig = $storeConfig;
         parent::__construct($context, $data);
     }
 
@@ -31,12 +35,12 @@ class AtomicUpdates extends Message
      */
     public function getText()
     {
-        $storeCodes = $this->_storeConfig->getStoreCodes();
+        $storeCodes = $this->storeConfig->getStoreCodes();
 
         $messages = [];
 
         foreach ($storeCodes as $storeCode) {
-            $atomicUpdatesEnabled = $this->_storeConfig->isAtomicUpdatesEnabled();
+            $atomicUpdatesEnabled = $this->storeConfig->isAtomicUpdatesEnabled();
 
             if (!$atomicUpdatesEnabled) {
                 $message = __('Atomic updates are <strong>disabled</strong>.');

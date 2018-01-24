@@ -5,35 +5,45 @@ namespace Doofinder\Feed\Model\Generator\Component\Processor;
 use \Doofinder\Feed\Model\Generator\Component;
 use \Doofinder\Feed\Model\Generator\Component\ProcessorInterface;
 
+/**
+ * Xml component
+ */
 class Xml extends Component implements ProcessorInterface
 {
     /**
      * @var \Sabre\Xml\Service
      */
-    private $_xmlService = null;
+    private $xmlService = null;
 
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    private $_helper;
+    private $helper;
 
     /**
      * @var \Magento\Framework\Filesystem\Io\File
      */
-    private $_fileIO = null;
+    private $fileIO = null;
 
     /**
      * @var \Magento\Framework\Filesystem\File\WriteFactory
      */
-    private $_fileWriteFactory = null;
+    private $fileWriteFactory = null;
 
     /**
      * @var string
      */
-    private $_feed = null;
+    private $feed = null;
 
     /**
      * Constructor
+     *
+     * @param \Sabre\Xml\Service $xmlService
+     * @param \Doofinder\Feed\Helper\Data $helper
+     * @param \Magento\Framework\Filesystem\File\WriteFactory $fileWriteFactory
+     * @param \Magento\Framework\Filesystem\Io\File $fileIO
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param array $data
      */
     public function __construct(
         \Sabre\Xml\Service $xmlService,
@@ -43,21 +53,22 @@ class Xml extends Component implements ProcessorInterface
         \Psr\Log\LoggerInterface $logger,
         array $data = []
     ) {
-        $this->_xmlService = $xmlService;
-        $this->_helper = $helper;
-        $this->_fileWriteFactory = $fileWriteFactory;
-        $this->_fileIO = $fileIO;
+        $this->xmlService = $xmlService;
+        $this->helper = $helper;
+        $this->fileWriteFactory = $fileWriteFactory;
+        $this->fileIO = $fileIO;
         parent::__construct($logger, $data);
     }
 
     /**
      * Process items
      *
-     * @param \Doofinder\Feed\Model\Generator\Item[]
+     * @param  \Doofinder\Feed\Model\Generator\Item[] $items
+     * @return void
      */
     public function process(array $items)
     {
-        $writer = $this->_xmlService->getWriter();
+        $writer = $this->xmlService->getWriter();
 
         // Initialize feed
         $this->initializeFeed($writer);
@@ -76,13 +87,14 @@ class Xml extends Component implements ProcessorInterface
      */
     public function getFeed()
     {
-        return $this->_feed;
+        return $this->feed;
     }
 
     /**
      * Initialize feed
      *
-     * @param \Sabre\Xml\Writer
+     * @param  \Sabre\Xml\Writer $writer
+     * @return void
      */
     private function initializeFeed(\Sabre\Xml\Writer $writer)
     {
@@ -97,8 +109,9 @@ class Xml extends Component implements ProcessorInterface
     /**
      * Generate feed
      *
-     * @param \Sabre\Xml\Writer
-     * @param \Doofinder\Feed\Model\Generator\Item[]
+     * @param  \Sabre\Xml\Writer $writer
+     * @param  \Doofinder\Feed\Model\Generator\Item[] $items
+     * @return void
      */
     private function generateFeed(\Sabre\Xml\Writer $writer, array $items)
     {
@@ -123,7 +136,8 @@ class Xml extends Component implements ProcessorInterface
     /**
      * Finalize feed
      *
-     * @param \Sabre\Xml\Writer
+     * @param  \Sabre\Xml\Writer $writer
+     * @return void
      */
     private function finalizeFeed(\Sabre\Xml\Writer $writer)
     {
@@ -138,18 +152,21 @@ class Xml extends Component implements ProcessorInterface
             $this->checkDestinationFile();
             $this->writeToDestinationFile($feed);
         } else {
-            $this->_feed = $feed;
+            $this->feed = $feed;
         }
     }
 
     /**
      * Check feed destination file
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\StateException Feed file error.
      */
     private function checkDestinationFile()
     {
         $isStart = $this->isStart();
-        $exists = $this->_fileIO->fileExists($this->getDestinationFile());
-        $isWriteable = $this->_fileIO->isWriteable($this->getDestinationFile());
+        $exists = $this->fileIO->fileExists($this->getDestinationFile());
+        $isWriteable = $this->fileIO->isWriteable($this->getDestinationFile());
 
         if ($isStart && $exists) {
             throw new \Magento\Framework\Exception\StateException(
@@ -169,11 +186,12 @@ class Xml extends Component implements ProcessorInterface
     /**
      * Write feed to destination file
      *
-     * @param  string
+     * @param  string $feed
+     * @return void
      */
     private function writeToDestinationFile($feed)
     {
-        $writer = $this->_fileWriteFactory->create($this->getDestinationFile(), 'file', 'a');
+        $writer = $this->fileWriteFactory->create($this->getDestinationFile(), 'file', 'a');
         $writer->write($feed);
         $writer->flush();
     }
@@ -181,7 +199,7 @@ class Xml extends Component implements ProcessorInterface
     /**
      * Is feed starting
      *
-     * @param  boolean
+     * @return boolean
      */
     private function isStart()
     {
@@ -191,7 +209,7 @@ class Xml extends Component implements ProcessorInterface
     /**
      * Is feed ending
      *
-     * @param  boolean
+     * @return boolean
      */
     private function isEnd()
     {
@@ -205,7 +223,7 @@ class Xml extends Component implements ProcessorInterface
      */
     private function getFeedUrl()
     {
-        return $this->_helper->getBaseUrl() . 'doofinder/feed';
+        return $this->helper->getBaseUrl() . 'doofinder/feed';
     }
 
     /**
@@ -215,7 +233,7 @@ class Xml extends Component implements ProcessorInterface
      */
     private function getModuleVersion()
     {
-        return 'Doofinder/' . $this->_helper->getModuleVersion();
+        return 'Doofinder/' . $this->helper->getModuleVersion();
     }
 
     /**

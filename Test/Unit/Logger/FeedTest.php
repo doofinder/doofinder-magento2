@@ -5,95 +5,109 @@ namespace Doofinder\Feed\Test\Unit\Logger;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 use Magento\Framework\Exception\NoSuchEntityException;
 
+/**
+ * Test class for \Doofinder\Feed\Logger\Feed
+ */
 class FeedTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Logger\Feed
      */
-    private $_logger;
+    private $logger;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $_parentLogger;
+    private $parentLogger;
 
     /**
      * @var \Doofinder\Feed\Model\Cron
      */
-    private $_process;
+    private $process;
 
     /**
      * @var \Monolog\Handler\AbstractHandler
      */
-    private $_handler;
+    private $handler;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_parentLogger = $this->getMock(
-            '\Magento\Framework\Logger\Monolog',
+        $this->parentLogger = $this->getMock(
+            \Magento\Framework\Logger\Monolog::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_process = $this->getMock(
-            '\Doofinder\Feed\Model\Cron',
+        $this->process = $this->getMock(
+            \Doofinder\Feed\Model\Cron::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_handler = $this->getMock(
-            '\Monolog\Handler\AbstractHandler',
+        $this->handler = $this->getMock(
+            \Monolog\Handler\AbstractHandler::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_logger = $this->objectManager->getObject(
-            '\Doofinder\Feed\Logger\Feed',
+        $this->logger = $this->objectManager->getObject(
+            \Doofinder\Feed\Logger\Feed::class,
             [
-                'logger' => $this->_parentLogger,
-                'process' => $this->_process,
-                'handlers' => [$this->_handler],
+                'logger' => $this->parentLogger,
+                'process' => $this->process,
+                'handlers' => [$this->handler],
             ]
         );
     }
 
     /**
-     * Test addRecord() method.
+     * Test addRecord() method
      *
-     * @dataProvider addRecordProvider
+     * @param  array $context
+     * @param  boolean $useProcess
+     * @param  boolean $callsParent
+     * @return void
+     * @dataProvider providerTestAddRecord
      */
-    public function testAddRecord($context, $useProcess, $callsParent)
+    public function testAddRecord(array $context, $useProcess, $callsParent)
     {
         $level = 100;
         $message = 'Sample message';
 
         $expected = $context;
         if ($useProcess) {
-            $expected['process'] = $this->_process;
+            $expected['process'] = $this->process;
         }
 
-        $this->_parentLogger->expects($this->once())->method('addRecord')
+        $this->parentLogger->expects($this->once())->method('addRecord')
             ->with($level, $message, $expected);
 
         if ($callsParent) {
-            $this->_handler->expects($this->once())->method('isHandling');
+            $this->handler->expects($this->once())->method('isHandling');
         }
 
-        $this->_logger->addRecord($level, $message, $context);
+        $this->logger->addRecord($level, $message, $context);
     }
 
-    public function addRecordProvider()
+    /**
+     * Data provider for testAddRecord() test
+     *
+     * @return array
+     */
+    public function providerTestAddRecord()
     {
         return [
             [[], true, true],

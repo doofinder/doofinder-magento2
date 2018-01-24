@@ -5,39 +5,48 @@ namespace Doofinder\Feed\Test\Unit\Helper;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class SerializerTest
- * @package Doofinder\Feed\Test\Unit\Helper
+ * Test class for \Doofinder\Feed\Helper\Serializer
  */
 class SerializerTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\Serializer
      */
-    private $_helper;
+    private $helper;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_helper = $this->objectManager->getObject(
-            '\Doofinder\Feed\Helper\Serializer'
+        $this->helper = $this->objectManager->getObject(
+            \Doofinder\Feed\Helper\Serializer::class
         );
     }
 
     /**
      * Test serialize() method.
      *
-     * @dataProvider serializeProvider
+     * @param  string $value
+     * @param  string $expected
+     * @return void
+     * @dataProvider serializeTestProvider
      */
     public function testSerialize($value, $expected)
     {
-        $this->assertSame($expected, $this->_helper->serialize($value));
+        $this->assertSame($expected, $this->helper->serialize($value));
     }
 
-    public function serializeProvider()
+    /**
+     * Data provider for testSerialize() test
+     *
+     * @return array
+     */
+    public function serializeTestProvider()
     {
         return [
             ['string', 's:6:"string";'],
@@ -48,10 +57,13 @@ class SerializerTest extends BaseTestCase
     /**
      * Test unserialize() method.
      *
-     * @dataProvider serializeProvider
+     * @param  string $expected
+     * @param  string $value
+     * @return void
+     * @dataProvider serializeTestProvider
      */
     public function testUnserialize($expected, $value)
     {
-        $this->assertSame($expected, $this->_helper->unserialize($value));
+        $this->assertSame($expected, $this->helper->unserialize($value));
     }
 }

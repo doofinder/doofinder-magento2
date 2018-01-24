@@ -5,38 +5,40 @@ namespace Doofinder\Feed\Test\Unit\Model\Source\Feed;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class AttributesTest
- * @package Doofinder\Feed\Test\Unit\Model\Source\Feed
+ * Test class for \Doofinder\Feed\Model\Config\Source\Feed\Attributes
  */
 class AttributesTest extends BaseTestCase
 {
     /**
      * @var Magento\Eav\Model\Config
      */
-    private $_eavConfig;
+    private $eavConfig;
 
     /**
      * @var \Magento\Framework\Escaper
      */
-    private $_escaper;
+    private $escaper;
 
     /**
      * @var \Magento\Eav\Model\Entity\Type
      */
-    private $_entityType;
+    private $entityType;
 
     /**
      * @var \Doofinder\Feed\Model\Config\Source\Feed\Attributes
      */
-    private $_model;
+    private $model;
 
     /**
      * Doofinder directives
+     * @var array
      */
     private $directives;
 
     /**
-     * Set up
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
@@ -50,31 +52,31 @@ class AttributesTest extends BaseTestCase
             'df_sale_price' => 'Doofinder: Product Sale Price',
         ];
 
-        $this->_eavConfig = $this->getMock(
-            '\Magento\Eav\Model\Config',
+        $this->eavConfig = $this->getMock(
+            \Magento\Eav\Model\Config::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_escaper = $this->getMock(
-            '\Magento\Framework\Escaper',
+        $this->escaper = $this->getMock(
+            \Magento\Framework\Escaper::class,
             null,
             [],
             '',
             false
         );
 
-        $this->_entityType = $this->getMock(
-            '\Magento\Eav\Model\Entity\Type',
+        $this->entityType = $this->getMock(
+            \Magento\Eav\Model\Entity\Type::class,
             [],
             [],
             '',
             false
         );
 
-        $eavAttribute = $this->getMockBuilder('\Magento\Catalog\Model\ResourceModel\Eav\Attribute')
+        $eavAttribute = $this->getMockBuilder(\Magento\Catalog\Model\ResourceModel\Eav\Attribute::class)
             ->disableOriginalConstructor()
             ->setMethods(['getAttributeLabel', 'getAttributeCode'])
             ->getMock();
@@ -88,30 +90,32 @@ class AttributesTest extends BaseTestCase
             ->willReturn('attr code');
 
         $attrCollection = $this->objectManager->getCollectionMock(
-            '\Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection',
+            \Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection::class,
             [$eavAttribute]
         );
 
-        $this->_entityType->expects($this->once())
+        $this->entityType->expects($this->once())
             ->method('getAttributeCollection')
             ->willReturn($attrCollection);
 
-        $this->_eavConfig->expects($this->once())
+        $this->eavConfig->expects($this->once())
             ->method('getEntityType')
             ->with(\Magento\Catalog\Model\Product::ENTITY)
-            ->willReturn($this->_entityType);
+            ->willReturn($this->entityType);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Config\Source\Feed\Attributes',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Config\Source\Feed\Attributes::class,
             [
-                'eavConfig' => $this->_eavConfig,
-                'escaper' => $this->_escaper
+                'eavConfig' => $this->eavConfig,
+                'escaper' => $this->escaper
             ]
         );
     }
 
     /**
-     * Test toOptionArray() method.
+     * Test toOptionArray() method
+     *
+     * @return void
      */
     public function testToOptionArray()
     {
@@ -119,11 +123,13 @@ class AttributesTest extends BaseTestCase
             'attr code' => 'Attribute: attr code'
         ];
 
-        $this->assertEquals($expected, $this->_model->toOptionArray());
+        $this->assertEquals($expected, $this->model->toOptionArray());
     }
 
     /**
-     * Test getAllAttributes() method.
+     * Test getAllAttributes() method
+     *
+     * @return void
      */
     public function testGetAllAttributes()
     {
@@ -131,6 +137,6 @@ class AttributesTest extends BaseTestCase
             'attr code' => 'Attribute: attr code'
         ];
 
-        $this->assertEquals($expected, $this->_model->getAllAttributes());
+        $this->assertEquals($expected, $this->model->getAllAttributes());
     }
 }

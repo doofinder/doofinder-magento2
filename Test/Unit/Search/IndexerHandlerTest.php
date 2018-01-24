@@ -5,6 +5,9 @@ namespace Doofinder\Feed\Test\Unit\Search;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
+ * Test class for \Doofinder\Feed\Search\IndexerHandler
+ *
+ * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class IndexerHandlerTest extends BaseTestCase
@@ -12,85 +15,87 @@ class IndexerHandlerTest extends BaseTestCase
     /**
      * @var \Doofinder\Feed\Search\IndexerHandler
      */
-    private $_indexer;
+    private $indexer;
 
     /**
      * @var \Magento\CatalogSearch\Model\Indexer\IndexerHandler
      */
-    private $_indexerHandler;
+    private $indexerHandler;
 
     /**
      * @var \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory
      */
-    private $_indexerHandlerFactory;
+    private $indexerHandlerFactory;
 
     /**
      * @var \Magento\Framework\Indexer\SaveHandler\Batch
      */
-    private $_batch;
+    private $batch;
 
     /**
      * @var \Traversable
      */
-    private $_documents;
+    private $documents;
 
     /**
      * @var \Doofinder\Feed\Model\Generator
      */
-    private $_generator;
+    private $generator;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    private $_generatorFactory;
+    private $generatorFactory;
 
     /**
      * @var \Magento\Catalog\Model\Product
      */
-    private $_product;
+    private $product;
 
     /**
      * @var \Magento\Catalog\Api\Data\ProductSearchResultsInterface
      */
-    private $_productSearchResults;
+    private $productSearchResults;
 
     /**
      * @var \Magento\Catalog\Model\ProductRepository
      */
-    private $_productRepository;
+    private $productRepository;
 
     /**
      * @var \Magento\Framework\Api\SearchCriteriaInterface
      */
-    private $_searchCriteria;
+    private $searchCriteria;
 
     /**
      * @var \Magento\Framework\Api\SearchCriteriaBuilder
      */
-    private $_searchCriteriaBuilder;
+    private $searchCriteriaBuilder;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    private $_feedConfig;
+    private $feedConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
-    private $_searchHelper;
+    private $searchHelper;
 
     /**
      * @var \Magento\Framework\Search\Request\Dimension
      */
-    private $_dimension;
+    private $dimension;
 
     /**
      * @var \Magento\Framework\Indexer\IndexStructureInterface
      */
-    private $_indexStructure;
+    private $indexStructure;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function setUp()
@@ -98,87 +103,87 @@ class IndexerHandlerTest extends BaseTestCase
         parent::setUp();
 
         // @codingStandardsIgnoreStart
-        $this->_documents = new \ArrayObject([1234 => ['sample' => 'item']]);
+        $this->documents = new \ArrayObject([1234 => ['sample' => 'item']]);
         // @codingStandardsIgnoreEnd
 
-        $this->_batch = $this->getMock(
-            '\Magento\Framework\Indexer\SaveHandler\Batch',
+        $this->batch = $this->getMock(
+            \Magento\Framework\Indexer\SaveHandler\Batch::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_generator = $this->getMock(
-            '\Doofinder\Feed\Model\Generator',
+        $this->generator = $this->getMock(
+            \Doofinder\Feed\Model\Generator::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_generatorFactory = $this->getMock(
-            '\Doofinder\Feed\Model\GeneratorFactory',
+        $this->generatorFactory = $this->getMock(
+            \Doofinder\Feed\Model\GeneratorFactory::class,
             ['create'],
             [],
             '',
             false
         );
 
-        $this->_product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
+        $this->product = $this->getMock(
+            \Magento\Catalog\Model\Product::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_productSearchResults = $this->getMock(
-            '\Magento\Catalog\Api\Data\ProductSearchResultsInterface',
+        $this->productSearchResults = $this->getMock(
+            \Magento\Catalog\Api\Data\ProductSearchResultsInterface::class,
             [],
             [],
             '',
             false
         );
-        $this->_productSearchResults->method('getItems')
-            ->willReturn([$this->_product]);
+        $this->productSearchResults->method('getItems')
+            ->willReturn([$this->product]);
 
-        $this->_productRepository = $this->getMock(
-            '\Magento\Catalog\Model\ProductRepository',
+        $this->productRepository = $this->getMock(
+            \Magento\Catalog\Model\ProductRepository::class,
             [],
             [],
             '',
             false
         );
-        $this->_productRepository->method('getList')
-            ->willReturn($this->_productSearchResults);
+        $this->productRepository->method('getList')
+            ->willReturn($this->productSearchResults);
 
-        $this->_searchCriteria = $this->getMock(
-            '\Magento\Framework\Api\SearchCriteriaInterface',
+        $this->searchCriteria = $this->getMock(
+            \Magento\Framework\Api\SearchCriteriaInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_searchCriteriaBuilder = $this->getMock(
-            '\Magento\Framework\Api\SearchCriteriaBuilder',
+        $this->searchCriteriaBuilder = $this->getMock(
+            \Magento\Framework\Api\SearchCriteriaBuilder::class,
             [],
             [],
             '',
             false
         );
-        $this->_searchCriteriaBuilder->method('create')
-            ->willReturn($this->_searchCriteria);
+        $this->searchCriteriaBuilder->method('create')
+            ->willReturn($this->searchCriteria);
 
-        $this->_feedConfig = $this->getMock(
-            '\Doofinder\Feed\Helper\FeedConfig',
+        $this->feedConfig = $this->getMock(
+            \Doofinder\Feed\Helper\FeedConfig::class,
             [],
             [],
             '',
             false
         );
-        $this->_feedConfig->method('getLeanFeedConfig')->with('sample')->willReturn([
+        $this->feedConfig->method('getLeanFeedConfig')->with('sample')->willReturn([
             'data' => [
                 'config' => [
                     'processors' => [
@@ -190,50 +195,50 @@ class IndexerHandlerTest extends BaseTestCase
             ],
         ]);
 
-        $this->_dimension = $this->getMock(
-            '\Magento\Framework\Search\Request\Dimension',
+        $this->dimension = $this->getMock(
+            \Magento\Framework\Search\Request\Dimension::class,
             [],
             [],
             '',
             false
         );
-        $this->_dimension->method('getName')->willReturn('scope');
-        $this->_dimension->method('getValue')->willReturn('sample');
+        $this->dimension->method('getName')->willReturn('scope');
+        $this->dimension->method('getValue')->willReturn('sample');
 
-        $this->_searchHelper = $this->getMock(
-            '\Doofinder\Feed\Helper\Search',
+        $this->searchHelper = $this->getMock(
+            \Doofinder\Feed\Helper\Search::class,
             [],
             [],
             '',
             false
         );
-        $this->_searchHelper->method('getStoreIdFromDimensions')
-            ->with([$this->_dimension])->willReturn('sample');
+        $this->searchHelper->method('getStoreIdFromDimensions')
+            ->with([$this->dimension])->willReturn('sample');
 
-        $this->_indexStructure = $this->getMock(
-            '\Magento\Framework\Indexer\IndexStructureInterface',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_indexerHandler = $this->getMock(
-            '\Magento\CatalogSearch\Model\Indexer\IndexerHandler',
+        $this->indexStructure = $this->getMock(
+            \Magento\Framework\Indexer\IndexStructureInterface::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_indexerHandlerFactory = $this->getMock(
-            '\Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory',
+        $this->indexerHandler = $this->getMock(
+            \Magento\CatalogSearch\Model\Indexer\IndexerHandler::class,
             [],
             [],
             '',
             false
         );
-        $this->_indexerHandlerFactory->method('create')
+
+        $this->indexerHandlerFactory = $this->getMock(
+            \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory::class,
+            [],
+            [],
+            '',
+            false
+        );
+        $this->indexerHandlerFactory->method('create')
             ->with([
                 'data' => [
                     'indexer_id' => 'sample-indexer',
@@ -241,19 +246,19 @@ class IndexerHandlerTest extends BaseTestCase
                 ],
                 'batchSize' => 100,
             ])
-            ->willReturn($this->_indexerHandler);
+            ->willReturn($this->indexerHandler);
 
-        $this->_indexer = $this->objectManager->getObject(
-            '\Doofinder\Feed\Search\IndexerHandler',
+        $this->indexer = $this->objectManager->getObject(
+            \Doofinder\Feed\Search\IndexerHandler::class,
             [
-                'batch' => $this->_batch,
-                'generatorFactory' => $this->_generatorFactory,
-                'productRepository' => $this->_productRepository,
-                'searchCriteriaBuilder' => $this->_searchCriteriaBuilder,
-                'feedConfig' => $this->_feedConfig,
-                'searchHelper' => $this->_searchHelper,
-                'indexStructure' => $this->_indexStructure,
-                'indexerHandlerFactory' => $this->_indexerHandlerFactory,
+                'batch' => $this->batch,
+                'generatorFactory' => $this->generatorFactory,
+                'productRepository' => $this->productRepository,
+                'searchCriteriaBuilder' => $this->searchCriteriaBuilder,
+                'feedConfig' => $this->feedConfig,
+                'searchHelper' => $this->searchHelper,
+                'indexStructure' => $this->indexStructure,
+                'indexerHandlerFactory' => $this->indexerHandlerFactory,
                 'data' => [
                     'indexer_id' => 'sample-indexer',
                     'fieldsets' => [],
@@ -264,17 +269,19 @@ class IndexerHandlerTest extends BaseTestCase
     }
 
     /**
-     * Test saveIndex() method.
+     * Test saveIndex() method
+     *
+     * @return void
      */
     public function testSaveIndex()
     {
-        $batch = $this->_documents->getArrayCopy();
-        $this->_batch->expects($this->at(0))->method('getItems')
-            ->with($this->_documents, 100)->willReturn([$batch]);
+        $batch = $this->documents->getArrayCopy();
+        $this->batch->expects($this->at(0))->method('getItems')
+            ->with($this->documents, 100)->willReturn([$batch]);
 
-        $this->_generator->expects($this->once())->method('run');
+        $this->generator->expects($this->once())->method('run');
 
-        $this->_generatorFactory
+        $this->generatorFactory
             ->expects($this->once())
             ->method('create')
             ->with([
@@ -282,7 +289,7 @@ class IndexerHandlerTest extends BaseTestCase
                     'config' => [
                         'fetchers' => [
                             'Product\Fixed' => [
-                                'products' => [$this->_product],
+                                'products' => [$this->product],
                             ],
                         ],
                         'processors' => [
@@ -294,52 +301,58 @@ class IndexerHandlerTest extends BaseTestCase
                     ],
                 ],
             ])
-            ->willReturn($this->_generator);
+            ->willReturn($this->generator);
 
-        $this->_indexerHandler->expects($this->once())->method('saveIndex')
-            ->with([$this->_dimension], $this->createIterator($batch));
+        $this->indexerHandler->expects($this->once())->method('saveIndex')
+            ->with([$this->dimension], $this->createIterator($batch));
 
-        $this->_indexer->saveIndex([$this->_dimension], $this->_documents);
+        $this->indexer->saveIndex([$this->dimension], $this->documents);
     }
 
     /**
-     * Test deleteIndex() method.
+     * Test deleteIndex() method
+     *
+     * @return void
      */
     public function testDeleteIndex()
     {
-        $batch = $this->_documents->getArrayCopy();
-        $this->_batch->expects($this->at(0))->method('getItems')
-            ->with($this->_documents, 100)->willReturn([$batch]);
+        $batch = $this->documents->getArrayCopy();
+        $this->batch->expects($this->at(0))->method('getItems')
+            ->with($this->documents, 100)->willReturn([$batch]);
 
-        $this->_searchHelper->expects($this->once())
+        $this->searchHelper->expects($this->once())
             ->method('deleteDoofinderItems')
             ->with([
                 ['id' => 1234],
             ]);
 
-        $this->_indexerHandler->expects($this->once())->method('deleteIndex')
-            ->with([$this->_dimension], $this->createIterator($batch));
+        $this->indexerHandler->expects($this->once())->method('deleteIndex')
+            ->with([$this->dimension], $this->createIterator($batch));
 
-        $this->_indexer->deleteIndex([$this->_dimension], $this->_documents);
+        $this->indexer->deleteIndex([$this->dimension], $this->documents);
     }
 
     /**
-     * Test cleanIndex() method.
+     * Test cleanIndex() method
+     *
+     * @return void
      */
     public function testCleanIndex()
     {
-        $this->_indexerHandler->expects($this->once())->method('cleanIndex')
-            ->with([$this->_dimension]);
+        $this->indexerHandler->expects($this->once())->method('cleanIndex')
+            ->with([$this->dimension]);
 
-        $this->_indexer->cleanIndex([$this->_dimension]);
+        $this->indexer->cleanIndex([$this->dimension]);
     }
 
     /**
-     * Test isAvailable() method.
+     * Test isAvailable() method
+     *
+     * @return void
      */
     public function testIsAvailable()
     {
-        $this->assertTrue($this->_indexer->isAvailable());
+        $this->assertTrue($this->indexer->isAvailable());
     }
 
     /**

@@ -6,9 +6,16 @@ use Magento\Framework\Setup\UninstallInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 
+/**
+ * Uninstall
+ */
 class Uninstall implements UninstallInterface
 {
     /**
+     * Uninstall
+     *
+     * @param SchemaSetupInterface $setup
+     * @param ModuleContextInterface $context
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @codingStandardsIgnoreStart
      */

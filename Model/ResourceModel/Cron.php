@@ -3,9 +3,7 @@
 namespace Doofinder\Feed\Model\ResourceModel;
 
 /**
- * Class Cron
- *
- * @package Doofinder\Feed\Model\ResourceModel
+ * Cron resource
  */
 class Cron extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {

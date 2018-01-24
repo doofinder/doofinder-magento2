@@ -5,101 +5,104 @@ namespace Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class GenerateTest
- * @package Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed
+ * Test class for \Doofinder\Feed\Controller\Adminhtml\Feed\Generate
  */
 class GenerateTest extends BaseTestCase
 {
     /**
      * @var \Magento\Backend\App\Action\Context
      */
-    private $_context;
+    private $context;
 
     /**
      * @var \Magento\Framework\Controller\Result\JsonFactory
      */
-    private $_resultJsonFactory;
+    private $resultJsonFactory;
 
     /**
      * @var \Magento\Framework\Controller\Result\Json
      */
-    private $_resultJson;
+    private $resultJson;
 
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Doofinder\Feed\Controller\Adminhtml\Feed\Generate
      */
-    private $_controller;
+    private $controller;
 
     /**
-     * Set up
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_context = $this->getMock(
-            '\Magento\Backend\App\Action\Context',
+        $this->context = $this->getMock(
+            \Magento\Backend\App\Action\Context::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_resultJsonFactory = $this->getMock(
-            '\Magento\Framework\Controller\Result\JsonFactory',
+        $this->resultJsonFactory = $this->getMock(
+            \Magento\Framework\Controller\Result\JsonFactory::class,
             ['create'],
             [],
             '',
             false
         );
 
-        $this->_resultJson = $this->getMock(
-            '\Magento\Framework\Controller\Result\Json',
+        $this->resultJson = $this->getMock(
+            \Magento\Framework\Controller\Result\Json::class,
             ['setData'],
             [],
             '',
             false
         );
 
-        $this->_schedule = $this->getMock(
-            '\Doofinder\Feed\Helper\Schedule',
+        $this->schedule = $this->getMock(
+            \Doofinder\Feed\Helper\Schedule::class,
             ['regenerateSchedule'],
             [],
             '',
             false
         );
 
-        $this->_resultJsonFactory->expects($this->once())
+        $this->resultJsonFactory->expects($this->once())
             ->method('create')
-            ->willReturn($this->_resultJson);
+            ->willReturn($this->resultJson);
 
-        $this->_schedule->expects($this->once())
+        $this->schedule->expects($this->once())
             ->method('regenerateSchedule');
 
-        $this->_resultJson->expects($this->once())
+        $this->resultJson->expects($this->once())
             ->method('setData')
             ->with(['message' => \Doofinder\Feed\Controller\Adminhtml\Feed\Generate::FEED_GENERATION_MESSAGE]);
 
-        $this->_controller = $this->objectManager->getObject(
-            '\Doofinder\Feed\Controller\Adminhtml\Feed\Generate',
+        $this->controller = $this->objectManager->getObject(
+            \Doofinder\Feed\Controller\Adminhtml\Feed\Generate::class,
             [
-                'context'       => $this->_context,
-                'resultJsonFactory'   => $this->_resultJsonFactory,
-                'schedule' => $this->_schedule,
+                'context'       => $this->context,
+                'resultJsonFactory'   => $this->resultJsonFactory,
+                'schedule' => $this->schedule,
             ]
         );
     }
 
     /**
-     * Test execute()
+     * Test execute() method
+     *
+     * @return void
      */
     public function testExecute()
     {
-        $this->_controller->execute();
+        $this->controller->execute();
     }
 }

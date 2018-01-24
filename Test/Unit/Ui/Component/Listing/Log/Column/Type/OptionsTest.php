@@ -5,49 +5,55 @@ namespace Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log\Column\Type;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class OptionsTest
- * @package Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log\Column\Type
+ * Test class for \Doofinder\Feed\Ui\Component\Listing\Log\Column\Type\Options
  */
 class OptionsTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Logger\Feed
      */
-    private $_logger;
+    private $logger;
 
     /**
      * @var \Doofinder\Feed\Ui\Component\Listing\Log\Column\Type\Options
      */
-    private $_options;
+    private $options;
 
+    /**
+     * Set up test
+     *
+     * @return void
+     */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_logger = $this->getMock(
-            '\Doofinder\Feed\Logger\Feed',
+        $this->logger = $this->getMock(
+            \Doofinder\Feed\Logger\Feed::class,
             [],
             [],
             '',
             false
         );
-        $this->_logger->method('getLevelOptions')->willReturn([
+        $this->logger->method('getLevelOptions')->willReturn([
             100 => 'DEBUG',
             200 => 'INFO',
             300 => 'WARNING',
             400 => 'ERROR',
         ]);
 
-        $this->_options = $this->objectManager->getObject(
-            '\Doofinder\Feed\Ui\Component\Listing\Log\Column\Type\Options',
+        $this->options = $this->objectManager->getObject(
+            \Doofinder\Feed\Ui\Component\Listing\Log\Column\Type\Options::class,
             [
-                'logger' => $this->_logger,
+                'logger' => $this->logger,
             ]
         );
     }
 
     /**
-     * Test toOptionArray()
+     * Test toOptionArray() method
+     *
+     * @return void
      */
     public function testToOptionArray()
     {
@@ -60,7 +66,7 @@ class OptionsTest extends BaseTestCase
 
         $this->assertEquals(
             $expected,
-            $this->_options->toOptionArray()
+            $this->options->toOptionArray()
         );
     }
 }

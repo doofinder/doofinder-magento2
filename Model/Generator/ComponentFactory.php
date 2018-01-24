@@ -11,22 +11,27 @@ abstract class ComponentFactory
      *
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $_objectManager = null;
+    private $objectManager = null;
 
     /**
      * Instance name to create
      *
      * @var string
      */
-    private $_instanceName = null;
+    private $instanceName = null;
 
+    /**
+     * Constructor
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param string $instanceName
+     */
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $objectManager,
-        $instanceName = '\Doofinder\Feed\Model\Generator\Component'
+        $instanceName = \Doofinder\Feed\Model\Generator\Component::class
     ) {
 
-        $this->_objectManager = $objectManager;
-        $this->_instanceName = $instanceName;
+        $this->objectManager = $objectManager;
+        $this->instanceName = $instanceName;
     }
 
     /**
@@ -39,7 +44,7 @@ abstract class ComponentFactory
     public function create(array $data = [], $componentName = '')
     {
         // @codingStandardsIgnoreStart
-        return $this->_objectManager->create($this->_instanceName . '\\' . $componentName, $data);
+        return $this->objectManager->create($this->instanceName . '\\' . $componentName, $data);
         // @codingStandardsIgnoreEnd
     }
 }

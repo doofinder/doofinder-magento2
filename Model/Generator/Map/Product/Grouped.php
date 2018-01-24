@@ -5,9 +5,7 @@ namespace Doofinder\Feed\Model\Generator\Map\Product;
 use \Doofinder\Feed\Model\Generator\Map\Product;
 
 /**
- * Class Grouped
- *
- * @package Doofinder\Feed\Model\Generator\Map\Product
+ * Grouped product map
  */
 class Grouped extends Product
 {
@@ -16,7 +14,7 @@ class Grouped extends Product
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $field
-     * @param boolean $minimal = false
+     * @param boolean $minimal
      * @return float
      */
     public function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)

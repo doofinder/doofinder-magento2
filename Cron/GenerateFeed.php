@@ -3,41 +3,40 @@
 namespace Doofinder\Feed\Cron;
 
 /**
- * Class GenerateFeed
- *
- * @package Doofinder\Feed\Cron
+ * Generate feed cron action
  */
 class GenerateFeed
 {
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    private $_generatorFactory;
+    private $generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    private $_feedConfig;
+    private $feedConfig;
 
     /**
      * GenerateFeed constructor.
      *
      * @param \Doofinder\Feed\Helper\Schedule $schedule
      * @param \Doofinder\Feed\Model\GeneratorFactory $generatorFactory
+     * @param \Doofinder\Feed\Helper\FeedConfig $feedConfig
      */
     public function __construct(
         \Doofinder\Feed\Helper\Schedule $schedule,
         \Doofinder\Feed\Model\GeneratorFactory $generatorFactory,
         \Doofinder\Feed\Helper\FeedConfig $feedConfig
     ) {
-        $this->_schedule = $schedule;
-        $this->_generatorFactory = $generatorFactory;
-        $this->_feedConfig = $feedConfig;
+        $this->schedule = $schedule;
+        $this->generatorFactory = $generatorFactory;
+        $this->feedConfig = $feedConfig;
     }
 
     /**
@@ -47,8 +46,8 @@ class GenerateFeed
      */
     public function execute()
     {
-        if ($process = $this->_schedule->getActiveProcess()) {
-            $this->_schedule->runProcess($process);
+        if ($process = $this->schedule->getActiveProcess()) {
+            $this->schedule->runProcess($process);
         }
 
         return $this;

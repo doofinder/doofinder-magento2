@@ -5,10 +5,10 @@ $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
 // @codingStandardsIgnoreStart
 /** @var \Magento\Framework\Stdlib\DateTime $dateTime */
-$dateTime = $objectManager->get('\Magento\Framework\Stdlib\DateTime');
+$dateTime = $objectManager->get(\Magento\Framework\Stdlib\DateTime::class);
 
 /** @var \Doofinder\Feed\Model\Cron $process */
-$process = $objectManager->create('\Doofinder\Feed\Model\Cron');
+$process = $objectManager->create(\Doofinder\Feed\Model\Cron::class);
 // @codingStandardsIgnoreEnd
 $process
     ->setStoreCode('default')

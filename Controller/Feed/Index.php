@@ -3,31 +3,29 @@
 namespace Doofinder\Feed\Controller\Feed;
 
 /**
- * Class Index
- *
- * @package Doofinder\Feed\Controller\Feed
+ * Dynamic feed controller
  */
 class Index extends \Magento\Framework\App\Action\Action
 {
     /**
      * @var \Doofinder\Feed\Helper\Data
      */
-    private $_helper;
+    private $helper;
 
     /**
      * @var \Doofinder\Feed\Model\GeneratorFactory
      */
-    private $_generatorFactory;
+    private $generatorFactory;
 
     /**
      * @var \Doofinder\Feed\Helper\FeedConfig
      */
-    private $_feedConfig;
+    private $feedConfig;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInteface
      */
-    private $_storeManager;
+    private $storeManager;
 
     /**
      * Index constructor.
@@ -46,18 +44,21 @@ class Index extends \Magento\Framework\App\Action\Action
     ) {
         parent::__construct($context);
 
-        $this->_helper = $helper;
-        $this->_generatorFactory = $generatorFactory;
-        $this->_feedConfig = $feedConfig;
-        $this->_storeManager = $storeManager;
+        $this->helper = $helper;
+        $this->generatorFactory = $generatorFactory;
+        $this->feedConfig = $feedConfig;
+        $this->storeManager = $storeManager;
     }
 
     /**
-     * Execute. Return feed with xml content type.
+     * Returns feed with xml content type.
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\NotFoundException Unauthorized access.
      */
     public function execute()
     {
-        $storeCode = $this->_helper->getParamString('store');
+        $storeCode = $this->helper->getParamString('store');
 
         // Do not proceed if password check fails
         if (!$this->checkPassword($storeCode)) {
@@ -66,22 +67,22 @@ class Index extends \Magento\Framework\App\Action\Action
             );
         }
 
-        $feedConfig = $this->_feedConfig->getFeedConfig($storeCode, $this->getFeedCustomParams());
+        $feedConfig = $this->feedConfig->getFeedConfig($storeCode, $this->getFeedCustomParams());
 
         // Set current store for generator
         if ($storeCode) {
-            $this->_storeManager->setCurrentStore($storeCode);
+            $this->storeManager->setCurrentStore($storeCode);
         }
 
         // Enforce transforming offset to last processed entity id
         $feedConfig['data']['config']['fetchers']['Product']['transform_offset'] = true;
 
-        $generator = $this->_generatorFactory->create($feedConfig);
+        $generator = $this->generatorFactory->create($feedConfig);
         $generator->run();
 
         $feed = $generator->getProcessor('Xml')->getFeed();
 
-        $this->_helper->setXmlHeaders($this->getResponse());
+        $this->helper->setXmlHeaders($this->getResponse());
         $this->getResponse()->setBody($feed);
     }
 
@@ -93,8 +94,8 @@ class Index extends \Magento\Framework\App\Action\Action
     private function getFeedCustomParams()
     {
         $params = [
-            'offset' => $this->_helper->getParamInt('offset'),
-            'limit' => $this->_helper->getParamInt('limit'),
+            'offset' => $this->helper->getParamInt('offset'),
+            'limit' => $this->helper->getParamInt('limit'),
         ];
 
         return array_filter($params, function ($value) {
@@ -110,7 +111,7 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     private function checkPassword($storeCode)
     {
-        $password = $this->_feedConfig->getFeedPassword($storeCode);
-        return !$password || $this->_helper->getParamString('password') == $password;
+        $password = $this->feedConfig->getFeedPassword($storeCode);
+        return !$password || $this->helper->getParamString('password') == $password;
     }
 }

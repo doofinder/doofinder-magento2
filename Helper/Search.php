@@ -2,45 +2,52 @@
 
 namespace Doofinder\Feed\Helper;
 
+/**
+ * Search helper
+ */
 class Search extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * @var \Doofinder\Feed\Search\SearchClientFactory
      */
-    private $_searchFactory;
+    private $searchFactory;
 
     /**
      * @var \Doofinder\Feed\Search\ManagementClientFactory
      */
-    private $_dmaFactory;
+    private $dmaFactory;
 
     /**
      * @var \Doofinder\Feed\Wrapper\Throttle
      */
-    private $_throttleFactory;
+    private $throttleFactory;
 
     /**
      * @var \Doofinder\Api\Management\SearchEngine[]
      */
-    private $_searchEngines = null;
+    private $searchEngines = null;
 
     /**
      * @var \Doofinder\Api\Search\Client|null
      */
-    private $_lastSearch = null;
+    private $lastSearch = null;
 
     /**
      * @var \Doofinder\Api\Search\Results|null
      */
-    private $_lastResults = null;
+    private $lastResults = null;
 
     /**
      * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
+     * @param \Doofinder\Feed\Search\SearchClientFactory $searchFactory
+     * @param \Doofinder\Feed\Search\ManagementClientFactory $dmaFactory
+     * @param \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -49,29 +56,26 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         \Doofinder\Feed\Search\ManagementClientFactory $dmaFactory,
         \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory
     ) {
-        $this->_storeConfig = $storeConfig;
-        $this->_searchFactory = $searchFactory;
-        $this->_dmaFactory = $dmaFactory;
-        $this->_throttleFactory = $throttleFactory;
+        $this->storeConfig = $storeConfig;
+        $this->searchFactory = $searchFactory;
+        $this->dmaFactory = $dmaFactory;
+        $this->throttleFactory = $throttleFactory;
         parent::__construct($context);
     }
 
     /**
      * Perform a doofinder search on given key.
      *
-     * @param string $queryText
-     * @param int $limit
-     * @param int $offset
-     *
-     * @return array - The array od product ids from first page
+     * @param  string  $queryText
+     * @return array The array od product ids from first page.
      */
     public function performDoofinderSearch($queryText)
     {
-        $hashId = $this->_storeConfig->getHashId($this->getStoreCode());
-        $apiKey = $this->_storeConfig->getApiKey();
-        $limit = $this->_storeConfig->getSearchRequestLimit($this->getStoreCode());
+        $hashId = $this->storeConfig->getHashId($this->getStoreCode());
+        $apiKey = $this->storeConfig->getApiKey();
+        $limit = $this->storeConfig->getSearchRequestLimit($this->getStoreCode());
 
-        $client = $this->_searchFactory->create($hashId, $apiKey);
+        $client = $this->searchFactory->create($hashId, $apiKey);
 
         try {
             // @codingStandardsIgnoreStart
@@ -83,8 +87,8 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         // Store objects
-        $this->_lastSearch = $client;
-        $this->_lastResults = $results;
+        $this->lastSearch = $client;
+        $this->lastResults = $results;
 
         return $results ? $this->retrieveIds($results) : [];
     }
@@ -112,14 +116,14 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAllResults()
     {
-        if (!$this->_lastResults) {
+        if (!$this->lastResults) {
             return [];
         }
 
-        $limit = $this->_storeConfig->getSearchTotalLimit($this->getStoreCode());
-        $ids = $this->retrieveIds($this->_lastResults);
+        $limit = $this->storeConfig->getSearchTotalLimit($this->getStoreCode());
+        $ids = $this->retrieveIds($this->lastResults);
 
-        while (count($ids) < $limit && ($results = $this->_lastSearch->nextPage())) {
+        while (count($ids) < $limit && ($results = $this->lastSearch->nextPage())) {
             $ids = array_merge($ids, $this->retrieveIds($results));
         }
 
@@ -129,11 +133,11 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Returns fetched results count
      *
-     * @return int
+     * @return integer
      */
     public function getResultsCount()
     {
-        return $this->_lastResults ? $this->_lastResults->getProperty('total') : 0;
+        return $this->lastResults ? $this->lastResults->getProperty('total') : 0;
     }
 
     /**
@@ -143,34 +147,34 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private function getStoreCode()
     {
-        return $this->_storeConfig->getStoreCode();
+        return $this->storeConfig->getStoreCode();
     }
 
     /**
      * Get Doofinder Search Engine
      *
-     * @param string $storeCode
      * @return \Doofinder\Feed\Wrapper\Throttle
+     * @throws \Magento\Framework\Exception\LocalizedException Search engine not exists.
      */
     private function getDoofinderSearchEngine()
     {
-        if ($this->_searchEngines === null) {
-            $this->_searchEngines = [];
+        if ($this->searchEngines === null) {
+            $this->searchEngines = [];
 
             // Create DoofinderManagementApi instance
-            $doofinderApi = $this->_throttleFactory->create([
-                'obj' => $this->_dmaFactory->create($this->_storeConfig->getApiKey())
+            $doofinderApi = $this->throttleFactory->create([
+                'obj' => $this->dmaFactory->create($this->storeConfig->getApiKey())
             ]);
 
             foreach ($doofinderApi->getSearchEngines() as $searchEngine) {
-                $this->_searchEngines[$searchEngine->hashid] = $searchEngine;
+                $this->searchEngines[$searchEngine->hashid] = $searchEngine;
             }
         }
 
         // Prepare SearchEngine instance
-        $hashId = $this->_storeConfig->getHashId($this->getStoreCode());
-        if (!empty($this->_searchEngines[$hashId])) {
-            return $this->_throttleFactory->create(['obj' => $this->_searchEngines[$hashId]]);
+        $hashId = $this->storeConfig->getHashId($this->getStoreCode());
+        if (!empty($this->searchEngines[$hashId])) {
+            return $this->throttleFactory->create(['obj' => $this->searchEngines[$hashId]]);
         }
 
         throw new \Magento\Framework\Exception\LocalizedException(
@@ -181,7 +185,9 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Update Doofinder items
      *
-     * @param array $items
+     * @param  array $items
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException Index items update error.
      */
     public function updateDoofinderItems(array $items)
     {
@@ -198,7 +204,9 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Delete Doofinder items
      *
-     * @param array $items
+     * @param  array $items
+     * @return boolean
+     * @throws \Magento\Framework\Exception\LocalizedException Index items delete error.
      */
     public function deleteDoofinderItems(array $items)
     {
@@ -226,6 +234,9 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Delete Doofinder index
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException Index deletion error.
      */
     public function deleteDoofinderIndex()
     {
@@ -238,6 +249,9 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Create Doofinder index
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException Index creation error.
      */
     public function createDoofinderIndex()
     {
@@ -252,7 +266,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      * Get store id from dimensions
      *
      * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
-     * @return int
+     * @return integer|null
      */
     public function getStoreIdFromDimensions(array $dimensions)
     {

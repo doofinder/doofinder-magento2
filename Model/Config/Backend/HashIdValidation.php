@@ -3,15 +3,14 @@
 namespace Doofinder\Feed\Model\Config\Backend;
 
 /**
- * Class HashIdValidation
- * @package Doofinder\Feed\Model\Config\Backend
+ * Hash ID validation backend
  */
 class HashIdValidation extends \Magento\Framework\App\Config\Value
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
-    private $_storeConfig;
+    private $storeConfig;
 
     /**
      * HashIdValidation constructor.
@@ -35,7 +34,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        $this->_storeConfig = $storeConfig;
+        $this->storeConfig = $storeConfig;
 
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
@@ -44,7 +43,6 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
      * Save configuration.
      *
      * @return mixed
-     * @throws \Magento\Framework\Exception\ValidatorException
      */
     public function save()
     {
@@ -58,21 +56,21 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
     /**
      * Check if hash id is unique in store.
      *
-     * @param string $hashId
-     * @return bool
-     * @throws \Magento\Framework\Exception\ValidatorException
+     * @param  string $hashId
+     * @return boolean
+     * @throws \Magento\Framework\Exception\ValidatorException Hash ID already used.
      */
     private function isUnique($hashId)
     {
-        $currentStoreCode = $this->_storeConfig->getStoreCode();
+        $currentStoreCode = $this->storeConfig->getStoreCode();
 
-        foreach ($this->_storeConfig->getStoreCodes(false) as $storeCode) {
+        foreach ($this->storeConfig->getStoreCodes(false) as $storeCode) {
             // Do not check current store
             if ($currentStoreCode == $storeCode) {
                 continue;
             }
 
-            $scopeHashId = $this->_storeConfig->getHashId($storeCode);
+            $scopeHashId = $this->storeConfig->getHashId($storeCode);
 
             if ($hashId && $hashId == $scopeHashId) {
                 throw new \Magento\Framework\Exception\ValidatorException(

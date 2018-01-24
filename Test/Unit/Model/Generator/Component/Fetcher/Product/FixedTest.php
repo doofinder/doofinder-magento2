@@ -4,82 +4,89 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Fetcher\Product;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Component\Fetcher\Product\Fixed
+ */
 class FixedTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Fetcher\Product\Fixed
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\ItemFactory
      */
-    private $_generatorItemFactory;
+    private $generatorItemFactory;
 
     /**
      * @var \Magento\Catalog\Model\Product
      */
-    private $_product;
+    private $product;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
+        $this->product = $this->getMock(
+            \Magento\Catalog\Model\Product::class,
             ['getEntityId'],
             [],
             '',
             false
         );
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_generatorItemFactory = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\ItemFactory',
+        $this->generatorItemFactory = $this->getMock(
+            \Doofinder\Feed\Model\Generator\ItemFactory::class,
             ['create'],
             [],
             '',
             false
         );
-        $this->_generatorItemFactory->expects($this->any())->method('create')
-            ->willReturn($this->_item);
+        $this->generatorItemFactory->expects($this->any())->method('create')
+            ->willReturn($this->item);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Component\Fetcher\Product\Fixed',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Component\Fetcher\Product\Fixed::class,
             [
-                'generatorItemFactory' => $this->_generatorItemFactory,
+                'generatorItemFactory' => $this->generatorItemFactory,
                 'data' => [
-                    'products' => [$this->_product],
+                    'products' => [$this->product],
                 ],
             ]
         );
     }
 
     /**
-     * Test fetch
+     * Test fetch() method
+     *
+     * @return void
      */
     public function testFetch()
     {
-        $this->_item->expects($this->once())->method('setContext')->with($this->_product);
-        $items = $this->_model->fetch();
+        $this->item->expects($this->once())->method('setContext')->with($this->product);
+        $items = $this->model->fetch();
 
-        $this->assertEquals([$this->_item], $items);
-        $this->assertEquals(true, $this->_model->isStarted());
-        $this->assertEquals(true, $this->_model->isDone());
+        $this->assertEquals([$this->item], $items);
+        $this->assertEquals(true, $this->model->isStarted());
+        $this->assertEquals(true, $this->model->isDone());
     }
 }

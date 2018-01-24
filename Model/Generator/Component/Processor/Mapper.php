@@ -5,41 +5,52 @@ namespace Doofinder\Feed\Model\Generator\Component\Processor;
 use \Doofinder\Feed\Model\Generator\Component;
 use \Doofinder\Feed\Model\Generator\Component\ProcessorInterface;
 
+/**
+ * Mapper component
+ */
 class Mapper extends Component implements ProcessorInterface
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item = null;
+    private $item = null;
 
     /**
      * @var \Magento\Framework\DataObject
      */
-    private $_context = null;
+    private $context = null;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Map
      */
-    private $_map = null;
+    private $map = null;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\MapFactory
      */
-    private $_mapFactory = null;
+    private $mapFactory = null;
 
+    /**
+     * Constructor
+     *
+     * @param \Doofinder\Feed\Model\Generator\MapFactory $mapFactory
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param array $data
+     */
     public function __construct(
         \Doofinder\Feed\Model\Generator\MapFactory $mapFactory,
         \Psr\Log\LoggerInterface $logger,
         array $data = []
     ) {
-        $this->_mapFactory = $mapFactory;
+        $this->mapFactory = $mapFactory;
         parent::__construct($logger, $data);
     }
 
     /**
      * Process items
      *
-     * @param \Doofinder\Feed\Model\Generator\Item[]
+     * @param  \Doofinder\Feed\Model\Generator\Item[] $items
+     * @return void
      */
     public function process(array $items)
     {
@@ -51,16 +62,17 @@ class Mapper extends Component implements ProcessorInterface
     /**
      * Process item
      *
-     * @param \Doofinder\Feed\Model\Generator\Item
+     * @param  \Doofinder\Feed\Model\Generator\Item $item
+     * @return void
      */
     private function processItem(\Doofinder\Feed\Model\Generator\Item $item)
     {
-        $this->_item = $item;
-        $this->_context = $this->_item->getContext();
-        $this->_map = $this->getMapInstance($this->_item);
+        $this->item = $item;
+        $this->context = $this->item->getContext();
+        $this->map = $this->getMapInstance($this->item);
 
         // Before
-        $this->_map->before();
+        $this->map->before();
 
         // Set mapped fields on item
         foreach ((array) $this->getMap() as $field => $definition) {
@@ -74,19 +86,19 @@ class Mapper extends Component implements ProcessorInterface
         }
 
         // After
-        $this->_map->after();
+        $this->map->after();
     }
 
     /**
      * Get mapped field value
      *
-     * @param array
+     * @param  array $definition
      * @return mixed
      */
     private function processDefinition(array $definition)
     {
         $field = $definition['field'];
-        $value = $this->_map->get($field);
+        $value = $this->map->get($field);
 
         switch ($field) {
             case 'boost':
@@ -100,11 +112,11 @@ class Mapper extends Component implements ProcessorInterface
     /**
      * Get map instance
      *
-     * @param \Doofinder\Feed\Model\Generator\Item
+     * @param  \Doofinder\Feed\Model\Generator\Item $item
      * @return \Doofinder\Feed\Model\Generator\Map
      */
     private function getMapInstance(\Doofinder\Feed\Model\Generator\Item $item)
     {
-        return $this->_mapFactory->create($item, $this->getData());
+        return $this->mapFactory->create($item, $this->getData());
     }
 }

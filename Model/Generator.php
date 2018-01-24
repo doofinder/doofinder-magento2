@@ -2,6 +2,11 @@
 
 namespace Doofinder\Feed\Model;
 
+/**
+ * Generator model
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Generator extends \Magento\Framework\DataObject
 {
     const CATEGORY_SEPARATOR = '%%';
@@ -13,49 +18,49 @@ class Generator extends \Magento\Framework\DataObject
      *
      * @var Generator\Component\FetcherFactory
      */
-    private $_fetcherFactory = null;
+    private $fetcherFactory = null;
 
     /**
      * Gernerator processor factory
      *
      * @var Generator\Component\ProcessorFactory
      */
-    private $_processorFactory = null;
+    private $processorFactory = null;
 
     /**
      * Generator fetchers
      *
      * @var Generator\Component\Fetcher[]
      */
-    private $_fetchers = [];
+    private $fetchers = [];
 
     /**
      * Generator processors
      *
      * @var Generator\Component\Processor[]
      */
-    private $_processors = [];
+    private $processors = [];
 
     /**
      * @var \Magento\Framework\Event\ManagerInteface
      */
-    private $_eventManager = null;
+    private $eventManager = null;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $_logger = null;
+    private $logger = null;
 
     /**
      * Generator items
      *
      * @var Generator\Item[]
      */
-    private $_items = [];
+    private $items = [];
 
     /**
-     * @param Generator\Component\FetcherFactory $itemsFetcherFactory
-     * @param Generator\Component\ProcessorFactory $itemsProcessorFactory
+     * @param Generator\Component\FetcherFactory $fetcherFactory
+     * @param Generator\Component\ProcessorFactory $processorFactory
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      * @param \Psr\Log\LoggerInterface $logger
      * @param array $data
@@ -67,19 +72,21 @@ class Generator extends \Magento\Framework\DataObject
         \Psr\Log\LoggerInterface $logger,
         array $data = []
     ) {
-        $this->_fetcherFactory = $fetcherFactory;
-        $this->_processorFactory = $processorFactory;
-        $this->_eventManager = $eventManager;
-        $this->_logger = $logger;
+        $this->fetcherFactory = $fetcherFactory;
+        $this->processorFactory = $processorFactory;
+        $this->eventManager = $eventManager;
+        $this->logger = $logger;
         parent::__construct($data);
     }
 
     /**
      * Run generator
+     *
+     * @return void
      */
     public function run()
     {
-        $this->_logger->debug(__('Generator run started'));
+        $this->logger->debug(__('Generator run started'));
 
         $this->initialize();
 
@@ -89,7 +96,7 @@ class Generator extends \Magento\Framework\DataObject
         // Process items
         $this->processItems();
 
-        $this->_logger->debug(__('Generator run finished'));
+        $this->logger->debug(__('Generator run finished'));
     }
 
     /**
@@ -101,17 +108,17 @@ class Generator extends \Magento\Framework\DataObject
     {
         // Create fetchers
         foreach ($this->getData('config/fetchers') as $class => $data) {
-            $this->_fetchers[$class] = $this->_fetcherFactory->create([
+            $this->fetchers[$class] = $this->fetcherFactory->create([
                 'data' => $data,
-                'logger' => $this->_logger,
+                'logger' => $this->logger,
             ], $class);
         }
 
         // Create processors
         foreach ($this->getData('config/processors') as $class => $data) {
-            $this->_processors[$class] = $this->_processorFactory->create([
+            $this->processors[$class] = $this->processorFactory->create([
                 'data' => $data,
-                'logger' => $this->_logger,
+                'logger' => $this->logger,
             ], $class);
         }
 
@@ -124,19 +131,18 @@ class Generator extends \Magento\Framework\DataObject
     /**
      * Fetch items
      *
-     * @return Generator\Item[]
      * @return Generator
      */
     private function fetchItems()
     {
-        $this->_items = [];
+        $this->items = [];
 
-        foreach ($this->_fetchers as $fetcher) {
-            $this->_logger->debug(__('Fetching items with %1', get_class($fetcher)));
-            $this->_items = array_merge($this->_items, $fetcher->fetch());
+        foreach ($this->fetchers as $fetcher) {
+            $this->logger->debug(__('Fetching items with %1', get_class($fetcher)));
+            $this->items = array_merge($this->items, $fetcher->fetch());
         }
 
-        // Dispatch event doofinder_feed_generator_items_fetched
+        // Dispatch event doofinder_feed_generatoritems_fetched
         $this->dispatch('items_fetched');
 
         return $this;
@@ -149,21 +155,21 @@ class Generator extends \Magento\Framework\DataObject
      */
     private function processItems()
     {
-        foreach ($this->_processors as $processor) {
-            $this->_logger->debug(__('Processing items with %1', get_class($processor)));
+        foreach ($this->processors as $processor) {
+            $this->logger->debug(__('Processing items with %1', get_class($processor)));
 
             /**
              * Run processor only on not skipped items
              * @notice Compatible with PHP5.3+
              */
-            $items = array_filter($this->_items, function ($item) {
+            $items = array_filter($this->items, function ($item) {
                 return !$item->isSkip();
             });
 
             $processor->process($items);
         }
 
-        // Dispatch event doofinder_feed_generator_items_processed
+        // Dispatch event doofinder_feed_generatoritems_processed
         $this->dispatch('items_processed');
 
         return $this;
@@ -172,40 +178,42 @@ class Generator extends \Magento\Framework\DataObject
     /**
      * Get fetchers
      *
+     * @param  string $class
      * @return \Doofinder\Feed\Model\Generator\Component\Fetcher|array
      */
     public function getFetcher($class = null)
     {
         if ($class === null) {
-            return $this->_fetchers;
+            return $this->fetchers;
         }
 
-        return isset($this->_fetchers[$class]) ? $this->_fetchers[$class] : null;
+        return isset($this->fetchers[$class]) ? $this->fetchers[$class] : null;
     }
 
     /**
      * Get processor
      *
-     * @param string
+     * @param  string $class
      * @return \Doofinder\Feed\Model\Generator\Component\Processor|array
      */
     public function getProcessor($class = null)
     {
         if ($class === null) {
-            return $this->_processors;
+            return $this->processors;
         }
 
-        return isset($this->_processors[$class]) ? $this->_processors[$class] : null;
+        return isset($this->processors[$class]) ? $this->processors[$class] : null;
     }
 
     /**
      * Dispatch an event
      *
-     * @param string
+     * @param  string $eventName
+     * @return void
      */
     private function dispatch($eventName)
     {
-        $this->_eventManager->dispatch('doofinder_feed_generator_' . $eventName, [
+        $this->eventManager->dispatch('doofinder_feed_generator_' . $eventName, [
             'generator' => $this,
         ]);
     }

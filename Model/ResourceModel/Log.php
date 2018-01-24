@@ -3,9 +3,7 @@
 namespace Doofinder\Feed\Model\ResourceModel;
 
 /**
- * Class Log
- *
- * @package Doofinder\Feed\Model\ResourceModel
+ * Log resource
  */
 class Log extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {

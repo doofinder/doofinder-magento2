@@ -5,79 +5,81 @@ namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\Form\Field;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class AdditionalAttributesTest
- *
- * @package Doofinder\Feed\Test\Unit\Block\Adminhtml\Form\Field
+ * Test class for \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes
  */
 class AdditionalAttributesTest extends BaseTestCase
 {
     /**
      * @var \Magento\Framework\View\Element\Context
      */
-    private $_context;
+    private $context;
 
     /**
      * @var \Doofinder\Feed\Model\Config\Source\Feed\Attributes
      */
-    private $_feedAttributes;
+    private $feedAttributes;
 
     /**
      * @var \Magento\Framework\Escaper
      */
-    private $_escaper;
+    private $escaper;
 
     /**
      * @var \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes
      */
-    private $_block;
+    private $block;
 
     /**
-     * Prepares the environment before running a test.
+     * Test run() method
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_context = $this->getMockBuilder('\Magento\Framework\View\Element\Context')
+        $this->context = $this->getMockBuilder(\Magento\Framework\View\Element\Context::class)
             ->setMethods(['getEscaper'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->_feedAttributes = $this->getMock(
-            '\Doofinder\Feed\Model\Config\Source\Feed\Attributes',
+        $this->feedAttributes = $this->getMock(
+            \Doofinder\Feed\Model\Config\Source\Feed\Attributes::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_escaper = $this->getMock(
-            '\Magento\Framework\Escaper',
+        $this->escaper = $this->getMock(
+            \Magento\Framework\Escaper::class,
             ['escapeHtml'],
             [],
             '',
             false
         );
 
-        $this->_context->expects($this->once())
+        $this->context->expects($this->once())
             ->method('getEscaper')
-            ->willReturn($this->_escaper);
+            ->willReturn($this->escaper);
 
-        $this->_feedAttributes->expects($this->once())
+        $this->feedAttributes->expects($this->once())
             ->method('getAllAttributes')
             ->willReturn(['code' => 'label', 'code2' => 'label2']);
 
-        $this->_block = $this->objectManager->getObject(
-            '\Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes',
+        $this->block = $this->objectManager->getObject(
+            \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes::class,
             [
-                'context' => $this->_context,
-                'feedAttributes' => $this->_feedAttributes
+                'context' => $this->context,
+                'feedAttributes' => $this->feedAttributes
             ]
         );
     }
 
     /**
-     * Test _toHtml() method.
+     * Test _toHtml() method
+     *
+     * @return void
      */
     public function testToHtml()
     {
@@ -85,6 +87,6 @@ class AdditionalAttributesTest extends BaseTestCase
         $expected .= '<option value="" ></option><option value="" ></option>';
         $expected .= '</select>';
 
-        $this->assertSame($expected, $this->_block->_toHtml());
+        $this->assertSame($expected, $this->block->_toHtml());
     }
 }

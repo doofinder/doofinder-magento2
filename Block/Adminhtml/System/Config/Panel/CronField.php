@@ -2,6 +2,9 @@
 
 namespace Doofinder\Feed\Block\Adminhtml\System\Config\Panel;
 
+/**
+ * Cron field
+ */
 class CronField extends Message
 {
     /**
@@ -12,12 +15,12 @@ class CronField extends Message
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_schedule;
+    private $schedule;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    private $_timezone;
+    private $timezone;
 
     /**
      * @param \Doofinder\Feed\Helper\Schedule $schedule
@@ -29,8 +32,8 @@ class CronField extends Message
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
     ) {
-        $this->_schedule = $schedule;
-        $this->_timezone = $context->getLocaleDate();
+        $this->schedule = $schedule;
+        $this->timezone = $context->getLocaleDate();
         parent::__construct($context, $data);
     }
 
@@ -71,8 +74,8 @@ class CronField extends Message
      */
     private function getLastFeedName($storeCode, $feedName)
     {
-        if ($this->_schedule->isFeedFileExist($storeCode)) {
-            $url = $this->_schedule->getFeedFileUrl($storeCode);
+        if ($this->schedule->isFeedFileExist($storeCode)) {
+            $url = $this->schedule->getFeedFileUrl($storeCode);
             return '<a href="' . $url . ' target="_blank">' . __('Get %1', $feedName) . '</a>';
         }
 
@@ -94,8 +97,8 @@ class CronField extends Message
             return $value;
         }
 
-        $date = $this->_timezone->scopeDate(null, $value);
-        return $this->_timezone->formatDateTime($date);
+        $date = $this->timezone->scopeDate(null, $value);
+        return $this->timezone->formatDateTime($date);
     }
 
     /**
@@ -107,7 +110,7 @@ class CronField extends Message
      */
     private function getProcessFieldValue($storeCode, $field)
     {
-        $process = $this->_schedule->getProcessByStoreCode($storeCode);
+        $process = $this->schedule->getProcessByStoreCode($storeCode);
 
         if (!$process || !$process->getId()) {
             switch ($field) {

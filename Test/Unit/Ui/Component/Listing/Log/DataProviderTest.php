@@ -5,104 +5,110 @@ namespace Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Class DataProviderTest
- * @package Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log
+ * Test class for \Magento\Framework\App\Request\DataPersistorInterface
  */
 class DataProviderTest extends BaseTestCase
 {
     /**
      * @var \Magento\Framework\App\Request\DataPersistorInterface
      */
-    private $_dataPersistor;
+    private $dataPersistor;
 
     /**
      * @var \Magento\Framework\Api\Filter
      */
-    private $_filter;
+    private $filter;
 
     /**
      * @var \Magento\Framework\Api\FilterBuilder
      */
-    private $_filterBuilder;
+    private $filterBuilder;
 
     /**
      * @var \Magento\Framework\Api\Search\SearchCriteria
      */
-    private $_searchCriteria;
+    private $searchCriteria;
 
     /**
      * @var \Magento\Framework\Api\Search\SearchCriteriaBuilder
      */
-    private $_searchCriteriaBuilder;
+    private $searchCriteriaBuilder;
 
     /**
      * @var \Doofinder\Feed\Ui\Component\Listing\Log\DataProvider
      */
-    private $_dataProvider;
+    private $dataProvider;
 
+    /**
+     * Set up test
+     *
+     * @return void
+     */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_filter = $this->getMock(
-            '\Magento\Framework\Api\Filter',
+        $this->filter = $this->getMock(
+            \Magento\Framework\Api\Filter::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_filterBuilder = $this->getMock(
-            '\Magento\Framework\Api\FilterBuilder',
+        $this->filterBuilder = $this->getMock(
+            \Magento\Framework\Api\FilterBuilder::class,
             [],
             [],
             '',
             false
         );
-        $this->_filterBuilder->method('create')->willReturn($this->_filter);
+        $this->filterBuilder->method('create')->willReturn($this->filter);
 
-        $this->_searchCriteria = $this->getMock(
-            '\Magento\Framework\Api\Search\SearchCriteria',
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->_searchCriteriaBuilder = $this->getMock(
-            '\Magento\Framework\Api\Search\SearchCriteriaBuilder',
-            [],
-            [],
-            '',
-            false
-        );
-        $this->_searchCriteriaBuilder->method('create')->willReturn($this->_searchCriteria);
-
-        $this->_dataPersistor = $this->getMock(
-            '\Magento\Framework\App\Request\DataPersistorInterface',
+        $this->searchCriteria = $this->getMock(
+            \Magento\Framework\Api\Search\SearchCriteria::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_dataProvider = $this->objectManager->getObject(
-            '\Doofinder\Feed\Ui\Component\Listing\Log\DataProvider',
+        $this->searchCriteriaBuilder = $this->getMock(
+            \Magento\Framework\Api\Search\SearchCriteriaBuilder::class,
+            [],
+            [],
+            '',
+            false
+        );
+        $this->searchCriteriaBuilder->method('create')->willReturn($this->searchCriteria);
+
+        $this->dataPersistor = $this->getMock(
+            \Magento\Framework\App\Request\DataPersistorInterface::class,
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->dataProvider = $this->objectManager->getObject(
+            \Doofinder\Feed\Ui\Component\Listing\Log\DataProvider::class,
             [
-                'filterBuilder' => $this->_filterBuilder,
-                'searchCriteriaBuilder' => $this->_searchCriteriaBuilder,
-                'dataPersistor' => $this->_dataPersistor,
+                'filterBuilder' => $this->filterBuilder,
+                'searchCriteriaBuilder' => $this->searchCriteriaBuilder,
+                'dataPersistor' => $this->dataPersistor,
             ]
         );
     }
 
     /**
-     * Test getSearchCriteria()
+     * Test getSearchCriteria() method
+     *
+     * @return void
      */
     public function testGetSearchCriteria()
     {
         $process = $this->getMock(
-            '\Doofinder\Feed\Model\Cron',
+            \Doofinder\Feed\Model\Cron::class,
             [],
             [],
             '',
@@ -110,30 +116,32 @@ class DataProviderTest extends BaseTestCase
         );
         $process->method('getId')->willReturn(5);
 
-        $this->_dataPersistor->expects($this->once())->method('get')
+        $this->dataPersistor->expects($this->once())->method('get')
             ->with('doofinder_feed_process')->willReturn($process);
 
-        $this->_filterBuilder->expects($this->once())->method('setField')
+        $this->filterBuilder->expects($this->once())->method('setField')
             ->with('process_id');
-        $this->_filterBuilder->expects($this->once())->method('setValue')
+        $this->filterBuilder->expects($this->once())->method('setValue')
             ->with(5);
-        $this->_filterBuilder->expects($this->once())->method('setConditionType')
+        $this->filterBuilder->expects($this->once())->method('setConditionType')
             ->with('eq');
 
-        $this->_searchCriteriaBuilder->expects($this->once())->method('addFilter')
-            ->with($this->_filter);
+        $this->searchCriteriaBuilder->expects($this->once())->method('addFilter')
+            ->with($this->filter);
 
-        $this->_dataProvider->getSearchCriteria();
+        $this->dataProvider->getSearchCriteria();
     }
 
     /**
      * Test getSearchCriteria() without process
+     *
+     * @return void
      */
     public function testGetSearchCriteriaWithoutProcess()
     {
-        $this->_searchCriteriaBuilder->expects($this->never())->method('addFilter')
-            ->with($this->_filter);
+        $this->searchCriteriaBuilder->expects($this->never())->method('addFilter')
+            ->with($this->filter);
 
-        $this->_dataProvider->getSearchCriteria();
+        $this->dataProvider->getSearchCriteria();
     }
 }

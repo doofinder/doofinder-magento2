@@ -4,59 +4,64 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Processor;
 
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
+/**
+ * Test class for \Doofinder\Feed\Model\Generator\Component\Processor\Mapper
+ */
 class MapperTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Mapper
      */
-    private $_model;
+    private $model;
 
     /**
      * @var \Magento\Catalog\Model\Product
      */
-    private $_product;
+    private $product;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item
      */
-    private $_item;
+    private $item;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Map
      */
-    private $_map;
+    private $map;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\MapFactory
      */
-    private $_mapFactory;
+    private $mapFactory;
 
     /**
-     * Prepares the environment before running a test.
+     * Set up test
+     *
+     * @return void
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->_product = $this->getMock(
-            '\Magento\Catalog\Model\Product',
+        $this->product = $this->getMock(
+            \Magento\Catalog\Model\Product::class,
             [],
             [],
             '',
             false
         );
 
-        $this->_item = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Item',
+        $this->item = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Item::class,
             ['getContext'],
             [],
             '',
             false
         );
-        $this->_item->method('getContext')->willReturn($this->_product);
+        $this->item->method('getContext')->willReturn($this->product);
 
-        $this->_map = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\Map',
+        $this->map = $this->getMock(
+            \Doofinder\Feed\Model\Generator\Map::class,
             [],
             [],
             '',
@@ -66,23 +71,23 @@ class MapperTest extends BaseTestCase
             ['title', 'Sample title'],
             ['description', 'Sample description'],
         ];
-        $this->_map->method('get')->will($this->returnValueMap($map));
-        $this->_map->expects($this->once())->method('before');
-        $this->_map->expects($this->once())->method('after');
+        $this->map->method('get')->will($this->returnValueMap($map));
+        $this->map->expects($this->once())->method('before');
+        $this->map->expects($this->once())->method('after');
 
-        $this->_mapFactory = $this->getMock(
-            '\Doofinder\Feed\Model\Generator\MapFactory',
+        $this->mapFactory = $this->getMock(
+            \Doofinder\Feed\Model\Generator\MapFactory::class,
             [],
             [],
             '',
             false
         );
-        $this->_mapFactory->method('create')->willReturn($this->_map);
+        $this->mapFactory->method('create')->willReturn($this->map);
 
-        $this->_model = $this->objectManager->getObject(
-            '\Doofinder\Feed\Model\Generator\Component\Processor\Mapper',
+        $this->model = $this->objectManager->getObject(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Mapper::class,
             [
-                'mapFactory' => $this->_mapFactory,
+                'mapFactory' => $this->mapFactory,
                 'data' => [
                     'map' => [
                         'name' => 'title',
@@ -94,18 +99,20 @@ class MapperTest extends BaseTestCase
     }
 
     /**
-     * Test process
+     * Test process() method
+     *
+     * @return void
      */
     public function testProcess()
     {
-        $this->_model->process([$this->_item]);
+        $this->model->process([$this->item]);
 
         $this->assertEquals(
             [
                 'name' => 'Sample title',
                 'desc' => 'Sample description',
             ],
-            $this->_item->getData()
+            $this->item->getData()
         );
     }
 }

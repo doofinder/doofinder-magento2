@@ -12,53 +12,60 @@ class ScheduleTest extends AbstractIntegrity
     /**
      * @var \Doofinder\Feed\Helper\Schedule
      */
-    private $_helper;
+    private $helper;
 
     /**
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    private $_objectManager;
+    private $objectManager;
 
     /**
      * @var \Magento\Store\Model\Store
      */
-    private $_defaultStore;
+    private $defaultStore;
 
     /**
      * @var \Doofinder\Feed\Model\CronFactory
      */
-    private $_cronFactory;
+    private $cronFactory;
 
     /**
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    private $_timezone;
+    private $timezone;
 
+    /**
+     * Set up test
+     *
+     * @return void
+     */
     public function setUp()
     {
-        $this->_objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+        $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
-        $this->_helper = $this->_objectManager->create(
-            '\Doofinder\Feed\Helper\Schedule'
+        $this->helper = $this->objectManager->create(
+            \Doofinder\Feed\Helper\Schedule::class
         );
 
-        $storeManager = $this->_objectManager->get(
-            '\Magento\Store\Model\StoreManagerInterface'
+        $storeManager = $this->objectManager->get(
+            \Magento\Store\Model\StoreManagerInterface::class
         );
 
-        $this->_defaultStore = $storeManager->getStore('default');
+        $this->defaultStore = $storeManager->getStore('default');
 
-        $this->_cronFactory = $this->_objectManager->create(
-            '\Doofinder\Feed\Model\CronFactory'
+        $this->cronFactory = $this->objectManager->create(
+            \Doofinder\Feed\Model\CronFactory::class
         );
 
-        $this->_timezone = $this->_objectManager->create(
-            '\Magento\Framework\Stdlib\DateTime\TimezoneInterface'
+        $this->timezone = $this->objectManager->create(
+            \Magento\Framework\Stdlib\DateTime\TimezoneInterface::class
         );
     }
 
     /**
-     * Test for getStoreConfig() method.
+     * Test for getStoreConfig() method
+     *
+     * @return void
      */
     public function testGetStoreConfig()
     {
@@ -90,26 +97,36 @@ class ScheduleTest extends AbstractIntegrity
                 'categories_in_navigation' => '0',
                 'password' => null,
             ],
-            $this->_helper->getStoreConfig()
+            $this->helper->getStoreConfig()
         );
     }
 
     /**
-     * Test for timeArrayToDate() method.
+     * Test for timeArrayToDate() method
      *
+     * @param  array $time
+     * @param  boolean $useTimezone
+     * @param  \DateTime $base
+     * @param  \DateTime $expected
+     * @return void
      * @dataProvider providerTestTimeArrayToDate
      */
-    public function testTimeArrayToDate($time, $useTimezone, $base, $expected)
+    public function testTimeArrayToDate(array $time, $useTimezone, \DateTime $base, \DateTime $expected)
     {
-        $date = $this->_helper->timeArrayToDate($time, $useTimezone, $base);
+        $date = $this->helper->timeArrayToDate($time, $useTimezone, $base);
 
         $this->assertEquals($expected, $date);
     }
 
+    /**
+     * Data provider for testTimeArrayToDate() test
+     *
+     * @return array
+     */
     public function providerTestTimeArrayToDate()
     {
         $configTimezone = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-            ->get('Magento\Framework\Stdlib\DateTime\TimezoneInterface')
+            ->get(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class)
             ->getConfigTimezone();
 
         // @codingStandardsIgnoreStart
@@ -137,17 +154,26 @@ class ScheduleTest extends AbstractIntegrity
     }
 
     /**
-     * Test for getScheduleDate() method.
+     * Test for getScheduleDate() method
      *
+     * @param \DateTime $date
+     * @param \DateTime $now
+     * @param \DateTime $expected
+     * @return void
      * @dataProvider providerTestGetScheduleDate
      */
-    public function testGetScheduleDate($date, $now, $expected)
+    public function testGetScheduleDate(\DateTime $date, \DateTime $now, \DateTime $expected)
     {
-        $date = $this->_helper->getScheduleDate($date, $now);
+        $date = $this->helper->getScheduleDate($date, $now);
 
         $this->assertEquals($expected, $date);
     }
 
+    /**
+     * Data provider for testGetScheduleDate() test
+     *
+     * @return array
+     */
     public function providerTestGetScheduleDate()
     {
         // @codingStandardsIgnoreStart
@@ -169,14 +195,15 @@ class ScheduleTest extends AbstractIntegrity
     /**
      * Test regenerateSchedule() method
      *
+     * @return void
      * @magentoDbIsolation enabled
      * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testRegenerateSchedule()
     {
-        $this->_helper->regenerateSchedule();
+        $this->helper->regenerateSchedule();
 
-        $process = $this->_cronFactory->create()->load('default', 'store_code');
+        $process = $this->cronFactory->create()->load('default', 'store_code');
         $this->assertEquals('default', $process->getStoreCode());
         $this->assertEquals('pending', $process->getStatus());
     }
@@ -184,12 +211,13 @@ class ScheduleTest extends AbstractIntegrity
     /**
      * Test updateProcess() method
      *
+     * @return void
      * @magentoDbIsolation enabled
      * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testUpdateProcess()
     {
-        $process = $this->_helper->updateProcess($this->_defaultStore);
+        $process = $this->helper->updateProcess($this->defaultStore);
 
         $this->assertEquals('default', $process->getStoreCode());
         $this->assertEquals('pending', $process->getStatus());
@@ -200,12 +228,12 @@ class ScheduleTest extends AbstractIntegrity
         $this->assertEquals(0, $process->getErrorStack());
         $this->assertEquals('0%', $process->getComplete());
         $this->assertEquals(
-            $this->_timezone->date(null, null, false)->modify('+1 day')->setTime(0, 0, 0),
-            $this->_timezone->date($process->getNextRun(), null, false)
+            $this->timezone->date(null, null, false)->modify('+1 day')->setTime(0, 0, 0),
+            $this->timezone->date($process->getNextRun(), null, false)
         );
         $this->assertEquals(
-            $this->_timezone->date(null, null, false)->modify('+1 day')->setTime(0, 0, 0),
-            $this->_timezone->date($process->getNextIteration(), null, false)
+            $this->timezone->date(null, null, false)->modify('+1 day')->setTime(0, 0, 0),
+            $this->timezone->date($process->getNextIteration(), null, false)
         );
         $this->assertStringMatchesFormat('%d-%d-%d 00:00:00', $process->getNextRun());
         $this->assertStringMatchesFormat('%d-%d-%d 00:00:00', $process->getNextIteration());
@@ -218,27 +246,28 @@ class ScheduleTest extends AbstractIntegrity
     /**
      * Test updateProcess() method custom time
      *
+     * @return void
      * @magentoDbIsolation enabled
      * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/start_time 10,15,30
      * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testUpdateProcessCustomTime()
     {
-        $process = $this->_helper->updateProcess($this->_defaultStore);
+        $process = $this->helper->updateProcess($this->defaultStore);
 
         $this->assertEquals(
-            $this->_timezone->date(null, null, false)
+            $this->timezone->date(null, null, false)
                 ->setTime(10, 15, 30)
                 ->format('H:i:s'),
-            $this->_timezone->date($process->getNextRun(), null, false)
+            $this->timezone->date($process->getNextRun(), null, false)
                 ->setTimezone($this->getDefaultTimezone())
                 ->format('H:i:s')
         );
         $this->assertEquals(
-            $this->_timezone->date(null, null, false)
+            $this->timezone->date(null, null, false)
                 ->setTime(10, 15, 30)
                 ->format('H:i:s'),
-            $this->_timezone->date($process->getNextIteration(), null, false)
+            $this->timezone->date($process->getNextIteration(), null, false)
                 ->setTimezone($this->getDefaultTimezone())
                 ->format('H:i:s')
         );
@@ -247,24 +276,26 @@ class ScheduleTest extends AbstractIntegrity
     /**
      * Test getProcessByStoreCode() method
      *
+     * @return void
      * @magentoDataFixture processSuccess
      */
     public function testGetProcessByStoreCode()
     {
-        $process = $this->_helper->getProcessByStoreCode($this->_defaultStore->getCode());
+        $process = $this->helper->getProcessByStoreCode($this->defaultStore->getCode());
 
-        $this->assertEquals($this->_defaultStore->getCode(), $process->getStoreCode());
+        $this->assertEquals($this->defaultStore->getCode(), $process->getStoreCode());
     }
 
     /**
      * Test updateProcess() method rescheduling
      *
+     * @return void
      * @magentoDataFixture processSuccess
      * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testUpdateProcessReschedule()
     {
-        $process = $this->_helper->updateProcess($this->_defaultStore);
+        $process = $this->helper->updateProcess($this->defaultStore);
 
         $this->assertEquals('default', $process->getStoreCode());
         $this->assertEquals('pending', $process->getStatus());
@@ -275,12 +306,12 @@ class ScheduleTest extends AbstractIntegrity
         $this->assertEquals(0, $process->getErrorStack());
         $this->assertEquals('0%', $process->getComplete());
         $this->assertEquals(
-            $this->_timezone->date(null, null, false)->modify('+1 day')->setTime(0, 0, 0),
-            $this->_timezone->date($process->getNextRun(), null, false)
+            $this->timezone->date(null, null, false)->modify('+1 day')->setTime(0, 0, 0),
+            $this->timezone->date($process->getNextRun(), null, false)
         );
         $this->assertEquals(
-            $this->_timezone->date(null, null, false)->modify('+1 day')->setTime(0, 0, 0),
-            $this->_timezone->date($process->getNextIteration(), null, false)
+            $this->timezone->date(null, null, false)->modify('+1 day')->setTime(0, 0, 0),
+            $this->timezone->date($process->getNextIteration(), null, false)
         );
         $this->assertStringMatchesFormat('%d-%d-%d 00:00:00', $process->getNextRun());
         $this->assertStringMatchesFormat('%d-%d-%d 00:00:00', $process->getNextIteration());
@@ -290,6 +321,11 @@ class ScheduleTest extends AbstractIntegrity
         $this->assertNotEquals('0000-00-00 00:00:00', $process->getCreatedAt());
     }
 
+    /**
+     * Fixture with successful process
+     *
+     * @return void
+     */
     public static function processSuccess()
     {
         // @codingStandardsIgnoreStart
@@ -300,16 +336,17 @@ class ScheduleTest extends AbstractIntegrity
     /**
      * Test getActiveProcess() method
      *
+     * @return void
      * @magentoDbIsolation enabled
      * @magentoConfigFixture default_store doofinder_config_data_feed/cron_settings/enabled 1
      */
     public function testGetActiveProcess()
     {
-        $process = $this->_helper->updateProcess($this->_defaultStore, true, true);
+        $process = $this->helper->updateProcess($this->defaultStore, true, true);
 
         $this->assertEquals(
             $process->getId(),
-            $this->_helper->getActiveProcess()->getId()
+            $this->helper->getActiveProcess()->getId()
         );
     }
 
@@ -321,7 +358,7 @@ class ScheduleTest extends AbstractIntegrity
     private function getDefaultTimezone()
     {
         // @codingStandardsIgnoreStart
-        return new \DateTimeZone($this->_timezone->getDefaultTimezone());
+        return new \DateTimeZone($this->timezone->getDefaultTimezone());
         // @codingStandardsIgnoreEnd
     }
 
@@ -333,7 +370,7 @@ class ScheduleTest extends AbstractIntegrity
     private function getConfigTimezone()
     {
         // @codingStandardsIgnoreStart
-        return new \DateTimeZone($this->_timezone->getConfigTimezone());
+        return new \DateTimeZone($this->timezone->getConfigTimezone());
         // @codingStandardsIgnoreEnd
     }
 }

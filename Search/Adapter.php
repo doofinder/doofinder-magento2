@@ -1,49 +1,50 @@
 <?php
 
+/**
+ * @see \Magento\Framework\Search\Adapter\Mysql
+ */
+
 namespace Doofinder\Feed\Search;
 
 /**
- * Adapter class
- *
- * @see \Magento\Framework\Search\Adapter\Mysql
- * @package Doofinder\Feed\Search
+ * Search adapter
  */
 class Adapter implements \Magento\Framework\Search\AdapterInterface
 {
     /**
      * @var \Magento\Framework\Search\Adapter\Mysql\Adapter
      */
-    private $_adapter;
+    private $adapter;
 
     /**
      * @var \Magento\Framework\Search\Adapter\Mysql\ResponseFactory
      */
-    private $_responseFactory;
+    private $responseFactory;
 
     /**
      * @var \Magento\Framework\Search\Adapter\Mysql\TemporaryStorage
      */
-    private $_temporaryStorage;
+    private $temporaryStorage;
 
     /**
      * @var \Magento\Framework\Api\Search\DocumentFactory
      */
-    private $_documentFactory;
+    private $documentFactory;
 
     /**
      * @var \Magento\Framework\Api\AttributeValueFactory
      */
-    private $_attributeValueFactory;
+    private $attributeValueFactory;
 
     /**
      * @var \Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder
      */
-    private $_aggregationBuilder;
+    private $aggregationBuilder;
 
     /**
      * @var \Doofinder\Feed\Helper\Search
      */
-    private $_search;
+    private $search;
 
     /**
      * @param \Magento\Framework\Search\Adapter\Mysql\Adapter $adapter
@@ -63,25 +64,28 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
         \Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder $aggregationBuilder,
         \Doofinder\Feed\Helper\Search $search
     ) {
-        $this->_adapter = $adapter;
-        $this->_responseFactory = $responseFactory;
-        $this->_temporaryStorage = $temporaryStorage;
-        $this->_documentFactory = $documentFactory;
-        $this->_attributeValueFactory = $attributeValFactory;
-        $this->_aggregationBuilder = $aggregationBuilder;
-        $this->_search = $search;
+        $this->adapter = $adapter;
+        $this->responseFactory = $responseFactory;
+        $this->temporaryStorage = $temporaryStorage;
+        $this->documentFactory = $documentFactory;
+        $this->attributeValueFactory = $attributeValFactory;
+        $this->aggregationBuilder = $aggregationBuilder;
+        $this->search = $search;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param  \Magento\Framework\Search\RequestInterface $request
+     * @return \Magento\Framework\Search\Adapter\Mysql\Response
      * @codingStandardsIgnoreStart
      */
     public function query(\Magento\Framework\Search\RequestInterface $request)
     {
     // @codingStandardsIgnoreEnd
-        if ($request->getName() != 'quick_search_container') {
+        if ($request->getName() != 'quicksearch_container') {
             // @codingStandardsIgnoreStart
-            return $this->_adapter->query($request);
+            return $this->adapter->query($request);
             // @codingStandardsIgnoreEnd
         }
 
@@ -89,16 +93,16 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
          * NOTICE Add cache magic here ?
          */
         $documents = $this->getDocuments($this->getQueryString($request->getQuery()));
-        $table = $this->_temporaryStorage->storeApiDocuments($this->createDocuments($documents));
+        $table = $this->temporaryStorage->storeApiDocuments($this->createDocuments($documents));
 
         $aggregations = [];
-        $aggregations = $this->_aggregationBuilder->build($request, $table, $documents);
+        $aggregations = $this->aggregationBuilder->build($request, $table, $documents);
         $response = [
             'documents' => $documents,
             'aggregations' => $aggregations,
         ];
 
-        return $this->_responseFactory->create($response);
+        return $this->responseFactory->create($response);
     }
 
     /**
@@ -110,10 +114,10 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
     private function getDocuments($queryText)
     {
         // Execute initial search
-        $this->_search->performDoofinderSearch($queryText);
+        $this->search->performDoofinderSearch($queryText);
 
         // Fetch all results
-        $results = $this->_search->getAllResults();
+        $results = $this->search->getAllResults();
         $score = count($results);
 
         $documents = [];
@@ -130,17 +134,17 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
     /**
      * Create documents
      *
-     * @param array
+     * @param  array $documents
      * @return \Magento\Framework\Api\Search\DocumentInterface[]
      */
-    private function createDocuments($documents)
+    private function createDocuments(array $documents)
     {
         return array_map(function ($data) {
-            $score = $this->_attributeValueFactory->create();
+            $score = $this->attributeValueFactory->create();
             $score->setAttributeCode('score');
             $score->setValue($data['score']);
 
-            $document = $this->_documentFactory->create();
+            $document = $this->documentFactory->create();
             $document->setId($data['entity_id']);
             $document->setCustomAttribute('score', $score);
 

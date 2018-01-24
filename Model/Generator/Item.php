@@ -2,27 +2,31 @@
 
 namespace Doofinder\Feed\Model\Generator;
 
+/**
+ * Item
+ */
 class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerializable
 {
     /**
      * @var \Magento\Framework\DataObject|null
      */
-    private $_context = null;
+    private $context = null;
 
     /**
      * @var \Doofinder\Feed\Model\Generator\Item[]
      */
-    private $_associates = [];
+    private $associates = [];
 
     /**
      * @var boolean
      */
-    private $_skip = false;
+    private $skip = false;
 
     /**
      * Serialize item to an XML
      *
-     * @param \Sabre\Xml\Writer
+     * @param  \Sabre\Xml\Writer $writer
+     * @return void
      */
     public function xmlSerialize(\Sabre\Xml\Writer $writer)
     {
@@ -35,10 +39,10 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
     /**
      * Convert data into xml valid property
      *
-     * @param array
+     * @param  array $data
      * @return array
      */
-    private function convertDataToXmlProperty($data)
+    private function convertDataToXmlProperty(array $data)
     {
         $properties = [];
 
@@ -53,7 +57,7 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
                 }
             }
 
-            if (!is_array($value) && !is_a($value, '\Sabre\Xml\XmlSerializable')) {
+            if (!is_array($value) && !is_a($value, \Sabre\Xml\XmlSerializable::class)) {
                 $value = $this->createCdata($value);
             }
 
@@ -69,12 +73,12 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
     /**
      * Set item context
      *
-     * @param \Magento\Framework\DataObject
+     * @param  \Magento\Framework\DataObject $context
      * @return Item
      */
     public function setContext(\Magento\Framework\DataObject $context)
     {
-        $this->_context = $context;
+        $this->context = $context;
         return $this;
     }
 
@@ -85,18 +89,18 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
      */
     public function getContext()
     {
-        return $this->_context;
+        return $this->context;
     }
 
     /**
      * Set item context
      *
-     * @param \Doofinder\Feed\Model\Generator\Item[]
+     * @param  \Doofinder\Feed\Model\Generator\Item[] $items
      * @return Item
      */
     public function setAssociates(array $items)
     {
-        $this->_associates = $items;
+        $this->associates = $items;
         return $this;
     }
 
@@ -107,7 +111,7 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
      */
     public function getAssociates()
     {
-        return $this->_associates;
+        return $this->associates;
     }
 
     /**
@@ -117,7 +121,7 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
      */
     public function hasAssociates()
     {
-        return !empty($this->_associates);
+        return !empty($this->associates);
     }
 
     /**
@@ -127,7 +131,7 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
      */
     public function skip()
     {
-        $this->_skip = true;
+        $this->skip = true;
         return $this;
     }
 
@@ -138,13 +142,13 @@ class Item extends \Magento\Framework\DataObject implements \Sabre\Xml\XmlSerial
      */
     public function isSkip()
     {
-        return $this->_skip;
+        return $this->skip;
     }
 
     /**
      * Check if array is associative
      *
-     * @param array
+     * @param  array $array
      * @return boolean
      */
     private function isAssocArray(array $array)
