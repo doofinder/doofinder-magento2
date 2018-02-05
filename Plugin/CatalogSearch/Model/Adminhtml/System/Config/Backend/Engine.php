@@ -62,13 +62,13 @@ class Engine
         foreach ($this->storeConfig->getStoreCodes(false) as $storeCode) {
             if (!$hashId = $this->storeConfig->getHashId($storeCode)) {
                 throw new \Magento\Framework\Exception\ValidatorException(
-                    __('HashID for store %1 is not provided.', $storeCode)
+                    __('HashID for store %1 is required. Please, set it before enabling Doofinder search engine.', $storeCode)
                 );
             }
 
             if (!isset($searchEngines[$hashId])) {
                 throw new \Magento\Framework\Exception\ValidatorException(
-                    __('Search engine with HashID %1 is not available.', $hashId)
+                    __('Search engine with HashID %1 does not exist in your account.', $hashId)
                 );
             }
         }
