@@ -151,6 +151,27 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Initialize search engines
+     *
+     * @param  string $apiKey
+     * @return array
+     */
+    public function getDoofinderSearchEngines($apiKey)
+    {
+        // Create DoofinderManagementApi instance
+        $doofinderApi = $this->throttleFactory->create([
+            'obj' => $this->dmaFactory->create($apiKey)
+        ]);
+
+        $searchEngines = [];
+        foreach ($doofinderApi->getSearchEngines() as $searchEngine) {
+            $searchEngines[$searchEngine->hashid] = $searchEngine;
+        }
+
+        return $searchEngines;
+    }
+
+    /**
      * Get Doofinder Search Engine
      *
      * @return \Doofinder\Feed\Wrapper\Throttle
@@ -159,16 +180,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     private function getDoofinderSearchEngine()
     {
         if ($this->searchEngines === null) {
-            $this->searchEngines = [];
-
-            // Create DoofinderManagementApi instance
-            $doofinderApi = $this->throttleFactory->create([
-                'obj' => $this->dmaFactory->create($this->storeConfig->getApiKey())
-            ]);
-
-            foreach ($doofinderApi->getSearchEngines() as $searchEngine) {
-                $this->searchEngines[$searchEngine->hashid] = $searchEngine;
-            }
+            $this->searchEngines = $this->getDoofinderSearchEngines($this->storeConfig->getApiKey());
         }
 
         // Prepare SearchEngine instance

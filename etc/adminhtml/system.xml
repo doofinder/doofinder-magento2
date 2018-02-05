@@ -33,6 +33,7 @@
                        showInStore="0"
                        showInWebsite="0">
                     <label>API Key</label>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\ApiKeyValidation</backend_model>
                     <comment>
                         <![CDATA[ You need a Management API Key. Search-only keys won't work. ]]>
                     </comment>

@@ -113,6 +113,10 @@
       <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
     </type>
 
+    <type name="Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine">
+      <plugin name="doofinderSearchEngineBackend" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine" sortOrder="1" />
+    </type>
+
     <type name="Doofinder\Feed\Console\Command\RescheduleProcessCommand">
         <arguments>
             <argument name="schedule" xsi:type="object">Doofinder\Feed\Helper\Schedule\Proxy</argument>

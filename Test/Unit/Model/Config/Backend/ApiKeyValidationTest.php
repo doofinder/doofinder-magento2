@@ -5,9 +5,9 @@ namespace Doofinder\Feed\Test\Unit\Model\Backend;
 use Doofinder\Feed\Test\Unit\BaseTestCase;
 
 /**
- * Test class for \Doofinder\Feed\Model\Config\Backend\HashIdValidation
+ * Test class for \Doofinder\Feed\Model\Config\Backend\ApiKeyValidation
  */
-class HashIdValidationTest extends BaseTestCase
+class ApiKeyValidationTest extends BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -45,13 +45,6 @@ class HashIdValidationTest extends BaseTestCase
             '',
             false
         );
-        $this->storeConfig->method('getStoreCode')->willReturn('current');
-        $this->storeConfig->method('getStoreCodes')->willReturn(['sample1', 'current', 'sample2']);
-        $this->storeConfig->method('getHashId')->will($this->returnValueMap([
-            ['current', 'sample_current_hash_id'],
-            ['sample1', 'sample_hash_id_1'],
-            ['sample2', 'sample_hash_id_2'],
-        ]));
 
         $this->search = $this->getMock(
             \Doofinder\Feed\Helper\Search::class,
@@ -70,7 +63,7 @@ class HashIdValidationTest extends BaseTestCase
         );
 
         $this->model = $this->objectManager->getObject(
-            \Doofinder\Feed\Model\Config\Backend\HashIdValidation::class,
+            \Doofinder\Feed\Model\Config\Backend\ApiKeyValidation::class,
             [
                 'storeConfig' => $this->storeConfig,
                 'search' => $this->search,
@@ -80,42 +73,26 @@ class HashIdValidationTest extends BaseTestCase
     }
 
     /**
-     * Test save() method
-     *
-     * @return void
-     * @doesNotPerformAssertions
-     */
-    public function testSave()
-    {
-        $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
-            'sample_hash_id' => [],
-        ]);
-
-        $this->model->setValue('sample_hash_id');
-        $this->model->save();
-    }
-
-    /**
-     * Test save() method with empty hash id
+     * Test save() method with empty value
      *
      * @return void
      */
     public function testSaveEmpty()
     {
         $this->resource->expects($this->once())->method('save');
+        $this->storeConfig->method('isInternalSearchEnabled')->willReturn(false);
 
         $this->model->setValue(null);
         $this->model->save();
     }
 
     /**
-     * Test save() with empty hash id with engine enabled
+     * Test save() method with empty value with engine enabled
      *
      * @return void
      * @expectedException \Magento\Framework\Exception\ValidatorException
      */
-    public function testSaveEmtpyEngineEnabled()
+    public function testSaveEmptyEngineEnabled()
     {
         $this->resource->expects($this->never())->method('save');
         $this->storeConfig->method('isInternalSearchEnabled')->willReturn(true);
@@ -125,56 +102,82 @@ class HashIdValidationTest extends BaseTestCase
     }
 
     /**
-     * Test save() method
+     * Test save() method valid format validation
      *
+     * @param  string $value
      * @return void
+     * @dataProvider providerTestSaveValidFormat
      */
-    public function testSaveSameAsCurrent()
+    public function testSaveValidFormat($value)
     {
         $this->resource->expects($this->once())->method('save');
 
-        $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
-            'sample_current_hash_id' => [],
-        ]);
-
-        $this->model->setValue('sample_current_hash_id');
+        $this->model->setValue($value);
         $this->model->save();
     }
 
     /**
-     * Test save() method
+     * Data provider for 'testSaveValidFormat'
      *
+     * @return array
+     */
+    public function providerTestSaveValidFormat()
+    {
+        return [
+            ['eu1-abcdef0123456789abcdef0123456789abcdef01'],
+            ['eu1-0123456789abcdef0123456789abcdef01234567'],
+            ['us1-abcdef0123456789abcdef0123456789abcdef01'],
+            ['us1-0123456789abcdef0123456789abcdef01234567'],
+        ];
+    }
+
+    /**
+     * Test save() method invalid format validation
+     *
+     * @param  string $value
      * @return void
      * @expectedException \Magento\Framework\Exception\ValidatorException
+     * @dataProvider providerTestSaveInvalidFormat
      */
-    public function testSaveNotUnique()
+    public function testSaveInvalidFormat($value)
     {
         $this->resource->expects($this->never())->method('save');
 
-        $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
-            'sample_hash_id_2' => [],
-        ]);
-
-        $this->model->setValue('sample_hash_id_2');
+        $this->model->setValue($value);
         $this->model->save();
     }
 
     /**
-     * Test save() method with unavailable engine
+     * Data provider for 'testSaveInvalidFormat'
+     *
+     * @return array
+     */
+    public function providerTestSaveInvalidFormat()
+    {
+        return [
+            ['foo'],
+            ['foo-bar'],
+            ['eu1-foo'],
+            ['eu1-abcdef0123456789abcdef-0123456789abcdef0'],
+            ['eu1-abcdefg0123456789abcdef0123456789abcdef0'],
+            ['eu1-abcdef0123456789abcdef0123456789abcdef0'],
+        ];
+    }
+
+    /**
+     * Test save() method with invalid api key
      *
      * @return void
      * @expectedException \Magento\Framework\Exception\ValidatorException
      */
-    public function testSaveEngineNotAvailable()
+    public function testSaveInvalidApiKey()
     {
         $this->resource->expects($this->never())->method('save');
+        $this->search->method('getDoofinderSearchEngines')->will(
+            $this->throwException(new \Doofinder\Api\Management\Errors\NotAllowed())
+        );
 
-        $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([]);
-
-        $this->model->setValue('sample_hash_id');
+        $this->model->setValue('eu1-0000000000000000000000000000000000000000');
         $this->model->save();
     }
 }
