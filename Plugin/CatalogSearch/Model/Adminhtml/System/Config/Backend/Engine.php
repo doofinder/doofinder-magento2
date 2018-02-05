@@ -54,7 +54,7 @@ class Engine
 
         if (!$apiKey = $this->storeConfig->getApiKey()) {
             throw new \Magento\Framework\Exception\ValidatorException(
-                __('Provide Api key before enabling Doofinder search engine.')
+                __('Provide API key before enabling Doofinder search engine.')
             );
         }
 

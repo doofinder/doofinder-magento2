@@ -105,7 +105,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
     {
         if (!$apiKey = $this->storeConfig->getApiKey()) {
             throw new \Magento\Framework\Exception\ValidatorException(
-                __('Provide Api key before HashID.')
+                __('Provide API key before HashID.')
             );
         }
 

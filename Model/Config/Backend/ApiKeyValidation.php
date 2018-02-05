@@ -3,7 +3,7 @@
 namespace Doofinder\Feed\Model\Config\Backend;
 
 /**
- * Api key validation backend
+ * API key validation backend
  */
 class ApiKeyValidation extends \Magento\Framework\App\Config\Value
 {
@@ -58,7 +58,7 @@ class ApiKeyValidation extends \Magento\Framework\App\Config\Value
         if ($apiKey = $this->getValue()) {
             if (!preg_match('/^(us1|eu1)-[0-9a-f]{40}$/', $apiKey)) {
                 throw new \Magento\Framework\Exception\ValidatorException(
-                    __('Api key %1 is in an invalid format.', $apiKey)
+                    __('API key %1 is in an invalid format.', $apiKey)
                 );
             }
 
@@ -66,12 +66,12 @@ class ApiKeyValidation extends \Magento\Framework\App\Config\Value
                 $this->search->getDoofinderSearchEngines($apiKey);
             } catch (\Doofinder\Api\Management\Errors\NotAllowed $exception) {
                 throw new \Magento\Framework\Exception\ValidatorException(
-                    __('Api key %1 is invalid.', $apiKey)
+                    __('API key %1 is invalid.', $apiKey)
                 );
             }
         } elseif ($this->storeConfig->isInternalSearchEnabled()) {
             throw new \Magento\Framework\Exception\ValidatorException(
-                __('Api key cannot be empty when Doofinder engine is enabled.')
+                __('API key cannot be empty when Doofinder engine is enabled.')
             );
         }
 
