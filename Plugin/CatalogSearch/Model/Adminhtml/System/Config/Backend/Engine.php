@@ -48,19 +48,22 @@ class Engine
         \Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine $engine,
         $value = null
     ) {
-        if ($engine->getValue() != $this->storeConfig::DOOFINDER_SEARCH_ENGINE_NAME) {
+        $storeConfig = $this->storeConfig;
+
+        // Fixes T_PAAMAYIM_NEKUDOTAYIM
+        if ($engine->getValue() != $storeConfig::DOOFINDER_SEARCH_ENGINE_NAME) {
             return $value;
         }
 
-        if (!$apiKey = $this->storeConfig->getApiKey()) {
+        if (!$apiKey = $storeConfig->getApiKey()) {
             throw new \Magento\Framework\Exception\ValidatorException(
                 __('Provide API key before enabling Doofinder search engine.')
             );
         }
 
         $searchEngines = $this->search->getDoofinderSearchEngines($apiKey);
-        foreach ($this->storeConfig->getStoreCodes(false) as $storeCode) {
-            if (!$hashId = $this->storeConfig->getHashId($storeCode)) {
+        foreach ($storeConfig->getStoreCodes(false) as $storeCode) {
+            if (!$hashId = $storeConfig->getHashId($storeCode)) {
                 throw new \Magento\Framework\Exception\ValidatorException(
                     __('HashID for store %1 is required. Please, set it before enabling Doofinder search engine.', $storeCode)
                 );
