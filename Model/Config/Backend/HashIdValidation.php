@@ -88,7 +88,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
 
             if ($hashId == $scopeHashId) {
                 throw new \Magento\Framework\Exception\ValidatorException(
-                    __('HashID %1 is already used in %2 store. It must have a unique value.', $hashId, $storeCode)
+                    __('HashID %1 is already used in %2 store. It must be unique.', $hashId, $storeCode)
                 );
             }
         }
@@ -105,7 +105,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
     {
         if (!$apiKey = $this->storeConfig->getApiKey()) {
             throw new \Magento\Framework\Exception\ValidatorException(
-                __('Provide API key before HashID.')
+                __('Provide API key in the Default Config store view before setting HashID.')
             );
         }
 
@@ -113,7 +113,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
 
         if (!isset($searchEngines[$hashId])) {
             throw new \Magento\Framework\Exception\ValidatorException(
-                __('Search engine with HashID %1 is not available.', $hashId)
+                __('Search engine with HashID %1 does not exist in your account.', $hashId)
             );
         }
     }
