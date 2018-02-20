@@ -83,19 +83,6 @@
                         <![CDATA[ Maximum number of pages obtained for a search query. Each page contains a maximum of 100 results. ]]>
                     </comment>
                 </field>
-                <field id="atomic_updates_enabled"
-                    translate="label"
-                    type="select"
-                    sortOrder="4"
-                    showInDefault="1"
-                    showInWebsite="0"
-                    showInStore="0">
-                    <label>Update products on save</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        <![CDATA[Requires a Management API key configured in Search Configuration.]]>
-                    </comment>
-                </field>
             </group>
             <group id="doofinder_layer"
                    translate="label"
@@ -146,7 +133,7 @@
             <group id="feed_attributes"
             translate="label"
             type="text"
-            sortOrder="1"
+            sortOrder="2"
             showInDefault="1"
             showInWebsite="1"
             showInStore="1">
@@ -265,7 +252,7 @@
             <group id="feed_settings"
                 translate="label"
                 type="text"
-                sortOrder="2"
+                sortOrder="1"
                 showInDefault="1"
                 showInWebsite="1"
                 showInStore="1">
@@ -316,6 +303,20 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                         <![CDATA[Whether this option is enabled or not, only active categories will be exported.]]>
+                    </comment>
+                </field>
+                <field id="atomic_updates_enabled"
+                    translate="label"
+                    type="select"
+                    sortOrder="20"
+                    showInDefault="1"
+                    showInWebsite="0"
+                    showInStore="1">
+                    <label>Update products on save</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\AtomicUpdates</frontend_model>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Requires a Management API key configured in Search Configuration.]]>
                     </comment>
                 </field>
             </group>

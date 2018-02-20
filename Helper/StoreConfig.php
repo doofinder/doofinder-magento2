@@ -92,8 +92,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             ['store_code' => $storeCode],
             ['attributes' => $this->scopeConfig->getValue(self::FEED_ATTRIBUTES_CONFIG, $scopeStore, $storeCode)],
             $this->scopeConfig->getValue(self::FEED_CRON_CONFIG, $scopeStore, $storeCode),
-            $this->scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode),
-            ['atomic_updates_enabled' => $this->isAtomicUpdatesEnabled()]
+            $this->scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode)
         );
 
         /**
@@ -256,15 +255,15 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isAtomicUpdatesEnabled($storeCode = null)
     {
-        $engineEnabled = $this->isInternalSearchEnabled($storeCode);
+        if ($this->isInternalSearchEnabled($storeCode)) {
+            return false;
+        }
 
-        $atomicUpdatesEnabled = $this->scopeConfig->getValue(
-            self::SEARCH_ENGINE_CONFIG . '/atomic_updates_enabled',
+        return $this->scopeConfig->getValue(
+            self::FEED_SETTINGS_CONFIG . '/atomic_updates_enabled',
             $this->getScopeStore(),
             $storeCode
         );
-
-        return $engineEnabled && $atomicUpdatesEnabled;
     }
 
     /**
