@@ -529,17 +529,6 @@
                     <button_label>View Log</button_label>
                     <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\ViewLogButton</frontend_model>
                 </field>
-
-                <field id="atomic_updates"
-                       translate="label"
-                       type="note"
-                       sortOrder="50"
-                       showInDefault="1"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <label>Atomic Updates</label>
-                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\Panel\AtomicUpdates</frontend_model>
-                </field>
             </group>
         </section>
     </system>
