@@ -28,6 +28,11 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const SEARCH_LAYER_CONFIG = 'doofinder_config_config/doofinder_layer';
 
     /**
+     * Path to search layer settings in config.xml/core_config_data
+     */
+    const BANNERS_CONFIG = 'doofinder_config_config/doofinder_banners';
+
+    /**
      * Path to account settings in config.xml/core_config_data
      */
     const ACCOUNT_CONFIG = 'doofinder_config_config/doofinder_account';
@@ -291,6 +296,36 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::SEARCH_LAYER_CONFIG . '/script',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Check if banners display is enabled.
+     *
+     * @param string|null $storeCode
+     * @return string
+     */
+    public function isBannersDisplayEnabled($storeCode = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::BANNERS_CONFIG . '/enabled',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Get banner placement location.
+     *
+     * @param string|null $storeCode
+     * @return string
+     */
+    public function getBannerPlacementAfter($storeCode = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::BANNERS_CONFIG . '/after',
             $this->getScopeStore(),
             $storeCode
         );
