@@ -17,6 +17,10 @@
                 <enabled>0</enabled>
                 <script></script>
             </doofinder_layer>
+            <doofinder_banners>
+                <enabled>0</enabled>
+                <after>.page-title</after>
+            </doofinder_banners>
         </doofinder_config_config>
         <doofinder_config_index>
             <feed_attributes>

@@ -123,7 +123,6 @@ class StoreConfigTest extends BaseTestCase
             'image_size'                    => 'small',
             'start_time'                    => ['10', '30', '0'],
             'attributes'                    => ['attr1' => 'value1', 'attr2' => 'value2'],
-            'atomic_updates_enabled'        => false,
         ];
 
         $result = $this->helper->getStoreConfig();
@@ -298,7 +297,7 @@ class StoreConfigTest extends BaseTestCase
 
         $this->scopeConfig->method('getValue')->will($this->returnValueMap([
             ['catalog/search/engine', 'store', $storeCode, $engine],
-            ['doofinder_config_config/doofinder_search_engine/atomic_updates_enabled', 'store', $storeCode, $atomic],
+            ['doofinder_config_index/feed_settings/atomic_updates_enabled', 'store', $storeCode, $atomic],
         ]));
 
         $this->assertEquals($expected, $this->helper->isAtomicUpdatesEnabled($storeCode));
@@ -312,10 +311,10 @@ class StoreConfigTest extends BaseTestCase
     public function providerTestIsAtomicUpdatesEnabled()
     {
         return [
-            [true, true, true],
+            [true, true, false],
             [false, false, false],
             [true, false, false],
-            [false, true, false],
+            [false, true, true],
         ];
     }
 
