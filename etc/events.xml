@@ -6,4 +6,10 @@
         <observer name="doofinder_feed_update_schedule" instance="Doofinder\Feed\Observer\Schedule" />
         <observer name="doofinder_feed_invalidate_index" instance="Doofinder\Feed\Observer\Indexer" />
     </event>
+    <event name="catalog_product_save_commit_after">
+        <observer name="doofinder_feed_atomic_update_save" instance="Doofinder\Feed\Observer\AtomicUpdate\Save" />
+    </event>
+    <event name="catalog_product_delete_commit_after">
+        <observer name="doofinder_feed_atomic_update_delete" instance="Doofinder\Feed\Observer\AtomicUpdate\Delete" />
+    </event>
 </config>

@@ -28,6 +28,11 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const SEARCH_LAYER_CONFIG = 'doofinder_config_config/doofinder_layer';
 
     /**
+     * Path to search layer settings in config.xml/core_config_data
+     */
+    const BANNERS_CONFIG = 'doofinder_config_config/doofinder_banners';
+
+    /**
      * Path to account settings in config.xml/core_config_data
      */
     const ACCOUNT_CONFIG = 'doofinder_config_config/doofinder_account';
@@ -92,8 +97,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             ['store_code' => $storeCode],
             ['attributes' => $this->scopeConfig->getValue(self::FEED_ATTRIBUTES_CONFIG, $scopeStore, $storeCode)],
             $this->scopeConfig->getValue(self::FEED_CRON_CONFIG, $scopeStore, $storeCode),
-            $this->scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode),
-            ['atomic_updates_enabled' => $this->isAtomicUpdatesEnabled()]
+            $this->scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode)
         );
 
         /**
@@ -256,15 +260,15 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isAtomicUpdatesEnabled($storeCode = null)
     {
-        $engineEnabled = $this->isInternalSearchEnabled($storeCode);
+        if ($this->isInternalSearchEnabled($storeCode)) {
+            return false;
+        }
 
-        $atomicUpdatesEnabled = $this->scopeConfig->getValue(
-            self::SEARCH_ENGINE_CONFIG . '/atomic_updates_enabled',
+        return $this->scopeConfig->getValue(
+            self::FEED_SETTINGS_CONFIG . '/atomic_updates_enabled',
             $this->getScopeStore(),
             $storeCode
         );
-
-        return $engineEnabled && $atomicUpdatesEnabled;
     }
 
     /**
@@ -292,6 +296,36 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::SEARCH_LAYER_CONFIG . '/script',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Check if banners display is enabled.
+     *
+     * @param string|null $storeCode
+     * @return string
+     */
+    public function isBannersDisplayEnabled($storeCode = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::BANNERS_CONFIG . '/enabled',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Get banner placement location.
+     *
+     * @param string|null $storeCode
+     * @return string
+     */
+    public function getBannerPlacementAfter($storeCode = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::BANNERS_CONFIG . '/after',
             $this->getScopeStore(),
             $storeCode
         );

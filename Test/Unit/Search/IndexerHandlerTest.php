@@ -7,7 +7,6 @@ use Doofinder\Feed\Test\Unit\BaseTestCase;
 /**
  * Test class for \Doofinder\Feed\Search\IndexerHandler
  *
- * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class IndexerHandlerTest extends BaseTestCase
@@ -38,16 +37,6 @@ class IndexerHandlerTest extends BaseTestCase
     private $documents;
 
     /**
-     * @var \Doofinder\Feed\Model\Generator
-     */
-    private $generator;
-
-    /**
-     * @var \Doofinder\Feed\Model\GeneratorFactory
-     */
-    private $generatorFactory;
-
-    /**
      * @var \Magento\Catalog\Model\Product
      */
     private $product;
@@ -73,11 +62,6 @@ class IndexerHandlerTest extends BaseTestCase
     private $searchCriteriaBuilder;
 
     /**
-     * @var \Doofinder\Feed\Helper\FeedConfig
-     */
-    private $feedConfig;
-
-    /**
      * @var \Doofinder\Feed\Helper\Search
      */
     private $searchHelper;
@@ -91,6 +75,11 @@ class IndexerHandlerTest extends BaseTestCase
      * @var \Magento\Framework\Indexer\IndexStructureInterface
      */
     private $indexStructure;
+
+    /**
+     * @var \Doofinder\Feed\Search\Processor
+     */
+    private $processor;
 
     /**
      * Set up test
@@ -109,22 +98,6 @@ class IndexerHandlerTest extends BaseTestCase
         $this->batch = $this->getMock(
             \Magento\Framework\Indexer\SaveHandler\Batch::class,
             [],
-            [],
-            '',
-            false
-        );
-
-        $this->generator = $this->getMock(
-            \Doofinder\Feed\Model\Generator::class,
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->generatorFactory = $this->getMock(
-            \Doofinder\Feed\Model\GeneratorFactory::class,
-            ['create'],
             [],
             '',
             false
@@ -175,25 +148,6 @@ class IndexerHandlerTest extends BaseTestCase
         );
         $this->searchCriteriaBuilder->method('create')
             ->willReturn($this->searchCriteria);
-
-        $this->feedConfig = $this->getMock(
-            \Doofinder\Feed\Helper\FeedConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
-        $this->feedConfig->method('getLeanFeedConfig')->with('sample')->willReturn([
-            'data' => [
-                'config' => [
-                    'processors' => [
-                        'Mapper' => [
-                            'map' => [],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
 
         $this->dimension = $this->getMock(
             \Magento\Framework\Search\Request\Dimension::class,
@@ -248,17 +202,24 @@ class IndexerHandlerTest extends BaseTestCase
             ])
             ->willReturn($this->indexerHandler);
 
+        $this->processor = $this->getMock(
+            \Doofinder\Feed\Search\Processor::class,
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->indexer = $this->objectManager->getObject(
             \Doofinder\Feed\Search\IndexerHandler::class,
             [
                 'batch' => $this->batch,
-                'generatorFactory' => $this->generatorFactory,
                 'productRepository' => $this->productRepository,
                 'searchCriteriaBuilder' => $this->searchCriteriaBuilder,
-                'feedConfig' => $this->feedConfig,
                 'searchHelper' => $this->searchHelper,
                 'indexStructure' => $this->indexStructure,
                 'indexerHandlerFactory' => $this->indexerHandlerFactory,
+                'processor' => $this->processor,
                 'data' => [
                     'indexer_id' => 'sample-indexer',
                     'fieldsets' => [],
@@ -279,29 +240,8 @@ class IndexerHandlerTest extends BaseTestCase
         $this->batch->expects($this->at(0))->method('getItems')
             ->with($this->documents, 100)->willReturn([$batch]);
 
-        $this->generator->expects($this->once())->method('run');
-
-        $this->generatorFactory
-            ->expects($this->once())
-            ->method('create')
-            ->with([
-                'data' => [
-                    'config' => [
-                        'fetchers' => [
-                            'Product\Fixed' => [
-                                'products' => [$this->product],
-                            ],
-                        ],
-                        'processors' => [
-                            'AtomicUpdater' => [],
-                            'Mapper' => [
-                                'map' => [],
-                            ],
-                        ],
-                    ],
-                ],
-            ])
-            ->willReturn($this->generator);
+        $this->processor->expects($this->once())->method('update')
+            ->with('sample', [$this->product]);
 
         $this->indexerHandler->expects($this->once())->method('saveIndex')
             ->with([$this->dimension], $this->createIterator($batch));
@@ -320,11 +260,9 @@ class IndexerHandlerTest extends BaseTestCase
         $this->batch->expects($this->at(0))->method('getItems')
             ->with($this->documents, 100)->willReturn([$batch]);
 
-        $this->searchHelper->expects($this->once())
-            ->method('deleteDoofinderItems')
-            ->with([
-                ['id' => 1234],
-            ]);
+        $this->processor->expects($this->once())
+            ->method('delete')
+            ->with('sample', [1234]);
 
         $this->indexerHandler->expects($this->once())->method('deleteIndex')
             ->with([$this->dimension], $this->createIterator($batch));

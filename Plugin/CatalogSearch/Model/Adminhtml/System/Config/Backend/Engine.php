@@ -64,9 +64,11 @@ class Engine
         $searchEngines = $this->search->getDoofinderSearchEngines($apiKey);
         foreach ($storeConfig->getStoreCodes(false) as $storeCode) {
             if (!$hashId = $storeConfig->getHashId($storeCode)) {
-                throw new \Magento\Framework\Exception\ValidatorException(
-                    __('HashID for store %1 is required. Please, set it before enabling Doofinder search engine.', $storeCode)
-                );
+                throw new \Magento\Framework\Exception\ValidatorException(__(
+                    'HashID for store %1 is required. ' .
+                    'Please, set it before enabling Doofinder search engine.',
+                    $storeCode
+                ));
             }
 
             if (!isset($searchEngines[$hashId])) {
