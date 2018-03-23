@@ -10,9 +10,6 @@ class Throttle
     /** Max allowed throttle retries **/
     const THROTTLE_RETRIES = 3;
 
-    /** Max allowed indexing retries **/
-    const INDEXING_RETRIES = 10;
-
     /**
      * Throttled object
      *
@@ -81,10 +78,6 @@ class Throttle
 
             $this->wait(1);
         } catch (\Doofinder\Api\Management\Errors\IndexingInProgress $e) {
-            if ($counter >= self::INDEXING_RETRIES) {
-                throw $e;
-            }
-
             $this->wait(3);
         }
 

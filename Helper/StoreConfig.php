@@ -150,19 +150,25 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getStoreCodes($onlyActive = true)
     {
-        $currentStoreCode = $this->getStoreCode();
+        if ($storeId = $this->_request->getParam('store')) {
+            return [$this->storeManager->getStore($storeId)->getCode()];
+        }
+
         $storeCodes = [];
-
-        if (in_array($currentStoreCode, ['admin', 'default'])) {
-            $stores = $this->storeManager->getStores();
-
-            foreach ($stores as $store) {
-                if (!$onlyActive || $store->isActive()) {
-                    $storeCodes[] = $store->getCode();
-                }
+        $stores = [];
+        if ($websiteId = $this->_request->getParam('website')) {
+            $storeIds = $this->storeManager->getStoreByWebsiteId($websiteId);
+            foreach ($storeIds as $storeId) {
+                $stores[] = $this->storeManager->getStore($storeId);
             }
         } else {
-            $storeCodes = [$currentStoreCode];
+            $stores = $this->storeManager->getStores();
+        }
+
+        foreach ($stores as $store) {
+            if (!$onlyActive || $store->isActive()) {
+                $storeCodes[] = $store->getCode();
+            }
         }
 
         return $storeCodes;
