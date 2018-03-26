@@ -140,17 +140,24 @@
                         <![CDATA[ Activate/deactivate banners. Banners require proper configuration in Doofinder Management panel. ]]>
                     </comment>
                 </field>
-                <field id="after"
+                <field id="insertion_point"
                        translate="label"
                        type="text"
                        sortOrder="1"
                        showInDefault="1"
                        showInStore="1"
                        showInWebsite="1">
-                    <label>After</label>
-                    <comment>
-                        <![CDATA[ Place banner after HTML element (selector). ]]>
-                    </comment>
+                    <label>Insertion point</label>
+                </field>
+                <field id="insertion_method"
+                       translate="label"
+                       type="select"
+                       sortOrder="1"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Insertion method</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Banner\Insertion</source_model>
                 </field>
             </group>
         </section>

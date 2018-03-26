@@ -6,7 +6,26 @@ define(["jquery"], function($) { // eslint-disable-line no-undef
     },
 
     setLocation: function() {
-      $(".search-result-banner").insertAfter($(this.options.bannerPlacement));
+      var banner = this.element;
+      var point = $(this.options.bannerInsertionPoint);
+      var method = this.options.bannerInsertionMethod;
+      switch (method) {
+        case 'after':
+          banner.insertAfter(point);
+          break;
+        case 'before':
+          banner.insertBefore(point);
+          break;
+        case 'append':
+          point.append(banner);
+          break;
+        case 'prepend':
+          point.prepend(banner);
+          break;
+        case 'replace':
+          point.replaceWith(banner);
+          break;
+      }
     },
 
     watchClick: function() {

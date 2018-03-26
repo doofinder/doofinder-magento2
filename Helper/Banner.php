@@ -54,7 +54,8 @@ class Banner extends \Magento\Framework\App\Helper\AbstractHelper
 
         if ($bannerData && $isEnabled) {
             $this->registerBannerDisplay($bannerData['id']);
-            $bannerData['placement'] = $this->getBannerPlacement();
+            $bannerData['insertion_point'] = $this->getInsertionPoint();
+            $bannerData['insertion_method'] = $this->getInsertionMethod();
             return $bannerData;
         }
 
@@ -96,9 +97,19 @@ class Banner extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    private function getBannerPlacement()
+    private function getInsertionPoint()
     {
-        return $this->storeConfig->getBannerPlacementAfter($this->getStoreCode());
+        return $this->storeConfig->getBannerInsertionPoint($this->getStoreCode());
+    }
+
+    /**
+     * Get banner insertion method.
+     *
+     * @return string
+     */
+    private function getInsertionMethod()
+    {
+        return $this->storeConfig->getBannerInsertionMethod($this->getStoreCode());
     }
 
     /**

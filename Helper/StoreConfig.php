@@ -328,10 +328,25 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string|null $storeCode
      * @return string
      */
-    public function getBannerPlacementAfter($storeCode = null)
+    public function getBannerInsertionPoint($storeCode = null)
     {
         return $this->scopeConfig->getValue(
-            self::BANNERS_CONFIG . '/after',
+            self::BANNERS_CONFIG . '/insertion_point',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Get banner insertion method.
+     *
+     * @param string|null $storeCode
+     * @return string
+     */
+    public function getBannerInsertionMethod($storeCode = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::BANNERS_CONFIG . '/insertion_method',
             $this->getScopeStore(),
             $storeCode
         );
