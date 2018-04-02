@@ -19,7 +19,8 @@
             </doofinder_layer>
             <doofinder_banners>
                 <enabled>0</enabled>
-                <after>.page-title</after>
+                <insertion_point>.page-title</insertion_point>
+                <insertion_method>after</insertion_method>
             </doofinder_banners>
         </doofinder_config_config>
         <doofinder_config_index>

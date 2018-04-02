@@ -19,7 +19,8 @@ if ($banner) : ?>
         ".search-result-banner": {
             "banner": {
                 "ajaxUrl": "<?php /* @escapeNotVerified */ echo $block->getAjaxUrl(); ?>",
-                "bannerPlacement": "<?php /* @escapeNotVerified */ echo $banner['placement']; ?>"
+                "bannerInsertionPoint": "<?php /* @escapeNotVerified */ echo $banner['insertion_point']; ?>",
+                "bannerInsertionMethod": "<?php /* @escapeNotVerified */ echo $banner['insertion_method']; ?>"
             }
         }
     }
