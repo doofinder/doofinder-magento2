@@ -38,29 +38,14 @@ class IndexerHandler implements IndexerInterface
     private $searchCriteriaBuilder;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var \Doofinder\Feed\Helper\StoreConfig
-     */
-    private $storeConfig;
-
-    /**
-     * @var \Doofinder\Feed\Helper\FeedConfig
-     */
-    private $feedConfig;
-
-    /**
-     * @var \Doofinder\Feed\Model\GeneratorFactory
-     */
-    private $generatorFactory;
-
-    /**
      * @var \Doofinder\Feed\Helper\Search
      */
     private $searchHelper;
+
+    /**
+     * @var Processor
+     */
+    private $processor;
 
     /**
      * @var integer
@@ -73,14 +58,10 @@ class IndexerHandler implements IndexerInterface
      * @param \Magento\Framework\Indexer\SaveHandler\Batch $batch
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Doofinder\Feed\Helper\FeedConfig $feedConfig
-     * @param \Doofinder\Feed\Model\GeneratorFactory $generatorFactory
      * @param \Doofinder\Feed\Helper\Search $searchHelper
+     * @param Processor $processor
      * @param array $data
      * @param integer $batchSize
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      * @SuppressWarnings(PHPMD.LongVariable)
      * @codingStandardsIgnoreStart
      * Ignore MEQP2.Classes.ConstructorOperations.CustomOperationsFound
@@ -91,11 +72,8 @@ class IndexerHandler implements IndexerInterface
         \Magento\Framework\Indexer\SaveHandler\Batch $batch,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Helper\FeedConfig $feedConfig,
-        \Doofinder\Feed\Model\GeneratorFactory $generatorFactory,
         \Doofinder\Feed\Helper\Search $searchHelper,
+        Processor $processor,
         array $data,
         $batchSize = 100
     ) {
@@ -108,11 +86,8 @@ class IndexerHandler implements IndexerInterface
         $this->batch = $batch;
         $this->productRepository = $productRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->storeManager = $storeManager;
-        $this->storeConfig = $storeConfig;
-        $this->feedConfig = $feedConfig;
-        $this->generatorFactory = $generatorFactory;
         $this->searchHelper = $searchHelper;
+        $this->processor = $processor;
         $this->batchSize = $batchSize;
     }
 
@@ -188,7 +163,8 @@ class IndexerHandler implements IndexerInterface
     private function insertDocuments(array $documents, array $dimensions)
     {
         if (!empty($documents)) {
-            $this->performAction(array_keys($documents), $dimensions, 'update');
+            $storeId = $this->searchHelper->getStoreIdFromDimensions($dimensions);
+            $this->processor->update($storeId, $this->getProducts(array_keys($documents)));
         }
     }
 
@@ -200,50 +176,9 @@ class IndexerHandler implements IndexerInterface
     private function dropDocuments(array $documents, array $dimensions)
     {
         if (!empty($documents)) {
-            $this->performAction(array_keys($documents), $dimensions, 'delete');
+            $storeId = $this->searchHelper->getStoreIdFromDimensions($dimensions);
+            $this->processor->delete($storeId, array_keys($documents));
         }
-    }
-
-    /**
-     * Perform action
-     *   - update - Run generator with AtomicUpdater
-     *   - delete - Delete items from index
-     *
-     * @param  int[] $ids
-     * @param  \Magento\Framework\Search\Request\Dimension[] $dimensions
-     * @param  string $action
-     * @return void
-     * @throws LocalizedException Unknown action.
-     */
-    private function performAction(array $ids, array $dimensions, $action)
-    {
-        $originalStoreCode = $this->storeConfig->getStoreCode();
-
-        $storeId = $this->searchHelper->getStoreIdFromDimensions($dimensions);
-        $this->storeManager->setCurrentStore($storeId);
-
-        if ($action == 'update') {
-            $feedConfig = $this->feedConfig->getLeanFeedConfig($storeId);
-
-            // Add fixed product fetcher
-            $feedConfig['data']['config']['fetchers']['Product\Fixed'] = [
-                'products' => $this->getProducts($ids),
-            ];
-
-            // Add atomic update processor
-            $feedConfig['data']['config']['processors']['AtomicUpdater'] = [];
-
-            $generator = $this->generatorFactory->create($feedConfig);
-            $generator->run();
-        } elseif ($action == 'delete') {
-            $this->searchHelper->deleteDoofinderItems(array_map(function ($id) {
-                return ['id' => $id];
-            }, $ids));
-        } else {
-            throw new LocalizedException(__('Unknown Doofinder indexer action'));
-        }
-
-        $this->storeManager->setCurrentStore($originalStoreCode);
     }
 
     /**

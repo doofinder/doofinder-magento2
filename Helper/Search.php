@@ -290,4 +290,18 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
 
         return null;
     }
+
+    /**
+     * Get search results banner data
+     *
+     * @return array|null
+     */
+    public function getDoofinderBannerData()
+    {
+        if ($this->lastResults) {
+            return $this->lastResults->getProperty('banner');
+        }
+
+        return null;
+    }
 }
