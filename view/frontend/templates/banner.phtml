@@ -1,0 +1,28 @@
+<?php
+/**
+ * @var \Doofinder\Feed\Block\Banner $block
+ */
+
+// @codingStandardsIgnoreFile
+
+$banner = $block->getBanner();
+if ($banner) : ?>
+<div class="search-result-banner">
+    <a href="<?php /* @escapeNotVerified */ echo $banner['link']; ?>"
+        <?php /* @escapeNotVerified */ echo $banner['blank'] ? 'target="_blank"' : ''; ?>
+        data-banner-id="<?php /* @escapeNotVerified */ echo $banner['id']; ?>">
+            <img src="<?php /* @escapeNotVerified */ echo $banner['image']; ?>">
+    </a>
+</div>
+<script type="text/x-magento-init">
+    {
+        ".search-result-banner": {
+            "banner": {
+                "ajaxUrl": "<?php /* @escapeNotVerified */ echo $block->getAjaxUrl(); ?>",
+                "bannerInsertionPoint": "<?php /* @escapeNotVerified */ echo $banner['insertion_point']; ?>",
+                "bannerInsertionMethod": "<?php /* @escapeNotVerified */ echo $banner['insertion_method']; ?>"
+            }
+        }
+    }
+</script>
+<?php endif;

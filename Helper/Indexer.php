@@ -129,4 +129,15 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
         $indexer = $this->indexerRegistry->get(\Magento\CatalogSearch\Model\Indexer\Fulltext::INDEXER_ID);
         $indexer->invalidate();
     }
+
+    /**
+     * Checks if index is run by schedule
+     *
+     * @return boolean
+     */
+    public function isScheduled()
+    {
+        $indexer = $this->indexerRegistry->get(\Magento\CatalogSearch\Model\Indexer\Fulltext::INDEXER_ID);
+        return $indexer->isScheduled();
+    }
 }

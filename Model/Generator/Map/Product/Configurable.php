@@ -75,6 +75,17 @@ class Configurable extends Product
      */
     public function get($field)
     {
+        // Don't merge prices
+        switch ($field) {
+            case 'df_regular_price':
+            case 'df_sale_price':
+            case 'price':
+            case 'special_price':
+            case 'tier_price':
+            case 'minimal_price':
+                return parent::get($field);
+        }
+
         // Only merge associated items values if option is enabled
         if ($this->grouped) {
             switch ($field) {

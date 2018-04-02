@@ -83,7 +83,7 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
     public function query(\Magento\Framework\Search\RequestInterface $request)
     {
     // @codingStandardsIgnoreEnd
-        if ($request->getName() != 'quicksearch_container') {
+        if (preg_match('/quick_?search_container/', $request->getName()) !== 1) {
             // @codingStandardsIgnoreStart
             return $this->adapter->query($request);
             // @codingStandardsIgnoreEnd

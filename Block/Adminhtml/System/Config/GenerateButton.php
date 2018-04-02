@@ -53,11 +53,30 @@ class GenerateButton extends \Magento\Config\Block\System\Config\Form\Field
             [
                 'button_label' => __($buttonLabel),
                 'html_id' => $element->getHtmlId(),
-                'ajax_url' => $this->_urlBuilder->getUrl(self::GENERATE_URL),
+                'ajax_url' => $this->_urlBuilder->getUrl(self::GENERATE_URL, $this->getScope()),
             ]
         );
 
         return $this->_toHtml();
+    }
+
+    /**
+     * Retrieve scope
+     *
+     * @return array
+     */
+    private function getScope()
+    {
+        if ($websiteId = $this->_request->getParam('website')) {
+            return [
+                'website' => $websiteId,
+            ];
+        } elseif ($storeId = $this->_request->getParam('store')) {
+            return [
+                'store' => $storeId,
+            ];
+        }
+        return [];
     }
 
     /**

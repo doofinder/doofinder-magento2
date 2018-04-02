@@ -9,6 +9,7 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
+                <item name="test" xsi:type="object">Doofinder\Feed\Console\Command\GenerateCommand</item>
                 <item name="run_process_command" xsi:type="object">Doofinder\Feed\Console\Command\RunProcessCommand</item>
                 <item name="reschedule_process_command" xsi:type="object">Doofinder\Feed\Console\Command\RescheduleProcessCommand</item>
             </argument>

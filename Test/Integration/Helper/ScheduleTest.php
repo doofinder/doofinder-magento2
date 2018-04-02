@@ -93,7 +93,6 @@ class ScheduleTest extends AbstractIntegrity
                     'availability' => 'df_availability',
                     'categories' => 'category_ids',
                 ],
-                'atomic_updates_enabled' => false,
                 'categories_in_navigation' => '0',
                 'password' => null,
             ],
