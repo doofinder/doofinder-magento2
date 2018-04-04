@@ -63,19 +63,27 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     private $serializer;
 
     /**
+     * @var \Doofinder\Feed\Model\StoreWebsiteRelation
+     */
+    private $storeWebsiteRelation;
+
+    /**
      * StoreConfig constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Doofinder\Feed\Helper\Serializer $serializer
+     * @param \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Doofinder\Feed\Helper\Serializer $serializer
+        \Doofinder\Feed\Helper\Serializer $serializer,
+        \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation
     ) {
         $this->storeManager = $storeManager;
         $this->serializer = $serializer;
+        $this->storeWebsiteRelation = $storeWebsiteRelation;
         parent::__construct($context);
     }
 
@@ -157,7 +165,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         $storeCodes = [];
         $stores = [];
         if ($websiteId = $this->_request->getParam('website')) {
-            $storeIds = $this->storeManager->getStoreByWebsiteId($websiteId);
+            $storeIds = $this->storeWebsiteRelation->getStoreByWebsiteId($websiteId);
             foreach ($storeIds as $storeId) {
                 $stores[] = $this->storeManager->getStore($storeId);
             }
