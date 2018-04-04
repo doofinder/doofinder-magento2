@@ -35,6 +35,11 @@ class StoreConfigTest extends BaseTestCase
     private $request;
 
     /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    private $storeWebsiteRelation;
+
+    /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
     private $helper;
@@ -88,12 +93,21 @@ class StoreConfigTest extends BaseTestCase
             false
         );
 
+        $this->storeWebsiteRelation = $this->getMock(
+            \Doofinder\Feed\Model\StoreWebsiteRelation::class,
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->helper = $this->objectManager->getObject(
             \Doofinder\Feed\Helper\StoreConfig::class,
             [
                 'scopeConfig'  => $this->scopeConfig,
                 'storeManager'    => $this->storeManager,
                 'logger'        => $this->logger,
+                'storeWebsiteRelation' => $this->storeWebsiteRelation,
                 '_request'   => $this->request,
             ]
         );
@@ -218,9 +232,9 @@ class StoreConfigTest extends BaseTestCase
         $storeTwo->method('isActive')->willReturn(true);
 
         $this->request->expects($this->at(1))->method('getParam')->with('website')->willReturn(1);
-        $this->storeManager->method('getStoreByWebsiteId')->with(1)->willReturn([1, 2]);
-        $this->storeManager->expects($this->at(1))->method('getStore')->with(1)->willReturn($storeOne);
-        $this->storeManager->expects($this->at(2))->method('getStore')->with(2)->willReturn($storeTwo);
+        $this->storeWebsiteRelation->method('getStoreByWebsiteId')->with(1)->willReturn([1, 2]);
+        $this->storeManager->expects($this->at(0))->method('getStore')->with(1)->willReturn($storeOne);
+        $this->storeManager->expects($this->at(1))->method('getStore')->with(2)->willReturn($storeTwo);
 
         $this->assertEquals($expected, $this->helper->getStoreCodes());
     }
