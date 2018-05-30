@@ -3,8 +3,8 @@ module.exports = (grunt) ->
     version:
       project:
         options:
-          prefix: '\"doofinder-magento2\",\\s+\"version\":\\s+\"'
-        src: ["package.json", "package-lock.json"]
+          prefix: 'doofinder-magento2\",\\s+\"version\":\\s+\"'
+        src: ["package.json", "package-lock.json", "composer.json"]
       module:
         options:
           prefix: 'name=\"Doofinder_Feed\"\\s+setup_version=\"'
