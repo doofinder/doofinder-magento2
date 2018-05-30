@@ -117,7 +117,7 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
         $this->search->performDoofinderSearch($queryText);
 
         // Fetch all results
-        $results = $this->search->getAllResults();
+        $results = array_unique($this->search->getAllResults()); // fix: prevent more than one same id
         $score = count($results);
 
         $documents = [];
