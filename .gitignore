@@ -6,3 +6,6 @@
 
 # Docker files
 /.env
+
+# Dev files
+/node_modules
