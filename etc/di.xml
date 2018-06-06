@@ -33,6 +33,10 @@
         </arguments>
     </type>
 
+    <type name="Magento\Indexer\Model\Indexer">
+        <plugin name="doofinderAfterReindex"
+                type="Doofinder\Feed\Plugin\Indexer\Model\Indexer" />
+    </type>
     <type name="Magento\Search\Model\AdapterFactory">
         <arguments>
             <argument name="adapters" xsi:type="array">

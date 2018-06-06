@@ -23,17 +23,25 @@ class Engine
     private $search;
 
     /**
+     * @var \Magento\Framework\Message\ManagerInterface
+     */
+    private $messageManager;
+
+    /**
      * Constructor
      *
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      * @param \Doofinder\Feed\Helper\Search $search
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
      */
     public function __construct(
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Helper\Search $search
+        \Doofinder\Feed\Helper\Search $search,
+        \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->storeConfig = $storeConfig;
         $this->search = $search;
+        $this->messageManager = $messageManager;
     }
 
     /**
@@ -79,5 +87,24 @@ class Engine
         }
 
         return $value;
+    }
+
+    /**
+     * If doofinder engine was enabled add message about change the index mode.
+     * @param \Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine $engine
+     * @param mixed $result
+     * @return mixed
+     */
+    public function afterSave(
+        \Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine $engine,
+        $result
+    ) {
+        $storeConfig = $this->storeConfig;
+        if ($engine->getValue() === $storeConfig::DOOFINDER_SEARCH_ENGINE_NAME) {
+            $this->messageManager->addNoticeMessage(
+                __('The catalog\'s index mode will change to Update On Save after Doofinder search indices are ready.')
+            );
+        }
+        return $result;
     }
 }

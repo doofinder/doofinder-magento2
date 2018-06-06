@@ -56,7 +56,12 @@ class InternalSearchEnabled extends \Magento\Config\Block\System\Config\Form\Fie
                 '_fragment' => self::SEARCH_ENGINE_FRAGMENT
             ]);
             $link = '<a href="' . $url . '">' . __('here') . '</a>';
-            $element->setComment(__('You can enable it %1 by choosing Doofinder in Search Engine field.', $link));
+            $element->setComment(__(
+                'You can enable it %1 by choosing Doofinder in Search Engine field. '
+                . 'Enabling internal search requires catalog\'s Update On Save index mode. '
+                . 'Index mode will be automatically changed.',
+                $link
+            ));
         }
 
         return parent::_getElementHtml($element);
