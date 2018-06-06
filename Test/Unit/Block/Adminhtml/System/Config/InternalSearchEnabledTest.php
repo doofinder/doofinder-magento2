@@ -123,7 +123,7 @@ class InternalSearchEnabledTest extends BaseTestCase
         $this->element->expects($this->once())->method('setComment')->with(__(
             'You can enable it %1 by choosing Doofinder in Search Engine field. '
             . 'Enabling internal search requires catalog\'s Update On Save index mode. '
-            . 'Index mode will be automatically changed',
+            . 'Index mode will be automatically changed.',
             '<a href="http://example.com/link">here</a>'
         ));
 
