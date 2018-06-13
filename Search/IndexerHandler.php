@@ -175,10 +175,25 @@ class IndexerHandler implements IndexerInterface
      */
     private function dropDocuments(array $documents, array $dimensions)
     {
-        if (!empty($documents)) {
+        $ids = $this->getDocumentsToDrop($documents);
+        if (!empty($ids)) {
             $storeId = $this->searchHelper->getStoreIdFromDimensions($dimensions);
-            $this->processor->delete($storeId, array_keys($documents));
+            $this->processor->delete($storeId, array_values($ids));
         }
+    }
+
+    /**
+     * @param array $documents
+     * @return array
+     */
+    private function getDocumentsToDrop(array $documents)
+    {
+        $products = $this->getProducts(array_values($documents));
+        $ids = [];
+        foreach ($products as $product) {
+            $ids[] = $product->getId();
+        }
+        return array_diff($documents, $ids);
     }
 
     /**
