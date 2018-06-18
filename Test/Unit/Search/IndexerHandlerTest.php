@@ -256,6 +256,8 @@ class IndexerHandlerTest extends BaseTestCase
      */
     public function testDeleteIndex()
     {
+        $this->documents = new \ArrayObject([1234]); // @codingStandardsIgnoreLine
+
         $batch = $this->documents->getArrayCopy();
         $this->batch->expects($this->at(0))->method('getItems')
             ->with($this->documents, 100)->willReturn([$batch]);
