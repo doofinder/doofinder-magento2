@@ -52,6 +52,11 @@ class IndexerHandlerTest extends BaseTestCase
     private $productRepository;
 
     /**
+     * @var \Magento\Catalog\Model\Product\Visibility
+     */
+    private $productVisibility;
+
+    /**
      * @var \Magento\Framework\Api\SearchCriteriaInterface
      */
     private $searchCriteria;
@@ -128,8 +133,20 @@ class IndexerHandlerTest extends BaseTestCase
             '',
             false
         );
+
         $this->productRepository->method('getList')
             ->willReturn($this->productSearchResults);
+
+        $this->productVisibility = $this->getMock(
+            \Magento\Catalog\Model\Product\Visibility::class,
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->productVisibility->method('getVisibleInSearchIds')
+            ->willReturn(['3, 4']);
 
         $this->searchCriteria = $this->getMock(
             \Magento\Framework\Api\SearchCriteriaInterface::class,
@@ -215,6 +232,7 @@ class IndexerHandlerTest extends BaseTestCase
             [
                 'batch' => $this->batch,
                 'productRepository' => $this->productRepository,
+                'productVisibility' => $this->productVisibility,
                 'searchCriteriaBuilder' => $this->searchCriteriaBuilder,
                 'searchHelper' => $this->searchHelper,
                 'indexStructure' => $this->indexStructure,
