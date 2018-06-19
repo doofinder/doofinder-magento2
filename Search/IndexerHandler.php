@@ -33,6 +33,11 @@ class IndexerHandler implements IndexerInterface
     private $productRepository;
 
     /**
+     * @var \Magento\Catalog\Model\Product\Visibility
+     */
+    private $productVisibility;
+
+    /**
      * @var \Magento\Framework\Api\SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
@@ -57,12 +62,14 @@ class IndexerHandler implements IndexerInterface
      * @param \Magento\Framework\Indexer\IndexStructureInterface $indexStructure
      * @param \Magento\Framework\Indexer\SaveHandler\Batch $batch
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Magento\Catalog\Model\Product\Visibility $productVisibility
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \Doofinder\Feed\Helper\Search $searchHelper
      * @param Processor $processor
      * @param array $data
      * @param integer $batchSize
      * @SuppressWarnings(PHPMD.LongVariable)
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      * @codingStandardsIgnoreStart
      * Ignore MEQP2.Classes.ConstructorOperations.CustomOperationsFound
      */
@@ -71,6 +78,7 @@ class IndexerHandler implements IndexerInterface
         \Magento\Framework\Indexer\IndexStructureInterface $indexStructure,
         \Magento\Framework\Indexer\SaveHandler\Batch $batch,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Catalog\Model\Product\Visibility $productVisibility,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Doofinder\Feed\Helper\Search $searchHelper,
         Processor $processor,
@@ -85,6 +93,7 @@ class IndexerHandler implements IndexerInterface
         $this->indexStructure = $indexStructure;
         $this->batch = $batch;
         $this->productRepository = $productRepository;
+        $this->productVisibility = $productVisibility;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->searchHelper = $searchHelper;
         $this->processor = $processor;
@@ -183,6 +192,7 @@ class IndexerHandler implements IndexerInterface
     }
 
     /**
+     * Retrieve products that should be removed from API
      * @param array $documents
      * @return array
      */
@@ -191,7 +201,9 @@ class IndexerHandler implements IndexerInterface
         $products = $this->getProducts(array_values($documents));
         $ids = [];
         foreach ($products as $product) {
-            $ids[] = $product->getId();
+            if (in_array($product->getVisibility(), $this->productVisibility->getVisibleInSearchIds())) {
+                $ids[] = $product->getId(); // products that are visible in search
+            }
         }
         return array_diff($documents, $ids);
     }
