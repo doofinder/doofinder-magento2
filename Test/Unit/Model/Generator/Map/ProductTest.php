@@ -154,7 +154,7 @@ class ProductTest extends BaseTestCase
     {
         $this->assertEquals('Sample title', $this->model->get('title'));
         $this->assertEquals('Sample description', $this->model->get('description'));
-        $this->assertEquals('Category 1>Category 1.1%%Category 2', $this->model->get('category_ids'));
+        $this->assertEquals(['Category 1>Category 1.1', 'Category 2'], $this->model->get('category_ids'));
         $this->assertEquals('http://example.com/path/to/image.jpg', $this->model->get('image'));
         $this->assertEquals('http://example.com/simple-product.html', $this->model->get('url_key'));
         $this->assertEquals('10.1234', $this->model->get('price'));
