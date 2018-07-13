@@ -155,15 +155,17 @@ class Product extends Map
          * Return array with stringified category tree
          * example: ['Category 1>Category 1.1', 'Category 2 > Category 2.1']
          */
-        return array_values(
-            array_map(function ($categories) {
-                return implode(
-                    \Doofinder\Feed\Model\Generator::CATEGORY_TREE_SEPARATOR,
-                    array_map(function ($category) {
-                        return $category->getName();
-                    }, $categories)
-                );
-            }, $tree)
+        return array_filter(
+            array_values(
+                array_map(function ($categories) {
+                    return implode(
+                        \Doofinder\Feed\Model\Generator::CATEGORY_TREE_SEPARATOR,
+                        array_map(function ($category) {
+                            return $category->getName();
+                        }, $categories)
+                    );
+                }, $tree)
+            )
         );
     }
 
