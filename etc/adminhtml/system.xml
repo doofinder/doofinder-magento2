@@ -280,14 +280,15 @@
                     <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
                 </field>
                 <field id="additional_attributes"
-                    translate="label"
+                    translate="label comment"
                     sortOrder="12"
                     showInDefault="1"
                     showInWebsite="1"
                     showInStore="1">
                     <label>Additional Attributes</label>
                     <frontend_model>Doofinder\Feed\Block\Adminhtml\Map\Additional</frontend_model>
-                    <backend_model>Doofinder\Feed\Model\Config\Backend\ArraySerialized</backend_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\AdditionalAttributes</backend_model>
+                    <comment>Field names must be in lowercase and contain no whitespaces.</comment>
                 </field>
             </group>
             <group id="feed_settings"
