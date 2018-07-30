@@ -71,7 +71,7 @@ class IndexTest extends \Magento\TestFramework\TestCase\AbstractController
                 'price' => 10,
                 'mpn' => 'product-1',
                 'availability' => 'in stock',
-                'categories' => 'Category 3>Category 4>Category 5',
+                'categories' => 'Category 5',
             ],
             [
                 'id' => 3,
@@ -81,7 +81,7 @@ class IndexTest extends \Magento\TestFramework\TestCase\AbstractController
                 'price' => 10,
                 'mpn' => 'product-3',
                 'availability' => 'in stock',
-                'categories' => 'Category 3>Category 4>Category 5',
+                'categories' => 'Category 5',
             ],
             [
                 'id' => 6,
@@ -91,7 +91,7 @@ class IndexTest extends \Magento\TestFramework\TestCase\AbstractController
                 'price' => 10,
                 'mpn' => 'product-6',
                 'availability' => 'out of stock',
-                'categories' => 'Category 3>Category 4>Category 5',
+                'categories' => 'Category 5',
             ],
             [
                 'id' => 7,
@@ -101,7 +101,7 @@ class IndexTest extends \Magento\TestFramework\TestCase\AbstractController
                 'price' => 10,
                 'mpn' => 'product-7',
                 'availability' => 'in stock',
-                'categories' => 'Category 3>Category 4',
+                'categories' => 'Category 4',
             ],
             [
                'id' => 8,
