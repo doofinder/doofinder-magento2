@@ -94,31 +94,23 @@ class ProductTest extends AbstractIntegrity
     {
         $product = $this->productRepository->get('simple');
 
+        $categoriesTree = $this->helper->getProductCategoriesWithParents($product);
+
+        $tree = [];
+        foreach ($categoriesTree as $key => $categoryTree) {
+            $ids = [];
+            foreach ($categoryTree as $category) {
+                $ids[] = $category->getId();
+            }
+            $tree[$key] = implode('/', $ids);
+        }
+
         $this->assertEquals(
             [
-                3 => [
-                    3 => '1/2/3',
-                ],
-                4 => [
-                    3 => '1/2/3',
-                    4 => '1/2/3/4',
-                ],
-                13 => [
-                    3 => '1/2/3',
-                    13 => '1/2/3/13',
-                ],
+                0 => '3/4',
+                1 => '3/13'
             ],
-            array_map(
-                function ($element) {
-                    return array_map(
-                        function ($category) {
-                            return $category->getPath();
-                        },
-                        $element
-                    );
-                },
-                $this->helper->getProductCategoriesWithParents($product)
-            )
+            $tree
         );
     }
 
@@ -131,30 +123,26 @@ class ProductTest extends AbstractIntegrity
     public function testGetProductCategoriesWithParentsNavigation()
     {
         $product = $this->productRepository->get('simple');
-        $category = $this->categoryRepository->get(3);
+        $category = $this->categoryRepository->get(13);
         $category->setIncludeInMenu(0);
         $category->save();
 
+        $categoriesTree = $this->helper->getProductCategoriesWithParents($product, true);
+
+        $tree = [];
+        foreach ($categoriesTree as $key => $categoryTree) {
+            $ids = [];
+            foreach ($categoryTree as $category) {
+                $ids[] = $category->getId();
+            }
+            $tree[$key] = implode('/', $ids);
+        }
+
         $this->assertEquals(
             [
-                4 => [
-                    4 => '1/2/3/4',
-                ],
-                13 => [
-                    13 => '1/2/3/13',
-                ],
+                0 => '3/4'
             ],
-            array_map(
-                function ($element) {
-                    return array_map(
-                        function ($category) {
-                            return $category->getPath();
-                        },
-                        $element
-                    );
-                },
-                $this->helper->getProductCategoriesWithParents($product, true)
-            )
+            $tree
         );
     }
 

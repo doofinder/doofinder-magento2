@@ -30,12 +30,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     private $stockRegistry;
 
     /**
-     * Static cache for category tree
-     * @var \Magento\Catalog\Model\Category[][]
-     */
-    private $categoryTree;
-
-    /**
      * @var \Magento\Tax\Model\Config
      */
     private $taxConfig;
@@ -62,7 +56,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $this->imageHelper = $imageHelper;
         $this->storeManager = $storeManager;
         $this->stockRegistry = $stockRegistry;
-        $this->categoryTree = [];
         $this->taxConfig = $taxConfig;
         parent::__construct($context);
     }
@@ -93,17 +86,23 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get categories
      *
      * @param int[] $ids
+     * @param boolean $fromNavigation
      * @return \Magento\Catalog\Model\Category[]
      */
-    private function getCategories(array $ids)
+    private function getCategories(array $ids, $fromNavigation = false)
     {
         $categoryCollection = $this->categoryColFactory->create();
         $categoryCollection
             ->addIdFilter($ids)
             ->addAttributeToSelect('name')
             ->addAttributeToSelect('include_in_menu')
-            ->addFieldToFilter('is_active', 1)
+            ->addAttributeToSelect('path')
+            ->addAttributeToFilter('is_active', 1)
             ->addFieldToFilter('level', ['gt' => 1]);
+
+        if ($fromNavigation) {
+            $categoryCollection->addFieldToFilter('include_in_menu', $fromNavigation);
+        }
 
         return $categoryCollection->getItems();
     }
@@ -112,64 +111,101 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get category tree
      *
      * @param \Magento\Catalog\Model\Category[] $categories
-     * @param boolean $fromNavigation Exclude categories not in menu.
-     * @return \Magento\Catalog\Model\Category[][]
+     * @param int[] $productCategoryIds
+     * @param boolean $fromNavigation
+     * @return \Magento\Catalog\Model\Category[]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function getCategoryTree(array $categories, $fromNavigation)
+    private function getCategoryTree(array $categories, array $productCategoryIds, $fromNavigation = false)
     {
-        // Store all requested category ids
-        $categoryIds = array_map(function ($category) {
-            return $category->getId();
-        }, $categories);
-
-        // Exclude previously processed categories
-        $categories = array_diff_key($categories, $this->categoryTree);
-
-        // Grab ids of all parent categories of all product categories
-        $parentIds = [];
-        array_walk($categories, function ($category) use (&$parentIds) {
-            $parentIds = array_merge($parentIds, $category->getParentIds());
-        });
-        $parentIds = array_unique($parentIds);
-
-        // Combine product categories with its parents for simplicity
-        $parents = $categories + $this->getCategories($parentIds);
-
-        // Now build tree of categories with its parents
+        // Store all category paths
+        $catTree = [];
         foreach ($categories as $category) {
-            $categoryId = $parentId = $category->getId();
+            $catTree[] = $category->getPath();
+        }
 
-            while ($parentId) {
-                // Ignore category if one of parents is missing
-                // this means that parent is not active
-                if (!isset($parents[$parentId])) {
-                    $this->categoryTree[$categoryId] = [];
+        $catTree = $this->filterCategories($catTree, $fromNavigation);
+
+        // Find same trees and store the deepest one
+        $toRemove = [];
+        foreach ($catTree as $item) {
+            foreach ($catTree as $cat) {
+                // Check if current path is a part of another path
+                // if it is, mark path to remove from tree
+                if (strstr($cat, $item . '/') !== false) {
+                    $toRemove[$item] = true;
                     break;
                 }
-
-                // Do not process categories not in menu if $fromNavigation is set
-                if ($fromNavigation && !$parents[$parentId]->getIncludeInMenu()) {
-                    break;
-                }
-
-                $this->categoryTree[$categoryId][$parentId] = $parents[$parentId];
-
-                // Stop processing on 2nd level
-                if ($parents[$parentId]->getLevel() <= 2) {
-                    break;
-                }
-
-                $parentId = $parents[$parentId]->getParentId();
-            }
-
-            // Now reverse the order to make parents before children
-            if (!empty($this->categoryTree[$categoryId])) {
-                $this->categoryTree[$categoryId] = array_reverse($this->categoryTree[$categoryId], true);
             }
         }
 
-        // Return tree
-        return array_intersect_key($this->categoryTree, array_flip($categoryIds));
+        // Get only needed category to build a tree
+        $result = [];
+        foreach ($categories as $category) {
+            if (!isset($toRemove[$category->getPath()])
+                && in_array($category->getPath(), $catTree)
+            ) {
+                $result[] = $category;
+            }
+        }
+
+        // Build the tree
+        $tree = [];
+        foreach ($result as $category) {
+            $ids = explode('/', $category->getPath());
+            foreach ($ids as $key => $id) {
+                if (!in_array($id, $productCategoryIds)) {
+                    unset($ids[$key]);
+                }
+            }
+
+            $tree[] = array_values(
+                $this->getCategories(
+                    $ids,
+                    $fromNavigation
+                )
+            );
+        }
+
+        return array_filter($tree);
+    }
+
+    /**
+     * Remove inactive or excluded from navigation trees
+     * @param array $catTree
+     * @param boolean $fromNavigation
+     * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function filterCategories(array $catTree, $fromNavigation = false)
+    {
+        foreach ($catTree as $key => $item) {
+            $tree = explode('/', $item);
+
+            $activeTree = [];
+
+            $categoryCollection = $this->categoryColFactory->create();
+            $categoryCollection->addIdFilter($tree)
+                ->addFieldToSelect('is_active')
+                ->addFieldToSelect('include_in_menu')
+                ->addFieldToFilter('level', ['gteq' => 1])
+                ->addAttributeToSort('path');
+
+            // check all categories in tree
+            foreach ($categoryCollection->getItems() as $category) {
+                /** @var \Magento\Catalog\Model\Category $category */
+                if (!$category->getIsActive()) {
+                    break;
+                }
+                if ($fromNavigation && !$category->getIncludeInMenu()) {
+                    break;
+                }
+                $activeTree[] = $category->getId();
+            }
+            array_unshift($activeTree, 1); // add id 1 as the main root category
+            $catTree[$key] = implode('/', $activeTree);
+        }
+        return $catTree;
     }
 
     /**
@@ -177,14 +213,15 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param boolean $fromNavigation Exclude categories not in menu.
-     * @return \Magento\Catalog\Model\Category[][]
+     * @return \Magento\Catalog\Model\Category[]
      */
     public function getProductCategoriesWithParents(
         \Magento\Catalog\Model\Product $product,
         $fromNavigation = false
     ) {
-        $categories = $this->getCategories($product->getCategoryIds());
-        return $this->getCategoryTree($categories, $fromNavigation);
+        $productCategoryIds = $product->getCategoryIds();
+        $categories = $this->getCategories($productCategoryIds);
+        return $this->getCategoryTree($categories, $productCategoryIds, $fromNavigation);
     }
 
     /**

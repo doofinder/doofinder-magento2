@@ -133,4 +133,9 @@
             <argument name="schedule" xsi:type="object">Doofinder\Feed\Helper\Schedule\Proxy</argument>
         </arguments>
     </type>
+
+    <type name="Doofinder\Feed\Model\Generator\Component\Processor\Xml">
+        <plugin name="doofinderProcessorXmlPlugin"
+                type="Doofinder\Feed\Model\Generator\Component\Processor\Plugin\XmlPlugin" />
+    </type>
 </config>

@@ -145,26 +145,27 @@ class Product extends Map
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param boolean $categoriesInNav Export only categories in navigation.
-     * @return string
+     * @return array
      */
     public function getProductCategories(\Magento\Catalog\Model\Product $product, $categoriesInNav)
     {
         $tree = $this->helper->getProductCategoriesWithParents($product, $categoriesInNav);
 
         /**
-         * Stringifies tree by imploding a set of imploded categories and their parents
-         * example: Category 1 > Category 1.1 % Category 2 > Category 2.1 > Category 2.1.1
+         * Return array with stringified category tree
+         * example: ['Category 1>Category 1.1', 'Category 2 > Category 2.1']
          */
-        return implode(
-            \Doofinder\Feed\Model\Generator::CATEGORY_SEPARATOR,
-            array_map(function ($categories) {
-                return implode(
-                    \Doofinder\Feed\Model\Generator::CATEGORY_TREE_SEPARATOR,
-                    array_map(function ($category) {
-                        return $category->getName();
-                    }, $categories)
-                );
-            }, $tree)
+        return array_filter(
+            array_values(
+                array_map(function ($categories) {
+                    return implode(
+                        \Doofinder\Feed\Model\Generator::CATEGORY_TREE_SEPARATOR,
+                        array_map(function ($category) {
+                            return $category->getName();
+                        }, $categories)
+                    );
+                }, $tree)
+            )
         );
     }
 
