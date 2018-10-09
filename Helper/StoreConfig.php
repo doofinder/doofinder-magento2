@@ -151,14 +151,27 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get current store code based on request parameter or store manager
+     * @return string
+     */
+    public function getCurrentStoreCode()
+    {
+        if ($storeId = $this->_request->getParam('store')) {
+            return $this->storeManager->getStore($storeId)->getCode();
+        }
+        return $this->storeManager->getStore()->getCode();
+    }
+
+    /**
      * Get active/all store codes
      *
      * @param boolean $onlyActive
+     * @param boolean $all
      * @return string[]
      */
-    public function getStoreCodes($onlyActive = true)
+    public function getStoreCodes($onlyActive = true, $all = false)
     {
-        if ($storeId = $this->_request->getParam('store')) {
+        if (!$all && $storeId = $this->_request->getParam('store')) {
             return [$this->storeManager->getStore($storeId)->getCode()];
         }
 
