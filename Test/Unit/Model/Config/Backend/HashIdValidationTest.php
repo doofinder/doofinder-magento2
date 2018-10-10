@@ -45,7 +45,7 @@ class HashIdValidationTest extends BaseTestCase
             '',
             false
         );
-        $this->storeConfig->method('getStoreCode')->willReturn('current');
+        $this->storeConfig->method('getCurrentStoreCode')->willReturn('current');
         $this->storeConfig->method('getStoreCodes')->willReturn(['sample1', 'current', 'sample2']);
         $this->storeConfig->method('getHashId')->will($this->returnValueMap([
             ['current', 'sample_current_hash_id'],
