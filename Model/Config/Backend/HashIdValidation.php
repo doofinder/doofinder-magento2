@@ -76,9 +76,9 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
      */
     private function validateUnique($hashId)
     {
-        $currentStoreCode = $this->storeConfig->getStoreCode();
-
-        foreach ($this->storeConfig->getStoreCodes(false) as $storeCode) {
+        $currentStoreCode = $this->storeConfig->getCurrentStoreCode();
+        $storeCodes = $this->storeConfig->getStoreCodes(false, true);
+        foreach ($storeCodes as $storeCode) {
             // Do not check current store
             if ($currentStoreCode == $storeCode) {
                 continue;

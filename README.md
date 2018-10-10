@@ -4,7 +4,26 @@
 
 ## Docker Environment
 
-First of all copy `.env.example` to `.env` and modify it to add your keys for `repo.magento.com` to it (Composer).
+To use the docker environment clone this repo inside a folder structure like this:
+
+```
+some_directory <- Name is not important
+  |- packages
+     |- doofinder
+        |- doofinder-magento2 <- This repo
+```
+
+And copy this repo's `docker-compose.yml` file to the root of the base directory (`some_directory` in the example) so you'll have:
+
+```
+some_directory <- Name is not important
+  |- packages
+  |  |- doofinder
+  |     |- doofinder-magento2 <- This repo
+  |- docker-compose.yml
+```
+
+Edit the copy of `docker-compose.yml` and set your tokens in the `COMPOSER_AUTH` environment variable.
 
 Then run the environment by executing:
 
@@ -12,9 +31,11 @@ Then run the environment by executing:
 $ docker-compose up
 ```
 
-Magento 2 with the module installed will be running at `http://localhost:8080`.
+from the base directory where the copy of `docker-compose.yml` is located.
 
-The admin panel will be available at `http://localhost:8080/admin`. Admin credentials are easy:
+Magento 2 with the module installed will be running at `http://localhost:80`.
+
+The admin panel will be available at `http://localhost:80/admin`. Admin credentials are easy:
 
 ```
 User: admin

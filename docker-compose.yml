@@ -1,24 +1,25 @@
 version: '2'
 
 services:
-  app:
-    image: magently/magento2:${MAGENTO_VERSION}
-    links:
-      - db
-    ports:
-      - ${EXTERNAL_HTTP_PORT}80
-    environment:
-      - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=secret
-      - MYSQL_DATABASE=db
-    volumes:
-      - ./:/app/packages/doofinder/doofinder-magento2
-    env_file: .env
-
   # MySQL container
   db:
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: db
+
+  # App container
+  app:
+    image: magently/magento2:latest
+    links:
+      - db
+    ports:
+      - 80:80
+    volumes:
+      - ./packages/:/app/packages/
+    environment:
+      - COMPOSER_AUTH={"http-basic":{"repo.magento.com":{"username":"","password":""}}}
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=secret
+      - MYSQL_DATABASE=db
