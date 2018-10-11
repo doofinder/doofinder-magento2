@@ -4,6 +4,8 @@
     <media>
         <images module="Magento_Catalog">
             <image id="doofinder_image" type="image" />
+            <image id="doofinder_small_image" type="small_image" />
+            <image id="doofinder_thumbnail" type="thumbnail" />
         </images>
     </media>
 </view>
