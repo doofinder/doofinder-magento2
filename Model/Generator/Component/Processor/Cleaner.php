@@ -124,7 +124,7 @@ class Cleaner extends Component implements ProcessorInterface
     private function decodeHtmlEntities($field)
     {
         // @codingStandardsIgnoreStart
-        return html_entity_decode($field, null, 'UTF-8');
+        return html_entity_decode($field, ENT_QUOTES, 'UTF-8');
         // @codingStandardsIgnoreEnd
     }
 
