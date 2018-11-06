@@ -229,14 +229,14 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $size
-     * @param string $type
+     * @param string $field
      * @return string|null
      */
-    public function getProductImageUrl(\Magento\Catalog\Model\Product $product, $size = null, $type = 'doofinder_image')
+    public function getProductImageUrl(\Magento\Catalog\Model\Product $product, $size = null, $field = 'image')
     {
-        if ($product->hasImage()) {
+        if ($product->hasData($field)) {
             return $this->imageHelper
-                ->init($product, $type)
+                ->init($product, 'doofinder_' . $field)
                 ->resize($size)
                 ->getUrl();
         }
