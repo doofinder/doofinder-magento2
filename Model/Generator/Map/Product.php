@@ -86,7 +86,7 @@ class Product extends Map
             case 'image':
             case 'small_image':
             case 'thumbnail':
-                return $this->getProductImage($this->context, $this->getImageSize(), 'doofinder_' . $field);
+                return $this->getProductImage($this->context, $this->getImageSize(), $field);
 
             case 'df_regular_price':
                 return $this->getProductPrice($this->context, 'regular_price');
@@ -176,12 +176,12 @@ class Product extends Map
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $size
-     * @param string $type
+     * @param string $field
      * @return string|null
      */
-    public function getProductImage(\Magento\Catalog\Model\Product $product, $size, $type)
+    public function getProductImage(\Magento\Catalog\Model\Product $product, $size, $field)
     {
-        return $this->helper->getProductImageUrl($product, $size, $type);
+        return $this->helper->getProductImageUrl($product, $size, $field);
     }
 
     /**
