@@ -6,6 +6,8 @@
 /\.stylelintrc        export-ignore
 /\.travis\.yml        export-ignore
 /docker-compose\.yml  export-ignore
-/package\.json        export-ignore
-/package-lock\.json   export-ignore
 /Gruntfile\.coffee    export-ignore
+/Manual\.pages        export-ignore
+/Manual\.pdf          export-ignore
+/package-lock\.json   export-ignore
+/package\.json        export-ignore
