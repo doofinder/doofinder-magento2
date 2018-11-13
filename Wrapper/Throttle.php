@@ -79,6 +79,10 @@ class Throttle
             $this->wait(1);
         } catch (\Doofinder\Api\Management\Errors\IndexingInProgress $e) {
             $this->wait(3);
+        } catch (\Doofinder\Api\Management\Errors\NotFound $e) {
+            if (strpos($e->getMessage(), 'product') !== false) {
+                return true;
+            }
         }
 
         return $this->throttle($name, $args, $counter + 1);
