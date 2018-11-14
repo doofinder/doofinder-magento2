@@ -64,6 +64,7 @@ class Throttle
      * @return mixed
      * @throws \Doofinder\Api\Management\Errors\ThrottledResponse Response throttled.
      * @throws \Doofinder\Api\Management\Errors\IndexingInProgress Indexing in progress.
+     * @throws \Doofinder\Api\management\Errors\NotFound Not found.
      */
     private function throttle($name, $args, $counter = 1)
     {
@@ -80,9 +81,10 @@ class Throttle
         } catch (\Doofinder\Api\Management\Errors\IndexingInProgress $e) {
             $this->wait(3);
         } catch (\Doofinder\Api\Management\Errors\NotFound $e) {
-            if (strpos($e->getMessage(), 'product') !== false) {
+            if ($name == 'deleteType') {
                 return true;
             }
+            throw $e;
         }
 
         return $this->throttle($name, $args, $counter + 1);
