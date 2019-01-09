@@ -40,7 +40,7 @@ class Integration extends \Magento\Framework\View\Element\AbstractBlock
          * NOTICE This works but could be done better
          */
         $script .= '<script type="text/javascript">';
-        $script .= 'document.getElementById(\'search\').removeAttribute(\'data-mage-init\');';
+        $script .= '(function(el){ el && el.removeAttribute(\'data-mage-init\'); })(document.getElementById(\'search\'));';
         $script .= '</script>';
 
         return $script;
