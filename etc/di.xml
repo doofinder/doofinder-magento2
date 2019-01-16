@@ -58,6 +58,13 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Search\Model\EngineResolver">
+        <arguments>
+            <argument name="engines" xsi:type="array">
+                <item name="doofinder" xsi:type="string">doofinder</item>
+            </argument>
+        </arguments>
+    </type>
     <virtualType name="Doofinder\Feed\Search\BaseIndexerHandlerFactory" type="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
         <arguments>
             <argument name="handlers" xsi:type="array">
@@ -107,6 +114,13 @@
         <arguments>
             <argument name="engines" xsi:type="array">
                 <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\ResourceModel\Engine</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\AdvancedSearch\Model\SuggestedQueries">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="doofinder" xsi:type="string">Magento\AdvancedSearch\Model\DataProvider\Suggestions</item>
             </argument>
         </arguments>
     </type>
