@@ -145,9 +145,10 @@ class IndexerHandler implements IndexerInterface
      * {@inheritdoc}
      *
      * NOTICE: Add hash id verification
+     * @param array $dimension
      * @return boolean
      */
-    public function isAvailable()
+    public function isAvailable($dimension = [])
     {
         return true;
     }
