@@ -148,7 +148,7 @@ class IndexerHandler implements IndexerInterface
      * @param array $dimension
      * @return boolean
      */
-    public function isAvailable($dimension = [])
+    public function isAvailable($dimensions = [])
     {
         return true;
     }
