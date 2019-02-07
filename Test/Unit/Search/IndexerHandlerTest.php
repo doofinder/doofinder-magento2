@@ -42,29 +42,19 @@ class IndexerHandlerTest extends BaseTestCase
     private $product;
 
     /**
-     * @var \Magento\Catalog\Api\Data\ProductSearchResultsInterface
+     * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
-    private $productSearchResults;
+    private $productCollectionFactory;
 
     /**
-     * @var \Magento\Catalog\Model\ProductRepository
+     * @var \Magento\Catalog\Model\ResourceModel\Product\Collection
      */
-    private $productRepository;
+    private $productCollection;
 
     /**
      * @var \Magento\Catalog\Model\Product\Visibility
      */
     private $productVisibility;
-
-    /**
-     * @var \Magento\Framework\Api\SearchCriteriaInterface
-     */
-    private $searchCriteria;
-
-    /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
 
     /**
      * @var \Doofinder\Feed\Helper\Search
@@ -116,26 +106,27 @@ class IndexerHandlerTest extends BaseTestCase
             false
         );
 
-        $this->productSearchResults = $this->getMock(
-            \Magento\Catalog\Api\Data\ProductSearchResultsInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
-        $this->productSearchResults->method('getItems')
-            ->willReturn([$this->product]);
-
-        $this->productRepository = $this->getMock(
-            \Magento\Catalog\Model\ProductRepository::class,
+        $this->productCollectionFactory = $this->getMock(
+            \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class,
             [],
             [],
             '',
             false
         );
 
-        $this->productRepository->method('getList')
-            ->willReturn($this->productSearchResults);
+        $this->productCollection = $this->getMock(
+            \Magento\Catalog\Model\ResourceModel\Product\Collection::class,
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->productCollectionFactory->method('create')->willReturn($this->productCollection);
+        $this->productCollection->method('addAttributeToFilter')->willReturnSelf();
+        $this->productCollection->method('addAttributeToSelect')->willReturnSelf();
+        $this->productCollection->method('addUrlRewrite')->willReturnSelf();
+        $this->productCollection->method('getItems')->willReturn([$this->product]);
 
         $this->productVisibility = $this->getMock(
             \Magento\Catalog\Model\Product\Visibility::class,
@@ -147,24 +138,6 @@ class IndexerHandlerTest extends BaseTestCase
 
         $this->productVisibility->method('getVisibleInSearchIds')
             ->willReturn(['3, 4']);
-
-        $this->searchCriteria = $this->getMock(
-            \Magento\Framework\Api\SearchCriteriaInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
-
-        $this->searchCriteriaBuilder = $this->getMock(
-            \Magento\Framework\Api\SearchCriteriaBuilder::class,
-            [],
-            [],
-            '',
-            false
-        );
-        $this->searchCriteriaBuilder->method('create')
-            ->willReturn($this->searchCriteria);
 
         $this->dimension = $this->getMock(
             \Magento\Framework\Search\Request\Dimension::class,
@@ -231,9 +204,8 @@ class IndexerHandlerTest extends BaseTestCase
             \Doofinder\Feed\Search\IndexerHandler::class,
             [
                 'batch' => $this->batch,
-                'productRepository' => $this->productRepository,
+                'productCollectionFactory' => $this->productCollectionFactory,
                 'productVisibility' => $this->productVisibility,
-                'searchCriteriaBuilder' => $this->searchCriteriaBuilder,
                 'searchHelper' => $this->searchHelper,
                 'indexStructure' => $this->indexStructure,
                 'indexerHandlerFactory' => $this->indexerHandlerFactory,
