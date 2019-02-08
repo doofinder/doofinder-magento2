@@ -79,6 +79,12 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getProductUrl(\Magento\Catalog\Model\Product $product)
     {
+        // Try to fix problem with long product URLs and admin URLs used for
+        // products depending on the execution environment.
+        if (PHP_SAPI !== 'cli') {
+            return $product->getProductUrl(false);
+        }
+
         return $product->getUrlInStore(['_type' => UrlInterface::URL_TYPE_WEB]);
     }
 
