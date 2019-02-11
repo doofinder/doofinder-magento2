@@ -20,7 +20,7 @@ class StartTimeTest extends BaseTestCase
     private $timezone;
 
     /**
-     * @var int $offset
+     * @var integer $offset
      */
     private $offset;
 
