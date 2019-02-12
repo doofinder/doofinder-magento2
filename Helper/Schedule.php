@@ -159,6 +159,9 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
         $now = $now ? $now : $this->timezone->date(null, null, false);
         $start = clone $date;
 
+        var_dump($now);
+        var_dump($start);
+
         if ($start < $now) {
             $start->modify('+1 day');
         }
@@ -264,7 +267,8 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
 
             // Override time if $now is enabled
             if ($now) {
-                $date = $this->timezone->date(null, null, false);
+                var_dump($now);
+                $date = $this->getNowDate();
             } else {
                 $date = $this->timeArrayToDate($config['start_time']);
             }
@@ -550,6 +554,8 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
             ])
             ->setOrder('next_iteration', 'asc')
             ->setPageSize(1);
+
+        echo $collection->getSelect()->__toString();
 
         return $collection->fetchItem();
     }
