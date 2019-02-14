@@ -50,6 +50,7 @@ class AttributesTest extends BaseTestCase
             'df_currency' => 'Doofinder: Product Currency',
             'df_regular_price' => 'Doofinder: Product Regular Price',
             'df_sale_price' => 'Doofinder: Product Sale Price',
+            'df_minimal_tier_price' => 'Doofinder: Product Minimal Tier Price',
         ];
 
         $this->eavConfig = $this->getMock(
