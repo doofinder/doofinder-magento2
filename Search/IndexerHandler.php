@@ -28,19 +28,14 @@ class IndexerHandler implements IndexerInterface
     private $batch;
 
     /**
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
-    private $productRepository;
+    private $productCollectionFactory;
 
     /**
      * @var \Magento\Catalog\Model\Product\Visibility
      */
     private $productVisibility;
-
-    /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
 
     /**
      * @var \Doofinder\Feed\Helper\Search
@@ -61,9 +56,8 @@ class IndexerHandler implements IndexerInterface
      * @param \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory $indexerHandlerFactory
      * @param \Magento\Framework\Indexer\IndexStructureInterface $indexStructure
      * @param \Magento\Framework\Indexer\SaveHandler\Batch $batch
-     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
      * @param \Magento\Catalog\Model\Product\Visibility $productVisibility
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \Doofinder\Feed\Helper\Search $searchHelper
      * @param Processor $processor
      * @param array $data
@@ -77,9 +71,8 @@ class IndexerHandler implements IndexerInterface
         \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory $indexerHandlerFactory,
         \Magento\Framework\Indexer\IndexStructureInterface $indexStructure,
         \Magento\Framework\Indexer\SaveHandler\Batch $batch,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
         \Magento\Catalog\Model\Product\Visibility $productVisibility,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Doofinder\Feed\Helper\Search $searchHelper,
         Processor $processor,
         array $data,
@@ -92,9 +85,8 @@ class IndexerHandler implements IndexerInterface
         ]);
         $this->indexStructure = $indexStructure;
         $this->batch = $batch;
-        $this->productRepository = $productRepository;
+        $this->productCollectionFactory = $productCollectionFactory;
         $this->productVisibility = $productVisibility;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->searchHelper = $searchHelper;
         $this->processor = $processor;
         $this->batchSize = $batchSize;
@@ -145,9 +137,10 @@ class IndexerHandler implements IndexerInterface
      * {@inheritdoc}
      *
      * NOTICE: Add hash id verification
-     * @param array $dimension
+     * @param array $dimensions
      * @return boolean
      */
+    // @codingStandardsIgnoreLine - do not hint array
     public function isAvailable($dimensions = [])
     {
         return true;
@@ -174,7 +167,7 @@ class IndexerHandler implements IndexerInterface
     {
         if (!empty($documents)) {
             $storeId = $this->searchHelper->getStoreIdFromDimensions($dimensions);
-            $this->processor->update($storeId, $this->getProducts(array_keys($documents)));
+            $this->processor->update($storeId, $this->getProducts(array_keys($documents), $storeId));
         }
     }
 
@@ -212,18 +205,24 @@ class IndexerHandler implements IndexerInterface
     /**
      * Get products
      *
-     * @param int[] $ids
+     * @param integer[] $ids
+     * @param integer|null $storeId
      * @return \Magento\Catalog\Model\Product[]
      */
-    private function getProducts(array $ids)
+    private function getProducts(array $ids, $storeId = null)
     {
-        $builder = $this->searchCriteriaBuilder;
-        $builder->addFilter('entity_id', $ids, 'in');
+        $collection = $this->productCollectionFactory->create();
 
-        $results = $this->productRepository->getList(
-            $builder->create()
-        );
+        $collection->addAttributeToFilter('entity_id', ['in' => $ids])
+            ->addAttributeToSelect('*')
+            ->addUrlRewrite()
+            ->addCategoryIds();
 
-        return $results->getItems();
+        if ($storeId) {
+            $collection->setStoreId($storeId);
+            $collection->addStoreFilter($storeId);
+        }
+
+        return $collection->getItems();
     }
 }

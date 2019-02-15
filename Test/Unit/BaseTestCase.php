@@ -3,17 +3,16 @@
 namespace Doofinder\Feed\Test\Unit;
 
 use Magento\Framework\TestFramework\Unit\BaseTestCase as FrameworkBaseTestCase;
-use PHPUnit_Framework_MockObject_Generator;
 
 /**
  * Base test class
- *
- * @SuppressWarnings(PHPMD.NumberOfChildren)
+ * General class for tests in project
+ * @SuppressWarnings(PHPMD.NumberOfChildren) @codingStandardsIgnoreLine
  */
 class BaseTestCase extends FrameworkBaseTestCase
 {
     /**
-     * @var array
+     * @var PHPUnit_Framework_MockObject_Generator|\PHPUnit\Framework\MockObject\Generator
      */
     private $myMockObjectGenerator;
 
@@ -32,9 +31,10 @@ class BaseTestCase extends FrameworkBaseTestCase
      * @param  boolean $cloneArguments
      * @param  boolean $callOriginalMethods
      * @return PHPUnit_Framework_MockObject
-     * @depracated
      * @see PHPUnit_Framework_TestCase
      * @SuppressWarnings(PHPMD.LongVariable)
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @SuppressWarnings(PHPMD.NumberOfChildren)
      */
     public function getMock(
         $originalClassName,
@@ -80,15 +80,21 @@ class BaseTestCase extends FrameworkBaseTestCase
 
     /**
      * Get the mock object generator, creating it if it doesn't exist.
-     *
-     * @return   PHPUnit_Framework_MockObject_Generator
+     * @return PHPUnit_Framework_MockObject_Generator
+     * @throws \Exception Cannot find MockObject Generator.
      */
     private function getMyMockObjectGenerator()
     {
         if (null === $this->myMockObjectGenerator) {
-            $this->myMockObjectGenerator = new PHPUnit_Framework_MockObject_Generator;
+            if (class_exists(\PHPUnit_Framework_MockObject_Generator::class)) {
+                $this->myMockObjectGenerator = new \PHPUnit_Framework_MockObject_Generator;
+            } elseif (class_exists(\PHPUnit\Framework\MockObject\Generator::class)) {
+                $this->myMockObjectGenerator = new \PHPUnit\Framework\MockObject\Generator;
+            }
         }
-
+        if (null === $this->myMockObjectGenerator) {
+            throw new \Exception('Cannot initialize MockObject Generator'); // @codingStandardsIgnoreLine
+        }
         return $this->myMockObjectGenerator;
     }
 }

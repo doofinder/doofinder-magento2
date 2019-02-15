@@ -264,12 +264,12 @@ class Schedule extends \Magento\Framework\App\Helper\AbstractHelper
 
             // Override time if $now is enabled
             if ($now) {
-                $date = $this->timezone->date(null, null, false);
+                $date = $this->getNowDate();
             } else {
                 $date = $this->timeArrayToDate($config['start_time']);
             }
 
-            $this->rescheduleProcess($process, $this->getScheduleDate($date));
+            $this->rescheduleProcess($process, $this->getScheduleDate($date, $now ? $date : null));
         }
 
         return $process;

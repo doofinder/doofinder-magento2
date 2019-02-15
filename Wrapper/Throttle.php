@@ -63,8 +63,7 @@ class Throttle
      * @param  integer    $counter Throttle counter.
      * @return mixed
      * @throws \Doofinder\Api\Management\Errors\ThrottledResponse Response throttled.
-     * @throws \Doofinder\Api\Management\Errors\IndexingInProgress Indexing in progress.
-     * @throws \Doofinder\Api\management\Errors\NotFound Not found.
+     * @throws \Doofinder\Api\Management\Errors\NotFound Not found.
      */
     private function throttle($name, $args, $counter = 1)
     {
