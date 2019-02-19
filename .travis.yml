@@ -48,7 +48,7 @@ before_install:
   - phpenv config-rm xdebug.ini
 
 install:
-  - composer create-project --repository-url=https://repo.magento.com/magento/project-community-edition "$MAGENTO_PATH" "$MAGENTO_VERSION"
+  - composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition "$MAGENTO_PATH" "$MAGENTO_VERSION"
   - composer config -d "$MAGENTO_PATH" minimum-stability "dev" 2>/dev/null
   - |-
     composer config -d "$MAGENTO_PATH" repositories.0 "{\"type\": \"path\", \"url\": \"$TRAVIS_BUILD_DIR\"}" 2>/dev/null
