@@ -53,7 +53,7 @@ install:
   - |-
     composer config -d "$MAGENTO_PATH" repositories.0 "{\"type\": \"path\", \"url\": \"$TRAVIS_BUILD_DIR\"}" 2>/dev/null
     composer config -d "$MAGENTO_PATH" repositories.1 "{\"type\": \"composer\", \"url\": \"https://repo.magento.com/\"}" 2>/dev/null
-  - composer require -d "$MAGENTO_PATH" "$MODULE_NAME"
+  - composer require -d "$MAGENTO_PATH" "$MODULE_NAME @dev"
   - cp Test/ci/phpunit.unit.xml "$MAGENTO_PATH/dev/tests/unit/phpunit.xml"
   - cp Test/ci/phpunit.integration.xml "$MAGENTO_PATH/dev/tests/integration/phpunit.xml"
   - cp Test/ci/install-config-mysql.php "$MAGENTO_PATH/dev/tests/integration/etc/install-config-mysql.php"
