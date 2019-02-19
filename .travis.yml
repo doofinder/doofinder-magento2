@@ -48,10 +48,11 @@ before_install:
   - phpenv config-rm xdebug.ini
 
 install:
-  - composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition "$MAGENTO_PATH" "$MAGENTO_VERSION"
+  - composer create-project --repository-url=https://repo.magento.com/magento/project-community-edition "$MAGENTO_PATH" "$MAGENTO_VERSION"
   - composer config -d "$MAGENTO_PATH" minimum-stability "dev" 2>/dev/null
   - |-
-    composer config -d "$MAGENTO_PATH" repositories.1 "{\"type\": \"path\", \"url\": \"$TRAVIS_BUILD_DIR\"}" 2>/dev/null
+    composer config -d "$MAGENTO_PATH" repositories.0 "{\"type\": \"path\", \"url\": \"$TRAVIS_BUILD_DIR\"}" 2>/dev/null
+    composer config -d "$MAGENTO_PATH" repositories.1 "{\"type\": \"composer\", \"url\": \"https://repo.magento.com/\"}" 2>/dev/null
   - composer require -d "$MAGENTO_PATH" "$MODULE_NAME"
   - cp Test/ci/phpunit.unit.xml "$MAGENTO_PATH/dev/tests/unit/phpunit.xml"
   - cp Test/ci/phpunit.integration.xml "$MAGENTO_PATH/dev/tests/integration/phpunit.xml"
