@@ -45,7 +45,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string|integer $value
      * @param mixed $defaultValue
      *
-     * @return int Value as int
+     * @return integer Value as int
      */
     public function getInteger($value, $defaultValue)
     {
@@ -62,7 +62,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param string|integer $value
      * @param mixed $defaultValue
      *
-     * @return bool Value as bool
+     * @return boolean Value as bool
      */
     public function isBoolean($value, $defaultValue)
     {

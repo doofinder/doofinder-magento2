@@ -15,6 +15,7 @@ class AdditionalAttributes extends ArraySerialized
      *
      * @return \Doofinder\Feed\Model\Config\Backend\ArraySerialized
      * @throws ValidatorException When there's a validation error.
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public function beforeSave()
     {

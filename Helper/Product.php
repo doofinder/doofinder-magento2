@@ -3,9 +3,12 @@
 namespace Doofinder\Feed\Helper;
 
 use Magento\Framework\UrlInterface;
+use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 
 /**
  * Product helper
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Product extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -35,12 +38,24 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     private $taxConfig;
 
     /**
+     * @var \Magento\Framework\Url
+     */
+    private $frontendUrl;
+
+    /**
+     * @var \Magento\UrlRewrite\Model\UrlFinderInterface
+     */
+    private $urlFinder;
+
+    /**
      * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory
      * @param \Magento\Catalog\Helper\Image $imageHelper
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
      * @param \Magento\Tax\Model\Config $taxConfig
+     * @param \Magento\Framework\Url $frontendUrl
+     * @param \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
      * @codingStandardsIgnoreStart
      */
     public function __construct(
@@ -49,7 +64,9 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
-        \Magento\Tax\Model\Config $taxConfig
+        \Magento\Tax\Model\Config $taxConfig,
+        \Magento\Framework\Url $frontendUrl,
+        \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
     ) {
         // * @codingStandardsIgnoreEnd
         $this->categoryColFactory = $categoryColFactory;
@@ -57,6 +74,8 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $this->storeManager = $storeManager;
         $this->stockRegistry = $stockRegistry;
         $this->taxConfig = $taxConfig;
+        $this->frontendUrl = $frontendUrl;
+        $this->urlFinder = $urlFinder;
         parent::__construct($context);
     }
 
@@ -74,12 +93,49 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get product url
      *
+     * This method is based on the \Magento\Catalog\Model\Product\Url::getUrl() method.
+     *
      * @param \Magento\Catalog\Model\Product $product
      * @return string
      */
     public function getProductUrl(\Magento\Catalog\Model\Product $product)
     {
-        return $product->getUrlInStore(['_type' => UrlInterface::URL_TYPE_WEB]);
+        $storeId = $product->getStoreId();
+        $routePath = '';
+        $requestPath = $product->getRequestPath();
+        $filterData = [
+            UrlRewrite::ENTITY_ID => $product->getId(),
+            UrlRewrite::ENTITY_TYPE => \Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator::ENTITY_TYPE,
+            UrlRewrite::STORE_ID => $storeId,
+        ];
+        $rewrite = $this->urlFinder->findOneByData($filterData);
+
+        if ($rewrite) {
+            $requestPath = $rewrite->getRequestPath();
+        }
+
+        if (!empty($requestPath)) {
+            $routeParams['_direct'] = $requestPath;
+        } else {
+            $routePath = 'catalog/product/view';
+            $routeParams['id'] = $product->getId();
+            $routeParams['s'] = $product->getUrlKey();
+        }
+
+        $routeParams['_scope'] = $storeId;
+        $routeParams['_nosid'] = true;
+        $routeParams['_type'] = UrlInterface::URL_TYPE_WEB;
+
+        if ($this->scopeConfig->getValue(\Magento\Store\Model\Store::XML_PATH_STORE_IN_URL) == 1) {
+            $routeParams['_scope_to_url'] = true;
+        }
+
+        $url = $this->frontendUrl->setScope($storeId)->getUrl(
+            $routePath,
+            $routeParams
+        );
+
+        return $url;
     }
 
     /**
