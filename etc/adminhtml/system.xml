@@ -361,6 +361,20 @@
                         <![CDATA[Requires a Management API key configured in Search Configuration.]]>
                     </comment>
                 </field>
+                <field id="cron_updates_enabled"
+                    translate="label comment"
+                    type="select"
+                    sortOrder="20"
+                    showInDefault="1"
+                    showInWebsite="0"
+                    showInStore="1">
+                    <label>Update products on cron run</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\CronUpdates</frontend_model>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Cron updates work only when Doofinder is set as internal search engine. If this option is active, then indices wouldn't be refreshed immediately after saving a product, but after a short period of time.]]>
+                    </comment>
+                </field>
             </group>
         </section>
         <section id="doofinder_config_data_feed"

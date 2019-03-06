@@ -299,6 +299,29 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Check, whether Cron updates are enabled and active.
+     *
+     * For Cron updates to work, Doofinder must be set as internal search engine.
+     *
+     * @param string $storeCode
+     *
+     * @return bool True if Cron updates are enabled.
+     */
+    public function isCronUpdatesEnabled($storeCode = null)
+    {
+        if (!$this->isInternalSearchEnabled($storeCode)) {
+            return false;
+        }
+
+        return $this->scopeConfig
+            ->getValue(
+                self::FEED_SETTINGS_CONFIG . '/cron_updates_enabled',
+                $this->getScopeStore(),
+                $storeCode
+            );
+    }
+
+    /**
      * Check if should export categories in navigation.
      *
      * @param string $storeCode
