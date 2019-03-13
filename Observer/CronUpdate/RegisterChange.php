@@ -10,31 +10,33 @@ use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResource;
 use Doofinder\Feed\Model\ResourceModel\ChangedProductFactory as ChangedProductResourceFactory;
 
 /**
- * This class is responsible for leaving a trace of deleted product to be later synchronized with Doofinder.
+ * This class is responsible for leaving a trace of a change of a product to be later synchronized using cron update.
+ *
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
-class Delete implements ObserverInterface
+class RegisterChange implements ObserverInterface
 {
     /**
-     * @var \Doofinder\Feed\Helper\StoreConfig $storeConfig
+     * @var StoreConfig $storeConfig
      */
     private $storeConfig;
 
     /**
-     * @var \Doofinder\Feed\Model\ChangedProductFactory $changedProductFactory
+     * @var ChangedProductFactory $changedProductFactory
      */
     private $changedProductFactory;
 
     /**
-     * @var \Doofinder\Feed\Model\ResourceModel\ChangedProductFactory $changedProductResourceFactory
+     * @var ChangedProductFactory $changedProductResourceFactory
      */
     private $changedProductResourceFactory;
 
     /**
      * A constructor.
      *
-     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Doofinder\Feed\Model\ChangedProductFactory $changedProductFactory
-     * @param \Doofinder\Feed\Model\ResourceModel\ChangedProductFactory $changedProductResourceFactory
+     * @param StoreConfig $storeConfig
+     * @param ChangedProductFactory $changedProductFactory
+     * @param ChangedProductResourceFactory $changedProductResourceFactory
      */
     public function __construct(
         StoreConfig $storeConfig,
@@ -49,7 +51,7 @@ class Delete implements ObserverInterface
     /**
      * Stores deleted product's ID to be synchronized on cron update run.
      *
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      *
      * @return void
      */
@@ -57,6 +59,22 @@ class Delete implements ObserverInterface
     {
         if (!$this->storeConfig->isCronUpdatesEnabled()) {
             return;
+        }
+
+        $eventName = $observer->getEvent()
+            ->getName();
+
+        switch ($eventName) {
+            case 'catalog_product_save_commit_after':
+                $type = ChangedProductResource::OPERATION_UPDATE;
+                break;
+
+            case 'catalog_product_delete_commit_after':
+                $type = ChangedProductResource::OPERATION_DELETE;
+                break;
+
+            default:
+                return;
         }
 
         $product = $observer->getDataObject();
@@ -68,7 +86,7 @@ class Delete implements ObserverInterface
         $changedProduct = $this->changedProductFactory
             ->create()
             ->setProductEntityId($product->getId())
-            ->setOperationType(ChangedProductResource::OPERATION_DELETE);
+            ->setOperationType($type);
 
         $this->changedProductResourceFactory
             ->create()
