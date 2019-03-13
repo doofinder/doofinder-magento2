@@ -8,10 +8,10 @@
     </event>
     <event name="catalog_product_save_commit_after">
         <observer name="doofinder_feed_atomic_update_save" instance="Doofinder\Feed\Observer\AtomicUpdate\Save" />
-        <observer name="doofinder_feed_cron_update_save" instance="Doofinder\Feed\Observer\CronUpdate\Save" />
+        <observer name="doofinder_feed_cron_update_save" instance="Doofinder\Feed\Observer\CronUpdate\RegisterChange" />
     </event>
     <event name="catalog_product_delete_commit_after">
         <observer name="doofinder_feed_atomic_update_delete" instance="Doofinder\Feed\Observer\AtomicUpdate\Delete" />
-        <observer name="doofinder_feed_cron_update_delete" instance="Doofinder\Feed\Observer\CronUpdate\Delete" />
+        <observer name="doofinder_feed_cron_update_delete" instance="Doofinder\Feed\Observer\CronUpdate\RegisterChange" />
     </event>
 </config>

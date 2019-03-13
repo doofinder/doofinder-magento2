@@ -5,6 +5,10 @@ namespace Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer;
 use Doofinder\Feed\Helper\StoreConfig;
 use Magento\CatalogSearch\Model\Indexer\Fulltext as FulltextIndexer;
 
+// phpcs:disable Squiz.Commenting.FunctionComment.MissingParamTag
+// phpcs:disable Squiz.Commenting.FunctionComment.MissingParamName
+// phpcs:disable EcgM2.Plugins.Plugin.PluginError, Squiz.Commenting.FunctionComment.TypeHintMissing
+
 /**
  * This class is responsible for aborting indexing in case it should not occur
  * immediatelly after updating a product (so it is later done by cron updates).
@@ -14,7 +18,7 @@ class Fulltext
     /**
      * A constructor.
      *
-     * @param Doofinder\Feed\Helper\StoreConfig $storeConfig
+     * @param StoreConfig $storeConfig
      */
     public function __construct(StoreConfig $storeConfig)
     {
@@ -24,11 +28,13 @@ class Fulltext
     /**
      * Conditionally aborts indexing after product bulk edit.
      *
-     * @param \Magento\CatalogSearch\Model\Indexer\Fulltext $indexer
+     * @param FulltextIndexer $indexer
      * @param \Closure $closure
-     * @param array $args
+     * @param array $arg
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function aroundExecuteList(
         FulltextIndexer $indexer,
@@ -43,11 +49,13 @@ class Fulltext
     /**
      * Conditionally aborts indexing after single product edit.
      *
-     * @param \Magento\CatalogSearch\Model\Indexer\Fulltext $indexer
+     * @param FulltextIndexer $indexer
      * @param \Closure $closure
-     * @param $args
+     * @param $arg
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function aroundExecuteRow(
         FulltextIndexer $indexer,
@@ -66,7 +74,7 @@ class Fulltext
      * - Doofinder is not set as internal search engine, because then it should be allowed to run index anyway,
      * - or Cron updates are enabled in admin and it means indexes will be refreshed upon next Cron update call.
      *
-     * @return bool Whether to allow running indexing.
+     * @return boolean Whether to allow running indexing.
      */
     private function canProceed()
     {

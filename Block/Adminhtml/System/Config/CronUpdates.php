@@ -2,6 +2,7 @@
 
 namespace Doofinder\Feed\Block\Adminhtml\System\Config;
 
+use Magento\Config\Block\System\Config\Form\Field;
 use Doofinder\Feed\Helper\StoreConfig;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
@@ -9,18 +10,18 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 /**
  * Class CronUpdates
  */
-class CronUpdates extends \Magento\Config\Block\System\Config\Form\Field
+class CronUpdates extends Field
 {
     /**
-     * @var \Doofinder\Feed\Helper\StoreConfig
+     * @var StoreConfig $storeConfig
      */
     private $storeConfig;
 
     /**
      * A constructor.
      *
-     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Magento\Backend\Block\Template\Context $context
+     * @param StoreConfig $storeConfig
+     * @param Context $context
      * @param array $data
      */
     public function __construct(
@@ -36,7 +37,7 @@ class CronUpdates extends \Magento\Config\Block\System\Config\Form\Field
     /**
      * Retrieve HTML markup for given form element
      *
-     * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @param AbstractElement $element
      *
      * @return string
      */

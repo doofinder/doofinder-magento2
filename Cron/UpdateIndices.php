@@ -15,6 +15,8 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductColl
  * is set as internal search engine, product updates and deletions are postponed
  * to next cron run instead of being executed immediately. This class then
  * executes those operations in bulk.
+ *
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
 class UpdateIndices
 {
@@ -26,32 +28,32 @@ class UpdateIndices
     const CHUNK_SIZE = 100;
 
     /**
-     * @var \Doofinder\Feed\Helper\StoreConfig $storeConfig
+     * @var StoreConfig $storeConfig
      */
     private $storeConfig;
 
     /**
-     * @var \Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory $changedProductCollectionFactory
+     * @var ChangedProductCollectionFactory $changedProductCollectionFactory
      */
     private $changedProductCollectionFactory;
 
     /**
-     * @var \Doofinder\Feed\Search\Processor $processor
+     * @var Processor $processor
      */
     private $processor;
 
     /**
-     * @var Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
+     * @var ProductCollectionFactory $productCollectionFactory
      */
     private $productCollectionFactory;
 
     /**
      * A constructor.
      *
-     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory $changedProductCollectionFactory
-     * @param \Doofinder\Feed\Search\Processor $processor
-     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
+     * @param StoreConfig $storeConfig
+     * @param ChangedProductCollectionFactory $changedProductCollectionFactory
+     * @param Processor $processor
+     * @param ProductCollectionFactory $productCollectionFactory
      */
     public function __construct(
         StoreConfig $storeConfig,
@@ -153,6 +155,7 @@ class UpdateIndices
             }
 
             foreach ($this->storeConfig->getStoreCodes() as $storeCode) {
+                // phpcs:ignore Ecg.Performance.Loop.ModelLSD, MEQP1.Performance.Loop.ModelLSD
                 $this->processor->delete($storeCode, $deletedIds);
             }
 

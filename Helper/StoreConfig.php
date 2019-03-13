@@ -305,7 +305,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param string $storeCode
      *
-     * @return bool True if Cron updates are enabled.
+     * @return boolean True if Cron updates are enabled.
      */
     public function isCronUpdatesEnabled($storeCode = null)
     {

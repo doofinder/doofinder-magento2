@@ -7,21 +7,24 @@ use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct;
 
+// phpcs:disable MEQP2.SQL.MissedIndexes.MissedIndexes
+// phpcs:disable PSR2.Methods.FunctionCallSignature.Indent
+
 /**
  * Upgrades database schema.
  */
 class UpgradeSchema implements UpgradeSchemaInterface
 {
     /**
-     * @var \Magento\Framework\Setup\SchemaSetupInterface $setup
+     * @var SchemaSetupInterface $setup
      */
     private $setup;
 
     /**
      * Performs database schema upgrade.
      *
-     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
-     * @param \Magento\Framework\Setup\ModuleContextInterface $context
+     * @param SchemaSetupInterface $setup
+     * @param ModuleContextInterface $context
      *
      * @return void
      */
@@ -50,18 +53,19 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->getConnection()
             ->newTable(ChangedProduct::TABLE_NAME);
 
+        // phpcs:disable Indent
         $table->addColumn(
-                ChangedProduct::FIELD_ID,
-                $table::TYPE_INTEGER,
-                null,
-                [
-                    'identity' => true,
-                    'unsigned' => true,
-                    'nullable' => false,
-                    'primary' => true
-                ],
-                'Row ID'
-            )
+            ChangedProduct::FIELD_ID,
+            $table::TYPE_INTEGER,
+            null,
+            [
+                'identity' => true,
+                'unsigned' => true,
+                'nullable' => false,
+                'primary' => true
+            ],
+            'Row ID'
+        )
             ->addColumn(
                 ChangedProduct::FIELD_PRODUCT_ID,
                 $table::TYPE_INTEGER,
