@@ -11,6 +11,7 @@
                 <internal_search_enabled>0</internal_search_enabled>
                 <page_limit>5</page_limit>
                 <atomic_updates_enabled>0</atomic_updates_enabled>
+                <cron_updates_enabled>0</cron_updates_enabled>
                 <request_limit>100</request_limit>
             </doofinder_search_engine>
             <doofinder_layer>

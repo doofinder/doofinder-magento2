@@ -11,6 +11,11 @@
             <argument name="collection" xsi:type="object" shared="false">Doofinder\Feed\Model\ResourceModel\Log\Grid\Collection</argument>
         </arguments>
     </type>
+    <type name="Magento\CatalogSearch\Model\Indexer\Fulltext">
+        <plugin name="doofinder_indexer_fulltext"
+            type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext"
+            sortOrder="1" />
+    </type>
     <virtualType name="Doofinder\Feed\Model\ResourceModel\Log\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
             <argument name="mainTable" xsi:type="string">doofinder_feed_log</argument>
