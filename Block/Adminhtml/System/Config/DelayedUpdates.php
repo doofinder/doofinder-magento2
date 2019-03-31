@@ -8,9 +8,13 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
 /**
- * Class CronUpdates
+ * Represents "Delayed product updates" option on admin panel, found under following path:
+ *
+ * Stores > Configuration > Doofinder > Index Settings
+ *
+ * The option is set per store view.
  */
-class CronUpdates extends Field
+class DelayedUpdates extends Field
 {
     /**
      * @var StoreConfig $storeConfig
@@ -35,7 +39,7 @@ class CronUpdates extends Field
     }
 
     /**
-     * Retrieve HTML markup for given form element
+     * Prevents changing field value in case Doofinder is not set as internal search engine.
      *
      * @param AbstractElement $element
      *

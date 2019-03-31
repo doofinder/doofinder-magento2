@@ -78,6 +78,6 @@ class Fulltext
      */
     private function canProceed()
     {
-        return !$this->storeConfig->isCronUpdatesEnabled();
+        return !$this->storeConfig->isDelayedUpdatesEnabled();
     }
 }

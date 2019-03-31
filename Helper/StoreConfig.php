@@ -163,6 +163,42 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Returns all store views available within current website.
+     *
+     * @param boolean $onlyActive Whether only active store views should be returned.
+     *
+     * @return \Magento\Store\Api\Data\StoreInterface[]
+     */
+    private function getAllStores($onlyActive = true)
+    {
+        $stores = [];
+
+        if ($websiteId = $this->_request->getParam('website')) {
+            $storeIds = $this->storeWebsiteRelation
+                ->getStoreByWebsiteId($websiteId);
+
+            foreach ($storeIds as $storeId) {
+                $stores[] = $this->storeManager
+                    ->getStore($storeId);
+            }
+        } else {
+            $stores = $this->storeManager
+                ->getStores();
+        }
+
+        if (!$onlyActive) {
+            return $stores;
+        }
+
+        return array_filter(
+            $stores,
+            function ($store) {
+                return $store->isActive();
+            }
+        );
+    }
+
+    /**
      * Get active/all store codes
      *
      * @param boolean $onlyActive
@@ -176,23 +212,33 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $storeCodes = [];
-        $stores = [];
-        if ($websiteId = $this->_request->getParam('website')) {
-            $storeIds = $this->storeWebsiteRelation->getStoreByWebsiteId($websiteId);
-            foreach ($storeIds as $storeId) {
-                $stores[] = $this->storeManager->getStore($storeId);
-            }
-        } else {
-            $stores = $this->storeManager->getStores();
-        }
+        $stores = $this->getAllStores($onlyActive);
 
         foreach ($stores as $store) {
-            if (!$onlyActive || $store->isActive()) {
-                $storeCodes[] = $store->getCode();
-            }
+            $storeCodes[] = $store->getCode();
         }
 
         return $storeCodes;
+    }
+
+    /**
+     * Returns the store view ID for a store having given store code.
+     *
+     * @param string $storeCode Code of the store whose ID should be returned.
+     *
+     * @return mixed
+     */
+    public function getStoreViewIdByStoreCode($storeCode)
+    {
+        $stores = $this->getAllStores(false);
+
+        foreach ($stores as $store) {
+            if ($store->getCode() === $storeCode) {
+                return $store->getId();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -282,12 +328,20 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Check if atomic updates are enabled.
      *
+     * Delayed product updates take precedence over atomic updates. For atomic updates
+     * to work, Doofinder must be set as internal search engine and delayed updates
+     * must be disabled.
+     *
      * @param string $storeCode
      * @return boolean
      */
     public function isAtomicUpdatesEnabled($storeCode = null)
     {
         if ($this->isInternalSearchEnabled($storeCode)) {
+            return false;
+        }
+
+        if ($this->isDelayedUpdatesEnabled($storeCode)) {
             return false;
         }
 
@@ -299,15 +353,16 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Check, whether Cron updates are enabled and active.
+     * Check, whether delayed product updates are enabled and active.
      *
-     * For Cron updates to work, Doofinder must be set as internal search engine.
+     * For delayed products updates to work, Doofinder must be set as internal search engine.
+     * If delayed updates are enabled, atomic updates are not invocated.
      *
      * @param string $storeCode
      *
      * @return boolean True if Cron updates are enabled.
      */
-    public function isCronUpdatesEnabled($storeCode = null)
+    public function isDelayedUpdatesEnabled($storeCode = null)
     {
         if (!$this->isInternalSearchEnabled($storeCode)) {
             return false;
