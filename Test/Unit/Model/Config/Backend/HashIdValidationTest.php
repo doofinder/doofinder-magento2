@@ -118,7 +118,7 @@ class HashIdValidationTest extends BaseTestCase
     public function testSaveEmtpyEngineEnabled()
     {
         $this->resource->expects($this->never())->method('save');
-        $this->storeConfig->method('isInternalSearchEnabled')->willReturn(true);
+        $this->storeConfig->method('isStoreSearchEngineEnabledNoCached')->willReturn(true);
 
         $this->model->setValue(null);
         $this->model->save();
@@ -152,6 +152,7 @@ class HashIdValidationTest extends BaseTestCase
     {
         $this->resource->expects($this->never())->method('save');
 
+        $this->storeConfig->method('isStoreSearchEngineEnabledNoCached')->willReturn(true);
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
         $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
             'sample_hash_id_2' => [],
@@ -171,6 +172,7 @@ class HashIdValidationTest extends BaseTestCase
     {
         $this->resource->expects($this->never())->method('save');
 
+        $this->storeConfig->method('isStoreSearchEngineEnabledNoCached')->willReturn(true);
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
         $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([]);
 

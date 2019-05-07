@@ -152,4 +152,9 @@
         <plugin name="doofinderProcessorXmlPlugin"
                 type="Doofinder\Feed\Model\Generator\Component\Processor\Plugin\XmlPlugin" />
     </type>
+
+    <type name="Doofinder\Feed\Search\IndexerHandler">
+        <plugin name="doofinderIndexerHandlerPlugin"
+                type="Doofinder\Feed\Plugin\Indexer\Model\IndexerHandler" />
+    </type>
 </config>

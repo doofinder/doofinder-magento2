@@ -3,7 +3,6 @@
 namespace Doofinder\Feed\Search;
 
 use Magento\Framework\Indexer\SaveHandler\IndexerInterface;
-use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Indexer handler
