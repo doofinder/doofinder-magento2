@@ -91,6 +91,9 @@ class Product extends Map
             case 'df_regular_price':
                 return $this->getProductPrice($this->context, 'regular_price');
 
+            case 'df_minimal_tier_price':
+                return $this->getProductPrice($this->context, 'minimal_tier_price');
+
             case 'df_sale_price':
                 $salePrice = $this->getProductPrice($this->context, 'final_price');
 

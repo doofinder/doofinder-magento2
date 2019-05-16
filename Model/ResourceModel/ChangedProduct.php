@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Model\ResourceModel;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDB;
 
 /**
- * Deleted product trace resource model.
+ * The resource model of product change trace.
  */
 class ChangedProduct extends AbstractDB
 {
@@ -33,21 +33,41 @@ class ChangedProduct extends AbstractDB
     /**
      * Operation performed on Changed product field name.
      *
-     * This can be either 'update' or 'delete' as of now.
+     * This can be either 'update', 'disable' or 'delete' as of now.
      *
      * @var string FIELD_OPERATION_TYPE
      */
     const FIELD_OPERATION_TYPE = 'operation_type';
 
     /**
-     * Changed product's update trace operation type.
+     * Store view the change was issued on.
+     *
+     * @var string FIELD_STORE_CODE
+     */
+    const FIELD_STORE_CODE = 'store_code';
+
+    /**
+     * Tells that the product was updated in regular way.
+     *
+     * Changes, however, may influence the visibility of the product and then the OPERATION_DISABLE is being
+     * set in `Doofinder\Feed\Observer\DelayedUpdates\RegisterChange` class.
      *
      * @var string OPERATION_UPDATE
      */
     const OPERATION_UPDATE = 'update';
 
     /**
-     * Changed product's delete trace operation type.
+     * Tells that the changes rendered the product insivible.
+     *
+     * This may be the cause of either disabling it on particular store view
+     * or switching its visibility to "Not visible individually".
+     *
+     * @var string OPERATION_DIASBLE
+     */
+    const OPERATION_DISABLE = 'disable';
+
+    /**
+     * Tells that the product was deleted completely.
      *
      * @var string OPERATION_DELETE
      */

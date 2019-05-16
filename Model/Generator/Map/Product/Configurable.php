@@ -79,6 +79,7 @@ class Configurable extends Product
         switch ($field) {
             case 'df_regular_price':
             case 'df_sale_price':
+            case 'df_minimal_tier_price':
             case 'price':
             case 'special_price':
             case 'tier_price':

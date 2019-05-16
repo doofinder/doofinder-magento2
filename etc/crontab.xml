@@ -8,7 +8,7 @@
         <job name="doofinder_feed_generate_feed" instance="Doofinder\Feed\Cron\GenerateFeed" method="execute">
             <schedule>* * * * *</schedule>
         </job>
-        <job name="doofinder_feed_update_indices" instance="Doofinder\Feed\Cron\UpdateIndices" method="execute">
+        <job name="doofinder_feed_perform_delayed_updates" instance="Doofinder\Feed\Cron\PerformDelayedUpdates" method="execute">
             <schedule>* * * * *</schedule>
         </job>
     </group>

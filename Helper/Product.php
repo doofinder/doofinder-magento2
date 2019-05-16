@@ -304,7 +304,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Catalog\Model\Product $product
      * @param string $attribute
      * @param boolean|null $tax
-     * @return float
+     * @return float|null
      */
     public function getProductPrice(
         \Magento\Catalog\Model\Product $product,
@@ -312,6 +312,10 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $tax = null
     ) {
         switch ($attribute) {
+            case 'minimal_tier_price':
+                $type = 'tier_price';
+                break;
+
             case 'special_price':
             case 'tier_price':
             case 'regular_price':
@@ -323,7 +327,15 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $price = $product->getPriceInfo()->getPrice($type);
-        $amount = $price->getAmount();
+
+        $amount = $attribute === 'minimal_tier_price'
+            ? $this->getMinimalTierPriceAmount($price)
+            : $price->getAmount();
+
+        if ($amount === null) {
+            // Return earlier to prevent tax operations on null
+            return null;
+        }
 
         if ($tax === null) {
             $taxConfig = $this->taxConfig;
@@ -445,5 +457,28 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     private function getStockItem($productId)
     {
         return $this->stockRegistry->getStockItem($productId);
+    }
+
+    /**
+     * Get minimal tier price
+     *
+     * @param \Magento\Catalog\Pricing\Price\TierPriceInterface $tierPrice
+     * @return \Magento\Framework\Pricing\Amount\AmountInterface|null
+     */
+    private function getMinimalTierPriceAmount(\Magento\Catalog\Pricing\Price\TierPriceInterface $tierPrice)
+    {
+        $priceList = $tierPrice->getTierPriceList();
+
+        if (empty($priceList)) {
+            return null;
+        }
+
+        $mappedPrices = array_filter(
+            array_map(function ($price) {
+                return $price['all_groups'] == 1 ? $price['price'] : null;
+            }, $priceList)
+        );
+
+        return empty($mappedPrices) ? null : min($mappedPrices);
     }
 }

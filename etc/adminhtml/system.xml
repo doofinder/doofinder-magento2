@@ -368,11 +368,11 @@
                     showInDefault="1"
                     showInWebsite="0"
                     showInStore="1">
-                    <label>Update products on cron run</label>
-                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\CronUpdates</frontend_model>
+                    <label>Delayed product updates</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\DelayedUpdates</frontend_model>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
-                        <![CDATA[Cron updates work only when Doofinder is set as internal search engine. If this option is active, then indices wouldn't be refreshed immediately after saving a product, but after a short period of time.]]>
+                        <![CDATA[Recommended for big stores with frequent product updates. Indices won't be refreshed immediately after saving a product, but after a short period of time, saving requests to Doofinder servers. Requires Doofinder set as Magento's internal search engine.]]>
                     </comment>
                 </field>
             </group>

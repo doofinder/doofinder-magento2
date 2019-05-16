@@ -115,6 +115,7 @@ class Attributes implements \Magento\Framework\Option\ArrayInterface
             'df_currency' => __('Doofinder: Product Currency'),
             'df_regular_price' => __('Doofinder: Product Regular Price'),
             'df_sale_price' => __('Doofinder: Product Sale Price'),
+            'df_minimal_tier_price' => __('Doofinder: Product Minimal Tier Price'),
         ];
     }
 }
