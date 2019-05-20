@@ -74,11 +74,11 @@ class PerformDelayedUpdates
      */
     public function execute()
     {
-        if (!$this->storeConfig->isDelayedUpdatesEnabled()) {
-            return;
-        }
-
         foreach ($this->storeConfig->getStoreCodes() as $storeCode) {
+            if (!$this->storeConfig->isDelayedUpdatesEnabled($storeCode)) {
+                continue;
+            }
+
             $this->processDeletedDocuments($storeCode);
             $this->processUpdatedDocuments($storeCode);
         }

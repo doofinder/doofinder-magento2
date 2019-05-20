@@ -2,82 +2,84 @@
 
 namespace Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer;
 
-use Doofinder\Feed\Helper\StoreConfig;
 use Magento\CatalogSearch\Model\Indexer\Fulltext as FulltextIndexer;
+use Doofinder\Feed\Registry\IndexerScope;
+use Doofinder\Feed\Helper\StoreConfig;
 
 // phpcs:disable Squiz.Commenting.FunctionComment.MissingParamTag
 // phpcs:disable Squiz.Commenting.FunctionComment.MissingParamName
 // phpcs:disable EcgM2.Plugins.Plugin.PluginError, Squiz.Commenting.FunctionComment.TypeHintMissing
 
 /**
- * This class is responsible for aborting indexing in case it should not occur
- * immediatelly after updating a product (so it is later done by cron updates).
+ * Class Fulltext
+ * The class responsible for setting indexer scope
+ * that will be used in Doofinder Indexer Handler
  */
 class Fulltext
 {
     /**
+     * @var StoreConfig
+     */
+    private $storeConfig;
+
+    /**
+     * @var IndexerScope
+     */
+    private $indexerScope;
+
+    /**
      * A constructor.
      *
      * @param StoreConfig $storeConfig
+     * @param IndexerScope $indexerScope
      */
-    public function __construct(StoreConfig $storeConfig)
-    {
+    public function __construct(
+        StoreConfig $storeConfig,
+        IndexerScope $indexerScope
+    ) {
         $this->storeConfig = $storeConfig;
+        $this->indexerScope = $indexerScope;
     }
 
     /**
-     * Conditionally aborts indexing after product bulk edit.
-     *
      * @param FulltextIndexer $indexer
-     * @param \Closure $closure
-     * @param array $arg
-     *
+     * @param mixed ...$args
      * @return void
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @codingStandardsIgnoreLine - params are not needed
      */
-    public function aroundExecuteList(
-        FulltextIndexer $indexer,
-        \Closure $closure,
-        array $arg
-    ) {
-        if ($this->canProceed()) {
-            $closure($arg);
-        }
-    }
-
-    /**
-     * Conditionally aborts indexing after single product edit.
-     *
-     * @param FulltextIndexer $indexer
-     * @param \Closure $closure
-     * @param $arg
-     *
-     * @return void
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function aroundExecuteRow(
-        FulltextIndexer $indexer,
-        \Closure $closure,
-        $arg
-    ) {
-        if ($this->canProceed()) {
-            $closure($arg);
-        }
-    }
-
-    /**
-     * Checks, whether indexing should occur immediately after products edit.
-     *
-     * It shouldn't in case:
-     * - Doofinder is not set as internal search engine, because then it should be allowed to run index anyway,
-     * - or Cron updates are enabled in admin and it means indexes will be refreshed upon next Cron update call.
-     *
-     * @return boolean Whether to allow running indexing.
-     */
-    private function canProceed()
+    public function beforeExecuteFull(FulltextIndexer $indexer, ...$args)
     {
-        return !$this->storeConfig->isDelayedUpdatesEnabled();
+        if ($this->storeConfig->isInternalSearchEnabled()) {
+            $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
+        }
+    }
+
+    /**
+     * @param FulltextIndexer $indexer
+     * @param mixed ...$args
+     * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @codingStandardsIgnoreLine - params are not needed
+     */
+    public function beforeExecuteRow(FulltextIndexer $indexer, ...$args)
+    {
+        if ($this->storeConfig->isInternalSearchEnabled()) {
+            $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_SAVE);
+        }
+    }
+
+    /**
+     * @param FulltextIndexer $indexer
+     * @param mixed ...$args
+     * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @codingStandardsIgnoreLine - params are not needed
+     */
+    public function beforeExecuteList(FulltextIndexer $indexer, ...$args)
+    {
+        if ($this->storeConfig->isInternalSearchEnabled()) {
+            $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_SAVE);
+        }
     }
 }

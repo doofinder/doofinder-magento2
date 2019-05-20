@@ -205,20 +205,20 @@ class RegisterChange implements ObserverInterface
      */
     private function getRelevantStoreCodes()
     {
-        $storeCode = $this->storeConfig
-            ->getCurrentStoreCode();
+        // Set relevantStoreCodes array with code of current store view, it can be specific store or admin for default
+        $relevantStoreCodes = [$this->storeConfig->getCurrentStoreCode()];
 
-        /**
-         * This is where a single store view code is returned.
-         *
-         * Default store view has `admin` as its code.
-         */
-        if ($storeCode != 'admin') {
-            return [$storeCode];
+        if ($relevantStoreCodes[0] === 'admin') {
+            // if current store view is admin, then substitute $relevantStoreCodes with codes of all store views
+            $relevantStoreCodes = $this->storeConfig->getStoreCodes();
         }
 
-        return $this->storeConfig
-            ->getStoreCodes();
+        // Exclude store views with disabled "Delayed Updates"
+        $relevantStoreCodes = array_filter($relevantStoreCodes, function ($storeCode) {
+            return $this->storeConfig->isDelayedUpdatesEnabled($storeCode);
+        });
+
+        return $relevantStoreCodes;
     }
 
     /**
