@@ -183,6 +183,29 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $catTree = $this->filterCategories($catTree, $fromNavigation);
 
         // Find same trees and store the deepest one
+        $toRemove = $this->getCategoriesToRemove($catTree);
+
+        // Get only needed category to build a tree
+        $filteredCategories = $this->getAllowedCategories($categories, $toRemove, $catTree);
+
+        // Build the tree
+        $tree = $this->buildCategoriesTree($filteredCategories, $productCategoryIds, $fromNavigation);
+
+        // Sort by path to set parents first
+        foreach ($tree as &$item) {
+            uasort($item, [$this, 'sortCategoryTree']);
+        }
+
+        return $tree;
+    }
+
+    /**
+     * Find same trees and store the deepest one
+     * @param array $catTree
+     * @return array
+     */
+    private function getCategoriesToRemove(array $catTree)
+    {
         $toRemove = [];
         foreach ($catTree as $item) {
             foreach ($catTree as $cat) {
@@ -195,7 +218,19 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
-        // Get only needed category to build a tree
+        return $toRemove;
+    }
+
+    /**
+     * Get only needed category to build a tree
+     *
+     * @param \Magento\Catalog\Model\Category[] $categories
+     * @param array $toRemove
+     * @param array $catTree
+     * @return \Magento\Catalog\Model\Category[]
+     */
+    private function getAllowedCategories(array $categories, array $toRemove, array $catTree)
+    {
         $result = [];
         foreach ($categories as $category) {
             if (!isset($toRemove[$category->getPath()])
@@ -205,9 +240,21 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
-        // Build the tree
+        return $result;
+    }
+
+    /**
+     * Build categories tree
+     *
+     * @param \Magento\Catalog\Model\Category[] $categories
+     * @param array $productCategoryIds
+     * @param boolean $isFromNavigation
+     * @return \Magento\Catalog\Model\Category[]
+     */
+    private function buildCategoriesTree(array $categories, array $productCategoryIds, $isFromNavigation = false)
+    {
         $tree = [];
-        foreach ($result as $category) {
+        foreach ($categories as $category) {
             $ids = explode('/', $category->getPath());
             foreach ($ids as $key => $id) {
                 if (!in_array($id, $productCategoryIds)) {
@@ -218,12 +265,31 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             $tree[] = array_values(
                 $this->getCategories(
                     $ids,
-                    $fromNavigation
+                    $isFromNavigation
                 )
             );
         }
 
         return array_filter($tree);
+    }
+
+    /**
+     * Sort categories tree by path
+     *
+     * @param \Magento\Catalog\Model\Category $category1
+     * @param \Magento\Catalog\Model\Category $category2
+     * @return integer
+     */
+    private function sortCategoryTree(
+        \Magento\Catalog\Model\Category $category1,
+        \Magento\Catalog\Model\Category $category2
+    ) {
+        $path1 = $category1->getPath();
+        $path2 = $category2->getPath();
+        if ($path1 === $path2) {
+            return 0;
+        }
+        return ($path1 < $path2) ? -1 : 1;
     }
 
     /**
