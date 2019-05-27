@@ -47,6 +47,19 @@
                     showInWebsite="0"
                     showInStore="1">
                 <label>Search Engine</label>
+                <field id="enabled"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="1"
+                       showInDefault="0"
+                       showInStore="1"
+                       showInWebsite="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[ Enable or disable indexer for this store. IMPORTANT: DISABLE ON YOUR OWN RISK! ]]>
+                    </comment>
+                </field>
                 <field id="hash_id"
                        translate="label"
                        type="text"
@@ -56,6 +69,9 @@
                        showInWebsite="0">
                     <label>Hash Id</label>
                     <backend_model>Doofinder\Feed\Model\Config\Backend\HashIdValidation</backend_model>
+                    <depends>
+                        <field id="doofinder_config_config/doofinder_search_engine/enabled">1</field>
+                    </depends>
                     <comment>
                         <![CDATA[ You must configure a "hashid" for each store view. ]]>
                     </comment>
