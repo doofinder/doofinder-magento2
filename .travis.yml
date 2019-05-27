@@ -46,6 +46,7 @@ before_install:
   - mysql -e 'FLUSH PRIVILEGES;'
   - composer config --global http-basic.repo.magento.com "$MAGENTO_AUTH_USER" "$MAGENTO_AUTH_PASSWORD"
   - phpenv config-rm xdebug.ini
+  - phpenv config-add travis.php.ini
 
 install:
   - composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition "$MAGENTO_PATH" "$MAGENTO_VERSION"
