@@ -72,6 +72,9 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     public function performDoofinderSearch($queryText)
     {
         $hashId = $this->storeConfig->getHashId($this->getStoreCode());
+        if (!$hashId) {
+            return [];
+        }
         $apiKey = $this->storeConfig->getApiKey();
         $limit = $this->storeConfig->getSearchRequestLimit($this->getStoreCode());
 
