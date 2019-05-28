@@ -45,6 +45,21 @@ class StoreConfigTest extends BaseTestCase
     private $helper;
 
     /**
+     * @var \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory
+     */
+    private $configCollectionFactory;
+
+    /**
+     * @var \Magento\Config\Model\ResourceModel\Config\Data\Collection
+     */
+    private $configCollection;
+
+    /**
+     * @var \Magento\Framework\App\Config\Value
+     */
+    private $configValue;
+
+    /**
      * Set up test
      *
      * @return void
@@ -101,14 +116,39 @@ class StoreConfigTest extends BaseTestCase
             false
         );
 
+        $this->configCollectionFactory = $this->getMock(
+            \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory::class,
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->configCollection = $this->getMock(
+            \Magento\Config\Model\ResourceModel\Config\Data\Collection::class,
+            [],
+            [],
+            '',
+            false
+        );
+
+        $this->configValue = $this->getMock(
+            \Magento\Framework\App\Config\Value::class,
+            [],
+            [],
+            '',
+            false
+        );
+
         $this->helper = $this->objectManager->getObject(
             \Doofinder\Feed\Helper\StoreConfig::class,
             [
-                'scopeConfig'  => $this->scopeConfig,
-                'storeManager'    => $this->storeManager,
-                'logger'        => $this->logger,
-                'storeWebsiteRelation' => $this->storeWebsiteRelation,
-                '_request'   => $this->request,
+                'scopeConfig'           => $this->scopeConfig,
+                'storeManager'          => $this->storeManager,
+                'logger'                => $this->logger,
+                'storeWebsiteRelation'  => $this->storeWebsiteRelation,
+                '_request'              => $this->request,
+                'configCollection'      => $this->configCollectionFactory,
             ]
         );
     }
@@ -307,6 +347,64 @@ class StoreConfigTest extends BaseTestCase
             ->willReturn($expected);
 
         $this->assertSame($expected, $this->helper->getApiKey());
+    }
+
+    /**
+     * Test isStoreSearchEngineEnabled() method
+     *
+     * @return void
+     */
+    public function testIsStoreSearchEngineEnabled()
+    {
+        $storeCode = 'sample';
+        $expected = true;
+
+        $this->scopeConfig
+            ->expects($this->once())
+            ->method('getValue')
+            ->with('doofinder_config_config/doofinder_search_engine/enabled', 'store', $storeCode)
+            ->willReturn($expected);
+
+        $this->assertSame($expected, $this->helper->isStoreSearchEngineEnabled($storeCode));
+    }
+
+    /**
+     * Test isStoreSearchEngineEnabledNoCached() method
+     *
+     * @return void
+     */
+    public function testIsStoreSearchEngineEnabledNoCached()
+    {
+        $storeId = '2';
+        $value = '1';
+
+        $this->configCollectionFactory->method('create')->willReturn($this->configCollection);
+
+        $this->configCollection
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator([
+                $this->configValue,
+                $this->configValue,
+            ]));
+
+        $this->configCollection
+            ->method('addScopeFilter')
+            ->with('stores', $storeId, \Doofinder\Feed\Helper\StoreConfig::SEARCH_ENGINE_CONFIG)
+            ->willReturnSelf();
+
+        $getDataWith = [['path'], ['path'], ['value']];
+
+        $this->configValue
+            ->expects($this->exactly(count($getDataWith)))
+            ->method('getData')
+            ->withConsecutive(...$getDataWith)
+            ->willReturnOnConsecutiveCalls(
+                \Doofinder\Feed\Helper\StoreConfig::SEARCH_ENGINE_CONFIG . '/hash_id', // unexpected path
+                \Doofinder\Feed\Helper\StoreConfig::SEARCH_ENGINE_CONFIG . '/enabled', // expected path
+                $value
+            );
+
+        $this->assertSame((bool) $value, $this->helper->isStoreSearchEngineEnabledNoCached($storeId));
     }
 
     /**

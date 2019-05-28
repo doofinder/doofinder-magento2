@@ -68,22 +68,30 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     private $storeWebsiteRelation;
 
     /**
+     * @var \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory
+     */
+    private $configCollection;
+
+    /**
      * StoreConfig constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Doofinder\Feed\Helper\Serializer $serializer
      * @param \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation
+     * @param \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory $configCollection
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Doofinder\Feed\Helper\Serializer $serializer,
-        \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation
+        \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation,
+        \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory $configCollection
     ) {
         $this->storeManager = $storeManager;
         $this->serializer = $serializer;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
+        $this->configCollection = $configCollection;
         parent::__construct($context);
     }
 
@@ -259,6 +267,46 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getApiKey()
     {
         return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/api_key');
+    }
+
+    /**
+     * Check if search engine is enabled for store
+     *
+     * @param string|null $storeCode
+     * @return boolean
+     */
+    public function isStoreSearchEngineEnabled($storeCode = null)
+    {
+        return (boolean) $this->scopeConfig->getValue(
+            self::SEARCH_ENGINE_CONFIG . '/enabled',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Check if search engine is enabled for store with avoid cache
+     *
+     * @param string|integer $storeCode
+     * @return boolean
+     */
+    public function isStoreSearchEngineEnabledNoCached($storeCode)
+    {
+        $scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
+        $collection = $this->configCollection->create();
+        $collection->addScopeFilter($scope, $storeCode, self::SEARCH_ENGINE_CONFIG);
+        foreach ($collection as $item) {
+            if ($item->getData('path') === self::SEARCH_ENGINE_CONFIG . '/enabled') {
+                $value = $item->getData('value');
+                if ($value === null) {
+                    return true;
+                }
+
+                return (bool) $value;
+            }
+        }
+
+        return true;
     }
 
     /**

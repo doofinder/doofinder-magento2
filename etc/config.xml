@@ -7,6 +7,7 @@
                 <api_key></api_key>
             </doofinder_account>
             <doofinder_search_engine>
+                <enabled>1</enabled>
                 <hash_id></hash_id>
                 <internal_search_enabled>0</internal_search_enabled>
                 <page_limit>5</page_limit>

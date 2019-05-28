@@ -105,6 +105,10 @@ class EngineTest extends BaseTestCase
         $this->engine->method('getValue')->willReturn('doofinder');
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
         $this->storeConfig->method('getStoreCodes')->willReturn(['store1', 'store3']);
+        $this->storeConfig
+            ->method('isStoreSearchEngineEnabled')
+            ->withConsecutive(['store1'], ['store3'])
+            ->willReturn([true, true]);
         $this->storeConfig->method('getHashId')->will($this->returnValueMap([
             ['store1', 'some_hash_1'],
             ['store3', 'some_hash_3'],
