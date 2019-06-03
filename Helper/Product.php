@@ -124,7 +124,9 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
 
         $routeParams['_scope'] = $storeId;
         $routeParams['_nosid'] = true;
-        $routeParams['_type'] = UrlInterface::URL_TYPE_WEB;
+        $routeParams['_type'] = UrlInterface::URL_TYPE_LINK;
+        // Special mark that URL is building by doofinder:
+        $routeParams['doofinder_product_url'] = true;
 
         if ($this->scopeConfig->getValue(\Magento\Store\Model\Store::XML_PATH_STORE_IN_URL) == 1) {
             $routeParams['_scope_to_url'] = true;

@@ -157,4 +157,8 @@
         <plugin name="doofinderIndexerHandlerPlugin"
                 type="Doofinder\Feed\Plugin\Indexer\Model\IndexerHandler" />
     </type>
+
+    <type name="Magento\Framework\Url\RouteParamsResolver">
+        <plugin name="doofinderUrlRouteParamsResolver" type="Doofinder\Feed\Plugin\Url\RouteParamsResolver" sortOrder="50"/>
+    </type>
 </config>
