@@ -11,7 +11,6 @@ use \Sabre\Xml\Service as XmlService;
 /**
  * Test class for \Doofinder\Feed\Controller\Feed\Index.
  *
- * @class IndexTest
  * @magentoDataFixture products
  */
 class IndexTest extends \Magento\TestFramework\TestCase\AbstractController
@@ -126,7 +125,41 @@ class IndexTest extends \Magento\TestFramework\TestCase\AbstractController
         $data = $this->parseXml($this->getResponse()->getContent());
         $items = $this->extractItems($data);
 
-        $this->assertEquals($expectedItems, $items);
+        $this->assertEquals($expectedItems, $this->getItemsSortedById($items));
+    }
+
+    /**
+     * Get items sorted by ID value
+     *
+     * @param array $items
+     * @return array
+     */
+    private function getItemsSortedById(array $items)
+    {
+        uasort($items, [$this, 'cmpArrays']);
+
+        // rewrite the array for the correct key sequence
+        $itemsResult = [];
+        foreach ($items as $item) {
+            $itemsResult[] = $item;
+        }
+
+        return $itemsResult;
+    }
+
+    /**
+     * Compare arrays by ID value
+     *
+     * @param array $array1
+     * @param array $array2
+     * @return integer
+     */
+    private function cmpArrays(array $array1, array $array2)
+    {
+        if ($array1['id'] == $array2['id']) {
+            return 0;
+        }
+        return ($array1['id'] < $array2['id']) ? -1 : 1;
     }
 
     /**
