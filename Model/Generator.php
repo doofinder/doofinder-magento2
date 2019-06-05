@@ -166,14 +166,6 @@ class Generator extends \Magento\Framework\DataObject
                 return !$item->isSkip();
             });
 
-            if ($processor instanceof \Doofinder\Feed\Model\Generator\Component\Processor\AtomicUpdater) {
-                foreach ($items as $item) {
-                    if (!$item->getData('best_price')) {
-                        $item->setData('best_price', $this->getBestPriceValue($item));
-                    }
-                }
-            }
-
             $processor->process($items);
         }
 
@@ -181,28 +173,6 @@ class Generator extends \Magento\Framework\DataObject
         $this->dispatch('items_processed');
 
         return $this;
-    }
-
-    /**
-     * Get best_price value as a smallest of price and sale_prica
-     *
-     * @param \Doofinder\Feed\Model\Generator\Item $item
-     * @return string|null
-     */
-    private function getBestPriceValue(\Doofinder\Feed\Model\Generator\Item $item)
-    {
-        $salePrice = $item->getData('sale_price');
-        $price = $item->getData('price');
-
-        if ($salePrice && $price) {
-            return min($salePrice, $price);
-        }
-
-        if ($price) {
-            return $price;
-        }
-
-        return null;
     }
 
     /**
