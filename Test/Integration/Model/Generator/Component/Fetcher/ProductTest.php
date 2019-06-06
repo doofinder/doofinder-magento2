@@ -24,6 +24,11 @@ class ProductTest extends AbstractIntegrity
     private $objectManager;
 
     /**
+     * @var \Magento\CatalogInventory\Model\ResourceModel\Stock\Status
+     */
+    private $stockStatusResource;
+
+    /**
      * Set up test
      *
      * @return void
@@ -32,8 +37,18 @@ class ProductTest extends AbstractIntegrity
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
+        $this->stockStatusResource = $this->getMockBuilder(
+            \Magento\CatalogInventory\Model\ResourceModel\Stock\Status::class
+        )->disableOriginalConstructor()
+        ->disableOriginalClone()
+        ->disableArgumentCloning()
+        ->getMock();
+
         $this->model = $this->objectManager->create(
-            \Doofinder\Feed\Model\Generator\Component\Fetcher\Product::class
+            \Doofinder\Feed\Model\Generator\Component\Fetcher\Product::class,
+            [
+                'stockStatusResource' => $this->stockStatusResource,
+            ]
         );
     }
 
