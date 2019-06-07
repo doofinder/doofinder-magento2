@@ -42,6 +42,16 @@ class IndexerHandler implements IndexerInterface
     private $searchHelper;
 
     /**
+     * @var \Doofinder\Feed\Helper\StoreConfig
+     */
+    private $storeConfig;
+
+    /**
+     * @var \Doofinder\Feed\Registry\IndexerScope
+     */
+    private $indexerScope;
+
+    /**
      * @var Processor
      */
     private $processor;
@@ -58,6 +68,8 @@ class IndexerHandler implements IndexerInterface
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
      * @param \Magento\Catalog\Model\Product\Visibility $productVisibility
      * @param \Doofinder\Feed\Helper\Search $searchHelper
+     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
+     * @param \Doofinder\Feed\Registry\IndexerScope $indexerScope
      * @param Processor $processor
      * @param array $data
      * @param integer $batchSize
@@ -73,6 +85,8 @@ class IndexerHandler implements IndexerInterface
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
         \Magento\Catalog\Model\Product\Visibility $productVisibility,
         \Doofinder\Feed\Helper\Search $searchHelper,
+        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
+        \Doofinder\Feed\Registry\IndexerScope $indexerScope,
         Processor $processor,
         array $data,
         $batchSize = 100
@@ -87,8 +101,32 @@ class IndexerHandler implements IndexerInterface
         $this->productCollectionFactory = $productCollectionFactory;
         $this->productVisibility = $productVisibility;
         $this->searchHelper = $searchHelper;
+        $this->storeConfig = $storeConfig;
         $this->processor = $processor;
         $this->batchSize = $batchSize;
+        $this->indexerScope = $indexerScope;
+    }
+
+    /**
+     * Checks, whether update should occur immediately after products edit.
+     *
+     * It shouldn't in case if cron updates are enabled in admin
+     * and it means indexes will be refreshed upon next Cron update call.
+     *
+     * @param array $dimensions
+     * @return array|null
+     */
+    private function canProceed(array $dimensions)
+    {
+        foreach ($dimensions as $key => $dimension) {
+            $isEnabled = $this->storeConfig->isDelayedUpdatesEnabled(
+                $this->searchHelper->getStoreIdFromDimensions([$dimension])
+            );
+            if ($isEnabled) {
+                unset($dimensions[$key]);
+            }
+        }
+        return $dimensions;
     }
 
     /**
@@ -100,6 +138,12 @@ class IndexerHandler implements IndexerInterface
      */
     public function saveIndex($dimensions, \Traversable $documents)
     {
+        if ($this->indexerScope->getIndexerScope() === \Doofinder\Feed\Registry\IndexerScope::SCOPE_SAVE) {
+            $dimensions = $this->canProceed($dimensions);
+            if (empty($dimensions)) {
+                return;
+            }
+        }
         foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
             $this->insertDocuments($batchDocuments, $dimensions);
             $this->indexerHandler->saveIndex($dimensions, $this->createIterator($batchDocuments));
@@ -115,6 +159,12 @@ class IndexerHandler implements IndexerInterface
      */
     public function deleteIndex($dimensions, \Traversable $documents)
     {
+        if ($this->indexerScope->getIndexerScope() === \Doofinder\Feed\Registry\IndexerScope::SCOPE_SAVE) {
+            $dimensions = $this->canProceed($dimensions);
+            if (empty($dimensions)) {
+                return;
+            }
+        }
         foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
             $this->dropDocuments($batchDocuments, $dimensions);
             $this->indexerHandler->deleteIndex($dimensions, $this->createIterator($batchDocuments));

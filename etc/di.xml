@@ -153,8 +153,9 @@
                 type="Doofinder\Feed\Model\Generator\Component\Processor\Plugin\XmlPlugin" />
     </type>
 
-    <type name="Doofinder\Feed\Search\IndexerHandler">
-        <plugin name="doofinderIndexerHandlerPlugin"
-                type="Doofinder\Feed\Plugin\Indexer\Model\IndexerHandler" />
+    <type name="Magento\CatalogSearch\Model\Indexer\Fulltext">
+        <plugin name="doofinder_indexer_fulltext"
+                type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext"
+                sortOrder="1" />
     </type>
 </config>

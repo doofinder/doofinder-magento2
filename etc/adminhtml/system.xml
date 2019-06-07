@@ -377,6 +377,20 @@
                         <![CDATA[Requires a Management API key configured in Search Configuration.]]>
                     </comment>
                 </field>
+                <field id="cron_updates_enabled"
+                    translate="label comment"
+                    type="select"
+                    sortOrder="20"
+                    showInDefault="1"
+                    showInWebsite="0"
+                    showInStore="1">
+                    <label>Delayed product updates</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\DelayedUpdates</frontend_model>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Recommended for big stores with frequent product updates. Indices won't be refreshed immediately after saving a product, but after a short period of time, saving requests to Doofinder servers. Requires Doofinder set as Magento's internal search engine.]]>
+                    </comment>
+                </field>
             </group>
         </section>
         <section id="doofinder_config_data_feed"
