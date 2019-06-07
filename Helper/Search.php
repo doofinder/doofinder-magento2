@@ -4,6 +4,8 @@ namespace Doofinder\Feed\Helper;
 
 /**
  * Search helper
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Search extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -28,6 +30,11 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     private $throttleFactory;
 
     /**
+     * @var \Doofinder\Feed\Helper\SearchFilter
+     */
+    private $filterHelper;
+
+    /**
      * @var \Doofinder\Api\Management\SearchEngine[]
      */
     private $searchEngines = null;
@@ -48,25 +55,28 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Doofinder\Feed\Search\SearchClientFactory $searchFactory
      * @param \Doofinder\Feed\Search\ManagementClientFactory $dmaFactory
      * @param \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory
+     * @param \Doofinder\Feed\Helper\SearchFilter $filterHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Doofinder\Feed\Search\SearchClientFactory $searchFactory,
         \Doofinder\Feed\Search\ManagementClientFactory $dmaFactory,
-        \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory
+        \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory,
+        \Doofinder\Feed\Helper\SearchFilter $filterHelper
     ) {
         $this->storeConfig = $storeConfig;
         $this->searchFactory = $searchFactory;
         $this->dmaFactory = $dmaFactory;
         $this->throttleFactory = $throttleFactory;
+        $this->filterHelper = $filterHelper;
         parent::__construct($context);
     }
 
     /**
      * Perform a doofinder search on given key.
      *
-     * @param  string  $queryText
+     * @param string $queryText
      * @return array The array od product ids from first page.
      */
     public function performDoofinderSearch($queryText)
@@ -82,7 +92,15 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
 
         try {
             // @codingStandardsIgnoreStart
-            $results = $client->query($queryText, null, ['rpp' => $limit, 'transformer' => 'onlyid', 'filter' => []]);
+            $results = $client->query(
+                $queryText,
+                null,
+                [
+                    'rpp' => $limit,
+                    'transformer' => 'onlyid',
+                    'filter' => $this->filterHelper->getFilters()
+                ]
+            );
             // @codingStandardsIgnoreEnd
         } catch (\Doofinder\Api\Search\Error $e) {
             $results = null;
