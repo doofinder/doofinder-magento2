@@ -158,4 +158,8 @@
                 type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext"
                 sortOrder="1" />
     </type>
+
+    <type name="Magento\Framework\Url\RouteParamsResolver">
+        <plugin name="doofinderUrlRouteParamsResolver" type="Doofinder\Feed\Plugin\Url\RouteParamsResolver" sortOrder="50"/>
+    </type>
 </config>
