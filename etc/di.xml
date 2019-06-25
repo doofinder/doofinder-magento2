@@ -152,4 +152,14 @@
         <plugin name="doofinderProcessorXmlPlugin"
                 type="Doofinder\Feed\Model\Generator\Component\Processor\Plugin\XmlPlugin" />
     </type>
+
+    <type name="Magento\CatalogSearch\Model\Indexer\Fulltext">
+        <plugin name="doofinder_indexer_fulltext"
+                type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext"
+                sortOrder="1" />
+    </type>
+
+    <type name="Magento\Framework\Url\RouteParamsResolver">
+        <plugin name="doofinderUrlRouteParamsResolver" type="Doofinder\Feed\Plugin\Url\RouteParamsResolver" sortOrder="50"/>
+    </type>
 </config>
