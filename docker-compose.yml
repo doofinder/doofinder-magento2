@@ -10,14 +10,15 @@ services:
 
   # App container
   app:
-    image: magently/magento2:latest
+    image: magently/magento2:2.3.1
     links:
       - db
     ports:
       - 80:80
     volumes:
-      - ./packages/:/app/packages/
+      - ./packages/:/var/www/magento/packages/
     environment:
+      - PHP_DEBUGGER=none
       - COMPOSER_AUTH={"http-basic":{"repo.magento.com":{"username":"","password":""}}}
       - MYSQL_HOST=db
       - MYSQL_USER=root

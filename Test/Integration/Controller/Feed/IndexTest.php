@@ -33,7 +33,7 @@ class IndexTest extends \Magento\TestFramework\TestCase\AbstractController
 
         $url = $this->_objectManager->get(\Magento\Framework\UrlInterface::class);
         $this->baseUrl = $url->getBaseUrl([
-            '_type' => \Magento\Framework\UrlInterface::URL_TYPE_WEB,
+            '_type' => \Magento\Framework\UrlInterface::URL_TYPE_LINK,
         ]);
     }
 
