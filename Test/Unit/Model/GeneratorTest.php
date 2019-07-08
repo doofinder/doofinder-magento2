@@ -2,16 +2,12 @@
 
 namespace Doofinder\Feed\Test\Unit\Model;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class GeneratorTest extends BaseTestCase
+class GeneratorTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator
@@ -83,38 +79,23 @@ class GeneratorTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->xmlWriter = $this->getMock(
-            \Sabre\Xml\Writer::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->xmlWriter = $this->getMockBuilder(\Sabre\Xml\Writer::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->xmlService = $this->getMock(
-            \Sabre\Xml\Service::class,
-            ['getWriter'],
-            [],
-            '',
-            false
-        );
+        $this->xmlService = $this->getMockBuilder(\Sabre\Xml\Service::class)
+            ->setMethods(['getWriter'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->xmlService->method('getWriter')->willReturn($this->xmlWriter);
 
-        $this->product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->item->method('getData')
             ->willReturn([
                 'name' => 'Sample product name',
@@ -130,58 +111,39 @@ class GeneratorTest extends BaseTestCase
             true
         ));
 
-        $this->fetcher = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\FetcherInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->fetcher = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Component\FetcherInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->fetcher->method('fetch')
             ->willReturn([$this->item, $this->item]);
 
-        $this->fetcherFactory = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\FetcherFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->fetcherFactory = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Component\FetcherFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->fetcherFactory->method('create')
             ->willReturn($this->fetcher);
 
-        $this->mapperProcessor = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\Processor\Mapper::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->mapperProcessor = $this->getMockBuilder(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Mapper::class
+        )->disableOriginalConstructor()
+        ->getMock();
         $this->mapperProcessor->expects($this->once())->method('process')->with([$this->item]);
-        $this->cleanerProcessor = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\Processor\Cleaner::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->cleanerProcessor = $this->getMockBuilder(
+            \Doofinder\Feed\Model\Generator\Component\Processor\Cleaner::class
+        )->disableOriginalConstructor()
+        ->getMock();
         $this->cleanerProcessor->expects($this->once())->method('process')->with([$this->item, $this->item]);
-        $this->xmlProcessor = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\Processor\Xml::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->xmlProcessor = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Component\Processor\Xml::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->xmlProcessor->expects($this->once())->method('process')->with([$this->item]);
 
-        $this->processorFactory = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\ProcessorFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->processorFactory = $this->getMockBuilder(
+            \Doofinder\Feed\Model\Generator\Component\ProcessorFactory::class
+        )->setMethods(['create'])
+        ->disableOriginalConstructor()
+        ->getMock();
         $this->processorFactory->expects($this->at(0))->method('create')
             ->with($this->anything(), 'Mapper')
             ->willReturn($this->mapperProcessor);
@@ -192,13 +154,10 @@ class GeneratorTest extends BaseTestCase
             ->with($this->anything(), 'Xml')
             ->willReturn($this->xmlProcessor);
 
-        $this->eventManager = $this->getMock(
-            \Magento\Framework\Event\ManagerInterface::class,
-            ['dispatch'],
-            [],
-            '',
-            false
-        );
+        $this->eventManager = $this->getMockBuilder(\Magento\Framework\Event\ManagerInterface::class)
+            ->setMethods(['dispatch'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->model = $this->objectManager->getObject(
             \Doofinder\Feed\Model\Generator::class,

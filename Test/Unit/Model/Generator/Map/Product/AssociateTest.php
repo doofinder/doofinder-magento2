@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Map\Product;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Map\Product\Associate
  */
-class AssociateTest extends BaseTestCase
+class AssociateTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product\Associate
@@ -38,30 +36,18 @@ class AssociateTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->helper = $this->getMock(
-            \Doofinder\Feed\Helper\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->helper = $this->getMockBuilder(\Doofinder\Feed\Helper\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->helper->method('getAttributeText')->willReturn('sample value');
 
-        $this->product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->item->method('getContext')->willReturn($this->product);
 
         $this->model = $this->objectManager->getObject(

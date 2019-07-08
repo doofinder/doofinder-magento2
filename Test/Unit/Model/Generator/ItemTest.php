@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Item
  */
-class ItemTest extends BaseTestCase
+class ItemTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Item

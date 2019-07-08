@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Processor;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Component\Processor\Filter
  */
-class FilterTest extends BaseTestCase
+class FilterTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Filter
@@ -46,16 +44,17 @@ class FilterTest extends BaseTestCase
         $this->items = [];
 
         foreach ($items as $item) {
-            array_push($this->items, $this->getMock(
-                \Doofinder\Feed\Model\Generator\Item::class,
-                null,
-                ['data' => $item]
-            ));
+            array_push(
+                $this->items,
+                $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+                    ->setMethods(['getTitle'])
+                    ->setConstructorArgs(['data' => $item])
+                    ->getMock()
+            );
         }
 
         $this->model = $this->objectManager->getObject(
-            \Doofinder\Feed\Model\Generator\Component\Processor\Filter::class,
-            []
+            \Doofinder\Feed\Model\Generator\Component\Processor\Filter::class
         );
     }
 

@@ -2,14 +2,12 @@
 
 namespace Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Controller\Adminhtml\Feed\Log
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class LogTest extends BaseTestCase
+class LogTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Backend\Model\View\Result\Redirect
@@ -91,118 +89,67 @@ class LogTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->resultRedirect = $this->getMock(
-            \Magento\Backend\Model\View\Result\Redirect::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->resultRedirect = $this->getMockBuilder(\Magento\Backend\Model\View\Result\Redirect::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->resultRedirect->method('setPath')->willReturn($this->resultRedirect);
 
-        $this->resultRedirectFactory = $this->getMock(
-            \Magento\Backend\Model\View\Result\RedirectFactory::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->resultRedirectFactory = $this->getMockBuilder(\Magento\Backend\Model\View\Result\RedirectFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->resultRedirectFactory->method('create')->willReturn($this->resultRedirect);
 
-        $this->messageManager = $this->getMock(
-            \Magento\Framework\Message\ManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->messageManager = $this->getMockBuilder(\Magento\Framework\Message\ManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->request = $this->getMock(
-            \Magento\Framework\App\RequestInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->request = $this->getMockBuilder(\Magento\Framework\App\RequestInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->context = $this->getMock(
-            \Magento\Backend\App\Action\Context::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->context = $this->getMockBuilder(\Magento\Backend\App\Action\Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->context->method('getResultRedirectFactory')->willReturn($this->resultRedirectFactory);
         $this->context->method('getMessageManager')->willReturn($this->messageManager);
         $this->context->method('getRequest')->willReturn($this->request);
 
-        $this->pageTitle = $this->getMock(
-            \Magento\Framework\View\Page\Title::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->pageTitle = $this->getMockBuilder(\Magento\Framework\View\Page\Title::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->pageConfig = $this->getMock(
-            \Magento\Framework\View\Page\Config::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->pageConfig = $this->getMockBuilder(\Magento\Framework\View\Page\Config::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->pageConfig->method('getTitle')->willReturn($this->pageTitle);
 
-        $this->resultPage = $this->getMock(
-            \Magento\Framework\View\Result\Page::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->resultPage = $this->getMockBuilder(\Magento\Framework\View\Result\Page::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->resultPage->method('getConfig')->willReturn($this->pageConfig);
 
-        $this->resultPageFactory = $this->getMock(
-            \Magento\Framework\View\Result\PageFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->resultPageFactory = $this->getMockBuilder(\Magento\Framework\View\Result\PageFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->resultPageFactory->method('create')->willReturn($this->resultPage);
 
-        $this->schedule = $this->getMock(
-            \Doofinder\Feed\Helper\Schedule::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->schedule = $this->getMockBuilder(\Doofinder\Feed\Helper\Schedule::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->dataPersistor = $this->getMock(
-            \Magento\Framework\App\Request\DataPersistorInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->dataPersistor = $this->getMockBuilder(\Magento\Framework\App\Request\DataPersistorInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->store = $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->store = $this->getMockBuilder(\Magento\Store\Model\Store::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->store->method('getCode')->willReturn('sample');
 
-        $this->storeManager = $this->getMock(
-            \Magento\Store\Model\StoreManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeManager = $this->getMockBuilder(\Magento\Store\Model\StoreManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->storeManager->method('getStore')
             ->with(1)->willReturn($this->store);
 
@@ -225,13 +172,9 @@ class LogTest extends BaseTestCase
      */
     public function testExecute()
     {
-        $process = $this->getMock(
-            \Doofinder\Feed\Model\Cron::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $process = $this->getMockBuilder(\Doofinder\Feed\Model\Cron::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->schedule->expects($this->once())->method('getProcessByStoreCode')
             ->with('sample')->willReturn($process);
