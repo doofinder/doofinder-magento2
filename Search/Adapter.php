@@ -95,11 +95,11 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
         $documents = $this->getDocuments($this->getQueryString($request->getQuery()));
         $table = $this->temporaryStorage->storeApiDocuments($this->createDocuments($documents));
 
-        $aggregations = [];
         $aggregations = $this->aggregationBuilder->build($request, $table, $documents);
         $response = [
             'documents' => $documents,
             'aggregations' => $aggregations,
+            'total' => count($documents),
         ];
 
         return $this->responseFactory->create($response);
