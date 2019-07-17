@@ -55,7 +55,7 @@ install:
     composer config -d "$MAGENTO_PATH" repositories.0 "{\"type\": \"path\", \"url\": \"$TRAVIS_BUILD_DIR\"}" 2>/dev/null
     composer config -d "$MAGENTO_PATH" repositories.1 "{\"type\": \"composer\", \"url\": \"https://repo.magento.com/\"}" 2>/dev/null
     if [[ "$MAGENTO_VERSION" == *"2.1"* ]]; then
-      sed -i 's#"phpunit/phpunit": "4\.1\.0"#"phpunit/phpunit": "^6"#' "$MAGENTO_PATH"/composer.json
+      sed -i 's#"phpunit/phpunit": "4\.1\.0"#"phpunit/phpunit": "5\.1\.0"#' "$MAGENTO_PATH"/composer.json
       composer update -d "$MAGENTO_PATH"
     fi
   - composer require -d "$MAGENTO_PATH" "$MODULE_NAME @dev"
