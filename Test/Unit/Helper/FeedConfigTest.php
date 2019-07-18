@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Helper\FeedConfig
  */
-class FeedConfigTest extends BaseTestCase
+class FeedConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -28,13 +26,9 @@ class FeedConfigTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->storeConfig = $this->getMock(
-            \Doofinder\Feed\Helper\StoreConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->storeConfig->method('getStoreConfig')->willReturn([
             'store_code' => 'default',

@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Fetcher\Product;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Component\Fetcher\Product\Fixed
  */
-class FixedTest extends BaseTestCase
+class FixedTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Fetcher\Product\Fixed
@@ -38,29 +36,19 @@ class FixedTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            ['getEntityId'],
-            [],
-            '',
-            false
-        );
+        $this->product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->setMethods(['getEntityId'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->generatorItemFactory = $this->getMock(
-            \Doofinder\Feed\Model\Generator\ItemFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->generatorItemFactory = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\ItemFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->generatorItemFactory->expects($this->any())->method('create')
             ->willReturn($this->item);
 

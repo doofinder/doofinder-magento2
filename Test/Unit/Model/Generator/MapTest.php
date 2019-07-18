@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Map
  */
-class MapTest extends BaseTestCase
+class MapTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map
@@ -33,26 +31,18 @@ class MapTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->context = $this->getMock(
-            \Magento\Framework\DataObject::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->context = $this->getMockBuilder(\Magento\Framework\DataObject::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $map = [
             ['title', null, 'Sample title'],
             ['description', null, 'Sample description'],
         ];
         $this->context->method('getData')->will($this->returnValueMap($map));
 
-        $this->item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->item->method('getContext')->willReturn($this->context);
 
         $this->model = $this->objectManager->getObject(

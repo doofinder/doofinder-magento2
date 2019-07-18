@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Magento\Framework\App\Request\DataPersistorInterface
  */
-class DataProviderTest extends BaseTestCase
+class DataProviderTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Framework\App\Request\DataPersistorInterface
@@ -48,47 +46,29 @@ class DataProviderTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->filter = $this->getMock(
-            \Magento\Framework\Api\Filter::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->filter = $this->getMockBuilder(\Magento\Framework\Api\Filter::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->filterBuilder = $this->getMock(
-            \Magento\Framework\Api\FilterBuilder::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->filterBuilder = $this->getMockBuilder(\Magento\Framework\Api\FilterBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->filterBuilder->method('create')->willReturn($this->filter);
 
-        $this->searchCriteria = $this->getMock(
-            \Magento\Framework\Api\Search\SearchCriteria::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->searchCriteria = $this->getMockBuilder(\Magento\Framework\Api\Search\SearchCriteria::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->searchCriteriaBuilder = $this->getMock(
-            \Magento\Framework\Api\Search\SearchCriteriaBuilder::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->searchCriteriaBuilder = $this->getMockBuilder(
+            \Magento\Framework\Api\Search\SearchCriteriaBuilder::class
+        )->disableOriginalConstructor()
+        ->getMock();
         $this->searchCriteriaBuilder->method('create')->willReturn($this->searchCriteria);
 
-        $this->dataPersistor = $this->getMock(
-            \Magento\Framework\App\Request\DataPersistorInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->dataPersistor = $this->getMockBuilder(
+            \Magento\Framework\App\Request\DataPersistorInterface::class
+        )->disableOriginalConstructor()
+        ->getMock();
 
         $this->dataProvider = $this->objectManager->getObject(
             \Doofinder\Feed\Ui\Component\Listing\Log\DataProvider::class,
@@ -107,13 +87,9 @@ class DataProviderTest extends BaseTestCase
      */
     public function testGetSearchCriteria()
     {
-        $process = $this->getMock(
-            \Doofinder\Feed\Model\Cron::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $process = $this->getMockBuilder(\Doofinder\Feed\Model\Cron::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $process->method('getId')->willReturn(5);
 
         $this->dataPersistor->expects($this->once())->method('get')

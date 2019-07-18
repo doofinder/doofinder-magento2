@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Fetcher;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Component\Fetcher\Product
  */
-class ProductTest extends BaseTestCase
+class ProductTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Fetcher\Product
@@ -48,21 +46,14 @@ class ProductTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            ['getEntityId'],
-            [],
-            '',
-            false
-        );
+        $this->product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->setMethods(['getEntityId'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->productCollection = $this->getMock(
-            \Magento\Catalog\Model\ResourceModel\Product\Collection::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->productCollection = $this->getMockBuilder(\Magento\Catalog\Model\ResourceModel\Product\Collection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->productCollection->expects($this->any())->method('addAttributeToSelect')
             ->willReturn($this->productCollection);
         $this->productCollection->expects($this->any())->method('addStoreFilter')
@@ -76,31 +67,22 @@ class ProductTest extends BaseTestCase
         $this->productCollection->expects($this->any())->method('getLastItem')
             ->willReturn($this->product);
 
-        $this->productCollectionFactory = $this->getMock(
-            \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->productCollectionFactory = $this->getMockBuilder(
+            \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class
+        )->setMethods(['create'])
+        ->disableOriginalConstructor()
+        ->getMock();
         $this->productCollectionFactory->expects($this->any())->method('create')
             ->willReturn($this->productCollection);
 
-        $this->item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->generatorItemFactory = $this->getMock(
-            \Doofinder\Feed\Model\Generator\ItemFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->generatorItemFactory = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\ItemFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->generatorItemFactory->expects($this->any())->method('create')
             ->willReturn($this->item);
 
@@ -165,22 +147,14 @@ class ProductTest extends BaseTestCase
         $this->model->setOffset(30);
         $this->model->setTransformOffset(true);
 
-        $select = $this->getMock(
-            \Magento\Framework\DB\Select::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $select = $this->getMockBuilder(\Magento\Framework\DB\Select::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->productCollection->method('getSelect')->willReturn($select);
 
-        $product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $product->method('getEntityId')->willReturn(51);
 
         $this->productCollection->expects($this->once())->method('getAllIds')

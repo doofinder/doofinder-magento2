@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\System\Config;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled
  */
-class InternalSearchEnabledTest extends BaseTestCase
+class InternalSearchEnabledTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Framework\Data\Form\Element\AbstractElement
@@ -43,43 +41,30 @@ class InternalSearchEnabledTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->element = $this->getMock(
-            \Magento\Framework\Data\Form\Element\AbstractElement::class,
-            array_merge(
+        $this->element = $this->getMockBuilder(\Magento\Framework\Data\Form\Element\AbstractElement::class)
+            ->setMethods(array_merge(
                 get_class_methods(\Magento\Framework\Data\Form\Element\AbstractElement::class),
                 ['setText', 'setComment']
-            ),
-            [],
-            '',
-            false
-        );
+            ))
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->element->method('getHtmlId')->willReturn('sample_id');
         $this->element->method('getElementHtml')->willReturn('sample value');
 
-        $this->urlBuilder = $this->getMock(
-            \Magento\Backend\Model\Url::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->urlBuilder = $this->getMockBuilder(\Magento\Backend\Model\Url::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->context = $this->getMock(
-            \Magento\Backend\Block\Template\Context::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->context = $this->getMockBuilder(\Magento\Backend\Block\Template\Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->context->method('getUrlBuilder')->willReturn($this->urlBuilder);
 
-        $this->storeConfig = $this->getMock(
-            \Doofinder\Feed\Helper\StoreConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->block = $this->objectManager->getObject(
             \Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled::class,

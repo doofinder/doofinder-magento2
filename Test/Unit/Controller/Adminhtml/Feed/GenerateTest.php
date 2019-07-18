@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Controller\Adminhtml\Feed;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Controller\Adminhtml\Feed\Generate
  */
-class GenerateTest extends BaseTestCase
+class GenerateTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Backend\App\Action\Context
@@ -43,37 +41,24 @@ class GenerateTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->context = $this->getMock(
-            \Magento\Backend\App\Action\Context::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->context = $this->getMockBuilder(\Magento\Backend\App\Action\Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->resultJsonFactory = $this->getMock(
-            \Magento\Framework\Controller\Result\JsonFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->resultJsonFactory = $this->getMockBuilder(\Magento\Framework\Controller\Result\JsonFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->resultJson = $this->getMock(
-            \Magento\Framework\Controller\Result\Json::class,
-            ['setData'],
-            [],
-            '',
-            false
-        );
+        $this->resultJson = $this->getMockBuilder(\Magento\Framework\Controller\Result\Json::class)
+            ->setMethods(['setData'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->schedule = $this->getMock(
-            \Doofinder\Feed\Helper\Schedule::class,
-            ['regenerateSchedule'],
-            [],
-            '',
-            false
-        );
+        $this->schedule = $this->getMockBuilder(\Doofinder\Feed\Helper\Schedule::class)
+            ->setMethods(['regenerateSchedule'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->resultJsonFactory->expects($this->once())
             ->method('create')

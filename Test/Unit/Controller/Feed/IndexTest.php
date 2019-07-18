@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Controller\Feed;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Controller\Feed\Index
  */
-class IndexTest extends BaseTestCase
+class IndexTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Framework\App\Action\Context
@@ -63,76 +61,46 @@ class IndexTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->helper = $this->getMock(
-            \Doofinder\Feed\Helper\Data::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->helper = $this->getMockBuilder(\Doofinder\Feed\Helper\Data::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->xml = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\Processor\Xml::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->xml = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Component\Processor\Xml::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->xml->expects($this->once())->method('getFeed');
 
-        $this->generator = $this->getMock(
-            \Doofinder\Feed\Model\Generator::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->generator = $this->getMockBuilder(\Doofinder\Feed\Model\Generator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->generator->expects($this->once())->method('getProcessor')
             ->with('Xml')->willReturn($this->xml);
 
-        $this->generatorFactory = $this->getMock(
-            \Doofinder\Feed\Model\GeneratorFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->generatorFactory = $this->getMockBuilder(\Doofinder\Feed\Model\GeneratorFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->generatorFactory->expects($this->once())
             ->method('create')->willReturn($this->generator);
 
-        $this->response = $this->getMock(
-            \Magento\Framework\App\Response\Http::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->response = $this->getMockBuilder(\Magento\Framework\App\Response\Http::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->response->expects($this->once())->method('setBody');
 
-        $this->request = $this->getMock(
-            \Magento\Framework\App\RequestInterface::class,
-            [],
-            [],
-            ''
-        );
+        $this->request = $this->getMockBuilder(\Magento\Framework\App\RequestInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->feedConfig = $this->getMock(
-            \Doofinder\Feed\Helper\FeedConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->feedConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\FeedConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->feedConfig->expects($this->once())
             ->method('getFeedConfig')->willReturn(['test' => 'test']);
 
-        $this->context = $this->getMock(
-            \Magento\Framework\App\Action\Context::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->context = $this->getMockBuilder(\Magento\Framework\App\Action\Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->context->method('getResponse')->willReturn($this->response);
         $this->context->method('getRequest')->willReturn($this->request);
 

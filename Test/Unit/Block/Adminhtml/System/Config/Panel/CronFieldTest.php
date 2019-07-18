@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\System\Config\Panel;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Block\Adminhtml\System\Config\Panel\Cron
  */
-class CronFieldTest extends BaseTestCase
+class CronFieldTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Framework\App\RequestInterface
@@ -63,88 +61,59 @@ class CronFieldTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->request = $this->getMock(
-            \Magento\Framework\App\RequestInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->request = $this->getMockBuilder(\Magento\Framework\App\RequestInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->request->method('getParam')->with('store')->willReturn(1);
 
-        $this->store =  $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->store =  $this->getMockBuilder(\Magento\Store\Model\Store::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->store->method('getCode')->willReturn('sample');
 
-        $this->storeManager =  $this->getMock(
-            \Magento\Store\Model\StoreManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeManager =  $this->getMockBuilder(\Magento\Store\Model\StoreManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->storeManager->method('getStore')->with(1)->willReturn($this->store);
 
-        $this->date = $this->getMock(
-            \DateTime::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->date = $this->getMockBuilder(\DateTime::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->timezone = $this->getMock(
-            \Magento\Framework\Stdlib\DateTime\Timezone::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->timezone = $this->getMockBuilder(\Magento\Framework\Stdlib\DateTime\Timezone::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->timezone->method('getConfigTimezone')->willReturn('UTC');
         $this->timezone->method('scopeDate')->willReturn($this->date);
         $this->timezone->method('formatDateTime')->willReturn('2000-10-05 14:20:00');
 
-        $this->context = $this->getMock(
-            \Magento\Backend\Block\Template\Context::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->context = $this->getMockBuilder(\Magento\Backend\Block\Template\Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->context->method('getRequest')->willReturn($this->request);
         $this->context->method('getStoreManager')->willReturn($this->storeManager);
         $this->context->method('getLocaleDate')->willReturn($this->timezone);
 
-        $this->element = $this->getMock(
-            \Magento\Framework\Data\Form\Element\AbstractElement::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->element = $this->getMockBuilder(\Magento\Framework\Data\Form\Element\AbstractElement::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->element->method('getHtmlId')->willReturn('sample_id');
         $this->element->method('getElementHtml')->willReturn('sample value');
 
-        $this->schedule = $this->getMock(
-            \Doofinder\Feed\Helper\Schedule::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->schedule = $this->getMockBuilder(\Doofinder\Feed\Helper\Schedule::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->process = $this->getMock(
-            \Doofinder\Feed\Model\Cron::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->process = $this->getMockBuilder(\Doofinder\Feed\Model\Cron::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->process->method('getId')->willReturn(5);
 
         $this->block = $this->objectManager->getObject(

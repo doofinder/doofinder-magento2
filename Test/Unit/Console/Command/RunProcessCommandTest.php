@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Console\Command;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Console\Command\RunProcessCommand
  */
-class RunProcessCommandTest extends BaseTestCase
+class RunProcessCommandTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\CronFactory
@@ -38,31 +36,20 @@ class RunProcessCommandTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->process = $this->getMock(
-            \Doofinder\Feed\Model\Cron::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->process = $this->getMockBuilder(\Doofinder\Feed\Model\Cron::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->process->method('load')->willReturn($this->process);
 
-        $this->cronFactory = $this->getMock(
-            \Doofinder\Feed\Model\CronFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->cronFactory = $this->getMockBuilder(\Doofinder\Feed\Model\CronFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->cronFactory->method('create')->willReturn($this->process);
 
-        $this->schedule = $this->getMock(
-            \Doofinder\Feed\Helper\Schedule::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->schedule = $this->getMockBuilder(\Doofinder\Feed\Helper\Schedule::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->command = $this->objectManager->getObject(
             \Doofinder\Feed\Console\Command\RunProcessCommand::class,

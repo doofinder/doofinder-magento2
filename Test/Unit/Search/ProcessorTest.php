@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Search;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Search\Processor
  */
-class ProcessorTest extends BaseTestCase
+class ProcessorTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator
@@ -49,29 +47,18 @@ class ProcessorTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->generator = $this->getMock(
-            \Doofinder\Feed\Model\Generator::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->generator = $this->getMockBuilder(\Doofinder\Feed\Model\Generator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->generatorFactory = $this->getMock(
-            \Doofinder\Feed\Model\GeneratorFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->generatorFactory = $this->getMockBuilder(\Doofinder\Feed\Model\GeneratorFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->feedConfig = $this->getMock(
-            \Doofinder\Feed\Helper\FeedConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->feedConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\FeedConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->feedConfig->method('getLeanFeedConfig')->willReturn([
             'data' => [
                 'config' => [
@@ -84,21 +71,13 @@ class ProcessorTest extends BaseTestCase
             ],
         ]);
 
-        $this->searchHelper = $this->getMock(
-            \Doofinder\Feed\Helper\Search::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->searchHelper = $this->getMockBuilder(\Doofinder\Feed\Helper\Search::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->processor = $this->objectManager->getObject(
             \Doofinder\Feed\Search\Processor::class,

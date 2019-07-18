@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine
  */
-class EngineTest extends BaseTestCase
+class EngineTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -38,29 +36,19 @@ class EngineTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->storeConfig = $this->getMock(
-            \Doofinder\Feed\Helper\StoreConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->search = $this->getMock(
-            \Doofinder\Feed\Helper\Search::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->search = $this->getMockBuilder(\Doofinder\Feed\Helper\Search::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->engine = $this->getMock(
-            \Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine::class,
-            ['getValue'],
-            [],
-            '',
-            false
-        );
+        $this->engine = $this->getMockBuilder(
+            \Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine::class
+        )->setMethods(['getValue'])
+        ->disableOriginalConstructor()
+        ->getMock();
 
         $this->plugin = $this->objectManager->getObject(
             \Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine::class,
@@ -75,7 +63,6 @@ class EngineTest extends BaseTestCase
      * Test beforeSave()
      *
      * @return void
-     * @doesNotPerformAssertions
      */
     public function testBeforeSave()
     {
@@ -124,7 +111,6 @@ class EngineTest extends BaseTestCase
      * Test beforeSave() method when engine is not selected
      *
      * @return void
-     * @doesNotPerformAssertions
      */
     public function testBeforeSaveNotSelected()
     {
