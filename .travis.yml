@@ -14,15 +14,17 @@ cache:
 matrix:
   include:
   - php: 7.0.24
-    env: MAGENTO_VERSION=2.1.15
+    env: MAGENTO_VERSION=2.1.17
   - php: 7.0.24
-    env: MAGENTO_VERSION=2.1.16
+    env: MAGENTO_VERSION=2.1.18
   - php: 7.0.24
-    env: MAGENTO_VERSION=2.2.6
+    env: MAGENTO_VERSION=2.2.8
   - php: 7.0.24
-    env: MAGENTO_VERSION=2.2.7
+    env: MAGENTO_VERSION=2.2.9
   - php: 7.1.3
-    env: MAGENTO_VERSION=2.3.0
+    env: MAGENTO_VERSION=2.3.1
+  - php: 7.1.3
+    env: MAGENTO_VERSION=2.3.2
 
 env:
   global:
