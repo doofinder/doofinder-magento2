@@ -2,14 +2,12 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Helper\Schedule
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ScheduleTest extends BaseTestCase
+class ScheduleTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\Schedule
@@ -96,30 +94,20 @@ class ScheduleTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->process = $this->getMock(
-            \Doofinder\Feed\Model\Cron::class,
-            ['getStoreCode', 'save', 'setOffset', 'setComplete', 'setLastFeedName', 'setMessage', 'setErrorStack'],
-            [],
-            '',
-            false
-        );
+        $this->process = $this->getMockBuilder(\Doofinder\Feed\Model\Cron::class)
+            ->setMethods([
+                'getStoreCode', 'save', 'setOffset', 'setComplete', 'setLastFeedName', 'setMessage', 'setErrorStack'
+            ])->disableOriginalConstructor()
+            ->getMock();
         $this->process->method('getStoreCode')->willReturn('feed');
 
-        $this->driver = $this->getMock(
-            \Magento\Framework\Filesystem\DriverInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->driver = $this->getMockBuilder(\Magento\Framework\Filesystem\DriverInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->directory = $this->getMock(
-            \Magento\Framework\Filesystem\Directory\Write::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->directory = $this->getMockBuilder(\Magento\Framework\Filesystem\Directory\Write::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->directory->method('getAbsolutePath')->will($this->onConsecutiveCalls(
             '/tmp/doofinder-feed.xml.tmp',
             '/tmp/doofinder-feed.xml.tmp',
@@ -127,104 +115,62 @@ class ScheduleTest extends BaseTestCase
         ));
         $this->directory->method('getDriver')->willReturn($this->driver);
 
-        $this->filesystem = $this->getMock(
-            \Magento\Framework\Filesystem::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->filesystem = $this->getMockBuilder(\Magento\Framework\Filesystem::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->filesystem->method('getDirectoryRead')->willReturn($this->directory);
         $this->filesystem->method('getDirectoryWrite')->willReturn($this->directory);
 
-        $this->fetcher = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\FetcherInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->fetcher = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Component\FetcherInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->fetcher->method('getLastProcessedEntityId')->will($this->onConsecutiveCalls(9, 21));
 
-        $this->generator = $this->getMock(
-            \Doofinder\Feed\Model\Generator::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->generator = $this->getMockBuilder(\Doofinder\Feed\Model\Generator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->generator->method('getFetcher')->willReturn($this->fetcher);
 
-        $this->generatorFactory = $this->getMock(
-            \Doofinder\Feed\Model\GeneratorFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->generatorFactory = $this->getMockBuilder(\Doofinder\Feed\Model\GeneratorFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->generatorFactory->method('create')->willReturn($this->generator);
 
-        $this->date = $this->getMock(
-            \DateTime::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->date = $this->getMockBuilder(\DateTime::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->timezone = $this->getMock(
-            \Magento\Framework\Stdlib\DateTime\TimezoneInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->timezone = $this->getMockBuilder(\Magento\Framework\Stdlib\DateTime\TimezoneInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->timezone->method('getConfigTimezone')->willReturn('America/Los_Angeles');
         $this->timezone->method('date')->willReturn($this->date);
 
-        $this->store = $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->store = $this->getMockBuilder(\Magento\Store\Model\Store::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->store->method('getBaseUrl')->with(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
             ->willReturn('http://example.com/media/');
 
-        $this->storeManager = $this->getMock(
-            \Magento\Store\Model\StoreManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeManager = $this->getMockBuilder(\Magento\Store\Model\StoreManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->storeManager->method('getStore')->with('default')->willReturn($this->store);
 
-        $this->feedLogger = $this->getMock(
-            \Doofinder\Feed\Logger\Feed::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->feedLogger = $this->getMockBuilder(\Doofinder\Feed\Logger\Feed::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->feedLoggerFactory = $this->getMock(
-            \Doofinder\Feed\Logger\FeedFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->feedLoggerFactory = $this->getMockBuilder(\Doofinder\Feed\Logger\FeedFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->feedLoggerFactory->method('create')->willReturn($this->feedLogger);
 
-        $this->storeConfig = $this->getMock(
-            \Doofinder\Feed\Helper\StoreConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->helper = $this->objectManager->getObject(
             \Doofinder\Feed\Helper\Schedule::class,

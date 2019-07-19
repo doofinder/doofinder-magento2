@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\Password
  */
-class PasswordTest extends BaseTestCase
+class PasswordTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Config\Backend\Password
@@ -34,7 +32,6 @@ class PasswordTest extends BaseTestCase
      * @param  string $value
      * @return void
      * @dataProvider providerTestBeforeSaveData
-     * @doesNotPerformAssertions
      */
     public function testBeforeSave($value)
     {

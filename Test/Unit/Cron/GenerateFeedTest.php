@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Cron;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Cron\GenerateFeed
  */
-class GenerateFeedTest extends BaseTestCase
+class GenerateFeedTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\Schedule
@@ -33,21 +31,13 @@ class GenerateFeedTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->schedule = $this->getMock(
-            \Doofinder\Feed\Helper\Schedule::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->schedule = $this->getMockBuilder(\Doofinder\Feed\Helper\Schedule::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->process = $this->getMock(
-            \Doofinder\Feed\Model\Cron::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->process = $this->getMockBuilder(\Doofinder\Feed\Model\Cron::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->cron = $this->objectManager->getObject(
             \Doofinder\Feed\Cron\GenerateFeed::class,

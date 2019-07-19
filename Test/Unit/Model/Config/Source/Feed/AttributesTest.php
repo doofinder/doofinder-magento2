@@ -1,13 +1,11 @@
 <?php
 
-namespace Doofinder\Feed\Test\Unit\Model\Source\Feed;
-
-use Doofinder\Feed\Test\Unit\BaseTestCase;
+namespace Doofinder\Feed\Test\Unit\Model\Config\Source\Feed;
 
 /**
  * Test class for \Doofinder\Feed\Model\Config\Source\Feed\Attributes
  */
-class AttributesTest extends BaseTestCase
+class AttributesTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var Magento\Eav\Model\Config
@@ -52,29 +50,18 @@ class AttributesTest extends BaseTestCase
             'df_sale_price' => 'Doofinder: Product Sale Price',
         ];
 
-        $this->eavConfig = $this->getMock(
-            \Magento\Eav\Model\Config::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->eavConfig = $this->getMockBuilder(\Magento\Eav\Model\Config::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->escaper = $this->getMock(
-            \Magento\Framework\Escaper::class,
-            null,
-            [],
-            '',
-            false
-        );
+        $this->escaper = $this->getMockBuilder(\Magento\Framework\Escaper::class)
+            ->setMethods(null)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->entityType = $this->getMock(
-            \Magento\Eav\Model\Entity\Type::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->entityType = $this->getMockBuilder(\Magento\Eav\Model\Entity\Type::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $eavAttribute = $this->getMockBuilder(\Magento\Catalog\Model\ResourceModel\Eav\Attribute::class)
             ->disableOriginalConstructor()

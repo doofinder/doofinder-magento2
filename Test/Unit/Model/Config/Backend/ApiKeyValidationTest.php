@@ -1,13 +1,11 @@
 <?php
 
-namespace Doofinder\Feed\Test\Unit\Model\Backend;
-
-use Doofinder\Feed\Test\Unit\BaseTestCase;
+namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\ApiKeyValidation
  */
-class ApiKeyValidationTest extends BaseTestCase
+class ApiKeyValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -38,29 +36,17 @@ class ApiKeyValidationTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->storeConfig = $this->getMock(
-            \Doofinder\Feed\Helper\StoreConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->search = $this->getMock(
-            \Doofinder\Feed\Helper\Search::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->search = $this->getMockBuilder(\Doofinder\Feed\Helper\Search::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->resource = $this->getMock(
-            \Magento\Framework\Model\ResourceModel\Db\AbstractDb::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->resource = $this->getMockBuilder(\Magento\Framework\Model\ResourceModel\Db\AbstractDb::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->model = $this->objectManager->getObject(
             \Doofinder\Feed\Model\Config\Backend\ApiKeyValidation::class,

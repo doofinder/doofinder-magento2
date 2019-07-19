@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Map;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Map\Product
  */
-class ProductTest extends BaseTestCase
+class ProductTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product
@@ -53,13 +51,9 @@ class ProductTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->category = $this->getMock(
-            \Magento\Catalog\Model\Category::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->category = $this->getMockBuilder(\Magento\Catalog\Model\Category::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->category->method('getName')->will(
             $this->onConsecutiveCalls(
                 'Category 1',
@@ -68,39 +62,23 @@ class ProductTest extends BaseTestCase
             )
         );
 
-        $this->product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->currency = $this->getMock(
-            \Magento\Directory\Model\Currency::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->currency = $this->getMockBuilder(\Magento\Directory\Model\Currency::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->currency->method('format')->with(10.1234)->willReturn('10.1234');
 
-        $this->priceCurrency = $this->getMock(
-            \Magento\Framework\Pricing\PriceCurrencyInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->priceCurrency = $this->getMockBuilder(\Magento\Framework\Pricing\PriceCurrencyInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->priceCurrency->method('getCurrency')->willReturn($this->currency);
 
-        $this->helper = $this->getMock(
-            \Doofinder\Feed\Helper\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->helper = $this->getMockBuilder(\Doofinder\Feed\Helper\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->helper->method('getProductUrl')->willReturn('http://example.com/simple-product.html');
         $this->helper->method('getProductCategoriesWithParents')->willReturn([
             [
@@ -125,13 +103,9 @@ class ProductTest extends BaseTestCase
         ];
         $this->helper->method('getAttributeText')->will($this->returnValueMap($map));
 
-        $this->item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->item->method('getContext')->willReturn($this->product);
 
         $this->model = $this->objectManager->getObject(

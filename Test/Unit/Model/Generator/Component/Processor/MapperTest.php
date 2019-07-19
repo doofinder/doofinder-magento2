@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Processor;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Component\Processor\Mapper
  */
-class MapperTest extends BaseTestCase
+class MapperTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\Mapper
@@ -43,30 +41,19 @@ class MapperTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            ['getContext'],
-            [],
-            '',
-            false
-        );
+        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->setMethods(['getContext'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->item->method('getContext')->willReturn($this->product);
 
-        $this->map = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Map::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->map = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Map::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $map = [
             ['title', 'Sample title'],
             ['description', 'Sample description'],
@@ -75,13 +62,9 @@ class MapperTest extends BaseTestCase
         $this->map->expects($this->once())->method('before');
         $this->map->expects($this->once())->method('after');
 
-        $this->mapFactory = $this->getMock(
-            \Doofinder\Feed\Model\Generator\MapFactory::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->mapFactory = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\MapFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->mapFactory->method('create')->willReturn($this->map);
 
         $this->model = $this->objectManager->getObject(

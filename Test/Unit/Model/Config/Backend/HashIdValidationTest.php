@@ -1,13 +1,11 @@
 <?php
 
-namespace Doofinder\Feed\Test\Unit\Model\Backend;
-
-use Doofinder\Feed\Test\Unit\BaseTestCase;
+namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\HashIdValidation
  */
-class HashIdValidationTest extends BaseTestCase
+class HashIdValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -38,13 +36,9 @@ class HashIdValidationTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->storeConfig = $this->getMock(
-            \Doofinder\Feed\Helper\StoreConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->storeConfig->method('getCurrentStoreCode')->willReturn('current');
         $this->storeConfig->method('getStoreCodes')->willReturn(['sample1', 'current', 'sample2']);
         $this->storeConfig->method('getHashId')->will($this->returnValueMap([
@@ -53,21 +47,13 @@ class HashIdValidationTest extends BaseTestCase
             ['sample2', 'sample_hash_id_2'],
         ]));
 
-        $this->search = $this->getMock(
-            \Doofinder\Feed\Helper\Search::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->search = $this->getMockBuilder(\Doofinder\Feed\Helper\Search::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->resource = $this->getMock(
-            \Magento\Framework\Model\ResourceModel\Db\AbstractDb::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->resource = $this->getMockBuilder(\Magento\Framework\Model\ResourceModel\Db\AbstractDb::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->model = $this->objectManager->getObject(
             \Doofinder\Feed\Model\Config\Backend\HashIdValidation::class,
@@ -83,7 +69,6 @@ class HashIdValidationTest extends BaseTestCase
      * Test save() method
      *
      * @return void
-     * @doesNotPerformAssertions
      */
     public function testSave()
     {

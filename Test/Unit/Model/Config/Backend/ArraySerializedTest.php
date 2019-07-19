@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\ArraySerialized
  */
-class ArraySerializedTest extends BaseTestCase
+class ArraySerializedTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Framework\Model\Context
@@ -48,45 +46,25 @@ class ArraySerializedTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->context = $this->getMock(
-            \Magento\Framework\Model\Context::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->context = $this->getMockBuilder(\Magento\Framework\Model\Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->registry = $this->getMock(
-            \Magento\Framework\Registry::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->registry = $this->getMockBuilder(\Magento\Framework\Registry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->configScope = $this->getMock(
-            \Magento\Framework\App\Config\ScopeConfigInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->configScope = $this->getMockBuilder(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->cacheTypeList = $this->getMock(
-            \Magento\Framework\App\Cache\TypeListInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->cacheTypeList = $this->getMockBuilder(\Magento\Framework\App\Cache\TypeListInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->managerInterface = $this->getMock(
-            \Magento\Framework\Event\ManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->managerInterface = $this->getMockBuilder(\Magento\Framework\Event\ManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->context->expects($this->once())
             ->method('getEventDispatcher')
