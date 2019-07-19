@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Helper\Data
  */
-class DataTest extends BaseTestCase
+class DataTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
@@ -43,37 +41,21 @@ class DataTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->storeManager = $this->getMock(
-            \Magento\Store\Model\StoreManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeManager = $this->getMockBuilder(\Magento\Store\Model\StoreManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->storeConfig = $this->getMock(
-            \Magento\Store\Api\Data\StoreConfigInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeConfig = $this->getMockBuilder(\Magento\Store\Api\Data\StoreConfigInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->module = $this->getMock(
-            \Magento\Framework\Module\ModuleListInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->module = $this->getMockBuilder(\Magento\Framework\Module\ModuleListInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->logger = $this->getMock(
-            \Psr\Log\LoggerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->helper = $this->objectManager->getObject(
             \Doofinder\Feed\Helper\Data::class,

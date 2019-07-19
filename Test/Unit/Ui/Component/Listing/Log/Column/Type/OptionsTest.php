@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Ui\Component\Listing\Log\Column\Type;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Ui\Component\Listing\Log\Column\Type\Options
  */
-class OptionsTest extends BaseTestCase
+class OptionsTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Logger\Feed
@@ -28,13 +26,9 @@ class OptionsTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->logger = $this->getMock(
-            \Doofinder\Feed\Logger\Feed::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->logger = $this->getMockBuilder(\Doofinder\Feed\Logger\Feed::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->logger->method('getLevelOptions')->willReturn([
             100 => 'DEBUG',
             200 => 'INFO',

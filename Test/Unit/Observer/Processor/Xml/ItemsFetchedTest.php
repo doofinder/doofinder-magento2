@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Observer\Processor\Xml;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Observer\Processor\Xml\ItemsFetched
  */
-class ItemsFetchedTest extends BaseTestCase
+class ItemsFetchedTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Observer\Processor\Xml\ItemsFetched
@@ -43,38 +41,25 @@ class ItemsFetchedTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->xmlProcessor = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\Processor\Xml::class,
-            ['setStart', 'setEnd'],
-            [],
-            '',
-            false
-        );
+        $this->xmlProcessor = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Component\Processor\Xml::class)
+            ->setMethods(['setStart', 'setEnd'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->fetcher = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Component\FetcherInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->fetcher = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Component\FetcherInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->generator = $this->getMock(
-            \Doofinder\Feed\Model\Generator::class,
-            ['getProcessor', 'getFetcher'],
-            [],
-            '',
-            false
-        );
+        $this->generator = $this->getMockBuilder(\Doofinder\Feed\Model\Generator::class)
+            ->setMethods(['getProcessor', 'getFetcher'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->generator->method('getProcessor')->with('Xml')->willReturn($this->xmlProcessor);
 
-        $this->invokedObserver = $this->getMock(
-            \Magento\Framework\Event\Observer::class,
-            ['getGenerator'],
-            [],
-            '',
-            false
-        );
+        $this->invokedObserver = $this->getMockBuilder(\Magento\Framework\Event\Observer::class)
+            ->setMethods(['getGenerator'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->invokedObserver->method('getGenerator')->willReturn($this->generator);
 
         $this->observer = $this->objectManager->getObject(

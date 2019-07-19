@@ -2,14 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\MapFactory
  */
-class MapFactoryTest extends BaseTestCase
+class MapFactoryTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\MapFactory
@@ -30,19 +26,14 @@ class MapFactoryTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->objectManagerMock = $this->getMock(
-            \Magento\Framework\ObjectManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->objectManagerMock = $this->getMockBuilder(\Magento\Framework\ObjectManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->model = $this->getMock(
+        $this->model = $this->objectManager->getObject(
             \Doofinder\Feed\Model\Generator\MapFactory::class,
-            null,
             [
-                'objectManager' => $this->objectManagerMock,
+                'objectManager'  => $this->objectManagerMock,
             ]
         );
     }
@@ -61,25 +52,20 @@ class MapFactoryTest extends BaseTestCase
     {
         // Create subclass mock
         if ($subclassExists) {
-            $this->getMock($expected, [], [], '', false);
+            $this->getMockBuilder($expected)
+                ->disableOriginalConstructor()
+                ->getMock();
         }
 
-        $context = $this->getMock(
-            $class,
-            ['getTypeId'],
-            [],
-            '',
-            false
-        );
+        $context = $this->getMockBuilder($class)
+            ->setMethods(['getTypeId'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $context->method('getTypeId')->willReturn($type);
 
-        $item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $item->method('getContext')->willReturn($context);
 
         $this->objectManagerMock->expects($this->once())->method('create')

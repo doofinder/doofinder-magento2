@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Map\Product;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Map\Product\Configurable
  */
-class ConfigurableTest extends BaseTestCase
+class ConfigurableTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product\Configurable
@@ -38,41 +36,25 @@ class ConfigurableTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->helper = $this->getMock(
-            \Doofinder\Feed\Helper\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->helper = $this->getMockBuilder(\Doofinder\Feed\Helper\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->productAttributeValue = 'sample parent value';
         $this->helper->method('getAttributeText')->will($this->returnCallback(function () {
             return $this->productAttributeValue;
         }));
 
-        $this->product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->associate = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->associate = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->item->method('getContext')->willReturn($this->product);
         $this->item->method('getAssociates')->willReturn([
             $this->associate,
@@ -81,13 +63,9 @@ class ConfigurableTest extends BaseTestCase
             $this->associate,
         ]);
 
-        $this->map = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Map\Product\Associate::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->map = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Map\Product\Associate::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->map->method('get')->will($this->onConsecutiveCalls(
             'sample associate value 1',
             'sample associate value 2',
@@ -95,13 +73,10 @@ class ConfigurableTest extends BaseTestCase
             'sample associate value 2'
         ));
 
-        $this->mapFactory = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Map\Product\AssociateFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->mapFactory = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Map\Product\AssociateFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->mapFactory->method('create')->willReturn($this->map);
 
         $this->model = $this->objectManager->getObject(

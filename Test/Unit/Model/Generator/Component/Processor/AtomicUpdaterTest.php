@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component\Processor;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Component\Processor\AtomicUpdater
  */
-class AtomicUpdaterTest extends BaseTestCase
+class AtomicUpdaterTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\Processor\AtomicUpdater
@@ -33,21 +31,13 @@ class AtomicUpdaterTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->item = $this->getMock(
-            \Doofinder\Feed\Model\Generator\Item::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->search = $this->getMock(
-            \Doofinder\Feed\Helper\Search::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->search = $this->getMockBuilder(\Doofinder\Feed\Helper\Search::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->model = $this->objectManager->getObject(
             \Doofinder\Feed\Model\Generator\Component\Processor\AtomicUpdater::class,

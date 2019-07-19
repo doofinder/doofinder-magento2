@@ -1,13 +1,11 @@
 <?php
 
-namespace Doofinder\Feed\Test\Unit\Model\Backend;
-
-use Doofinder\Feed\Test\Unit\BaseTestCase;
+namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\StartTime
  */
-class StartTimeTest extends BaseTestCase
+class StartTimeTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \DateTime
@@ -38,21 +36,13 @@ class StartTimeTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->date = $this->getMock(
-            \DateTime::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->date = $this->getMockBuilder(\DateTime::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->timezone = $this->getMock(
-            \Magento\Framework\Stdlib\DateTime\Timezone::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->timezone = $this->getMockBuilder(\Magento\Framework\Stdlib\DateTime\Timezone::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->timezone->method('getDefaultTimezone')->willReturn('UTC');
         $this->timezone->method('getConfigTimezone')->willReturn('America/Los_Angeles');
         $this->timezone->method('date')->willReturn($this->date);
