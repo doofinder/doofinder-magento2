@@ -129,11 +129,11 @@
     </type>
 
     <type name="Magento\Config\Model\Config">
-      <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
+        <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
     </type>
 
     <type name="Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine">
-      <plugin name="doofinderSearchEngineBackend" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine" sortOrder="1" />
+        <plugin name="doofinderSearchEngineBackend" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine" sortOrder="1" />
     </type>
 
     <type name="Doofinder\Feed\Console\Command\RescheduleProcessCommand">
@@ -161,5 +161,21 @@
 
     <type name="Magento\Framework\Url\RouteParamsResolver">
         <plugin name="doofinderUrlRouteParamsResolver" type="Doofinder\Feed\Plugin\Url\RouteParamsResolver" sortOrder="50"/>
+    </type>
+
+    <!-- The virtual types are not set because of the Amasty extension -->
+    <type name="Magento\Elasticsearch\Model\Layer\Search\ItemCollectionProvider">
+        <arguments>
+            <argument name="factories" xsi:type="array">
+                <item name="doofinder" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Elasticsearch\Model\Layer\Category\ItemCollectionProvider">
+        <arguments>
+            <argument name="factories" xsi:type="array">
+                <item name="doofinder" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</item>
+            </argument>
+        </arguments>
     </type>
 </config>
