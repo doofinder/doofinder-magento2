@@ -2,14 +2,12 @@
 
 namespace Doofinder\Feed\Test\Unit\Controller\Feed;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Controller\Feed\Config
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ConfigTest extends BaseTestCase
+class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Controller\Feed\Config
@@ -81,110 +79,68 @@ class ConfigTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->storeConfig = $this->getMock(
-            \Doofinder\Feed\Helper\StoreConfig::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->jsonResult = $this->getMock(
-            \Magento\Framework\Controller\Result\Json::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->jsonResult = $this->getMockBuilder(\Magento\Framework\Controller\Result\Json::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->resultFactory = $this->getMock(
-            \Magento\Framework\Controller\ResultFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->resultFactory = $this->getMockBuilder(\Magento\Framework\Controller\ResultFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->resultFactory->method('create')
             ->with('json')->willReturn($this->jsonResult);
 
-        $this->response = $this->getMock(
-            \Magento\Framework\App\ResponseInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->response = $this->getMockBuilder(\Magento\Framework\App\ResponseInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->context = $this->getMock(
-            \Magento\Framework\App\Action\Context::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->context = $this->getMockBuilder(\Magento\Framework\App\Action\Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->context->method('getResponse')->willReturn($this->response);
         $this->context->method('getResultFactory')->willReturn($this->resultFactory);
 
-        $this->store = $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->store = $this->getMockBuilder(\Magento\Store\Model\Store::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->store->method('getCode')->willReturn('default');
         $this->store->method('getUrl')->with('doofinder/feed')->willReturn(
             'http://example.com/index.php/doofinder/feed/'
         );
         $this->store->method('getCurrentCurrencyCode')->willReturn('USD');
 
-        $this->storeManager = $this->getMock(
-            \Magento\Store\Model\StoreManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeManager = $this->getMockBuilder(\Magento\Store\Model\StoreManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->storeManager->method('getStore')->willReturn($this->store);
         $this->storeManager->method('getStores')->willReturn([$this->store]);
 
-        $this->productMetadata = $this->getMock(
-            \Magento\Framework\App\ProductMetadataInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->productMetadata = $this->getMockBuilder(\Magento\Framework\App\ProductMetadataInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->productMetadata->method('getVersion')->willReturn('x.y.z');
         $this->productMetadata->method('getEdition')->willReturn('Community');
 
-        $this->helper = $this->getMock(
-            \Doofinder\Feed\Helper\Data::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->helper = $this->getMockBuilder(\Doofinder\Feed\Helper\Data::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->helper->method('getModuleVersion')->willReturn('k.l.m');
 
-        $this->scopeConfig = $scopeConfig = $this->getMock(
-            \Magento\Framework\App\Config\ScopeConfigInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->scopeConfig = $scopeConfig = $this->getMockBuilder(
+            \Magento\Framework\App\Config\ScopeConfigInterface::class
+        )->disableOriginalConstructor()
+        ->getMock();
         $this->scopeConfig->method('getValue')->will($this->returnValueMap([
             ['general/locale/code', $scopeConfig::SCOPE_TYPE_DEFAULT, null, 'EN'],
         ]));
 
-        $this->schedule = $this->getMock(
-            \Doofinder\Feed\Helper\Schedule::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->schedule = $this->getMockBuilder(\Doofinder\Feed\Helper\Schedule::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->schedule->method('isFeedFileExist')->willReturn(false);
         $this->schedule->method('getFeedFileUrl')->with('default', false)
             ->willReturn('http://example.com/pub/media//doofinder-default.xml');

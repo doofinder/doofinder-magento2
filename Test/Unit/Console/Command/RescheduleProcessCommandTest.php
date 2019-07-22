@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Console\Command;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Console\Command\RescheduleProcessCommand
  */
-class RescheduleProcessCommandTest extends BaseTestCase
+class RescheduleProcessCommandTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
@@ -38,30 +36,18 @@ class RescheduleProcessCommandTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->store = $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->store = $this->getMockBuilder(\Magento\Store\Model\Store::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->storeManager = $this->getMock(
-            \Magento\Store\Model\StoreManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeManager = $this->getMockBuilder(\Magento\Store\Model\StoreManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->storeManager->expects($this->once())->method('getStore')->with('default')->willReturn($this->store);
 
-        $this->schedule = $this->getMock(
-            \Doofinder\Feed\Helper\Schedule::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->schedule = $this->getMockBuilder(\Doofinder\Feed\Helper\Schedule::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->command = $this->objectManager->getObject(
             \Doofinder\Feed\Console\Command\RescheduleProcessCommand::class,

@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Helper\StoreConfig
  */
-class StoreConfigTest extends BaseTestCase
+class StoreConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
@@ -68,77 +66,43 @@ class StoreConfigTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->scopeConfig = $this->getMock(
-            \Magento\Framework\App\Config\ScopeConfigInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->scopeConfig = $this->getMockBuilder(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->storeManager = $this->getMock(
-            \Magento\Store\Model\StoreManager::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeManager = $this->getMockBuilder(\Magento\Store\Model\StoreManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->storeInterface = $this->getMock(
-            \Magento\Store\Api\Data\StoreInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeInterface = $this->getMockBuilder(\Magento\Store\Api\Data\StoreInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->logger = $this->getMock(
-            \Psr\Log\LoggerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->request = $this->getMock(
-            \Magento\Framework\App\Request\Http::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->request = $this->getMockBuilder(\Magento\Framework\App\Request\Http::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->storeWebsiteRelation = $this->getMock(
-            \Doofinder\Feed\Model\StoreWebsiteRelation::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->storeWebsiteRelation = $this->getMockBuilder(\Doofinder\Feed\Model\StoreWebsiteRelation::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->configCollectionFactory = $this->getMock(
-            \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->configCollectionFactory = $this->getMockBuilder(
+            \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory::class
+        )->disableOriginalConstructor()
+        ->getMock();
 
-        $this->configCollection = $this->getMock(
-            \Magento\Config\Model\ResourceModel\Config\Data\Collection::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->configCollection = $this->getMockBuilder(
+            \Magento\Config\Model\ResourceModel\Config\Data\Collection::class
+        )->disableOriginalConstructor()
+        ->getMock();
 
-        $this->configValue = $this->getMock(
-            \Magento\Framework\App\Config\Value::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->configValue = $this->getMockBuilder(\Magento\Framework\App\Config\Value::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->helper = $this->objectManager->getObject(
             \Doofinder\Feed\Helper\StoreConfig::class,
@@ -229,13 +193,9 @@ class StoreConfigTest extends BaseTestCase
         $storeCode = 'store_code';
         $this->request->method('getParam')->with('store')->willReturn($storeId);
 
-        $store = $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $store = $this->getMockBuilder(\Magento\Store\Model\Store::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $store->method('getCode')->willReturn($storeCode);
 
         $this->storeManager->method('getStore')->with($storeId)->willReturn($store);
@@ -251,30 +211,23 @@ class StoreConfigTest extends BaseTestCase
     {
         $expected = ['store_one', 'store_two'];
 
-        $storeOne = $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
-        $storeOne->method('getCode')->willReturn('store_one');
-        $storeOne->method('isActive')->willReturn(true);
+        $store = $this->getMockBuilder(\Magento\Store\Model\Store::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $storeTwo = $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
-        $storeTwo->method('getCode')->willReturn('store_two');
-        $storeTwo->method('isActive')->willReturn(true);
+        $store->method('getCode')
+            ->willReturnOnConsecutiveCalls('store_one', 'store_two');
+
+        $store->method('isActive')
+            ->willReturnOnConsecutiveCalls(true, true);
 
         $this->request->expects($this->at(1))->method('getParam')->with('website')->willReturn(1);
         $this->storeWebsiteRelation->method('getStoreByWebsiteId')->with(1)->willReturn([1, 2]);
-        $this->storeManager->expects($this->at(0))->method('getStore')->with(1)->willReturn($storeOne);
-        $this->storeManager->expects($this->at(1))->method('getStore')->with(2)->willReturn($storeTwo);
+
+        $this->storeManager->expects($this->exactly(2))
+            ->method('getStore')
+            ->withConsecutive([1], [2])
+            ->willReturnOnConsecutiveCalls($store, $store);
 
         $this->assertEquals($expected, $this->helper->getStoreCodes());
     }
@@ -282,13 +235,23 @@ class StoreConfigTest extends BaseTestCase
     /**
      * Test getStoreCodes without specified website or store
      * @param boolean $onlyActive
-     * @param array $stores
      * @param array $expected
      * @return void
      * @dataProvider providerTestGetStoreCodes
      */
-    public function testGetStoreCodes($onlyActive, array $stores, array $expected)
+    public function testGetStoreCodes($onlyActive, array $expected)
     {
+        $store = $this->getMockBuilder(\Magento\Store\Model\Store::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $store
+            ->method('getCode')
+            ->willReturnOnConsecutiveCalls('active', 'inactive');
+        $store
+            ->method('isActive')
+            ->willReturnOnConsecutiveCalls(true, false);
+        $stores = [$store, $store];
+
         $this->request->method('getParam')->willReturn(null);
         $this->storeManager->method('getStores')->willReturn($stores);
 
@@ -302,32 +265,9 @@ class StoreConfigTest extends BaseTestCase
      */
     public function providerTestGetStoreCodes()
     {
-        $stores = [];
-        $store = $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
-        $store->method('getCode')->willReturn('active');
-        $store->method('isActive')->willReturn(true);
-        $stores[] = $store;
-
-        $store = $this->getMock(
-            \Magento\Store\Model\Store::class,
-            [],
-            [],
-            '',
-            false
-        );
-        $store->method('getCode')->willReturn('inactive');
-        $store->method('isActive')->willReturn(false);
-        $stores[] = $store;
-
         return [
-            [true, $stores, ['active']],
-            [false, $stores, ['active', 'inactive']]
+            [true, ['active']],
+            [false, ['active', 'inactive']]
         ];
     }
 

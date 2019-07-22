@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\Form\Field;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes
  */
-class AdditionalAttributesTest extends BaseTestCase
+class AdditionalAttributesTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Framework\View\Element\Context
@@ -43,21 +41,14 @@ class AdditionalAttributesTest extends BaseTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->feedAttributes = $this->getMock(
-            \Doofinder\Feed\Model\Config\Source\Feed\Attributes::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->feedAttributes = $this->getMockBuilder(\Doofinder\Feed\Model\Config\Source\Feed\Attributes::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->escaper = $this->getMock(
-            \Magento\Framework\Escaper::class,
-            ['escapeHtml'],
-            [],
-            '',
-            false
-        );
+        $this->escaper = $this->getMockBuilder(\Magento\Framework\Escaper::class)
+            ->setMethods(['escapeHtml'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->context->expects($this->once())
             ->method('getEscaper')

@@ -2,14 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Model\Generator\Component;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Component\FetcherFactory
  */
-class FetcherFactoryTest extends BaseTestCase
+class FetcherFactoryTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Component\FetcherFactory
@@ -30,17 +26,12 @@ class FetcherFactoryTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->objectManagerMock = $this->getMock(
-            \Magento\Framework\ObjectManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->objectManagerMock = $this->getMockBuilder(\Magento\Framework\ObjectManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->model = $this->getMock(
+        $this->model = $this->objectManager->getObject(
             \Doofinder\Feed\Model\Generator\Component\FetcherFactory::class,
-            null,
             [
                 'objectManager' => $this->objectManagerMock,
                 'instanceName' => \Test\Unit\Doofinder\Feed::class
@@ -55,7 +46,9 @@ class FetcherFactoryTest extends BaseTestCase
      */
     public function testCreate()
     {
-        $this->objectManagerMock->expects($this->once())->method('create')
+        $this->objectManagerMock
+            ->expects($this->once())
+            ->method('create')
             ->with(\Test\Unit\Doofinder\Feed\Fetcher\Test::class, ['sample' => 'data']);
 
         $this->model->create(['sample' => 'data'], 'Test');

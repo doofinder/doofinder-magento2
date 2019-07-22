@@ -2,14 +2,12 @@
 
 namespace Doofinder\Feed\Test\Unit\Search;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Search\IndexerHandler
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class IndexerHandlerTest extends BaseTestCase
+class IndexerHandlerTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Search\IndexerHandler
@@ -90,37 +88,23 @@ class IndexerHandlerTest extends BaseTestCase
         $this->documents = new \ArrayObject([1234 => ['sample' => 'item']]);
         // @codingStandardsIgnoreEnd
 
-        $this->batch = $this->getMock(
-            \Magento\Framework\Indexer\SaveHandler\Batch::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->batch = $this->getMockBuilder(\Magento\Framework\Indexer\SaveHandler\Batch::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->product = $this->getMock(
-            \Magento\Catalog\Model\Product::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->product = $this->getMockBuilder(\Magento\Catalog\Model\Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->productCollectionFactory = $this->getMock(
-            \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->productCollectionFactory = $this->getMockBuilder(
+            \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class
+        )->disableOriginalConstructor()
+        ->getMock();
 
-        $this->productCollection = $this->getMock(
-            \Magento\Catalog\Model\ResourceModel\Product\Collection::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->productCollection = $this->getMockBuilder(
+            \Magento\Catalog\Model\ResourceModel\Product\Collection::class
+        )->disableOriginalConstructor()
+        ->getMock();
 
         $this->productCollectionFactory->method('create')->willReturn($this->productCollection);
         $this->productCollection->method('addAttributeToFilter')->willReturnSelf();
@@ -128,60 +112,38 @@ class IndexerHandlerTest extends BaseTestCase
         $this->productCollection->method('addUrlRewrite')->willReturnSelf();
         $this->productCollection->method('getItems')->willReturn([$this->product]);
 
-        $this->productVisibility = $this->getMock(
-            \Magento\Catalog\Model\Product\Visibility::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->productVisibility = $this->getMockBuilder(
+            \Magento\Catalog\Model\Product\Visibility::class
+        )->disableOriginalConstructor()
+        ->getMock();
 
         $this->productVisibility->method('getVisibleInSearchIds')
             ->willReturn(['3, 4']);
 
-        $this->dimension = $this->getMock(
-            \Magento\Framework\Search\Request\Dimension::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->dimension = $this->getMockBuilder(\Magento\Framework\Search\Request\Dimension::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->dimension->method('getName')->willReturn('scope');
         $this->dimension->method('getValue')->willReturn('sample');
 
-        $this->searchHelper = $this->getMock(
-            \Doofinder\Feed\Helper\Search::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->searchHelper = $this->getMockBuilder(\Doofinder\Feed\Helper\Search::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->searchHelper->method('getStoreIdFromDimensions')
             ->with([$this->dimension])->willReturn('sample');
 
-        $this->indexStructure = $this->getMock(
-            \Magento\Framework\Indexer\IndexStructureInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->indexStructure = $this->getMockBuilder(\Magento\Framework\Indexer\IndexStructureInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->indexerHandler = $this->getMock(
-            \Magento\CatalogSearch\Model\Indexer\IndexerHandler::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->indexerHandler = $this->getMockBuilder(\Magento\CatalogSearch\Model\Indexer\IndexerHandler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->indexerHandlerFactory = $this->getMock(
-            \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->indexerHandlerFactory = $this->getMockBuilder(
+            \Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory::class
+        )->disableOriginalConstructor()
+        ->getMock();
         $this->indexerHandlerFactory->method('create')
             ->with([
                 'data' => [
@@ -192,13 +154,9 @@ class IndexerHandlerTest extends BaseTestCase
             ])
             ->willReturn($this->indexerHandler);
 
-        $this->processor = $this->getMock(
-            \Doofinder\Feed\Search\Processor::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->processor = $this->getMockBuilder(\Doofinder\Feed\Search\Processor::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->indexer = $this->objectManager->getObject(
             \Doofinder\Feed\Search\IndexerHandler::class,

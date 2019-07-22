@@ -1,13 +1,11 @@
 <?php
 
-namespace Doofinder\Feed\Test\Unit\Model\Backend;
-
-use Doofinder\Feed\Test\Unit\BaseTestCase;
+namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\Cron
  */
-class CronTest extends BaseTestCase
+class CronTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Magento\Framework\Model\Context
@@ -58,61 +56,35 @@ class CronTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->context = $this->getMock(
-            \Magento\Framework\Model\Context::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->context = $this->getMockBuilder(\Magento\Framework\Model\Context::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->registry = $this->getMock(
-            \Magento\Framework\Registry::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->registry = $this->getMockBuilder(\Magento\Framework\Registry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->configScope = $this->getMock(
-            \Magento\Framework\App\Config\ScopeConfigInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->configScope = $this->getMockBuilder(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->cacheTypeList = $this->getMock(
-            \Magento\Framework\App\Cache\TypeListInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->cacheTypeList = $this->getMockBuilder(\Magento\Framework\App\Cache\TypeListInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->configValueFactory = $this->getMock(
-            \Magento\Framework\App\Config\ValueFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->configValueFactory = $this->getMockBuilder(\Magento\Framework\App\Config\ValueFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->configValue = $this->getMock(
-            \Magento\Framework\App\Config\Value::class,
-            ['load', 'setValue', 'setPath', 'save'],
-            [],
-            '',
-            false
-        );
+        $this->configValue = $this->getMockBuilder(\Magento\Framework\App\Config\Value::class)
+            ->setMethods(['load', 'setValue', 'setPath', 'save'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->managerInterface = $this->getMock(
-            \Magento\Framework\Event\ManagerInterface::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->managerInterface = $this->getMockBuilder(\Magento\Framework\Event\ManagerInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->context->expects($this->once())
             ->method('getEventDispatcher')

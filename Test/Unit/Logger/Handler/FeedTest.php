@@ -2,13 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Logger\Handler;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-use Magento\Framework\Exception\NoSuchEntityException;
-
 /**
  * Test class for \Doofinder\Feed\Logger\Feed\Handler
  */
-class FeedTest extends BaseTestCase
+class FeedTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Logger\Feed\Handler
@@ -49,48 +46,29 @@ class FeedTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->process = $this->getMock(
-            \Doofinder\Feed\Model\Cron::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->process = $this->getMockBuilder(\Doofinder\Feed\Model\Cron::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->process->method('getId')->willReturn(15);
 
-        $this->logResource = $this->getMock(
-            \Doofinder\Feed\Model\ResourceModel\Log::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->logResource = $this->getMockBuilder(\Doofinder\Feed\Model\ResourceModel\Log::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->logEntry = $this->getMock(
-            \Doofinder\Feed\Model\Log::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->logEntry = $this->getMockBuilder(\Doofinder\Feed\Model\Log::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->logEntry->method('getResource')->willReturn($this->logResource);
 
-        $this->logFactory = $this->getMock(
-            \Doofinder\Feed\Model\LogFactory::class,
-            ['create'],
-            [],
-            '',
-            false
-        );
+        $this->logFactory = $this->getMockBuilder(\Doofinder\Feed\Model\LogFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->logFactory->method('create')->willReturn($this->logEntry);
 
-        $this->datetime = $this->getMock(
-            \Magento\Framework\Stdlib\DateTime::class,
-            [],
-            [],
-            '',
-            false
-        );
+        $this->datetime = $this->getMockBuilder(\Magento\Framework\Stdlib\DateTime::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->handler = $this->objectManager->getObject(
             \Doofinder\Feed\Logger\Handler\Feed::class,

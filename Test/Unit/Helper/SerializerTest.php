@@ -2,12 +2,10 @@
 
 namespace Doofinder\Feed\Test\Unit\Helper;
 
-use Doofinder\Feed\Test\Unit\BaseTestCase;
-
 /**
  * Test class for \Doofinder\Feed\Helper\Serializer
  */
-class SerializerTest extends BaseTestCase
+class SerializerTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
 {
     /**
      * @var \Doofinder\Feed\Helper\Serializer
