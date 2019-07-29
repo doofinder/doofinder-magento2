@@ -163,6 +163,10 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
     private function getQueryString(\Magento\Framework\Search\Request\QueryInterface $query)
     {
         $should = $query->getShould();
-        return $should['search']->getValue();
+        if (isset($should['search'])) {
+            return $should['search']->getValue();
+        }
+
+        return '';
     }
 }
