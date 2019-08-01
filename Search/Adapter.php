@@ -83,7 +83,10 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
     public function query(\Magento\Framework\Search\RequestInterface $request)
     {
     // @codingStandardsIgnoreEnd
-        if (preg_match('/quick_?search_container/', $request->getName()) !== 1) {
+        $query = $request->getQuery();
+        if (preg_match('/quick_?search_container/', $request->getName()) !== 1
+            || !$this->isSearchValue($query)
+        ) {
             // @codingStandardsIgnoreStart
             return $this->adapter->query($request);
             // @codingStandardsIgnoreEnd
@@ -92,7 +95,7 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
         /**
          * NOTICE Add cache magic here ?
          */
-        $documents = $this->getDocuments($this->getQueryString($request->getQuery()));
+        $documents = $this->getDocuments($this->getQueryString($query));
         $table = $this->temporaryStorage->storeApiDocuments($this->createDocuments($documents));
 
         $aggregations = $this->aggregationBuilder->build($request, $table, $documents);
@@ -164,5 +167,17 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
     {
         $should = $query->getShould();
         return $should['search']->getValue();
+    }
+
+    /**
+     * Check whether query string exists
+     *
+     * @param \Magento\Framework\Search\Request\QueryInterface $query
+     * @return boolean
+     */
+    private function isSearchValue(\Magento\Framework\Search\Request\QueryInterface $query)
+    {
+        $should = $query->getShould();
+        return isset($should['search']);
     }
 }
