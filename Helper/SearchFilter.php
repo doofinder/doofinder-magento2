@@ -23,19 +23,27 @@ class SearchFilter extends \Magento\Framework\App\Helper\AbstractHelper
     private $filters;
 
     /**
+     * @var \Doofinder\Feed\Helper\StoreConfig
+     */
+    private $storeConfig;
+
+    /**
      * Constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Option\CollectionFactory $attrCollFactory
      * @param \Magento\Eav\Model\Config $eavConfig
+     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Eav\Model\ResourceModel\Entity\Attribute\Option\CollectionFactory $attrCollFactory,
-        \Magento\Eav\Model\Config $eavConfig
+        \Magento\Eav\Model\Config $eavConfig,
+        \Doofinder\Feed\Helper\StoreConfig $storeConfig
     ) {
         $this->attrCollFactory = $attrCollFactory;
         $this->eavConfig = $eavConfig;
+        $this->storeConfig = $storeConfig;
         parent::__construct($context);
     }
 
@@ -58,7 +66,8 @@ class SearchFilter extends \Magento\Framework\App\Helper\AbstractHelper
                 if ($attribute && $attribute->getAttributeId()) {
                     $filterValue = $this->getFilterValue($attribute, $value);
                     if ($filterValue !== null) {
-                        $this->filters[$filter] = $filterValue;
+                        $label = $this->getFieldName($filter);
+                        $this->filters[$label] = $filterValue;
                     }
                 }
             }
@@ -134,5 +143,23 @@ class SearchFilter extends \Magento\Framework\App\Helper\AbstractHelper
             ->setAttributeFilter($attributeId)
             ->setIdFilter($optionId)
             ->setStoreFilter();
+    }
+
+    /**
+     * Get field name by given attribute name
+     *
+     * @param string $attribute
+     *
+     * @return string
+     */
+    private function getFieldName($attribute)
+    {
+        $config = $this->storeConfig->getStoreConfig();
+        $result = array_search($attribute, $config['attributes']);
+        if ($result === false) {
+            return $attribute;
+        }
+
+        return $result;
     }
 }
