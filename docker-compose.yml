@@ -17,6 +17,7 @@ services:
       - 80:80
     volumes:
       - ./packages/:/var/www/magento/packages/
+      - ./log/:/var/www/magento/var/log/
     environment:
       - PHP_DEBUGGER=none
       - COMPOSER_AUTH={"http-basic":{"repo.magento.com":{"username":"","password":""}}}
