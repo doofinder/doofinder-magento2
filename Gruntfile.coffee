@@ -13,8 +13,6 @@ module.exports = (grunt) ->
   grunt.initConfig config
   grunt.loadNpmTasks "grunt-version"
 
-  # Remember to update version in package.json first!
   grunt.registerTask "release", ["version:project:patch", "version:module"]
   grunt.registerTask "release:minor", ["version:project:minor", "version:module"]
   grunt.registerTask "release:major", ["version:project:major", "version:module"]
-
