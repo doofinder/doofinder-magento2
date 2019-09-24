@@ -195,7 +195,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Doofinder Search Engine
      *
-     * @return \Doofinder\Feed\Wrapper\Throttle
+     * @return \Doofinder\Feed\Wrapper\Throttle|null
      * @throws \Magento\Framework\Exception\LocalizedException Search engine not exists.
      */
     private function getDoofinderSearchEngine()
@@ -204,8 +204,14 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
             $this->searchEngines = $this->getDoofinderSearchEngines($this->storeConfig->getApiKey());
         }
 
+        // Check whether particular store has disabled search engine
+        $code = $this->getStoreCode();
+        if (!$this->storeConfig->isStoreSearchEngineEnabled($code)) {
+            return null;
+        }
+
         // Prepare SearchEngine instance
-        $hashId = $this->storeConfig->getHashId($this->getStoreCode());
+        $hashId = $this->storeConfig->getHashId($code);
         if (!empty($this->searchEngines[$hashId])) {
             return $this->throttleFactory->create(['obj' => $this->searchEngines[$hashId]]);
         }
@@ -225,12 +231,14 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     public function updateDoofinderItems(array $items)
     {
         $searchEngine = $this->getDoofinderSearchEngine();
-        $result = $searchEngine->updateItems('product', array_values($items));
+        if ($searchEngine) {
+            $result = $searchEngine->updateItems('product', array_values($items));
 
-        if (!$result) {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('There was an error during Doofinder index items update.')
-            );
+            if (!$result) {
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('There was an error during Doofinder index items update.')
+                );
+            }
         }
     }
 
@@ -244,6 +252,9 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     public function deleteDoofinderItems(array $items)
     {
         $searchEngine = $this->getDoofinderSearchEngine();
+        if (!$searchEngine) {
+            return false;
+        }
         $result = $searchEngine->deleteItems('product', array_map(function ($item) {
             return $item['id'];
         }, $items));
@@ -273,7 +284,8 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function deleteDoofinderIndex()
     {
-        if (!$this->getDoofinderSearchEngine()->deleteType('product')) {
+        $searchEngine = $this->getDoofinderSearchEngine();
+        if ($searchEngine && !$searchEngine->deleteType('product')) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('There was an error during Doofinder index deletion')
             );
@@ -288,7 +300,8 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function createDoofinderIndex()
     {
-        if (!$this->getDoofinderSearchEngine()->addType('product')) {
+        $searchEngine = $this->getDoofinderSearchEngine();
+        if ($searchEngine && !$searchEngine->addType('product')) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('There was an error during Doofinder index creation')
             );
