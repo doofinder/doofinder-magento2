@@ -43,21 +43,6 @@ class StoreConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
     private $helper;
 
     /**
-     * @var \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory
-     */
-    private $configCollectionFactory;
-
-    /**
-     * @var \Magento\Config\Model\ResourceModel\Config\Data\Collection
-     */
-    private $configCollection;
-
-    /**
-     * @var \Magento\Framework\App\Config\Value
-     */
-    private $configValue;
-
-    /**
      * Set up test
      *
      * @return void
@@ -90,20 +75,6 @@ class StoreConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configCollectionFactory = $this->getMockBuilder(
-            \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory::class
-        )->disableOriginalConstructor()
-        ->getMock();
-
-        $this->configCollection = $this->getMockBuilder(
-            \Magento\Config\Model\ResourceModel\Config\Data\Collection::class
-        )->disableOriginalConstructor()
-        ->getMock();
-
-        $this->configValue = $this->getMockBuilder(\Magento\Framework\App\Config\Value::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->helper = $this->objectManager->getObject(
             \Doofinder\Feed\Helper\StoreConfig::class,
             [
@@ -112,54 +83,8 @@ class StoreConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
                 'logger'                => $this->logger,
                 'storeWebsiteRelation'  => $this->storeWebsiteRelation,
                 '_request'              => $this->request,
-                'configCollection'      => $this->configCollectionFactory,
             ]
         );
-    }
-
-    /**
-     * Test getStoreConfig() method
-     *
-     * @return void
-     */
-    public function testGetStoreConfig()
-    {
-        $this->storeManager->expects($this->once())
-            ->method('getStore')
-            ->willReturn($this->storeInterface);
-
-        $this->storeInterface->expects($this->once())
-            ->method('getCode')
-            ->willReturn('default');
-
-        $this->scopeConfig->expects($this->at(0))
-            ->method('getValue')
-            ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_ATTRIBUTES_CONFIG)
-            ->willReturn(['attr1' => 'value1', 'attr2' => 'value2']);
-
-        $this->scopeConfig->expects($this->at(1))
-            ->method('getValue')
-            ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_CRON_CONFIG)
-            ->willReturn(['enabled' => 1, 'start_time' => '10,30,0']);
-
-        $this->scopeConfig->expects($this->at(2))
-            ->method('getValue')
-            ->with(\Doofinder\Feed\Helper\StoreConfig::FEED_SETTINGS_CONFIG)
-            ->willReturn(['split_configurable_products' => 0, 'image_size' => 'small', 'export_product_prices' => 1]);
-
-        $expected = [
-            'store_code'                    => 'default',
-            'enabled'                       => 1,
-            'split_configurable_products'   => 0,
-            'export_product_prices'         => 1,
-            'image_size'                    => 'small',
-            'start_time'                    => ['10', '30', '0'],
-            'attributes'                    => ['attr1' => 'value1', 'attr2' => 'value2'],
-        ];
-
-        $result = $this->helper->getStoreConfig();
-
-        $this->assertEquals($expected, $result);
     }
 
     /**
@@ -290,64 +215,6 @@ class StoreConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
     }
 
     /**
-     * Test isStoreSearchEngineEnabled() method
-     *
-     * @return void
-     */
-    public function testIsStoreSearchEngineEnabled()
-    {
-        $storeCode = 'sample';
-        $expected = true;
-
-        $this->scopeConfig
-            ->expects($this->once())
-            ->method('getValue')
-            ->with('doofinder_config_config/doofinder_search_engine/enabled', 'store', $storeCode)
-            ->willReturn($expected);
-
-        $this->assertSame($expected, $this->helper->isStoreSearchEngineEnabled($storeCode));
-    }
-
-    /**
-     * Test isStoreSearchEngineEnabledNoCached() method
-     *
-     * @return void
-     */
-    public function testIsStoreSearchEngineEnabledNoCached()
-    {
-        $storeId = '2';
-        $value = '1';
-
-        $this->configCollectionFactory->method('create')->willReturn($this->configCollection);
-
-        $this->configCollection
-            ->method('getIterator')
-            ->willReturn(new \ArrayIterator([
-                $this->configValue,
-                $this->configValue,
-            ]));
-
-        $this->configCollection
-            ->method('addScopeFilter')
-            ->with('stores', $storeId, \Doofinder\Feed\Helper\StoreConfig::SEARCH_ENGINE_CONFIG)
-            ->willReturnSelf();
-
-        $getDataWith = [['path'], ['path'], ['value']];
-
-        $this->configValue
-            ->expects($this->exactly(count($getDataWith)))
-            ->method('getData')
-            ->withConsecutive(...$getDataWith)
-            ->willReturnOnConsecutiveCalls(
-                \Doofinder\Feed\Helper\StoreConfig::SEARCH_ENGINE_CONFIG . '/hash_id', // unexpected path
-                \Doofinder\Feed\Helper\StoreConfig::SEARCH_ENGINE_CONFIG . '/enabled', // expected path
-                $value
-            );
-
-        $this->assertSame((bool) $value, $this->helper->isStoreSearchEngineEnabledNoCached($storeId));
-    }
-
-    /**
      * Test getHashId() method
      *
      * @return void
@@ -376,12 +243,10 @@ class StoreConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      */
     public function testIsInternalSearchEnabled($enabled, $expected)
     {
-        $storeCode = 'sample';
-
-        $this->scopeConfig->method('getValue')->with('catalog/search/engine', 'store', $storeCode)
+        $this->scopeConfig->method('getValue')->with('catalog/search/engine', 'store', null)
             ->willReturn($enabled);
 
-        $this->assertEquals($expected, $this->helper->isInternalSearchEnabled($storeCode));
+        $this->assertEquals($expected, $this->helper->isInternalSearchEnabled());
     }
 
     /**
@@ -395,27 +260,6 @@ class StoreConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
             [true, true],
             [false, false],
         ];
-    }
-
-    /**
-     * Test isAtomicUpdatesEnabled() method.
-     *
-     * @param  string $engine
-     * @param  boolean $atomic
-     * @param  boolean $expected
-     * @return void
-     * @dataProvider providerTestIsAtomicUpdatesEnabled
-     */
-    public function testIsAtomicUpdatesEnabled($engine, $atomic, $expected)
-    {
-        $storeCode = 'sample';
-
-        $this->scopeConfig->method('getValue')->will($this->returnValueMap([
-            ['catalog/search/engine', 'store', $storeCode, $engine],
-            ['doofinder_config_index/feed_settings/atomic_updates_enabled', 'store', $storeCode, $atomic],
-        ]));
-
-        $this->assertEquals($expected, $this->helper->isAtomicUpdatesEnabled($storeCode));
     }
 
     /**

@@ -54,32 +54,4 @@ class Fulltext
             $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
         }
     }
-
-    /**
-     * @param FulltextIndexer $indexer
-     * @param mixed ...$args
-     * @return void
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @codingStandardsIgnoreLine - params are not needed
-     */
-    public function beforeExecuteRow(FulltextIndexer $indexer, ...$args)
-    {
-        if ($this->storeConfig->isInternalSearchEnabled()) {
-            $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_SAVE);
-        }
-    }
-
-    /**
-     * @param FulltextIndexer $indexer
-     * @param mixed ...$args
-     * @return void
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @codingStandardsIgnoreLine - params are not needed
-     */
-    public function beforeExecuteList(FulltextIndexer $indexer, ...$args)
-    {
-        if ($this->storeConfig->isInternalSearchEnabled()) {
-            $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_SAVE);
-        }
-    }
 }

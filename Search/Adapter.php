@@ -1,110 +1,101 @@
 <?php
 
-/**
- * @see \Magento\Framework\Search\Adapter\Mysql
- */
-
 namespace Doofinder\Feed\Search;
 
+use Magento\Framework\Search\AdapterInterface;
+use Doofinder\Feed\Helper\Search;
+use Magento\Framework\Search\RequestInterface;
+use Magento\Framework\Search\Response\QueryResponse;
+use Magento\Framework\Search\Request\QueryInterface;
+
 /**
- * Search adapter
+ * Class Adapter
+ * The class responsible for handling search request to Doofinder
  */
-class Adapter implements \Magento\Framework\Search\AdapterInterface
+class Adapter implements AdapterInterface
 {
     /**
-     * @var \Magento\Framework\Search\Adapter\Mysql\Adapter
-     */
-    private $adapter;
-
-    /**
-     * @var \Magento\Framework\Search\Adapter\Mysql\ResponseFactory
+     * @var ResponseFactory
      */
     private $responseFactory;
 
     /**
-     * @var \Magento\Framework\Search\Adapter\Mysql\TemporaryStorage
-     */
-    private $temporaryStorage;
-
-    /**
-     * @var \Magento\Framework\Api\Search\DocumentFactory
-     */
-    private $documentFactory;
-
-    /**
-     * @var \Magento\Framework\Api\AttributeValueFactory
-     */
-    private $attributeValueFactory;
-
-    /**
-     * @var \Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder
+     * @var Aggregation\Builder
      */
     private $aggregationBuilder;
 
     /**
-     * @var \Doofinder\Feed\Helper\Search
+     * @var Search
      */
     private $search;
 
     /**
-     * @param \Magento\Framework\Search\Adapter\Mysql\Adapter $adapter
-     * @param \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory
-     * @param \Magento\Framework\Search\Adapter\Mysql\TemporaryStorage $temporaryStorage
-     * @param \Magento\Framework\Api\Search\DocumentFactory $documentFactory
-     * @param \Magento\Framework\Api\AttributeValueFactory $attributeValFactory
-     * @param \Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder $aggregationBuilder
-     * @param \Doofinder\Feed\Helper\Search $search
+     * @var Filters
+     */
+    private $filters;
+
+    /**
+     * @var Cache
+     */
+    private $cache;
+
+    /**
+     * @var RequestAggregation
+     */
+    private $requestAggregation;
+
+    /**
+     * Adapter constructor.
+     * @param ResponseFactory $responseFactory
+     * @param Aggregation\Builder $aggregationBuilder
+     * @param Search $search
+     * @param Filters $filters
+     * @param Cache $cache
+     * @param RequestAggregation $requestAggregation
      */
     public function __construct(
-        \Magento\Framework\Search\Adapter\Mysql\Adapter $adapter,
-        \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory,
-        \Magento\Framework\Search\Adapter\Mysql\TemporaryStorage $temporaryStorage,
-        \Magento\Framework\Api\Search\DocumentFactory $documentFactory,
-        \Magento\Framework\Api\AttributeValueFactory $attributeValFactory,
-        \Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder $aggregationBuilder,
-        \Doofinder\Feed\Helper\Search $search
+        ResponseFactory $responseFactory,
+        Aggregation\Builder $aggregationBuilder,
+        Search $search,
+        Filters $filters,
+        Cache $cache,
+        RequestAggregation $requestAggregation
     ) {
-        $this->adapter = $adapter;
         $this->responseFactory = $responseFactory;
-        $this->temporaryStorage = $temporaryStorage;
-        $this->documentFactory = $documentFactory;
-        $this->attributeValueFactory = $attributeValFactory;
         $this->aggregationBuilder = $aggregationBuilder;
         $this->search = $search;
+        $this->filters = $filters;
+        $this->cache = $cache;
+        $this->requestAggregation = $requestAggregation;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  \Magento\Framework\Search\RequestInterface $request
-     * @return \Magento\Framework\Search\Adapter\Mysql\Response
-     * @codingStandardsIgnoreStart
+     * {@inheritDoc}
+     * @param RequestInterface $request
+     * @return QueryResponse
      */
-    public function query(\Magento\Framework\Search\RequestInterface $request)
+    public function query(RequestInterface $request)
     {
-    // @codingStandardsIgnoreEnd
         $query = $request->getQuery();
-        if (preg_match('/quick_?search_container/', $request->getName()) !== 1
-            || !$this->isSearchValue($query)
-        ) {
-            // @codingStandardsIgnoreStart
-            return $this->adapter->query($request);
-            // @codingStandardsIgnoreEnd
-        }
+        $filters = $this->filters->get($request);
 
-        /**
-         * NOTICE Add cache magic here ?
-         */
-        $documents = $this->getDocuments($this->getQueryString($query));
-        $table = $this->temporaryStorage->storeApiDocuments($this->createDocuments($documents));
+        $rawResponse = $this->getDocuments(
+            $this->getQueryString($query),
+            $filters
+        );
+        $this->cache->setResponse($rawResponse);
+        $rawDocuments = $rawResponse;
 
-        $aggregations = $this->aggregationBuilder->build($request, $table, $documents);
+        $buckets = $request->getAggregation();
+        $aggregatesBuckets = $this->requestAggregation->get($buckets, $rawResponse);
+        $rawResponse['aggregations'] = $aggregatesBuckets;
+        $aggregations = $this->aggregationBuilder->build($request, $rawResponse);
+
         $response = [
-            'documents' => $documents,
+            'documents' => $rawDocuments,
             'aggregations' => $aggregations,
-            'total' => count($documents),
+            'total' => count($rawDocuments),
         ];
-
         return $this->responseFactory->create($response);
     }
 
@@ -112,47 +103,19 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
      * Executes query and return raw response
      *
      * @param string $queryText
+     * @param array $filters
      * @return array
      */
-    private function getDocuments($queryText)
+    private function getDocuments($queryText, array $filters = [])
     {
-        // Execute initial search
-        $this->search->performDoofinderSearch($queryText);
-
-        // Fetch all results
-        $results = array_unique($this->search->getAllResults()); // fix: prevent more than one same id
+        $results = $this->search->performDoofinderSearch($queryText, $filters);
         $score = count($results);
 
-        $documents = [];
-        foreach ($results as $item) {
-            $documents[] = [
-                'entity_id' => $item,
-                'score' => $score--,
-            ];
+        foreach ($results as &$item) {
+            $item['_score'] = $score--;
         }
 
-        return $documents;
-    }
-
-    /**
-     * Create documents
-     *
-     * @param  array $documents
-     * @return \Magento\Framework\Api\Search\DocumentInterface[]
-     */
-    private function createDocuments(array $documents)
-    {
-        return array_map(function ($data) {
-            $score = $this->attributeValueFactory->create();
-            $score->setAttributeCode('score');
-            $score->setValue($data['score']);
-
-            $document = $this->documentFactory->create();
-            $document->setId($data['entity_id']);
-            $document->setCustomAttribute('score', $score);
-
-            return $document;
-        }, $documents);
+        return $results;
     }
 
     /**
@@ -160,10 +123,10 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
      *
      * @notice This may not be the right way
      *
-     * @param \Magento\Framework\Search\Request\QueryInterface $query
+     * @param QueryInterface $query
      * @return string
      */
-    private function getQueryString(\Magento\Framework\Search\Request\QueryInterface $query)
+    private function getQueryString(QueryInterface $query)
     {
         $should = $query->getShould();
         if (isset($should['search'])) {
@@ -171,17 +134,5 @@ class Adapter implements \Magento\Framework\Search\AdapterInterface
         }
 
         return '';
-    }
-
-    /**
-     * Check whether query string exists
-     *
-     * @param \Magento\Framework\Search\Request\QueryInterface $query
-     * @return boolean
-     */
-    private function isSearchValue(\Magento\Framework\Search\Request\QueryInterface $query)
-    {
-        $should = $query->getShould();
-        return isset($should['search']);
     }
 }

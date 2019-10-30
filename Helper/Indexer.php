@@ -23,6 +23,16 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     private $indexerRegistry;
 
     /**
+     * @var Search
+     */
+    private $search;
+
+    /**
+     * @var \Magento\Framework\Search\Request\DimensionFactory
+     */
+    private $dimensionFactory;
+
+    /**
      * Old doofinder section configs before save
      *
      * @var array
@@ -30,18 +40,25 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     private $oldConfigs = [];
 
     /**
+     * Indexer constructor.
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
+     * @param StoreConfig $storeConfig
      * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
+     * @param Search $search
+     * @param \Magento\Framework\Search\Request\DimensionFactory $dimensionFactory
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
+        StoreConfig $storeConfig,
+        \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry,
+        Search $search,
+        \Magento\Framework\Search\Request\DimensionFactory $dimensionFactory
     ) {
         parent::__construct($context);
         $this->storeConfig = $storeConfig;
         $this->indexerRegistry = $indexerRegistry;
+        $this->search = $search;
+        $this->dimensionFactory = $dimensionFactory;
     }
 
     /**
@@ -56,7 +73,7 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
         $storeConfig = $this->storeConfig;
 
         $configs = [];
-        $ignore = ['password', 'categories_in_navigation'];
+        $ignore = ['categories_in_navigation'];
         foreach ($storeCodes as $storeCode) {
             $config = array_merge(
                 $this->scopeConfig->getValue($storeConfig::FEED_ATTRIBUTES_CONFIG, $scope, $storeCode),
@@ -91,6 +108,10 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function shouldIndexInvalidate()
     {
+        if (!$this->storeConfig->isInternalSearchEnabled()) {
+            // Doofinder is not set as Search Engine - no need to invalidate
+            return false;
+        }
         if (empty($this->oldConfigs)) {
             // No old config - assume index should invalidate
             return true;
@@ -104,11 +125,6 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         foreach (array_keys($configs) as $storeCode) {
-            if (!$this->storeConfig->isInternalSearchEnabled($storeCode)) {
-                // Doofinder internal search disabled, proceed
-                continue;
-            }
-
             if ($configs[$storeCode] != $this->oldConfigs[$storeCode]) {
                 // Configs does not match - invalidate
                 return true;
@@ -139,5 +155,75 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $indexer = $this->indexerRegistry->get(\Magento\CatalogSearch\Model\Indexer\Fulltext::INDEXER_ID);
         return $indexer->isScheduled();
+    }
+
+    /**
+     * Get store id from dimensions
+     *
+     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @return integer|null
+     */
+    public function getStoreIdFromDimensions(array $dimensions)
+    {
+        foreach ($dimensions as $dimension) {
+            if ($dimension->getName() == 'scope') {
+                return $dimension->getValue();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Check, whether delayed product updates are enabled and active.
+     *
+     * For delayed products updates to work, Doofinder must be set as internal search engine.
+     *
+     * @return boolean True if Cron updates are enabled.
+     */
+    public function isDelayedUpdatesEnabled()
+    {
+        if (!$this->storeConfig->isInternalSearchEnabled()) {
+            return false;
+        }
+
+        if ($this->isScheduled()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array $dimensions
+     * @return boolean
+     */
+    public function isAvailable(array $dimensions = [])
+    {
+        if (!$apiKey = $this->storeConfig->getApiKey()) {
+            return false;
+        }
+
+        if (!$dimensions) {
+            return true; // when Indexer mode is on save, dimensions are empty
+        }
+
+        $storeId = $this->getStoreIdFromDimensions($dimensions);
+        $hashId = $this->storeConfig->getHashId($storeId);
+        $searchEngines = $this->search->getDoofinderSearchEngines($apiKey);
+
+        if (!isset($searchEngines[$hashId])) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param integer $storeId
+     * @return \Magento\Framework\Search\Request\Dimension
+     */
+    public function getDimensions($storeId)
+    {
+        return $this->dimensionFactory->create(['name' => 'scope', 'value' => $storeId]);
     }
 }
