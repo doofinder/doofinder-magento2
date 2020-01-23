@@ -105,17 +105,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Set content type as xml.
-     *
-     * @param \Magento\Framework\App\ResponseInterface $response
-     * @return void
-     */
-    public function setXmlHeaders(\Magento\Framework\App\ResponseInterface $response)
-    {
-        $response->setHeader('Content-type', 'application/xml; charset="utf-8"', true);
-    }
-
-    /**
      * Set content type as json.
      *
      * @param \Magento\Framework\App\ResponseInterface $response

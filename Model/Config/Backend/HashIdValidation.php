@@ -55,16 +55,13 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
      */
     public function save()
     {
-        if ($this->storeConfig->isStoreSearchEngineEnabledNoCached($this->getScopeId())) {
-            $hashId = $this->getValue();
-            if (empty($hashId) && $this->storeConfig->isInternalSearchEnabled()) {
-                throw new \Magento\Framework\Exception\ValidatorException(
-                    __('HashID cannot be empty when Doofinder engine is enabled.')
-                );
-            }
-
+        if ($hashId = $this->getValue()) {
             $this->validateUnique($hashId);
             $this->validateSearchEngine($hashId);
+        } elseif ($this->storeConfig->isInternalSearchEnabled()) {
+            throw new \Magento\Framework\Exception\ValidatorException(
+                __('HashID cannot be empty when Doofinder engine is enabled.')
+            );
         }
 
         return parent::save();

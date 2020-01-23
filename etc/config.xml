@@ -7,12 +7,9 @@
                 <api_key></api_key>
             </doofinder_account>
             <doofinder_search_engine>
-                <enabled>1</enabled>
                 <hash_id></hash_id>
                 <internal_search_enabled>0</internal_search_enabled>
                 <page_limit>5</page_limit>
-                <atomic_updates_enabled>0</atomic_updates_enabled>
-                <cron_updates_enabled>0</cron_updates_enabled>
                 <request_limit>100</request_limit>
             </doofinder_search_engine>
             <doofinder_layer>
@@ -45,18 +42,7 @@
                 <price_tax_mode>0</price_tax_mode>
                 <image_size></image_size>
                 <categories_in_navigation>0</categories_in_navigation>
-                <split_configurable_products>0</split_configurable_products>
             </feed_settings>
         </doofinder_config_index>
-        <doofinder_config_data_feed>
-            <cron_settings>
-                <enabled>0</enabled>
-                <start_time>0,0,0</start_time>
-                <step_size>1000</step_size>
-                <step_delay>5</step_delay>
-                <password></password>
-            </cron_settings>
-            <feed_status></feed_status>
-        </doofinder_config_data_feed>
     </default>
 </config>

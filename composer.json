@@ -3,7 +3,7 @@
     "version": "0.2.8",
     "description": "Doofinder module for Magento 2",
     "require": {
-        "magento/framework": ">=100.1.0",
+        "magento/framework": ">=101.0",
         "sabre/xml": "^1.4||^2.0",
         "doofinder/doofinder": "^5.7"
     },

@@ -30,11 +30,6 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     private $throttleFactory;
 
     /**
-     * @var \Doofinder\Feed\Helper\SearchFilter
-     */
-    private $filterHelper;
-
-    /**
      * @var \Doofinder\Api\Management\SearchEngine[]
      */
     private $searchEngines = null;
@@ -55,21 +50,18 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Doofinder\Feed\Search\SearchClientFactory $searchFactory
      * @param \Doofinder\Feed\Search\ManagementClientFactory $dmaFactory
      * @param \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory
-     * @param \Doofinder\Feed\Helper\SearchFilter $filterHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Doofinder\Feed\Search\SearchClientFactory $searchFactory,
         \Doofinder\Feed\Search\ManagementClientFactory $dmaFactory,
-        \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory,
-        \Doofinder\Feed\Helper\SearchFilter $filterHelper
+        \Doofinder\Feed\Wrapper\ThrottleFactory $throttleFactory
     ) {
         $this->storeConfig = $storeConfig;
         $this->searchFactory = $searchFactory;
         $this->dmaFactory = $dmaFactory;
         $this->throttleFactory = $throttleFactory;
-        $this->filterHelper = $filterHelper;
         parent::__construct($context);
     }
 
@@ -77,14 +69,12 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      * Perform a doofinder search on given key.
      *
      * @param string $queryText
+     * @param array $filters
      * @return array The array od product ids from first page.
      */
-    public function performDoofinderSearch($queryText)
+    public function performDoofinderSearch($queryText, array $filters = [])
     {
         $hashId = $this->storeConfig->getHashId($this->getStoreCode());
-        if (!$hashId) {
-            return [];
-        }
         $apiKey = $this->storeConfig->getApiKey();
         $limit = $this->storeConfig->getSearchRequestLimit($this->getStoreCode());
 
@@ -97,8 +87,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
                 null,
                 [
                     'rpp' => $limit,
-                    'transformer' => 'onlyid',
-                    'filter' => $this->filterHelper->getFilters()
+                    'filter' => $filters
                 ]
             );
             // @codingStandardsIgnoreEnd
@@ -111,7 +100,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         $this->lastSearch = $client;
         $this->lastResults = $results;
 
-        return $results ? $this->retrieveIds($results) : [];
+        return $results->getResults();
     }
 
     /**
@@ -204,11 +193,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
             $this->searchEngines = $this->getDoofinderSearchEngines($this->storeConfig->getApiKey());
         }
 
-        // Check whether particular store has disabled search engine
         $code = $this->getStoreCode();
-        if (!$this->storeConfig->isStoreSearchEngineEnabled($code)) {
-            return null;
-        }
 
         // Prepare SearchEngine instance
         $hashId = $this->storeConfig->getHashId($code);
@@ -306,23 +291,6 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
                 __('There was an error during Doofinder index creation')
             );
         }
-    }
-
-    /**
-     * Get store id from dimensions
-     *
-     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
-     * @return integer|null
-     */
-    public function getStoreIdFromDimensions(array $dimensions)
-    {
-        foreach ($dimensions as $dimension) {
-            if ($dimension->getName() == 'scope') {
-                return $dimension->getValue();
-            }
-        }
-
-        return null;
     }
 
     /**

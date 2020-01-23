@@ -37,7 +37,7 @@ class DelayedUpdates
     {
         return in_array(
             $product->getVisibility(),
-            $this->productVisibility->getVisibleInSearchIds()
+            $this->productVisibility->getVisibleInSiteIds()
         );
     }
 }
