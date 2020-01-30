@@ -130,15 +130,41 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @return boolean
+     */
+    public function isSingleStoreMode()
+    {
+        return $this->storeManager->isSingleStoreMode();
+    }
+
+    /**
+     * Get current store based on request parameter or store manager
+     * @return \Magento\Store\Api\Data\StoreInterface
+     */
+    public function getCurrentStore()
+    {
+        if ($storeId = $this->_request->getParam('store')) {
+            return $this->storeManager->getStore($storeId);
+        }
+        return $this->storeManager->getStore();
+    }
+
+    /**
      * Get current store code based on request parameter or store manager
      * @return string
      */
     public function getCurrentStoreCode()
     {
-        if ($storeId = $this->_request->getParam('store')) {
-            return $this->storeManager->getStore($storeId)->getCode();
-        }
-        return $this->storeManager->getStore()->getCode();
+        return $this->getCurrentStore()->getCode();
+    }
+
+    /**
+     * Check if current operation is a save action
+     * @return boolean
+     */
+    public function isSaveAction()
+    {
+        return $this->_request->getActionName() == 'save';
     }
 
     /**

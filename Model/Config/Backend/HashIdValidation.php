@@ -64,7 +64,28 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
             );
         }
 
+        if ($this->storeConfig->isSingleStoreMode()) {
+            $this->setScope(\Magento\Store\Model\ScopeInterface::SCOPE_STORES);
+            $this->setScopeId($this->storeConfig->getCurrentStore()->getId());
+        }
+
         return parent::save();
+    }
+
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        if ($this->storeConfig->isSingleStoreMode()) {
+            if ($this->storeConfig->isSaveAction()) {
+                return parent::getValue();
+            }
+            return $this->storeConfig->getHashId(
+                $this->storeConfig->getCurrentStoreCode()
+            );
+        }
+        return parent::getValue();
     }
 
     /**
