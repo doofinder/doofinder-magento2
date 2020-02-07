@@ -5,28 +5,19 @@ namespace Doofinder\Feed\Cron;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResource;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory as ChangedProductCollectionFactory;
-use Doofinder\Feed\Search\Processor;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Doofinder\Feed\Helper\Indexer as IndexerHelper;
+use Doofinder\Feed\Model\Indexer\IndexerHandler;
+use Doofinder\Feed\Registry\IndexerScope;
+use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\Full;
 
 /**
  * This class reflects current product data in Doofinder on cron run.
- *
- * When 'Update on cron' option is selected in admin panel and Doofinder
- * is set as internal search engine, product updates and deletions are postponed
- * to next cron run instead of being executed immediately. This class then
- * executes those operations in bulk.
  *
  * @SuppressWarnings(PHPMD.LongVariable)
  */
 class PerformDelayedUpdates
 {
-    /**
-     * Determines how much products at most are to be processed in a single API call.
-     *
-     * @var integer CHUNK_SIZE
-     */
-    const CHUNK_SIZE = 100;
-
     /**
      * @var StoreConfig $storeConfig
      */
@@ -38,33 +29,48 @@ class PerformDelayedUpdates
     private $changedProductCollectionFactory;
 
     /**
-     * @var Processor $processor
+     * @var IndexerHelper
      */
-    private $processor;
+    private $indexerHelper;
 
     /**
-     * @var ProductCollectionFactory $productCollectionFactory
+     * @var IndexerHandler
      */
-    private $productCollectionFactory;
+    private $indexerHandler;
 
     /**
-     * A constructor.
-     *
+     * @var IndexerScope
+     */
+    private $indexerScope;
+
+    /**
+     * @var Full
+     */
+    private $fullAction;
+
+    /**
+     * PerformDelayedUpdates constructor.
      * @param StoreConfig $storeConfig
      * @param ChangedProductCollectionFactory $changedProductCollectionFactory
-     * @param Processor $processor
-     * @param ProductCollectionFactory $productCollectionFactory
+     * @param IndexerHelper $indexerHelper
+     * @param IndexerHandler $indexerHandler
+     * @param IndexerScope $indexerScope
+     * @param Full $fullAction
      */
     public function __construct(
         StoreConfig $storeConfig,
         ChangedProductCollectionFactory $changedProductCollectionFactory,
-        Processor $processor,
-        ProductCollectionFactory $productCollectionFactory
+        IndexerHelper $indexerHelper,
+        IndexerHandler $indexerHandler,
+        IndexerScope $indexerScope,
+        Full $fullAction
     ) {
         $this->storeConfig = $storeConfig;
         $this->changedProductCollectionFactory = $changedProductCollectionFactory;
-        $this->processor = $processor;
-        $this->productCollectionFactory = $productCollectionFactory;
+        $this->indexerHelper = $indexerHelper;
+        $this->indexerHandler = $indexerHandler;
+        $this->indexerScope = $indexerScope;
+        $this->fullAction = $fullAction;
     }
 
     /**
@@ -74,14 +80,34 @@ class PerformDelayedUpdates
      */
     public function execute()
     {
-        foreach ($this->storeConfig->getStoreCodes() as $storeCode) {
-            if (!$this->storeConfig->isDelayedUpdatesEnabled($storeCode)) {
-                continue;
-            }
-
-            $this->processDeletedDocuments($storeCode);
-            $this->processUpdatedDocuments($storeCode);
+        if (!$this->indexerHelper->isDelayedUpdatesEnabled()) {
+            return;
         }
+
+        $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_DELAYED);
+        foreach ($this->storeConfig->getStoreCodes() as $storeCode) {
+            $dimensions = $this->getDimensions($storeCode);
+
+            $this->indexerHandler->deleteIndex(
+                $dimensions,
+                $this->getDeletedDocuments($storeCode)
+            );
+            $this->indexerHandler->saveIndex(
+                $dimensions,
+                $this->getUpdatedDocuments($storeCode)
+            );
+        }
+        $this->indexerScope->setIndexerScope(null);
+    }
+
+    /**
+     * @param string $storeCode
+     * @return array
+     */
+    private function getDimensions($storeCode)
+    {
+        $storeId = $this->storeConfig->getStoreViewIdByStoreCode($storeCode);
+        return [$this->indexerHelper->getDimensions($storeId)];
     }
 
     /**
@@ -89,87 +115,53 @@ class PerformDelayedUpdates
      *
      * @param string $storeCode Code of the store view traces should be processed on.
      *
-     * @return void
+     * @return void|\Generator
      */
-    private function processDeletedDocuments($storeCode)
+    private function getDeletedDocuments($storeCode)
     {
-        do {
-            /**
-             * @var \Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection $collection
-             */
-            $collection = $this->getDeletedProductsCollection($storeCode);
+        /**
+         * @var \Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection $collection
+         */
+        $collection = $this->getDeletedProductsCollection($storeCode);
 
-            if ($collection->getSize() === 0) {
-                return;
-            }
+        if ($collection->getSize() === 0) {
+            return;
+        }
 
-            /**
-             * We only need to know the IDs of deleted products and pass them to the processor.
-             */
-            $deletedIds = $collection->getColumnValues(ChangedProductResource::FIELD_PRODUCT_ID);
+        foreach ($collection as $item) {
+            yield $item[ChangedProductResource::FIELD_PRODUCT_ID];
+        }
 
-            // phpcs:ignore Ecg.Performance.Loop.ModelLSD, MEQP1.Performance.Loop.ModelLSD
-            $this->processor->delete($storeCode, $deletedIds);
-
-            $collection->walk('delete');
-        } while ($collection->getSize() == self::CHUNK_SIZE);
+        $collection->walk('delete');
     }
 
     /**
      * Processes all updated products traces for given store view.
      *
-     * This method fetches at most 100 traces per request, and processes all of the traces
-     * in subsequent API calls.
      *
      * @param string $storeCode Code of the store view traces should be processed on.
      *
-     * @return void
+     * @return void|\Generator
      */
-    private function processUpdatedDocuments($storeCode)
+    private function getUpdatedDocuments($storeCode)
     {
-        do {
-            /**
-             * @var \Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection $collection
-             */
-            $collection = $this->getUpdatedProductsCollection($storeCode);
+        /**
+         * @var \Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection $collection
+         */
+        $collection = $this->getUpdatedProductsCollection($storeCode);
 
-            if ($collection->getSize() === 0) {
-                return;
-            }
+        if ($collection->getSize() === 0) {
+            return;
+        }
 
-            /**
-             * We only need to know the IDs of updated products and pass them
-             * to the collection factory.
-             */
-            $updatedIds = $collection->getColumnValues(ChangedProductResource::FIELD_PRODUCT_ID);
+        foreach ($collection as $item) {
+            yield $item[ChangedProductResource::FIELD_PRODUCT_ID] => [];
+        }
 
-            $storeViewId = $this->storeConfig
-                ->getStoreViewIdByStoreCode($storeCode);
+        $productIds = $collection->getColumnValues(ChangedProductResource::FIELD_PRODUCT_ID);
+        yield $this->fullAction->rebuildStoreIndex($storeCode, $productIds);
 
-            $productCollection = $this->productCollectionFactory
-                ->create()
-                ->addStoreFilter($storeViewId)
-                ->addFieldToSelect('*')
-                ->addFieldToFilter(
-                    'entity_id',
-                    [
-                        'in' => $updatedIds
-                    ]
-                );
-
-            /**
-             * The `update` method of `Doofinder\Feed\Search\Processor` class expects
-             * an array of products' models.
-             */
-            $updatedProducts = [];
-            foreach ($productCollection as $product) {
-                $updatedProducts[] = $product;
-            }
-
-            $this->processor->update($storeCode, $updatedProducts);
-
-            $collection->walk('delete');
-        } while ($collection->getSize() == self::CHUNK_SIZE);
+        $collection->walk('delete');
     }
 
     /**
@@ -201,8 +193,6 @@ class PerformDelayedUpdates
                 ChangedProductResource::FIELD_STORE_CODE,
                 $storeCode
             )
-            ->setPageSize(self::CHUNK_SIZE)
-            ->setCurPage(1)
             ->load();
     }
 
@@ -218,7 +208,6 @@ class PerformDelayedUpdates
         return $this->getChangedProductCollection(
             [
                 ChangedProductResource::OPERATION_DELETE,
-                ChangedProductResource::OPERATION_DISABLE
             ],
             $storeCode
         );

@@ -9,7 +9,7 @@ namespace Doofinder\Feed\Registry;
 class IndexerScope
 {
     const SCOPE_FULL = 'indexer_execute_full';
-    const SCOPE_SAVE = 'indexer_execute_save';
+    const SCOPE_DELAYED = 'indexer_execute_delayed';
 
     /**
      * @var string

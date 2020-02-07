@@ -17,10 +17,7 @@ use Psr\Log\LoggerInterface;
 /**
  * This class is responsible for leaving a trace of a change of a product to be later synchronized using cron update.
  *
- * This plugin fires on every store view, but if cron updates are disabled for the store view on which the product
- * is being changed, then the execution is interruped early, resulting in no trace being recorded.
- *
- * For store views that do have cron updates enabled, the execution of this plugin results in storing following
+ * Execution of this plugin results in storing following
  * information in database table (name of the table is stored as a `TABLE_NAME` constant
  * in `Doofinder\Feed\Model\ResourceModel\ChangedProduct` class):
  *
@@ -106,7 +103,7 @@ class RegisterChange implements ObserverInterface
         /**
          * @var string $operation
          */
-        $operation = $this->getOperation($observer, $product);
+        $operation = $this->getOperation($observer);
 
         /**
          * @var string[] $relevantStoreCodes
@@ -151,15 +148,12 @@ class RegisterChange implements ObserverInterface
      * Determines the operation that was performed on a product.
      *
      * @param Observer $observer
-     * @param Product $product
      *
      * @return string A constant of `Doofinder\Feed\Model\ResourceModel\ChangedProduct`
      *  class indicating the operation associated
      */
-    private function getOperation(
-        Observer $observer,
-        Product $product
-    ) {
+    private function getOperation(Observer $observer)
+    {
         $eventName = $observer->getEvent()
             ->getName();
 
@@ -168,19 +162,6 @@ class RegisterChange implements ObserverInterface
          */
         if ($eventName == 'catalog_product_delete_commit_after') {
             return ChangedProductResource::OPERATION_DELETE;
-        }
-
-        /**
-         * Product set as disabled or set as not visible individually in
-         * any store view should also be deleted from the index (shouldn't
-         * appear in it) even if its other properties have been altered.
-         * Different operation is used to distinguish the product from those,
-         * that were permamently lost.
-         */
-        if ($product->getStatus() == ProductStatus::STATUS_DISABLED
-            || !$this->helper->isProductVisible($product)
-        ) {
-            return ChangedProductResource::OPERATION_DISABLE;
         }
 
         /**
@@ -213,16 +194,11 @@ class RegisterChange implements ObserverInterface
             $relevantStoreCodes = $this->storeConfig->getStoreCodes();
         }
 
-        // Exclude store views with disabled "Delayed Updates"
-        $relevantStoreCodes = array_filter($relevantStoreCodes, function ($storeCode) {
-            return $this->storeConfig->isDelayedUpdatesEnabled($storeCode);
-        });
-
         return $relevantStoreCodes;
     }
 
     /**
-     * Determines, what trace (either update, disable or delete) should be recorded
+     * Determines, what trace (either update or delete) should be recorded
      * for the product change, and invokes the method responsible for the appropriate
      * one among them on every relevant store view.
      *
@@ -240,19 +216,7 @@ class RegisterChange implements ObserverInterface
         foreach ($relevantStoreCodes as $storeCode) {
             switch ($operation) {
                 case ChangedProductResource::OPERATION_UPDATE:
-                    if ($this->helper->isProductVisible($product)) {
-                        $this->leaveUpdateTrace($product, $storeCode);
-                        break;
-                    }
-                    /**
-                     * When the product was in fact updated in a way that causes it to
-                     * no longer be visible in search results, then the `disable` operation
-                     * should be issued to remove the product from Doofinder index.
-                     */
-                    // intended fall-through
-
-                case ChangedProductResource::OPERATION_DISABLE:
-                    $this->leaveDisableTrace($product, $storeCode);
+                    $this->leaveUpdateTrace($product, $storeCode);
                     break;
 
                 case ChangedProductResource::OPERATION_DELETE:
@@ -291,28 +255,6 @@ class RegisterChange implements ObserverInterface
             $product,
             $storeCode,
             ChangedProductResource::OPERATION_UPDATE
-        );
-    }
-
-    /**
-     * Leaves a disable trace for a product change.
-     *
-     * This method invokes a `leaveTrace()` method with appropriate
-     * operation value as its parameter.
-     *
-     * @param Product $product
-     * @param string $storeCode
-     *
-     * @return void
-     */
-    private function leaveDisableTrace(
-        Product $product,
-        $storeCode
-    ) {
-        $this->leaveTrace(
-            $product,
-            $storeCode,
-            ChangedProductResource::OPERATION_DISABLE
         );
     }
 

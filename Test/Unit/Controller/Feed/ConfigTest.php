@@ -65,11 +65,6 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
     private $scopeConfig;
 
     /**
-     * @var \Doofinder\Feed\Helper\Schedule
-     */
-    private $schedule;
-
-    /**
      * Set up test
      *
      * @return void
@@ -138,13 +133,6 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
             ['general/locale/code', $scopeConfig::SCOPE_TYPE_DEFAULT, null, 'EN'],
         ]));
 
-        $this->schedule = $this->getMockBuilder(\Doofinder\Feed\Helper\Schedule::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->schedule->method('isFeedFileExist')->willReturn(false);
-        $this->schedule->method('getFeedFileUrl')->with('default', false)
-            ->willReturn('http://example.com/pub/media//doofinder-default.xml');
-
         $this->controller = $this->objectManager->getObject(
             \Doofinder\Feed\Controller\Feed\Config::class,
             [
@@ -154,7 +142,6 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
                 'productMetadata' => $this->productMetadata,
                 'helper' => $this->helper,
                 'scopeConfig' => $this->scopeConfig,
-                'schedule' => $this->schedule,
                 'context' => $this->context,
             ]
         );
@@ -167,10 +154,6 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      */
     public function testExecuteEnabled()
     {
-        $this->storeConfig->method('getStoreConfig')->willReturn([
-            'enabled' => true,
-        ]);
-
         $config = [
             'platform' => [
                 'name' => 'Magento',
@@ -189,8 +172,6 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
                     'default' => [
                         'language' => 'EN',
                         'currency' => 'USD',
-                        'feed_url' => 'http://example.com/pub/media//doofinder-default.xml',
-                        'feed_exists' => false,
                     ],
                 ],
             ],

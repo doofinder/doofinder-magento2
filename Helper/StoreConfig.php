@@ -2,6 +2,8 @@
 
 namespace Doofinder\Feed\Helper;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+
 /**
  * Store config helper
  */
@@ -11,11 +13,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * Path to attributes config in config.xml/core_config_data
      */
     const FEED_ATTRIBUTES_CONFIG = 'doofinder_config_index/feed_attributes';
-
-    /**
-     * Path to cron config in config.xml/core_config_data
-     */
-    const FEED_CRON_CONFIG = 'doofinder_config_data_feed/cron_settings';
 
     /**
      * Path to feed settings in config.xml/core_config_data
@@ -68,83 +65,57 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     private $storeWebsiteRelation;
 
     /**
-     * @var \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory
-     */
-    private $configCollection;
-
-    /**
      * StoreConfig constructor.
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Doofinder\Feed\Helper\Serializer $serializer
      * @param \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation
-     * @param \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory $configCollection
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Doofinder\Feed\Helper\Serializer $serializer,
-        \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation,
-        \Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory $configCollection
+        \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation
     ) {
         $this->storeManager = $storeManager;
         $this->serializer = $serializer;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
-        $this->configCollection = $configCollection;
         parent::__construct($context);
     }
 
     /**
-     * Return array with store config.
-     *
-     * @param string|null $storeCode
+     * Get Doofinder attributes that should be indexed
+     * @param null|integer $storeId
      * @return array
      */
-    public function getStoreConfig($storeCode = null)
+    public function getDoofinderFields($storeId = null)
     {
-        if (!$storeCode) {
-            $storeCode = $this->getStoreCode();
-        }
-
-        $scopeStore = $this->getScopeStore();
-
-        $config = array_merge(
-            ['store_code' => $storeCode],
-            ['attributes' => $this->scopeConfig->getValue(self::FEED_ATTRIBUTES_CONFIG, $scopeStore, $storeCode)],
-            $this->scopeConfig->getValue(self::FEED_CRON_CONFIG, $scopeStore, $storeCode),
-            $this->scopeConfig->getValue(self::FEED_SETTINGS_CONFIG, $scopeStore, $storeCode)
+        $attributes = $this->scopeConfig->getValue(
+            self::FEED_ATTRIBUTES_CONFIG,
+            $this->getScopeStore(),
+            $storeId
         );
 
-        /**
-         * @notice 'backend_model' does not process config value
-         *          so we need to unserialize value here.
-         * @see     MAGETWO-80296
-         */
-        if (!empty($config['attributes']['additional_attributes'])) {
-            $additionalAttributes = [];
-            foreach ($this->serializer->unserialize(
-                $config['attributes']['additional_attributes']
-            ) as $data) {
-                $additionalAttributes[$data['field']] = $data['additional_attribute'];
-            }
-
-            unset($config['attributes']['additional_attributes']);
-            $config['attributes'] = array_merge($config['attributes'], $additionalAttributes);
+        $unserialized = $this->serializer->unserialize($attributes['additional_attributes']);
+        foreach ($unserialized as $attr) {
+            $attributes[$attr['field']] = $attr['additional_attribute'];
         }
+        unset($attributes['additional_attributes']);
+        return $attributes;
+    }
 
-        /**
-         * @notice There is a bug in PHP 7.0.7 and Magento 2.1.3+
-         *         which resulted with references in $config array,
-         *         so we merge $config array with new value instead
-         *         of replacing key with new value.
-         */
-        $config = array_merge(
-            $config,
-            ['start_time' => explode(',', $config['start_time'])]
+    /**
+     * Get Doofinder default attributes code
+     * @return array
+     */
+    public function getDefaultDoofinderFields()
+    {
+        $attributes = $this->scopeConfig->getValue(
+            self::FEED_ATTRIBUTES_CONFIG
         );
-
-        return $config;
+        unset($attributes['additional_attributes']);
+        return $attributes;
     }
 
     /**
@@ -159,15 +130,41 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * @return boolean
+     */
+    public function isSingleStoreMode()
+    {
+        return $this->storeManager->isSingleStoreMode();
+    }
+
+    /**
+     * Get current store based on request parameter or store manager
+     * @return \Magento\Store\Api\Data\StoreInterface
+     */
+    public function getCurrentStore()
+    {
+        if ($storeId = $this->_request->getParam('store')) {
+            return $this->storeManager->getStore($storeId);
+        }
+        return $this->storeManager->getStore();
+    }
+
+    /**
      * Get current store code based on request parameter or store manager
      * @return string
      */
     public function getCurrentStoreCode()
     {
-        if ($storeId = $this->_request->getParam('store')) {
-            return $this->storeManager->getStore($storeId)->getCode();
-        }
-        return $this->storeManager->getStore()->getCode();
+        return $this->getCurrentStore()->getCode();
+    }
+
+    /**
+     * Check if current operation is a save action
+     * @return boolean
+     */
+    public function isSaveAction()
+    {
+        return $this->_request->getActionName() == 'save';
     }
 
     /**
@@ -270,46 +267,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Check if search engine is enabled for store
-     *
-     * @param string|null $storeCode
-     * @return boolean
-     */
-    public function isStoreSearchEngineEnabled($storeCode = null)
-    {
-        return (boolean) $this->scopeConfig->getValue(
-            self::SEARCH_ENGINE_CONFIG . '/enabled',
-            $this->getScopeStore(),
-            $storeCode
-        );
-    }
-
-    /**
-     * Check if search engine is enabled for store with avoid cache
-     *
-     * @param string|integer $storeCode
-     * @return boolean
-     */
-    public function isStoreSearchEngineEnabledNoCached($storeCode)
-    {
-        $scope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
-        $collection = $this->configCollection->create();
-        $collection->addScopeFilter($scope, $storeCode, self::SEARCH_ENGINE_CONFIG);
-        foreach ($collection as $item) {
-            if ($item->getData('path') === self::SEARCH_ENGINE_CONFIG . '/enabled') {
-                $value = $item->getData('value');
-                if ($value === null) {
-                    return true;
-                }
-
-                return (bool) $value;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Get Hash ID.
      *
      * @param string $storeCode
@@ -359,75 +316,23 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Check if internal search is enabled.
      *
-     * @param string $storeCode
      * @return boolean
      */
-    public function isInternalSearchEnabled($storeCode = null)
+    public function isInternalSearchEnabled()
     {
         $engine = $this->scopeConfig->getValue(
             self::CATALOG_SEARCH_ENGINE_CONFIG,
             $this->getScopeStore(),
-            $storeCode
+            null
         );
 
         return $engine == self::DOOFINDER_SEARCH_ENGINE_NAME;
     }
 
     /**
-     * Check if atomic updates are enabled.
-     *
-     * Delayed product updates take precedence over atomic updates. For atomic updates
-     * to work, Doofinder must be set as internal search engine and delayed updates
-     * must be disabled.
-     *
-     * @param string $storeCode
-     * @return boolean
-     */
-    public function isAtomicUpdatesEnabled($storeCode = null)
-    {
-        if ($this->isInternalSearchEnabled($storeCode)) {
-            return false;
-        }
-
-        if ($this->isDelayedUpdatesEnabled($storeCode)) {
-            return false;
-        }
-
-        return $this->scopeConfig->getValue(
-            self::FEED_SETTINGS_CONFIG . '/atomic_updates_enabled',
-            $this->getScopeStore(),
-            $storeCode
-        );
-    }
-
-    /**
-     * Check, whether delayed product updates are enabled and active.
-     *
-     * For delayed products updates to work, Doofinder must be set as internal search engine.
-     * If delayed updates are enabled, atomic updates are not invocated.
-     *
-     * @param string $storeCode
-     *
-     * @return boolean True if Cron updates are enabled.
-     */
-    public function isDelayedUpdatesEnabled($storeCode = null)
-    {
-        if (!$this->isInternalSearchEnabled($storeCode)) {
-            return false;
-        }
-
-        return $this->scopeConfig
-            ->getValue(
-                self::FEED_SETTINGS_CONFIG . '/cron_updates_enabled',
-                $this->getScopeStore(),
-                $storeCode
-            );
-    }
-
-    /**
      * Check if should export categories in navigation.
      *
-     * @param string $storeCode
+     * @param string|null $storeCode
      * @return boolean
      */
     public function isExportCategoriesInNavigation($storeCode = null)
@@ -436,6 +341,47 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             self::FEED_SETTINGS_CONFIG . '/categories_in_navigation',
             $this->getScopeStore(),
             $storeCode
+        );
+    }
+
+    /**
+     * @param string|null $storeCode
+     * @return string
+     */
+    public function getImageSize($storeCode = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::FEED_SETTINGS_CONFIG . '/image_size',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Check if should export product prices.
+     *
+     * @param string|null $storeCode
+     * @return boolean
+     */
+    public function isExportProductPrices($storeCode = null)
+    {
+        return (bool) $this->scopeConfig->getValue(
+            self::FEED_SETTINGS_CONFIG . '/export_product_prices',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * @param integer $storeId
+     * @return string
+     */
+    public function getPriceTaxMode($storeId)
+    {
+        return $this->scopeConfig->getValue(
+            self::FEED_SETTINGS_CONFIG . '/price_tax_mode',
+            $this->getScopeStore(),
+            $storeId
         );
     }
 

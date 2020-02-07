@@ -57,16 +57,6 @@ class ChangedProduct extends AbstractDB
     const OPERATION_UPDATE = 'update';
 
     /**
-     * Tells that the changes rendered the product insivible.
-     *
-     * This may be the cause of either disabling it on particular store view
-     * or switching its visibility to "Not visible individually".
-     *
-     * @var string OPERATION_DIASBLE
-     */
-    const OPERATION_DISABLE = 'disable';
-
-    /**
      * Tells that the product was deleted completely.
      *
      * @var string OPERATION_DELETE

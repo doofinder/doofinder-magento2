@@ -28,16 +28,6 @@ class Config extends \Magento\Framework\App\Action\Action
     private $storeConfig;
 
     /**
-     * @var \Doofinder\Feed\Helper\Schedule
-     */
-    private $schedule;
-
-    /**
-     * @var \Magento\Framework\Filesystem
-     */
-    private $filesystem;
-
-    /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     private $scopeConfig;
@@ -49,8 +39,6 @@ class Config extends \Magento\Framework\App\Action\Action
      * @param \Doofinder\Feed\Helper\Data $helper
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Doofinder\Feed\Helper\Schedule $schedule
-     * @param \Magento\Framework\Filesystem $filesystem
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Action\Context $context
      */
@@ -59,8 +47,6 @@ class Config extends \Magento\Framework\App\Action\Action
         \Doofinder\Feed\Helper\Data $helper,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Helper\Schedule $schedule,
-        \Magento\Framework\Filesystem $filesystem,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\Action\Context $context
     ) {
@@ -68,8 +54,6 @@ class Config extends \Magento\Framework\App\Action\Action
         $this->helper = $helper;
         $this->storeManager = $storeManager;
         $this->storeConfig = $storeConfig;
-        $this->schedule = $schedule;
-        $this->filesystem = $filesystem;
         $this->scopeConfig = $scopeConfig;
         parent::__construct($context);
     }
@@ -101,22 +85,11 @@ class Config extends \Magento\Framework\App\Action\Action
 
         foreach ($this->storeManager->getStores() as $store) {
             $storeCode = $store->getCode();
-            $settings = $this->storeConfig->getStoreConfig($storeCode);
-
-            if ($settings['enabled']) {
-                $feedUrl = $this->schedule->getFeedFileUrl($storeCode, false);
-                $feedExists = $this->schedule->isFeedFileExist($storeCode);
-            } else {
-                $feedUrl = $store->getUrl('doofinder/feed');
-                $feedExists = true;
-            }
 
             $config['module']['options']['language'][] = $storeCode;
             $config['module']['configuration'][$storeCode] = [
                 'language' => strtoupper(substr($this->scopeConfig->getValue('general/locale/code'), 0, 2)),
                 'currency' => $store->getCurrentCurrencyCode(),
-                'feed_url' => $feedUrl,
-                'feed_exists' => $feedExists,
             ];
         }
 
