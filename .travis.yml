@@ -47,7 +47,10 @@ before_install:
   - mysql -e "GRANT ALL PRIVILEGES ON magento_integration_tests.* TO 'magento'@'localhost' IDENTIFIED BY 'magento';"
   - mysql -e 'FLUSH PRIVILEGES;'
   - composer config --global http-basic.repo.magento.com "$MAGENTO_AUTH_USER" "$MAGENTO_AUTH_PASSWORD"
+  # Remove Xdebug.
   - phpenv config-rm xdebug.ini
+  # Validate composer.json file.
+  - composer validate --strict
   - phpenv config-add travis.php.ini
 
 install:
