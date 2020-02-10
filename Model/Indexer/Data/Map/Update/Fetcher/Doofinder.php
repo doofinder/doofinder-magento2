@@ -81,6 +81,7 @@ class Doofinder implements FetcherInterface
             foreach ($fields as $indexField => $attribute) {
                 $this->processed[$productId][$indexField] = $generator->get($product, $attribute);
             }
+            $this->processed[$productId] = array_filter($this->processed[$productId]);
         }
     }
 
