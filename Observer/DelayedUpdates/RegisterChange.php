@@ -103,7 +103,7 @@ class RegisterChange implements ObserverInterface
         /**
          * @var string $operation
          */
-        $operation = $this->getOperation($observer);
+        $operation = $this->getOperation($observer, $product);
 
         /**
          * @var string[] $relevantStoreCodes
@@ -148,11 +148,12 @@ class RegisterChange implements ObserverInterface
      * Determines the operation that was performed on a product.
      *
      * @param Observer $observer
+     * @param Product $product
      *
      * @return string A constant of `Doofinder\Feed\Model\ResourceModel\ChangedProduct`
      *  class indicating the operation associated
      */
-    private function getOperation(Observer $observer)
+    private function getOperation(Observer $observer, Product $product)
     {
         $eventName = $observer->getEvent()
             ->getName();
@@ -160,7 +161,9 @@ class RegisterChange implements ObserverInterface
         /**
          * Product that was deleted from all stores should be deleted from index as well.
          */
-        if ($eventName == 'catalog_product_delete_commit_after') {
+        if ($eventName == 'catalog_product_delete_commit_after'
+            || $product->getStatus() == ProductStatus::STATUS_DISABLED
+        ) {
             return ChangedProductResource::OPERATION_DELETE;
         }
 
