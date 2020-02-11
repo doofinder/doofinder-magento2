@@ -76,7 +76,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $hashId = $this->storeConfig->getHashId($this->getStoreCode());
         $apiKey = $this->storeConfig->getApiKey();
-        $limit = $this->storeConfig->getSearchRequestLimit($this->getStoreCode());
+        $limit = $this->storeConfig->getSearchRequestLimit();
 
         $client = $this->searchFactory->create($hashId, $apiKey);
 
@@ -114,27 +114,6 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         $ids = [];
         foreach ($results->getResults() as $result) {
             $ids[] = $result['id'];
-        }
-
-        return $ids;
-    }
-
-    /**
-     * Fetch all results of last doofinder search
-     *
-     * @return array - The array of products ids from all pages
-     */
-    public function getAllResults()
-    {
-        if (!$this->lastResults) {
-            return [];
-        }
-
-        $limit = $this->storeConfig->getSearchTotalLimit($this->getStoreCode());
-        $ids = $this->retrieveIds($this->lastResults);
-
-        while (count($ids) < $limit && ($results = $this->lastSearch->nextPage())) {
-            $ids = array_merge($ids, $this->retrieveIds($results));
         }
 
         return $ids;
