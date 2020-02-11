@@ -9,8 +9,6 @@
             <doofinder_search_engine>
                 <hash_id></hash_id>
                 <internal_search_enabled>0</internal_search_enabled>
-                <page_limit>5</page_limit>
-                <request_limit>100</request_limit>
             </doofinder_search_engine>
             <doofinder_layer>
                 <enabled>0</enabled>
