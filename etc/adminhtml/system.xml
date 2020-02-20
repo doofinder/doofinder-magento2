@@ -70,19 +70,6 @@
                     <label>Use Doofinder for Internal Search</label>
                     <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled</frontend_model>
                 </field>
-                <field id="page_limit"
-                       translate="label"
-                       type="text"
-                       sortOrder="3"
-                       showInDefault="1"
-                       showInStore="0"
-                       showInWebsite="0">
-                    <label>Max requests per search</label>
-                    <validate>required-entry validate-number</validate>
-                    <comment>
-                        <![CDATA[ Maximum number of pages obtained for a search query. Each page contains a maximum of 100 results. ]]>
-                    </comment>
-                </field>
             </group>
             <group id="doofinder_layer"
                    translate="label"
