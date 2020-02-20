@@ -150,18 +150,10 @@ class PerformDelayedUpdates
          */
         $collection = $this->getUpdatedProductsCollection($storeCode);
 
-        if ($collection->getSize() === 0) {
-            return;
-        }
-
-        foreach ($collection as $item) {
-            yield $item[ChangedProductResource::FIELD_PRODUCT_ID] => [];
-        }
-
         $productIds = $collection->getColumnValues(ChangedProductResource::FIELD_PRODUCT_ID);
-        yield $this->fullAction->rebuildStoreIndex($storeCode, $productIds);
-
         $collection->walk('delete');
+
+        return $this->fullAction->rebuildStoreIndex($storeCode, $productIds);
     }
 
     /**
