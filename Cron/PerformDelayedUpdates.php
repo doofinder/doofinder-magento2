@@ -5,11 +5,12 @@ namespace Doofinder\Feed\Cron;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResource;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory as ChangedProductCollectionFactory;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Model\Indexer\IndexerHandler;
 use Doofinder\Feed\Registry\IndexerScope;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\Full;
+use Magento\Store\Model\App\Emulation;
+use Magento\Framework\App\Area;
 
 /**
  * This class reflects current product data in Doofinder on cron run.
@@ -49,6 +50,11 @@ class PerformDelayedUpdates
     private $fullAction;
 
     /**
+     * @var Emulation
+     */
+    private $appEmulation;
+
+    /**
      * PerformDelayedUpdates constructor.
      * @param StoreConfig $storeConfig
      * @param ChangedProductCollectionFactory $changedProductCollectionFactory
@@ -56,6 +62,7 @@ class PerformDelayedUpdates
      * @param IndexerHandler $indexerHandler
      * @param IndexerScope $indexerScope
      * @param Full $fullAction
+     * @param Emulation $appEmulation
      */
     public function __construct(
         StoreConfig $storeConfig,
@@ -63,7 +70,8 @@ class PerformDelayedUpdates
         IndexerHelper $indexerHelper,
         IndexerHandler $indexerHandler,
         IndexerScope $indexerScope,
-        Full $fullAction
+        Full $fullAction,
+        Emulation $appEmulation
     ) {
         $this->storeConfig = $storeConfig;
         $this->changedProductCollectionFactory = $changedProductCollectionFactory;
@@ -71,6 +79,7 @@ class PerformDelayedUpdates
         $this->indexerHandler = $indexerHandler;
         $this->indexerScope = $indexerScope;
         $this->fullAction = $fullAction;
+        $this->appEmulation = $appEmulation;
     }
 
     /**
@@ -86,8 +95,10 @@ class PerformDelayedUpdates
 
         $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_DELAYED);
         foreach ($this->storeConfig->getStoreCodes() as $storeCode) {
-            $dimensions = $this->getDimensions($storeCode);
+            $storeId = $this->storeConfig->getStoreViewIdByStoreCode($storeCode);
+            $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
 
+            $dimensions = $this->getDimensions($storeCode);
             $this->indexerHandler->deleteIndex(
                 $dimensions,
                 $this->getDeletedDocuments($storeCode)
@@ -96,6 +107,8 @@ class PerformDelayedUpdates
                 $dimensions,
                 $this->getUpdatedDocuments($storeCode)
             );
+
+            $this->appEmulation->stopEnvironmentEmulation();
         }
         $this->indexerScope->setIndexerScope(null);
     }
