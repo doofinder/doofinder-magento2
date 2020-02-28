@@ -106,13 +106,11 @@ class Processor
     /**
      * Delete products in Doofinder index
      *
-     * @param  integer[] $ids
+     * @param  array $productIds
      * @return void
      */
-    private function performDelete(array $ids)
+    private function performDelete(array $productIds)
     {
-        $this->searchHelper->deleteDoofinderItems(array_map(function ($id) {
-            return ['id' => $id];
-        }, $ids));
+        $this->searchHelper->deleteDoofinderItems($productIds);
     }
 }

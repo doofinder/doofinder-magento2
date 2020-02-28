@@ -7,6 +7,7 @@ use Magento\Framework\Indexer\SaveHandler\Batch;
 use Magento\Framework\Indexer\SaveHandler\IndexerInterface;
 use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Registry\IndexerScope;
+use Doofinder\Feed\Model\ChangedProduct\Registration;
 
 /**
  * Indexer handler
@@ -44,6 +45,11 @@ class IndexerHandler implements IndexerInterface
     private $mapper;
 
     /**
+     * @var Registration
+     */
+    private $registration;
+
+    /**
      * @var array
      */
     private $data;
@@ -61,6 +67,7 @@ class IndexerHandler implements IndexerInterface
      * @param Data\Mapper $mapper
      * @param IndexerHelper $indexerHelper
      * @param IndexerScope $indexerScope
+     * @param Registration $registration
      * @param array $data
      * @param integer $batchSize
      */
@@ -71,6 +78,7 @@ class IndexerHandler implements IndexerInterface
         Data\Mapper $mapper,
         IndexerHelper $indexerHelper,
         IndexerScope $indexerScope,
+        Registration $registration,
         array $data = [],
         $batchSize = 100
     ) {
@@ -80,6 +88,7 @@ class IndexerHandler implements IndexerInterface
         $this->mapper = $mapper;
         $this->indexerHelper = $indexerHelper;
         $this->indexerScope = $indexerScope;
+        $this->registration = $registration;
         $this->data = $data;
         $this->batchSize = $batchSize;
     }
@@ -104,6 +113,15 @@ class IndexerHandler implements IndexerInterface
     public function saveIndex($dimensions, \Traversable $documents)
     {
         if (!$this->canProceed()) {
+            foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
+                $productIds = array_keys($batchDocuments);
+                foreach ($productIds as $productId) {
+                    $this->registration->registerUpdate(
+                        $productId,
+                        $this->indexerHelper->getStoreCodeFromDimensions($dimensions)
+                    );
+                }
+            }
             return; // it's a Magento save index
         }
 
@@ -124,8 +142,18 @@ class IndexerHandler implements IndexerInterface
     public function deleteIndex($dimensions, \Traversable $documents)
     {
         if (!$this->canProceed()) {
+            foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
+                $productIds = array_values($batchDocuments);
+                foreach ($productIds as $productId) {
+                    $this->registration->registerDelete(
+                        $productId,
+                        $this->indexerHelper->getStoreCodeFromDimensions($dimensions)
+                    );
+                }
+            }
             return; // it's a Magento save index
         }
+
         $scopeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
         foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
             $docs = $this->mapper->get('delete')->map($batchDocuments, $scopeId);

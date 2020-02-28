@@ -2,10 +2,4 @@
     <event name="admin_system_config_changed_section_doofinder_config_data_feed">
         <observer name="doofinder_feed_invalidate_index" instance="Doofinder\Feed\Observer\Indexer" />
     </event>
-    <event name="catalog_product_save_commit_after">
-        <observer name="doofinder_feed_cron_update_save" instance="Doofinder\Feed\Observer\DelayedUpdates\RegisterChange" />
-    </event>
-    <event name="catalog_product_delete_commit_after">
-        <observer name="doofinder_feed_cron_update_delete" instance="Doofinder\Feed\Observer\DelayedUpdates\RegisterChange" />
-    </event>
 </config>

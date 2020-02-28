@@ -2,6 +2,7 @@
 
 namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 
+use Doofinder\Feed\Model\Generator\MapInterface;
 use Doofinder\Feed\Model\Indexer\Data\Map\Update\FetcherInterface;
 use Doofinder\Feed\Helper\StoreConfig;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
@@ -107,7 +108,7 @@ class Doofinder implements FetcherInterface
     /**
      * Get product generator
      * @param string $type
-     * @return mixed
+     * @return MapInterface
      */
     private function getGenerator($type)
     {
@@ -132,16 +133,10 @@ class Doofinder implements FetcherInterface
      */
     private function getProductCollection(array $productIds, $storeId)
     {
-        $attributes = array_values($this->getFields($storeId));
         $collection = $this->productColFactory->create()
             ->addIdFilter($productIds)
-            ->addAttributeToSelect($attributes)
+            ->addAttributeToSelect('*')
             ->addStoreFilter($storeId)
-            ->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
-            ->addAttributeToFilter('visibility', [
-                \Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH,
-                \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH
-            ])
             ->addAttributeToSort('id', 'asc');
 
         /**

@@ -175,6 +175,24 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get store code from dimensions
+     *
+     * @param \Magento\Framework\Search\Request\Dimension[] $dimensions
+     * @return integer|null
+     */
+    public function getStoreCodeFromDimensions(array $dimensions)
+    {
+        foreach ($dimensions as $dimension) {
+            if ($dimension->getName() == 'scope') {
+                $storeId = $dimension->getValue();
+                return $this->storeConfig->getStoreCode($storeId);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Check, whether delayed product updates are enabled and active.
      *
      * For delayed products updates to work, Doofinder must be set as internal search engine.

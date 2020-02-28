@@ -3,6 +3,7 @@
 namespace Doofinder\Feed\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDB;
+use Magento\Framework\Model\AbstractModel;
 
 /**
  * The resource model of product change trace.
@@ -78,5 +79,30 @@ class ChangedProduct extends AbstractDB
             self::TABLE_NAME,
             'entity_id'
         );
+    }
+
+    /**
+     * @param AbstractModel $object
+     * @param integer $productId
+     * @param string $storeCode
+     * @param string $operationType
+     * @return $this
+     */
+    public function loadChanged(AbstractModel $object, $productId, $storeCode, $operationType)
+    {
+        $select = $this->getConnection()->select();
+        $select->from($this->getMainTable())
+            ->where(self::FIELD_PRODUCT_ID . ' = ?', $productId)
+            ->where(self::FIELD_STORE_CODE . ' = ?', $storeCode)
+            ->where(self::FIELD_OPERATION_TYPE . ' = ?', $operationType);
+        $data = $this->getConnection()->fetchRow($select);
+
+        if ($data) {
+            $object->setData($data);
+        }
+        $this->unserializeFields($object);
+        $this->_afterLoad($object);
+
+        return $this;
     }
 }
