@@ -170,6 +170,9 @@
         <arguments>
             <argument name="generators" xsi:type="array">
                 <item name="simple" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product</item>
+                <item name="grouped" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product\Grouped</item>
+                <item name="configurable" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product\Configurable</item>
+                <item name="bundle" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product\Bundle</item>
             </argument>
         </arguments>
     </type>
