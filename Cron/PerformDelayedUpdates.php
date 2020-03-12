@@ -5,6 +5,7 @@ namespace Doofinder\Feed\Cron;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResource;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory as ChangedProductCollectionFactory;
+use Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection as ChangedProductCollection;
 use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Model\Indexer\IndexerHandler;
 use Doofinder\Feed\Registry\IndexerScope;
@@ -15,7 +16,6 @@ use Magento\Framework\App\Area;
 /**
  * This class reflects current product data in Doofinder on cron run.
  *
- * @SuppressWarnings(PHPMD.LongVariable)
  */
 class PerformDelayedUpdates
 {
@@ -25,9 +25,9 @@ class PerformDelayedUpdates
     private $storeConfig;
 
     /**
-     * @var ChangedProductCollectionFactory $changedProductCollectionFactory
+     * @var ChangedProductCollectionFactory $changedColFactory
      */
-    private $changedProductCollectionFactory;
+    private $changedColFactory;
 
     /**
      * @var IndexerHelper
@@ -57,7 +57,7 @@ class PerformDelayedUpdates
     /**
      * PerformDelayedUpdates constructor.
      * @param StoreConfig $storeConfig
-     * @param ChangedProductCollectionFactory $changedProductCollectionFactory
+     * @param ChangedProductCollectionFactory $changedColFactory
      * @param IndexerHelper $indexerHelper
      * @param IndexerHandler $indexerHandler
      * @param IndexerScope $indexerScope
@@ -66,7 +66,7 @@ class PerformDelayedUpdates
      */
     public function __construct(
         StoreConfig $storeConfig,
-        ChangedProductCollectionFactory $changedProductCollectionFactory,
+        ChangedProductCollectionFactory $changedColFactory,
         IndexerHelper $indexerHelper,
         IndexerHandler $indexerHandler,
         IndexerScope $indexerScope,
@@ -74,7 +74,7 @@ class PerformDelayedUpdates
         Emulation $appEmulation
     ) {
         $this->storeConfig = $storeConfig;
-        $this->changedProductCollectionFactory = $changedProductCollectionFactory;
+        $this->changedColFactory = $changedColFactory;
         $this->indexerHelper = $indexerHelper;
         $this->indexerHandler = $indexerHandler;
         $this->indexerScope = $indexerScope;
@@ -133,7 +133,7 @@ class PerformDelayedUpdates
     private function getDeletedDocuments($storeCode)
     {
         /**
-         * @var \Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection $collection
+         * @var ChangedProductCollection $collection
          */
         $collection = $this->getDeletedProductsCollection($storeCode);
 
@@ -159,46 +159,15 @@ class PerformDelayedUpdates
     private function getUpdatedDocuments($storeCode)
     {
         /**
-         * @var \Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection $collection
+         * @var ChangedProductCollection $collection
          */
         $collection = $this->getUpdatedProductsCollection($storeCode);
 
         $productIds = $collection->getColumnValues(ChangedProductResource::FIELD_PRODUCT_ID);
         $collection->walk('delete');
 
-        return $this->fullAction->rebuildStoreIndex($storeCode, $productIds);
-    }
-
-    /**
-     * Returns a collection of products change traces.
-     *
-     * This method fetches at most 100 traces per request, and processes all of the traces
-     * in subsequent API calls.
-     *
-     * @param string $type      Type of operation executed on a product. This can be either 'update' or 'delete'.
-     *                          Using OPERATION constats of class Doofinder\Feed\Model\ResourceModel\ChangedProduct
-     *                          is strongly advised.
-     * @param string $storeCode Code of store view which product change traces should be returned for.
-     *
-     * @return \Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection A collection of products change traces.
-     */
-    private function getChangedProductCollection(
-        $type,
-        $storeCode
-    ) {
-        return $this->changedProductCollectionFactory
-            ->create()
-            ->removeAllFieldsFromSelect()
-            ->addFieldToSelect(ChangedProductResource::FIELD_PRODUCT_ID)
-            ->addFieldToFilter(
-                ChangedProductResource::FIELD_OPERATION_TYPE,
-                $type
-            )
-            ->addFieldToFilter(
-                ChangedProductResource::FIELD_STORE_CODE,
-                $storeCode
-            )
-            ->load();
+        $storeId = $this->storeConfig->getStoreViewIdByStoreCode($storeCode);
+        return $this->fullAction->rebuildStoreIndex($storeId, $productIds);
     }
 
     /**
@@ -206,30 +175,21 @@ class PerformDelayedUpdates
      *
      * @param string $storeCode Code of the store product delete or disable traces should be returned for.
      *
-     * @return \Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection
+     * @return ChangedProductCollection
      */
     private function getDeletedProductsCollection($storeCode)
     {
-        return $this->getChangedProductCollection(
-            [
-                ChangedProductResource::OPERATION_DELETE,
-            ],
-            $storeCode
-        );
+        return $this->changedColFactory->create()->filterDeleted($storeCode);
     }
 
     /**
      * Returns a collection of product traces for products that have been updated.
-     *
      * @param string $storeCode Code of the store product update traces should be returned for.
      *
-     * @return \Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection
+     * @return ChangedProductCollection
      */
     private function getUpdatedProductsCollection($storeCode)
     {
-        return $this->getChangedProductCollection(
-            ChangedProductResource::OPERATION_UPDATE,
-            $storeCode
-        );
+        return $this->changedColFactory->create()->filterUpdated($storeCode);
     }
 }

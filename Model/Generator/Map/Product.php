@@ -102,6 +102,8 @@ class Product implements MapInterface
             case 'special_price':
             case 'tier_price':
             case 'minimal_price':
+            case 'final_price':
+            case 'regular_price':
                 return $this->getProductPrice($product, $field);
 
             case 'df_availability':

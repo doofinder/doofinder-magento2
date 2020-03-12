@@ -104,22 +104,6 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Retrieve ids from Doofinder results
-     *
-     * @param \Doofinder\Api\Search\Results $results
-     * @return array
-     */
-    private function retrieveIds(\Doofinder\Api\Search\Results $results)
-    {
-        $ids = [];
-        foreach ($results->getResults() as $result) {
-            $ids[] = $result['id'];
-        }
-
-        return $ids;
-    }
-
-    /**
      * Returns fetched results count
      *
      * @return integer

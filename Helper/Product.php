@@ -310,7 +310,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getProductPrice(
         \Magento\Catalog\Model\Product $product,
-        $attribute = 'price',
+        $attribute = 'final_price',
         $tax = null
     ) {
         switch ($attribute) {
@@ -402,13 +402,18 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAttributeText(\Magento\Catalog\Model\Product $product, $attributeName)
     {
-        $frontend = $product->getResource()->getAttribute($attributeName)->getFrontend();
+        $attribute = $product->getResource()->getAttribute($attributeName);
         $value = $product->getData($attributeName);
 
         if (!$value) {
             return null;
         }
 
+        if (!$attribute) {
+            return null;
+        }
+
+        $frontend = $attribute->getFrontend();
         $value = $frontend->getOption($value);
 
         if (!$value) {
