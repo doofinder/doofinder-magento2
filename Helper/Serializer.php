@@ -12,12 +12,12 @@ class Serializer
     /**
      * Serialize string
      *
-     * @param string $str
-     * @return array
+     * @param array|string $data
+     * @return string
      */
-    public function serialize($str)
+    public function serialize($data)
     {
-        return ZendSerializer::serialize($str, 'phpserialize');
+        return ZendSerializer::serialize($data, 'json');
     }
 
     /**
@@ -28,6 +28,6 @@ class Serializer
      */
     public function unserialize($str)
     {
-        return ZendSerializer::unserialize($str, 'phpserialize');
+        return ZendSerializer::unserialize($str, 'json');
     }
 }

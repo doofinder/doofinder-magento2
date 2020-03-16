@@ -13,3 +13,10 @@
 - Change of indexer from By Schedule to On Save after first whole reindex was deleted- if we changed API, it wouldn’t be needed
 - Updated Delayed Updates logic to use IndexerHandler. In addition, the "disabled" operation has been removed when turning off the product because search and indexer is based on attribute values
 - Whole search engine works on our code
+
+Refactor Doofinder Attributes
+
+- Change serializer from phpserializer to json
+- Remove configuration for default Doofinder fields, leave for couple of them
+- Remove "label" field from Additional Attributes
+- Add attributes provider for Image link field

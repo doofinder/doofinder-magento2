@@ -4,7 +4,7 @@ namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 
 use Doofinder\Feed\Model\Generator\MapInterface;
 use Doofinder\Feed\Model\Indexer\Data\Map\Update\FetcherInterface;
-use Doofinder\Feed\Helper\StoreConfig;
+use Doofinder\Feed\Model\Config\Indexer\Attributes;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\CatalogInventory\Model\ResourceModel\Stock\Status;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
@@ -36,26 +36,26 @@ class Doofinder implements FetcherInterface
     private $stockStatusResource;
 
     /**
-     * @var StoreConfig
+     * @var Attributes
      */
-    private $storeConfig;
+    private $attributes;
 
     /**
      * Doofinder constructor.
      * @param CollectionFactory $collectionFactory
      * @param Status $stockStatusResource
-     * @param StoreConfig $storeConfig
+     * @param Attributes $attributes
      * @param array $generators
      */
     public function __construct(
         CollectionFactory $collectionFactory,
         Status $stockStatusResource,
-        StoreConfig $storeConfig,
+        Attributes $attributes,
         array $generators
     ) {
         $this->productColFactory = $collectionFactory;
         $this->stockStatusResource = $stockStatusResource;
-        $this->storeConfig = $storeConfig;
+        $this->attributes = $attributes;
         $this->generators = $generators;
     }
 
@@ -123,7 +123,7 @@ class Doofinder implements FetcherInterface
      */
     private function getFields($storeId)
     {
-        return $this->storeConfig->getDoofinderFields($storeId);
+        return $this->attributes->get($storeId);
     }
 
     /**

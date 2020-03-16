@@ -22,18 +22,10 @@
         </doofinder_config_config>
         <doofinder_config_index>
             <feed_attributes>
-                <id>df_id</id>
-                <title>name</title>
-                <description>short_description</description>
                 <brand>manufacturer</brand>
-                <categories>category_ids</categories>
-                <link>url_key</link>
                 <image_link>image</image_link>
-                <price>df_regular_price</price>
-                <sale_price>df_sale_price</sale_price>
                 <mpn>sku</mpn>
-                <availability>df_availability</availability>
-                <additional_attributes>a:0:{}</additional_attributes>
+                <additional_attributes>[]</additional_attributes>
             </feed_attributes>
             <feed_settings>
                 <export_product_prices>1</export_product_prices>

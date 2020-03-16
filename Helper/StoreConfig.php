@@ -111,19 +111,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get Doofinder default attributes code
-     * @return array
-     */
-    public function getDefaultDoofinderFields()
-    {
-        $attributes = $this->scopeConfig->getValue(
-            self::FEED_ATTRIBUTES_CONFIG
-        );
-        unset($attributes['additional_attributes']);
-        return $attributes;
-    }
-
-    /**
      * Get store code.
      *
      * @param string $store
