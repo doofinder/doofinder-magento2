@@ -10,6 +10,11 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
+     * Module name
+     */
+    const MODULE_NAME = 'Doofinder_Feed';
+
+    /**
      * Path to attributes config in config.xml/core_config_data
      */
     const FEED_ATTRIBUTES_CONFIG = 'doofinder_config_index/feed_attributes';
@@ -90,27 +95,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get Doofinder attributes that should be indexed
-     * @param null|integer $storeId
-     * @return array
-     */
-    public function getDoofinderFields($storeId = null)
-    {
-        $attributes = $this->scopeConfig->getValue(
-            self::FEED_ATTRIBUTES_CONFIG,
-            $this->getScopeStore(),
-            $storeId
-        );
-
-        $unserialized = $this->serializer->unserialize($attributes['additional_attributes']);
-        foreach ($unserialized as $attr) {
-            $attributes[$attr['field']] = $attr['additional_attribute'];
-        }
-        unset($attributes['additional_attributes']);
-        return $attributes;
-    }
-
-    /**
      * Get store code.
      *
      * @param string $store
@@ -166,7 +150,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return \Magento\Store\Api\Data\StoreInterface[]
      */
-    private function getAllStores($onlyActive = true)
+    public function getAllStores($onlyActive = true)
     {
         $stores = [];
 
@@ -256,6 +240,40 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getApiKey()
     {
         return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/api_key');
+    }
+
+    /**
+     * Get Doofinder attributes that should be indexed
+     * @param null|integer $storeId
+     * @return array
+     */
+    public function getDoofinderFields($storeId = null)
+    {
+        $attributes = $this->scopeConfig->getValue(
+            self::FEED_ATTRIBUTES_CONFIG,
+            $this->getScopeStore(),
+            $storeId
+        );
+
+        $unserialized = $this->serializer->unserialize($attributes['additional_attributes']);
+        foreach ($unserialized as $attr) {
+            $attributes[$attr['field']] = $attr['additional_attribute'];
+        }
+        unset($attributes['additional_attributes']);
+        return $attributes;
+    }
+
+    /**
+     * @param string $storeCode
+     * @return string
+     */
+    public function getStoreLanguage($storeCode)
+    {
+        return $this->scopeConfig->getValue(
+            'general/locale/code',
+            $this->getScopeStore(),
+            $storeCode
+        );
     }
 
     /**

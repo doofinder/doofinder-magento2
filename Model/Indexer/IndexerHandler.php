@@ -169,7 +169,7 @@ class IndexerHandler implements IndexerInterface
      */
     public function cleanIndex($dimensions)
     {
-        $this->indexStructure->delete(null, [], $dimensions);
+        $this->indexStructure->delete(null, $dimensions);
         $this->indexStructure->create(null, [], $dimensions);
     }
 

@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Helper;
 
-use \Zend\Serializer\Serializer as ZendSerializer;
+use Zend\Serializer\Serializer as ZendSerializer;
 
 /**
  * Helper class for serialization/deserialization

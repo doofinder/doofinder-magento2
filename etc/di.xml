@@ -4,6 +4,15 @@
         <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
     </type>
 
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="doo_execute_delayed_updates"
+                      xsi:type="object">Doofinder\Feed\Console\Command\PerformDelayedUpdates</item>
+            </argument>
+        </arguments>
+    </type>
+
     <!-- Indexers -->
     <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
         <arguments>

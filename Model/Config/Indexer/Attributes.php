@@ -39,6 +39,14 @@ class Attributes
     }
 
     /**
+     * @return array
+     */
+    public function getDefaultAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
      * @param integer $storeId
      * @return array
      */
