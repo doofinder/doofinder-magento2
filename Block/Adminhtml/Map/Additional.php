@@ -37,7 +37,6 @@ class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
     protected function _prepareToRender()
     {
     // @codingStandardsIgnoreEnd
-        $this->addColumn('label', ['label' => __('Label')]);
         $this->addColumn('field', ['label' => __('Field')]);
         $this->addColumn(
             'additional_attribute',

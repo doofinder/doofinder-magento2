@@ -104,16 +104,6 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Returns fetched results count
-     *
-     * @return integer
-     */
-    public function getResultsCount()
-    {
-        return $this->lastResults ? $this->lastResults->getProperty('total') : 0;
-    }
-
-    /**
      * Returns current store code
      *
      * @return string

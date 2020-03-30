@@ -55,7 +55,7 @@ class AdditionalAttributesTest extends \Magento\Framework\TestFramework\Unit\Bas
             ->willReturn($this->escaper);
 
         $this->feedAttributes->expects($this->once())
-            ->method('getAllAttributes')
+            ->method('toOptionArray')
             ->willReturn(['code' => 'label', 'code2' => 'label2']);
 
         $this->block = $this->objectManager->getObject(

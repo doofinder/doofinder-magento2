@@ -48,10 +48,13 @@ class AdditionalAttributes extends \Magento\Framework\View\Element\Html\Select
     public function _toHtml()
     {
         if (!$this->getOptions()) {
-            $attributes = $this->feedAttributes->getAllAttributes();
+            $attributes = $this->feedAttributes->toOptionArray();
 
             foreach ($attributes as $code => $label) {
-                $this->addOption($code, $label);
+                $this->addOption(
+                    $code,
+                    $this->escapeJsQuote($label)
+                );
             }
         }
 
