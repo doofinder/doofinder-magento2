@@ -4,6 +4,15 @@
         <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
     </type>
 
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="doo_execute_delayed_updates"
+                      xsi:type="object">Doofinder\Feed\Console\Command\PerformDelayedUpdates</item>
+            </argument>
+        </arguments>
+    </type>
+
     <!-- Indexers -->
     <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
         <arguments>
@@ -31,6 +40,56 @@
         <plugin name="doofinder_indexer_fulltext"
                 type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext"
                 sortOrder="1" />
+    </type>
+
+    <type name="Doofinder\Feed\Model\Config\Indexer\Attributes">
+        <arguments>
+            <argument name="attributes" xsi:type="array">
+                <item name="id" xsi:type="string">df_id</item>
+                <item name="title" xsi:type="string">name</item>
+                <item name="description" xsi:type="string">short_description</item>
+                <item name="categories" xsi:type="string">category_ids</item>
+                <item name="link" xsi:type="string">url_key</item>
+                <item name="price" xsi:type="string">df_regular_price</item>
+                <item name="sale_price" xsi:type="string">df_sale_price</item>
+                <item name="availability" xsi:type="string">df_availability</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Doofinder\Feed\Model\Attributes\Doofinder">
+        <arguments>
+            <argument name="attributes" xsi:type="array">
+                <item name="df_id" xsi:type="string" translate="true">Doofinder: Product Id</item>
+                <item name="df_availability" xsi:type="string" translate="true">Doofinder: Product Availability</item>
+                <item name="df_currency" xsi:type="string" translate="true">Doofinder: Product Currency</item>
+                <item name="df_regular_price" xsi:type="string" translate="true">Doofinder: Product Regular Price</item>
+                <item name="df_sale_price" xsi:type="string" translate="true">Doofinder: Product Sale Price</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="doofinderAttributesAll" type="Doofinder\Feed\Model\Config\Source\Feed\Attributes">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="doofinder" xsi:type="object">Doofinder\Feed\Model\Attributes\Doofinder</item>
+                <item name="catalog" xsi:type="object">Doofinder\Feed\Model\Attributes\Catalog</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="doofinderAttributesImages" type="Doofinder\Feed\Model\Config\Source\Feed\Attributes">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="images" xsi:type="object">Doofinder\Feed\Model\Attributes\Images</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes">
+        <arguments>
+            <argument name="feedAttributes" xsi:type="object">doofinderAttributesAll</argument>
+        </arguments>
     </type>
 
     <type name="Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine">

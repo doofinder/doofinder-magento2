@@ -3,7 +3,7 @@
 namespace Doofinder\Feed\Model\AdditionalAttributes\Provider;
 
 use Doofinder\Feed\Model\AdditionalAttributes\AttributesProviderInterface;
-use Doofinder\Feed\Helper\StoreConfig;
+use Doofinder\Feed\Model\Config\Indexer\Attributes;
 
 /**
  * Class Doofinder
@@ -11,9 +11,9 @@ use Doofinder\Feed\Helper\StoreConfig;
 class Doofinder implements AttributesProviderInterface
 {
     /**
-     * @var StoreConfig
+     * @var Attributes
      */
-    private $storeConfig;
+    private $indexerAttributes;
 
     /**
      * @var array
@@ -22,11 +22,11 @@ class Doofinder implements AttributesProviderInterface
 
     /**
      * Doofinder constructor.
-     * @param StoreConfig $storeConfig
+     * @param Attributes $indexerAttributes
      */
-    public function __construct(StoreConfig $storeConfig)
+    public function __construct(Attributes $indexerAttributes)
     {
-        $this->storeConfig = $storeConfig;
+        $this->indexerAttributes = $indexerAttributes;
     }
 
     /**
@@ -37,7 +37,7 @@ class Doofinder implements AttributesProviderInterface
     {
         if (!$this->attributes) {
             $this->attributes = array_keys(
-                $this->storeConfig->getDefaultDoofinderFields()
+                $this->indexerAttributes->getDefaultAttributes()
             );
         }
         return $this->attributes;

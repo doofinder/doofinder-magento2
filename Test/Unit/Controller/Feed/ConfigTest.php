@@ -45,19 +45,14 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
     private $store;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * @var \Magento\Framework\App\ProductMetadataInterface
      */
     private $productMetadata;
 
     /**
-     * @var \Doofinder\Feed\Helper\Data
+     * @var \Magento\Framework\Module\ModuleListInterface
      */
-    private $helper;
+    private $moduleList;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
@@ -103,16 +98,8 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->store->method('getCode')->willReturn('default');
-        $this->store->method('getUrl')->with('doofinder/feed')->willReturn(
-            'http://example.com/index.php/doofinder/feed/'
-        );
+        $this->store->method('getId')->willReturn(1);
         $this->store->method('getCurrentCurrencyCode')->willReturn('USD');
-
-        $this->storeManager = $this->getMockBuilder(\Magento\Store\Model\StoreManagerInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->storeManager->method('getStore')->willReturn($this->store);
-        $this->storeManager->method('getStores')->willReturn([$this->store]);
 
         $this->productMetadata = $this->getMockBuilder(\Magento\Framework\App\ProductMetadataInterface::class)
             ->disableOriginalConstructor()
@@ -120,15 +107,24 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
         $this->productMetadata->method('getVersion')->willReturn('x.y.z');
         $this->productMetadata->method('getEdition')->willReturn('Community');
 
-        $this->helper = $this->getMockBuilder(\Doofinder\Feed\Helper\Data::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->helper->method('getModuleVersion')->willReturn('k.l.m');
-
         $this->scopeConfig = $scopeConfig = $this->getMockBuilder(
             \Magento\Framework\App\Config\ScopeConfigInterface::class
         )->disableOriginalConstructor()
         ->getMock();
+
+        $this->storeConfig->expects($this->once())->method('getAllStores')->willReturn([$this->store]);
+        $this->storeConfig->expects($this->once())->method('getStoreLanguage')->willReturn('EN');
+
+        $this->moduleList = $this->getMockBuilder(
+            \Magento\Framework\Module\ModuleListInterface::class
+        )->disableOriginalConstructor()->getMock();
+        $this->moduleList->expects($this->once())
+            ->method('getOne')
+            ->with($this->storeConfig::MODULE_NAME)
+            ->willReturn([
+                'setup_version' => 'k.l.m'
+            ]);
+
         $this->scopeConfig->method('getValue')->will($this->returnValueMap([
             ['general/locale/code', $scopeConfig::SCOPE_TYPE_DEFAULT, null, 'EN'],
         ]));
@@ -137,11 +133,8 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
             \Doofinder\Feed\Controller\Feed\Config::class,
             [
                 'storeConfig' => $this->storeConfig,
-                'resultFactory' => $this->resultFactory,
-                'storeManager' => $this->storeManager,
                 'productMetadata' => $this->productMetadata,
-                'helper' => $this->helper,
-                'scopeConfig' => $this->scopeConfig,
+                'moduleList' => $this->moduleList,
                 'context' => $this->context,
             ]
         );
@@ -162,7 +155,6 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
             ],
             'module' => [
                 'version' => 'k.l.m',
-                'feed' => 'http://example.com/index.php/doofinder/feed/',
                 'options' => [
                     'language' => [
                         'default',

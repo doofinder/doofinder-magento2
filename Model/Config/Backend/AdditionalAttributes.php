@@ -72,8 +72,6 @@ class AdditionalAttributes extends ArraySerialized
             if (!$item['field']) {
                 throw new ValidatorException(__("Additional attribute's name is invalid."));
             }
-
-            $item['label'] = trim($item['label']);
         }
         $this->setValue($value);
 
@@ -102,9 +100,7 @@ class AdditionalAttributes extends ArraySerialized
     {
         $validate = is_array($item)
             && isset($item['field'])
-            && trim($item['field'])
-            && isset($item['label'])
-            && trim($item['label']);
+            && trim($item['field']);
 
         if (!$validate) {
             throw new ValidatorException(__("Additional attribute's data is invalid."));

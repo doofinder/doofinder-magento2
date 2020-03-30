@@ -166,26 +166,6 @@
             showInWebsite="1"
             showInStore="1">
                 <label>Attributes</label>
-                <field id="title"
-                    translate="label"
-                    type="select"
-                    sortOrder="2"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Title</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
-                <field id="description"
-                    translate="label"
-                    type="select"
-                    sortOrder="3"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Description</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
                 <field id="brand"
                     translate="label"
                     type="select"
@@ -194,27 +174,7 @@
                     showInWebsite="1"
                     showInStore="1">
                     <label>Brand</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
-                <field id="categories"
-                    translate="label"
-                    type="select"
-                    sortOrder="5"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Categories</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
-                <field id="link"
-                    translate="label"
-                    type="select"
-                    sortOrder="6"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Link</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                    <source_model>doofinderAttributesAll</source_model>
                 </field>
                 <field id="image_link"
                     translate="label"
@@ -224,27 +184,7 @@
                     showInWebsite="1"
                     showInStore="1">
                     <label>Image link</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
-                <field id="price"
-                    translate="label"
-                    type="select"
-                    sortOrder="8"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Price</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
-                <field id="sale_price"
-                    translate="label"
-                    type="select"
-                    sortOrder="9"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Sale Price</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                    <source_model>doofinderAttributesImages</source_model>
                 </field>
                 <field id="mpn"
                     translate="label"
@@ -254,17 +194,7 @@
                     showInWebsite="1"
                     showInStore="1">
                     <label>MPN</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
-                </field>
-                <field id="availability"
-                    translate="label"
-                    type="select"
-                    sortOrder="11"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Availability</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\Attributes</source_model>
+                    <source_model>doofinderAttributesAll</source_model>
                 </field>
                 <field id="additional_attributes"
                     translate="label comment"
