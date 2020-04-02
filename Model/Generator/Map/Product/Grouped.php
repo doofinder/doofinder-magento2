@@ -2,27 +2,39 @@
 
 namespace Doofinder\Feed\Model\Generator\Map\Product;
 
-use \Doofinder\Feed\Model\Generator\Map\Product;
+use Doofinder\Feed\Model\Generator\Map\Product as MapProduct;
+use Magento\Catalog\Model\Product;
 
 /**
  * Grouped product map
  */
-class Grouped extends Product
+class Grouped extends MapProduct
 {
     /**
-     * Get bundle product price
-     *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param Product $product
      * @param string $field
-     * @param boolean $minimal
-     * @return float
+     * @return mixed
      */
-    public function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)
+    public function getProductPrice(Product $product, $field)
     {
         if ($field == 'final_price') {
-            $minimal = true;
+            // Magento will return final price properly
+            return parent::getProductPrice($product, $field);
         }
 
-        return parent::getProductPrice($product, $field, $minimal);
+        // for other price types, use children's price
+        $prices = [];
+        $usedProds = $product->getTypeInstance(true)->getAssociatedProducts($product);
+        foreach ($usedProds as $child) {
+            if ($child->getId() != $product->getId()) {
+                $prices[] = parent::getProductPrice($child, $field);
+            }
+        }
+
+        $prices = array_filter($prices, function ($price) {
+            return is_numeric($price);
+        });
+
+        return !empty($prices) ? min($prices) : null;
     }
 }

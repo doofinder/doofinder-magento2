@@ -2,87 +2,60 @@
 
 namespace Doofinder\Feed\Controller\Feed;
 
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Module\ModuleListInterface;
+use Doofinder\Feed\Helper\StoreConfig;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Controller\ResultInterface;
+
 /**
  * Config controller
  */
-class Config extends \Magento\Framework\App\Action\Action
+class Config extends Action
 {
     /**
-     * @var \Magento\Framework\App\ProductMetadataInterface
+     * @var ProductMetadataInterface
      */
     private $productMetadata;
 
     /**
-     * @var \Doofinder\Feed\Helper\Data
+     * @var ModuleListInterface
      */
-    private $helper;
+    private $moduleList;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var \Doofinder\Feed\Helper\StoreConfig
+     * @var StoreConfig
      */
     private $storeConfig;
 
     /**
-     * @var \Doofinder\Feed\Helper\Schedule
-     */
-    private $schedule;
-
-    /**
-     * @var \Magento\Framework\Filesystem
-     */
-    private $filesystem;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    /**
      * Config constructor.
-     *
-     * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
-     * @param \Doofinder\Feed\Helper\Data $helper
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Doofinder\Feed\Helper\Schedule $schedule
-     * @param \Magento\Framework\Filesystem $filesystem
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Framework\App\Action\Context $context
+     * @param Context $context
+     * @param ProductMetadataInterface $productMetadata
+     * @param ModuleListInterface $moduleList
+     * @param StoreConfig $storeConfig
      */
     public function __construct(
-        \Magento\Framework\App\ProductMetadataInterface $productMetadata,
-        \Doofinder\Feed\Helper\Data $helper,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Helper\Schedule $schedule,
-        \Magento\Framework\Filesystem $filesystem,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\App\Action\Context $context
+        Context $context,
+        ProductMetadataInterface $productMetadata,
+        ModuleListInterface $moduleList,
+        StoreConfig $storeConfig
     ) {
         $this->productMetadata = $productMetadata;
-        $this->helper = $helper;
-        $this->storeManager = $storeManager;
+        $this->moduleList = $moduleList;
         $this->storeConfig = $storeConfig;
-        $this->schedule = $schedule;
-        $this->filesystem = $filesystem;
-        $this->scopeConfig = $scopeConfig;
         parent::__construct($context);
     }
 
     /**
      * Returns config json
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        $this->helper->setJsonHeaders($this->getResponse());
-
         $config = [
             'platform' => [
                 'name' => 'Magento',
@@ -90,8 +63,7 @@ class Config extends \Magento\Framework\App\Action\Action
                 'version' => $this->productMetadata->getVersion(),
             ],
             'module' => [
-                'version' => $this->helper->getModuleVersion(),
-                'feed' => $this->storeManager->getStore()->getUrl('doofinder/feed'),
+                'version' => $this->moduleList->getOne(StoreConfig::MODULE_NAME)['setup_version'],
                 'options' => [
                     'language' => [],
                 ],
@@ -99,27 +71,26 @@ class Config extends \Magento\Framework\App\Action\Action
             ],
         ];
 
-        foreach ($this->storeManager->getStores() as $store) {
+        foreach ($this->storeConfig->getAllStores() as $store) {
             $storeCode = $store->getCode();
-            $settings = $this->storeConfig->getStoreConfig($storeCode);
-
-            if ($settings['enabled']) {
-                $feedUrl = $this->schedule->getFeedFileUrl($storeCode, false);
-                $feedExists = $this->schedule->isFeedFileExist($storeCode);
-            } else {
-                $feedUrl = $store->getUrl('doofinder/feed');
-                $feedExists = true;
-            }
 
             $config['module']['options']['language'][] = $storeCode;
             $config['module']['configuration'][$storeCode] = [
-                'language' => strtoupper(substr($this->scopeConfig->getValue('general/locale/code'), 0, 2)),
+                'language' => $this->getLanguage($storeCode),
                 'currency' => $store->getCurrentCurrencyCode(),
-                'feed_url' => $feedUrl,
-                'feed_exists' => $feedExists,
             ];
         }
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($config);
+    }
 
-        return $this->resultFactory->create('json')->setData($config);
+    /**
+     * @param string $storeCode
+     * @return string
+     */
+    private function getLanguage($storeCode)
+    {
+        return strtoupper(
+            substr($this->storeConfig->getStoreLanguage($storeCode), 0, 2)
+        );
     }
 }

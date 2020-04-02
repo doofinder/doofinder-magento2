@@ -2,27 +2,24 @@
 
 namespace Doofinder\Feed\Model\Generator\Map\Product;
 
-use \Doofinder\Feed\Model\Generator\Map\Product;
+use Doofinder\Feed\Model\Generator\Map\Product as MapProduct;
+use Magento\Catalog\Model\Product;
 
 /**
  * Bundle product map
  */
-class Bundle extends Product
+class Bundle extends MapProduct
 {
     /**
-     * Get bundle product price
-     *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param Product $product
      * @param string $field
-     * @param boolean $minimal
-     * @return float
+     * @return mixed
      */
-    public function getProductPrice(\Magento\Catalog\Model\Product $product, $field, $minimal = false)
+    public function getProductPrice(Product $product, $field)
     {
-        if ($field == 'final_price') {
-            $minimal = true;
+        if ($field == 'special_price') {
+            $field = 'final_price';
         }
-
-        return parent::getProductPrice($product, $field, $minimal);
+        return parent::getProductPrice($product, $field);
     }
 }

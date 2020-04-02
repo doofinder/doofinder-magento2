@@ -2,20 +2,23 @@
 
 namespace Doofinder\Feed\Model\Generator\Map;
 
-use \Doofinder\Feed\Model\Generator\Map;
-use \Doofinder\Feed\Model\Config\Source\Feed\PriceTaxMode;
+use Doofinder\Feed\Model\Config\Source\Feed\PriceTaxMode;
+use Doofinder\Feed\Model\Generator\MapInterface;
 
 /**
  * Product map
  */
-class Product extends Map
+class Product implements MapInterface
 {
     /**
      * @var \Doofinder\Feed\Helper\Product
-     * @codingStandardsIgnoreStart
      */
-    protected $helper = null;
-    // @codingStandardsIgnoreEnd
+    private $productHelper;
+
+    /**
+     * @var \Doofinder\Feed\Helper\StoreConfig
+     */
+    private $storeConfig;
 
     /**
      * @var \Magento\Framework\Pricing\PriceCurrencyInterface
@@ -23,78 +26,72 @@ class Product extends Map
     private $priceCurrency;
 
     /**
-     * Tax helper
-     *
      * @var \Magento\Tax\Model\Config
      */
     private $taxConfig;
 
     /**
-     * Class constructor
-     *
+     * Product constructor.
+     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      * @param \Doofinder\Feed\Helper\Product $helper
-     * @param \Doofinder\Feed\Model\Generator\Item $item
      * @param \Magento\Tax\Model\Config $taxConfig
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
-     * @param array $data
-     * @throws \Magento\Framework\Exception\LocalizedException Context is not a product.
-     * @codingStandardsIgnoreStart
-     * Ignore MEQP2.Classes.ConstructorOperations.CustomOperationsFound
      */
     public function __construct(
+        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         \Doofinder\Feed\Helper\Product $helper,
-        \Doofinder\Feed\Model\Generator\Item $item,
         \Magento\Tax\Model\Config $taxConfig,
-        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        array $data = []
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
     ) {
-    // @codingStandardsIgnoreEnd
-        $this->helper = $helper;
+        $this->storeConfig = $storeConfig;
+        $this->productHelper = $helper;
         $this->priceCurrency = $priceCurrency;
         $this->taxConfig = $taxConfig;
-
-        if (!is_a($item->getContext(), \Magento\Catalog\Model\Product::class)) {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('Item context is not a product')
-            );
-        }
-
-        parent::__construct($item, $data);
     }
 
     /**
-     * Get value
-     *
+     * {@inheritDoc}
+     * @param \Magento\Catalog\Model\Product $product
      * @param string $field
      * @return mixed
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @codingStandardsIgnoreStart
      */
-    public function get($field)
+    // @codingStandardsIgnoreLine
+    public function get(\Magento\Catalog\Model\Product $product, $field)
     {
-    // @codingStandardsIgnoreEnd
+        if (!$field) {
+            return '';
+        }
+
         switch ($field) {
             case 'df_id':
-                return $this->getProductId($this->context);
+                return $this->getProductId($product);
 
             case 'url_key':
-                return $this->getProductUrl($this->context);
+                return $this->getProductUrl($product);
 
             case 'category_ids':
-                return $this->getProductCategories($this->context, $this->getCategoriesInNavigation());
+                return $this->getProductCategories(
+                    $product,
+                    $this->isExportCategoriesInNavigation($product->getStoreId())
+                );
 
             case 'image':
             case 'small_image':
             case 'thumbnail':
-                return $this->getProductImage($this->context, $this->getImageSize(), $field);
+                return $this->getProductImage(
+                    $product,
+                    $this->getImageSize($product->getStoreId()),
+                    $field
+                );
 
             case 'df_regular_price':
-                return $this->getProductPrice($this->context, 'regular_price');
+                return $this->getProductPrice($product, 'regular_price');
 
             case 'df_sale_price':
-                $salePrice = $this->getProductPrice($this->context, 'final_price');
+                $salePrice = $this->getProductPrice($product, 'final_price');
 
-                if ($salePrice < $this->getProductPrice($this->context, 'regular_price')) {
+                if ($salePrice < $this->getProductPrice($product, 'regular_price')) {
                     // Only return 'sale price' if is less than 'regular price'
                     return $salePrice;
                 }
@@ -105,19 +102,21 @@ class Product extends Map
             case 'special_price':
             case 'tier_price':
             case 'minimal_price':
-                return $this->getProductPrice($this->context, $field);
+            case 'final_price':
+            case 'regular_price':
+                return $this->getProductPrice($product, $field);
 
             case 'df_availability':
-                return $this->getProductAvailability($this->context);
+                return $this->getProductAvailability($product);
 
             case 'df_currency':
                 return $this->getCurrencyCode();
 
             case 'quantity_and_stock_status':
-                return $this->getQuantityAndStockStatus($this->context);
+                return $this->getQuantityAndStockStatus($product);
         }
 
-        return $this->getAttributeText($this->context, $field);
+        return $this->getAttributeText($product, $field);
     }
 
     /**
@@ -128,7 +127,7 @@ class Product extends Map
      */
     public function getProductId(\Magento\Catalog\Model\Product $product)
     {
-        return $this->helper->getProductId($product);
+        return $this->productHelper->getProductId($product);
     }
 
     /**
@@ -139,7 +138,7 @@ class Product extends Map
      */
     public function getProductUrl(\Magento\Catalog\Model\Product $product)
     {
-        return $this->helper->getProductUrl($product);
+        return $this->productHelper->getProductUrl($product);
     }
 
     /**
@@ -151,7 +150,7 @@ class Product extends Map
      */
     public function getProductCategories(\Magento\Catalog\Model\Product $product, $categoriesInNav)
     {
-        $tree = $this->helper->getProductCategoriesWithParents($product, $categoriesInNav);
+        $tree = $this->productHelper->getProductCategoriesWithParents($product, $categoriesInNav);
 
         /**
          * Return array with stringified category tree
@@ -161,7 +160,7 @@ class Product extends Map
             array_values(
                 array_map(function ($categories) {
                     return implode(
-                        \Doofinder\Feed\Model\Generator::CATEGORY_TREE_SEPARATOR,
+                        '>',
                         array_map(function ($category) {
                             return $category->getName();
                         }, $categories)
@@ -181,7 +180,7 @@ class Product extends Map
      */
     public function getProductImage(\Magento\Catalog\Model\Product $product, $size, $field)
     {
-        return $this->helper->getProductImageUrl($product, $size, $field);
+        return $this->productHelper->getProductImageUrl($product, $size, $field);
     }
 
     /**
@@ -193,13 +192,13 @@ class Product extends Map
      */
     public function getProductPrice(\Magento\Catalog\Model\Product $product, $field)
     {
-        if (!$this->getExportProductPrices()) {
+        if (!$this->isExportProductPrices($product->getStoreId())) {
             return null;
         }
 
         $tax = null;
         if ($this->taxConfig->needPriceConversion()) {
-            switch ($this->getPriceTaxMode()) {
+            switch ($this->getPriceTaxMode($product->getStoreId())) {
                 case PriceTaxMode::MODE_WITH_TAX:
                     $tax = true;
                     break;
@@ -211,7 +210,7 @@ class Product extends Map
         }
 
         // Return price converted to store currency
-        return $this->helper->getProductPrice($product, $field, $tax);
+        return $this->productHelper->getProductPrice($product, $field, $tax);
     }
 
     /**
@@ -222,7 +221,7 @@ class Product extends Map
      */
     public function getProductAvailability(\Magento\Catalog\Model\Product $product)
     {
-        return $this->helper->getProductAvailability($product);
+        return $this->productHelper->getProductAvailability($product);
     }
 
     /**
@@ -232,7 +231,7 @@ class Product extends Map
      */
     public function getCurrencyCode()
     {
-        return $this->helper->getCurrencyCode();
+        return $this->productHelper->getCurrencyCode();
     }
 
     /**
@@ -243,7 +242,7 @@ class Product extends Map
      */
     public function getQuantityAndStockStatus(\Magento\Catalog\Model\Product $product)
     {
-        return $this->helper->getQuantityAndStockStatus($product);
+        return $this->productHelper->getQuantityAndStockStatus($product);
     }
 
     /**
@@ -255,6 +254,58 @@ class Product extends Map
      */
     public function getAttributeText(\Magento\Catalog\Model\Product $product, $field)
     {
-        return $this->helper->getAttributeText($product, $field);
+        return $this->productHelper->getAttributeText($product, $field);
+    }
+
+    /**
+     * @param integer|null $storeId
+     * @return boolean
+     */
+    public function isExportCategoriesInNavigation($storeId = null)
+    {
+        return $this->storeConfig->isExportCategoriesInNavigation($storeId);
+    }
+
+    /**
+     * @param integer|null $storeId
+     * @return string
+     */
+    public function getImageSize($storeId = null)
+    {
+        return $this->storeConfig->getImageSize($storeId);
+    }
+
+    /**
+     * @param integer|null $storeId
+     * @return boolean
+     */
+    public function isExportProductPrices($storeId = null)
+    {
+        return $this->storeConfig->isExportProductPrices($storeId);
+    }
+
+    /**
+     * @param integer|null $storeId
+     * @return string
+     */
+    public function getPriceTaxMode($storeId = null)
+    {
+        return $this->storeConfig->getPriceTaxMode($storeId);
+    }
+
+    /**
+     * @return \Doofinder\Feed\Helper\Product
+     */
+    public function getProductHelper()
+    {
+        return $this->productHelper;
+    }
+
+    /**
+     * @return \Doofinder\Feed\Helper\StoreConfig
+     */
+    public function getStoreConfigHelper()
+    {
+        return $this->storeConfig;
     }
 }

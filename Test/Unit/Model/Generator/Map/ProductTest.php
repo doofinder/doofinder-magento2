@@ -18,11 +18,6 @@ class ProductTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
     private $category;
 
     /**
-     * @var \Doofinder\Feed\Model\Generator\Item
-     */
-    private $item;
-
-    /**
      * @var \Magento\Catalog\Model\Product
      */
     private $product;
@@ -36,6 +31,11 @@ class ProductTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      * @var \Magento\Framework\Pricing\PriceCurrencyInterface
      */
     private $priceCurrency;
+
+    /**
+     * @var \Doofinder\Feed\Helper\StoreConfig
+     */
+    private $storeConfig;
 
     /**
      * @var \Doofinder\Feed\Helper\Product
@@ -76,6 +76,12 @@ class ProductTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
             ->getMock();
         $this->priceCurrency->method('getCurrency')->willReturn($this->currency);
 
+        $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->storeConfig->method('isExportProductPrices')->willReturn(true);
+
         $this->helper = $this->getMockBuilder(\Doofinder\Feed\Helper\Product::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -103,20 +109,14 @@ class ProductTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
         ];
         $this->helper->method('getAttributeText')->will($this->returnValueMap($map));
 
-        $this->item = $this->getMockBuilder(\Doofinder\Feed\Model\Generator\Item::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->item->method('getContext')->willReturn($this->product);
-
         $this->model = $this->objectManager->getObject(
             \Doofinder\Feed\Model\Generator\Map\Product::class,
             [
                 'helper' => $this->helper,
-                'item' => $this->item,
                 'priceCurrency' => $this->priceCurrency,
+                'storeConfig' => $this->storeConfig,
             ]
         );
-        $this->model->setExportProductPrices(true);
     }
 
     /**
@@ -126,18 +126,29 @@ class ProductTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      */
     public function testGet()
     {
-        $this->assertEquals('Sample title', $this->model->get('title'));
-        $this->assertEquals('Sample description', $this->model->get('description'));
-        $this->assertEquals(['Category 1>Category 1.1', 'Category 2'], $this->model->get('category_ids'));
-        $this->assertEquals('http://example.com/path/to/image.jpg', $this->model->get('image'));
-        $this->assertEquals('http://example.com/simple-product.html', $this->model->get('url_key'));
-        $this->assertEquals('10.1234', $this->model->get('price'));
-        $this->assertEquals(null, $this->model->setExportProductPrices(false)->get('price'));
-        $this->assertEquals('in stock', $this->model->get('df_availability'));
-        $this->assertEquals('USD', $this->model->get('df_currency'));
-        $this->assertEquals('blue', $this->model->get('color'));
-        $this->assertEquals('Taxable', $this->model->get('tax_class_id'));
-        $this->assertEquals('Company', $this->model->get('manufacturer'));
-        $this->assertEquals('5 - in stock', $this->model->get('quantity_and_stock_status'));
+        $this->assertEquals('Sample title', $this->model->get($this->product, 'title'));
+        $this->assertEquals('Sample description', $this->model->get($this->product, 'description'));
+        $this->assertEquals(
+            ['Category 1>Category 1.1', 'Category 2'],
+            $this->model->get($this->product, 'category_ids')
+        );
+        $this->assertEquals(
+            'http://example.com/path/to/image.jpg',
+            $this->model->get($this->product, 'image')
+        );
+        $this->assertEquals(
+            'http://example.com/simple-product.html',
+            $this->model->get($this->product, 'url_key')
+        );
+        $this->assertEquals('10.1234', $this->model->get($this->product, 'price'));
+        $this->assertEquals('in stock', $this->model->get($this->product, 'df_availability'));
+        $this->assertEquals('USD', $this->model->get($this->product, 'df_currency'));
+        $this->assertEquals('blue', $this->model->get($this->product, 'color'));
+        $this->assertEquals('Taxable', $this->model->get($this->product, 'tax_class_id'));
+        $this->assertEquals('Company', $this->model->get($this->product, 'manufacturer'));
+        $this->assertEquals(
+            '5 - in stock',
+            $this->model->get($this->product, 'quantity_and_stock_status')
+        );
     }
 }

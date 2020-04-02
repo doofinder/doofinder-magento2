@@ -1,42 +1,106 @@
 <?xml version="1.0"?>
-<!--
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Config\Model\Config">
+        <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
+    </type>
+
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="test" xsi:type="object">Doofinder\Feed\Console\Command\GenerateCommand</item>
-                <item name="run_process_command" xsi:type="object">Doofinder\Feed\Console\Command\RunProcessCommand</item>
-                <item name="reschedule_process_command" xsi:type="object">Doofinder\Feed\Console\Command\RescheduleProcessCommand</item>
+                <item name="doo_execute_delayed_updates"
+                      xsi:type="object">Doofinder\Feed\Console\Command\PerformDelayedUpdates</item>
             </argument>
         </arguments>
     </type>
 
-    <type name="Doofinder\Feed\Logger\Feed">
+    <!-- Indexers -->
+    <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
         <arguments>
-            <argument name="name" xsi:type="string">feed</argument>
             <argument name="handlers" xsi:type="array">
-                <item name="feed" xsi:type="object">Doofinder\Feed\Logger\Handler\Feed</item>
+                <item name="doofinder" xsi:type="string">Doofinder\Feed\Model\Indexer\IndexerHandler</item>
             </argument>
         </arguments>
     </type>
-
-    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+    <type name="Magento\CatalogSearch\Model\Indexer\IndexStructureFactory">
         <arguments>
-            <argument name="collections" xsi:type="array">
-                <item name="feed_log_grid_data_source" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Log\Grid\Collection</item>
+            <argument name="structures" xsi:type="array">
+                <item name="doofinder" xsi:type="string">Doofinder\Feed\Model\Indexer\IndexStructure</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Doofinder\Feed\Model\Indexer\Data\Mapper">
+        <arguments>
+            <argument name="maps" xsi:type="array">
+                <item name="update" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Update</item>
+                <item name="delete" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Delete</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\CatalogSearch\Model\Indexer\Fulltext">
+        <plugin name="doofinder_indexer_fulltext"
+                type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext"
+                sortOrder="1" />
+    </type>
+
+    <type name="Doofinder\Feed\Model\Config\Indexer\Attributes">
+        <arguments>
+            <argument name="attributes" xsi:type="array">
+                <item name="id" xsi:type="string">df_id</item>
+                <item name="title" xsi:type="string">name</item>
+                <item name="description" xsi:type="string">short_description</item>
+                <item name="categories" xsi:type="string">category_ids</item>
+                <item name="link" xsi:type="string">url_key</item>
+                <item name="price" xsi:type="string">df_regular_price</item>
+                <item name="sale_price" xsi:type="string">df_sale_price</item>
+                <item name="availability" xsi:type="string">df_availability</item>
             </argument>
         </arguments>
     </type>
 
-    <type name="Magento\Indexer\Model\Indexer">
-        <plugin name="doofinderAfterReindex"
-                type="Doofinder\Feed\Plugin\Indexer\Model\Indexer" />
+    <type name="Doofinder\Feed\Model\Attributes\Doofinder">
+        <arguments>
+            <argument name="attributes" xsi:type="array">
+                <item name="df_id" xsi:type="string" translate="true">Doofinder: Product Id</item>
+                <item name="df_availability" xsi:type="string" translate="true">Doofinder: Product Availability</item>
+                <item name="df_currency" xsi:type="string" translate="true">Doofinder: Product Currency</item>
+                <item name="df_regular_price" xsi:type="string" translate="true">Doofinder: Product Regular Price</item>
+                <item name="df_sale_price" xsi:type="string" translate="true">Doofinder: Product Sale Price</item>
+            </argument>
+        </arguments>
     </type>
+
+    <virtualType name="doofinderAttributesAll" type="Doofinder\Feed\Model\Config\Source\Feed\Attributes">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="doofinder" xsi:type="object">Doofinder\Feed\Model\Attributes\Doofinder</item>
+                <item name="catalog" xsi:type="object">Doofinder\Feed\Model\Attributes\Catalog</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="doofinderAttributesImages" type="Doofinder\Feed\Model\Config\Source\Feed\Attributes">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="images" xsi:type="object">Doofinder\Feed\Model\Attributes\Images</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes">
+        <arguments>
+            <argument name="feedAttributes" xsi:type="object">doofinderAttributesAll</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine">
+        <plugin name="doofinderSearchEngineBackend" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine" sortOrder="1" />
+    </type>
+
+    <type name="Magento\Framework\Url\RouteParamsResolver">
+        <plugin name="doofinderUrlRouteParamsResolver" type="Doofinder\Feed\Plugin\Url\RouteParamsResolver" sortOrder="50"/>
+    </type>
+
+    <!-- Search -->
     <type name="Magento\Search\Model\AdapterFactory">
         <arguments>
             <argument name="adapters" xsi:type="array">
@@ -51,13 +115,6 @@
             </argument>
         </arguments>
     </type>
-    <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
-        <arguments>
-            <argument name="handlers" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Doofinder\Feed\Search\IndexerHandler</item>
-            </argument>
-        </arguments>
-    </type>
     <type name="Magento\Search\Model\EngineResolver">
         <arguments>
             <argument name="engines" xsi:type="array">
@@ -65,55 +122,24 @@
             </argument>
         </arguments>
     </type>
-    <virtualType name="Doofinder\Feed\Search\BaseIndexerHandlerFactory" type="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
+    <type name="Magento\CatalogSearch\Model\ResourceModel\EngineProvider">
         <arguments>
-            <argument name="handlers" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\Indexer\IndexerHandler</item>
-            </argument>
-        </arguments>
-    </virtualType>
-    <type name="Doofinder\Feed\Search\IndexerHandler">
-        <arguments>
-            <argument name="indexerHandlerFactory" xsi:type="object">Doofinder\Feed\Search\BaseIndexerHandlerFactory</argument>
-        </arguments>
-    </type>
-    <type name="Magento\CatalogSearch\Model\Indexer\IndexStructureFactory">
-        <arguments>
-            <argument name="structures" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Doofinder\Feed\Search\IndexStructure</item>
-            </argument>
-        </arguments>
-    </type>
-    <virtualType name="Doofinder\Feed\Search\BaseIndexStructureFactory" type="Magento\CatalogSearch\Model\Indexer\IndexStructureFactory">
-        <arguments>
-            <argument name="structures" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\Indexer\IndexStructure</item>
-            </argument>
-        </arguments>
-    </virtualType>
-    <type name="Doofinder\Feed\Search\IndexStructure">
-        <arguments>
-            <argument name="indexStructureFactory" xsi:type="object">Doofinder\Feed\Search\BaseIndexStructureFactory</argument>
-        </arguments>
-    </type>
-    <type name="Magento\Framework\Search\Dynamic\IntervalFactory">
-        <arguments>
-            <argument name="intervals" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Magento\Framework\Search\Adapter\Mysql\Aggregation\Interval</item>
+            <argument name="engines" xsi:type="array">
+                <item name="doofinder" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Engine</item>
             </argument>
         </arguments>
     </type>
     <type name="Magento\Framework\Search\Dynamic\DataProviderFactory">
         <arguments>
             <argument name="dataProviders" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\Adapter\Mysql\Dynamic\DataProvider</item>
+                <item name="doofinder" xsi:type="string">Doofinder\Feed\Search\Dynamic\DataProvider</item>
             </argument>
         </arguments>
     </type>
-    <type name="Magento\CatalogSearch\Model\ResourceModel\EngineProvider">
+    <type name="Magento\Framework\Search\Dynamic\IntervalFactory">
         <arguments>
-            <argument name="engines" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\ResourceModel\Engine</item>
+            <argument name="intervals" xsi:type="array">
+                <item name="doofinder" xsi:type="string">Magento\CatalogSearch\Model\Price\Interval</item>
             </argument>
         </arguments>
     </type>
@@ -128,53 +154,125 @@
         <plugin name="doofinderFeedTaxConfig" type="Doofinder\Feed\Model\Tax\Plugin\Config"/>
     </type>
 
-    <type name="Magento\Config\Model\Config">
-        <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
+    <type name="Magento\Catalog\Model\Layer\Resolver">
+        <plugin name="doo_set_layer_type"
+                type="Doofinder\Feed\Plugin\LayerResolver"/>
     </type>
 
-    <type name="Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine">
-        <plugin name="doofinderSearchEngineBackend" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine" sortOrder="1" />
-    </type>
-
-    <type name="Doofinder\Feed\Console\Command\RescheduleProcessCommand">
+    <virtualType name="doofinderFulltextSearchCollection" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
         <arguments>
-            <argument name="schedule" xsi:type="object">Doofinder\Feed\Helper\Schedule\Proxy</argument>
+            <argument name="searchRequestName" xsi:type="string">quick_search_container</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="doofinderFulltextSearchCollectionFactory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">doofinderFulltextSearchCollection</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Doofinder\Feed\Model\Layer\Search\ItemCollectionProvider">
+        <arguments>
+            <argument name="collectionFactory" xsi:type="object">doofinderFulltextSearchCollectionFactory</argument>
         </arguments>
     </type>
 
-    <type name="Doofinder\Feed\Console\Command\RunProcessCommand">
+    <virtualType name="doofinderCategoryCollection" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
         <arguments>
-            <argument name="schedule" xsi:type="object">Doofinder\Feed\Helper\Schedule\Proxy</argument>
+            <argument name="searchRequestName" xsi:type="string">catalog_view_container</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="doofinderCategoryCollectionFactory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">doofinderCategoryCollection</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Doofinder\Feed\Model\Layer\Category\ItemCollectionProvider">
+        <arguments>
+            <argument name="collectionFactory" xsi:type="object">doofinderCategoryCollectionFactory</argument>
         </arguments>
     </type>
 
-    <type name="Doofinder\Feed\Model\Generator\Component\Processor\Xml">
-        <plugin name="doofinderProcessorXmlPlugin"
-                type="Doofinder\Feed\Model\Generator\Component\Processor\Plugin\XmlPlugin" />
-    </type>
-
-    <type name="Magento\CatalogSearch\Model\Indexer\Fulltext">
-        <plugin name="doofinder_indexer_fulltext"
-                type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext"
-                sortOrder="1" />
-    </type>
-
-    <type name="Magento\Framework\Url\RouteParamsResolver">
-        <plugin name="doofinderUrlRouteParamsResolver" type="Doofinder\Feed\Plugin\Url\RouteParamsResolver" sortOrder="50"/>
-    </type>
-
-    <!-- The virtual types are not set because of the Amasty extension -->
-    <type name="Magento\Elasticsearch\Model\Layer\Search\ItemCollectionProvider">
+    <type name="Doofinder\Feed\Plugin\ItemCollection">
         <arguments>
-            <argument name="factories" xsi:type="array">
-                <item name="doofinder" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</item>
+            <argument name="catItemCollection" xsi:type="object">Doofinder\Feed\Model\Layer\Category\ItemCollectionProvider</argument>
+            <argument name="searchItemCollection" xsi:type="object">Doofinder\Feed\Model\Layer\Search\ItemCollectionProvider</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Layer\ContextInterface">
+        <plugin name="doo_get_collection"
+                type="Doofinder\Feed\Plugin\ItemCollection"/>
+    </type>
+
+    <type name="Doofinder\Feed\Model\Indexer\Data\Map\Update">
+        <arguments>
+            <argument name="fetchers" xsi:type="array">
+                <item name="magento" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\Magento</item>
+                <item name="category" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\Category</item>
+                <item name="price" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\Price</item>
+                <item name="doofinder" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\Doofinder</item>
             </argument>
         </arguments>
     </type>
-    <type name="Magento\Elasticsearch\Model\Layer\Category\ItemCollectionProvider">
+    <type name="Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\Magento">
         <arguments>
-            <argument name="factories" xsi:type="array">
-                <item name="doofinder" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</item>
+            <argument name="excludedAttributes" xsi:type="array">
+                <item name="price" xsi:type="string">price</item>
+                <item name="media_gallery" xsi:type="string">media_gallery</item>
+                <item name="tier_price" xsi:type="string">tier_price</item>
+                <item name="quantity_and_stock_status" xsi:type="string">quantity_and_stock_status</item>
+                <item name="giftcard_amounts" xsi:type="string">giftcard_amounts</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\Doofinder">
+        <arguments>
+            <argument name="generators" xsi:type="array">
+                <item name="simple" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product</item>
+                <item name="grouped" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product\Grouped</item>
+                <item name="configurable" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product\Configurable</item>
+                <item name="bundle" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product\Bundle</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="doofinderSearchEntityMetadata" type="Magento\Framework\Search\EntityMetadata">
+        <arguments>
+            <argument name="entityId" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+    <type name="Doofinder\Feed\Search\DocumentFactory">
+        <arguments>
+            <argument name="entityMetadata" xsi:type="object">doofinderSearchEntityMetadata</argument>
+        </arguments>
+    </type>
+
+
+    <type name="Doofinder\Feed\Search\Aggregation\Builder">
+        <arguments>
+            <argument name="dataProviderContainer" xsi:type="array">
+                <item name="catalogsearch_fulltext" xsi:type="object">Doofinder\Feed\Search\Dynamic\DataProvider</item>
+            </argument>
+            <argument name="aggregationContainer" xsi:type="array">
+                <item name="termBucket" xsi:type="object">Doofinder\Feed\Search\Aggregation\Builder\Term</item>
+                <item name="dynamicBucket" xsi:type="object">Doofinder\Feed\Search\Aggregation\Builder\Dynamic</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\Price">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Doofinder\Feed\Model\AdditionalAttributes\DisallowedAttributesProvider">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="category" xsi:type="object">Doofinder\Feed\Model\AdditionalAttributes\Provider\Category</item>
+                <item name="price" xsi:type="object">Doofinder\Feed\Model\AdditionalAttributes\Provider\Price</item>
+                <item name="magento" xsi:type="object">Doofinder\Feed\Model\AdditionalAttributes\Provider\Magento</item>
+                <item name="doofinder" xsi:type="object">Doofinder\Feed\Model\AdditionalAttributes\Provider\Doofinder</item>
             </argument>
         </arguments>
     </type>

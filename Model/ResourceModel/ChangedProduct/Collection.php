@@ -27,4 +27,44 @@ class Collection extends AbstractCollection
             ChangedProductResourceModel::class
         );
     }
+
+    /**
+     * @param string $storeCode
+     * @return $this
+     */
+    public function filterDeleted($storeCode)
+    {
+        $this->addFieldToSelect(ChangedProductResourceModel::FIELD_ID)
+            ->addFieldToSelect(ChangedProductResourceModel::FIELD_PRODUCT_ID)
+            ->addFieldToFilter(
+                ChangedProductResourceModel::FIELD_OPERATION_TYPE,
+                ChangedProductResourceModel::OPERATION_DELETE
+            )
+            ->addFieldToFilter(
+                ChangedProductResourceModel::FIELD_STORE_CODE,
+                $storeCode
+            );
+
+        return $this;
+    }
+
+    /**
+     * @param string $storeCode
+     * @return $this
+     */
+    public function filterUpdated($storeCode)
+    {
+        $this->addFieldToSelect(ChangedProductResourceModel::FIELD_ID)
+            ->addFieldToSelect(ChangedProductResourceModel::FIELD_PRODUCT_ID)
+            ->addFieldToFilter(
+                ChangedProductResourceModel::FIELD_OPERATION_TYPE,
+                ChangedProductResourceModel::OPERATION_UPDATE
+            )
+            ->addFieldToFilter(
+                ChangedProductResourceModel::FIELD_STORE_CODE,
+                $storeCode
+            );
+        return $this;
+    }
+
 }

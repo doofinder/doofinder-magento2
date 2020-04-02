@@ -71,10 +71,6 @@ class Engine
 
         $searchEngines = $this->search->getDoofinderSearchEngines($apiKey);
         foreach ($storeConfig->getStoreCodes(false) as $storeCode) {
-            if (!$storeConfig->isStoreSearchEngineEnabled($storeCode)) {
-                continue;
-            }
-
             if (!$hashId = $storeConfig->getHashId($storeCode)) {
                 throw new \Magento\Framework\Exception\ValidatorException(__(
                     'HashID for store %1 is required. ' .
@@ -91,24 +87,5 @@ class Engine
         }
 
         return $value;
-    }
-
-    /**
-     * If doofinder engine was enabled add message about change the index mode.
-     * @param \Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine $engine
-     * @param mixed $result
-     * @return mixed
-     */
-    public function afterSave(
-        \Magento\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine $engine,
-        $result
-    ) {
-        $storeConfig = $this->storeConfig;
-        if ($engine->getValue() === $storeConfig::DOOFINDER_SEARCH_ENGINE_NAME) {
-            $this->messageManager->addNoticeMessage(
-                __('The catalog\'s index mode will change to Update On Save after Doofinder search indices are ready.')
-            );
-        }
-        return $result;
     }
 }

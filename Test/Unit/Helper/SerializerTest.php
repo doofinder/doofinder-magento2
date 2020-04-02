@@ -46,9 +46,10 @@ class SerializerTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      */
     public function serializeTestProvider()
     {
+        $array = ['hello', 'world'];
+        $serialized = json_encode($array);
         return [
-            ['string', 's:6:"string";'],
-            [['hello', 'world'], 'a:2:{i:0;s:5:"hello";i:1;s:5:"world";}'],
+            [$array, $serialized]
         ];
     }
 
