@@ -12,6 +12,16 @@
             </argument>
         </arguments>
     </type>
+    <type name="Doofinder\Feed\Console\Command\PerformDelayedUpdates">
+        <arguments>
+            <argument name="processor" xsi:type="object">Doofinder\Feed\Model\ChangedProduct\Processor\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Doofinder\Feed\Cron\PerformDelayedUpdates">
+        <arguments>
+            <argument name="processor" xsi:type="object">Doofinder\Feed\Model\ChangedProduct\Processor\Proxy</argument>
+        </arguments>
+    </type>
 
     <!-- Indexers -->
     <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
