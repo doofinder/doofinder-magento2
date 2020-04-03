@@ -4,6 +4,7 @@ namespace Doofinder\Feed\Block;
 
 /**
  * Class Integration
+ * The class responsible for integrating Doofinder Layer
  */
 class Integration extends \Magento\Framework\View\Element\AbstractBlock
 {
@@ -40,8 +41,8 @@ class Integration extends \Magento\Framework\View\Element\AbstractBlock
          * NOTICE This works but could be done better
          */
         $script .= '<script type="text/javascript">';
-        // @codingStandardsIgnoreLine
-        $script .= '(function(el){ el && el.removeAttribute(\'data-mage-init\'); })(document.getElementById(\'search\'));';
+        $script .=
+            '(function(el){ el && el.removeAttribute(\'data-mage-init\'); })(document.getElementById(\'search\'));';
         $script .= '</script>';
 
         return $script;

@@ -108,19 +108,19 @@ class IndexerTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
     }
 
     /**
-     * @param boolean $internalSearchEnabled
+     * @param boolean $isSearchEnabled
      * @param boolean $isScheduled
      * @param boolean $result
      * @return void
      * @dataProvider isDelayedUpdatesEnabledDataProvider
      */
-    public function testIsDelayedUpdatesEnabled($internalSearchEnabled, $isScheduled, $result)
+    public function testIsDelayedUpdatesEnabled($isSearchEnabled, $isScheduled, $result)
     {
         $this->storeConfig->expects($this->once())
             ->method('isInternalSearchEnabled')
-            ->willReturn($internalSearchEnabled);
+            ->willReturn($isSearchEnabled);
 
-        if ($internalSearchEnabled) {
+        if ($isSearchEnabled) {
             $this->indexerRegistry->expects($this->once())
                 ->method('get')
                 ->with(\Magento\CatalogSearch\Model\Indexer\Fulltext::INDEXER_ID)

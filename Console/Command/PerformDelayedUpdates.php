@@ -53,7 +53,6 @@ class PerformDelayedUpdates extends Command
     /**
      * @return void
      */
-    // @codingStandardsIgnoreLine - have to use protected class
     protected function configure()
     {
         $this->setName('doofinder:indexer:delayed_updates')
@@ -81,9 +80,13 @@ class PerformDelayedUpdates extends Command
             throw new LocalizedException(__('Delayed updates are disabled. Use --force=1 to proceed'));
         }
 
+        $output->writeln('<info>Started</info>');
+
         $self = $this;
         $this->state->emulateAreaCode(Area::AREA_FRONTEND, function () use ($self) {
             $self->processor->execute();
         });
+
+        $output->writeln('<info>Finished</info>');
     }
 }

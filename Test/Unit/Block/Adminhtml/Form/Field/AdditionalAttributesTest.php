@@ -18,6 +18,16 @@ class AdditionalAttributesTest extends \Magento\Framework\TestFramework\Unit\Bas
     private $feedAttributes;
 
     /**
+     * @var \Magento\Framework\Event\ManagerInterface
+     */
+    private $eventManager;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
      * @var \Magento\Framework\Escaper
      */
     private $escaper;
@@ -37,7 +47,6 @@ class AdditionalAttributesTest extends \Magento\Framework\TestFramework\Unit\Bas
         parent::setUp();
 
         $this->context = $this->getMockBuilder(\Magento\Framework\View\Element\Context::class)
-            ->setMethods(['getEscaper'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -45,11 +54,24 @@ class AdditionalAttributesTest extends \Magento\Framework\TestFramework\Unit\Bas
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->escaper = $this->getMockBuilder(\Magento\Framework\Escaper::class)
-            ->setMethods(['escapeHtml'])
+        $this->eventManager = $this->getMockBuilder(\Magento\Framework\Event\ManagerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->escaper = $this->getMockBuilder(\Magento\Framework\Escaper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->scopeConfig = $this->getMockBuilder(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->context->expects($this->once())
+            ->method('getEventManager')
+            ->willReturn($this->eventManager);
+        $this->context->expects($this->once())
+            ->method('getScopeConfig')
+            ->willReturn($this->scopeConfig);
         $this->context->expects($this->once())
             ->method('getEscaper')
             ->willReturn($this->escaper);
@@ -78,6 +100,6 @@ class AdditionalAttributesTest extends \Magento\Framework\TestFramework\Unit\Bas
         $expected .= '<option value="" ></option><option value="" ></option>';
         $expected .= '</select>';
 
-        $this->assertSame($expected, $this->block->_toHtml());
+        $this->assertSame($expected, $this->block->toHtml());
     }
 }

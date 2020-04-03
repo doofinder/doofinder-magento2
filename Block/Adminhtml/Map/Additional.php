@@ -4,6 +4,7 @@ namespace Doofinder\Feed\Block\Adminhtml\Map;
 
 /**
  * Class Additional
+ * The class responsible for generating custom frontend model on Stores -> Configuration
  */
 class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
 {
@@ -17,7 +18,7 @@ class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
      *
      * @return \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes
      */
-    private function _getAttributesRenderer()
+    private function getAttributesRenderer()
     {
         if (!$this->attributesRenderer) {
             $this->attributesRenderer = $this->getLayout()->createBlock(
@@ -32,15 +33,14 @@ class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
 
     /**
      * {@inheritDoc}
-     * @codingStandardsIgnoreStart
+     * @return void
      */
     protected function _prepareToRender()
     {
-    // @codingStandardsIgnoreEnd
         $this->addColumn('field', ['label' => __('Field')]);
         $this->addColumn(
             'additional_attribute',
-            ['label' => __('Attribute'), 'renderer' => $this->_getAttributesRenderer()]
+            ['label' => __('Attribute'), 'renderer' => $this->getAttributesRenderer()]
         );
 
         $this->_addAfter = false;
@@ -51,15 +51,14 @@ class Additional extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
      * {@inheritDoc}
      *
      * @param \Magento\Framework\DataObject $row
-     * @codingStandardsIgnoreStart
+     * @return void
      */
     protected function _prepareArrayRow(\Magento\Framework\DataObject $row)
     {
-    // @codingStandardsIgnoreEnd
         $options = [];
         $customAttribute = $row->getData('additional_attribute');
 
-        $key = 'option_' . $this->_getAttributesRenderer()->calcOptionHash($customAttribute);
+        $key = 'option_' . $this->getAttributesRenderer()->calcOptionHash($customAttribute);
         $options[$key] = 'selected="selected"';
 
         $row->setData('option_extra_attrs', $options);

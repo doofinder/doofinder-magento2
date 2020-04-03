@@ -81,7 +81,6 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
         $client = $this->searchFactory->create($hashId, $apiKey);
 
         try {
-            // @codingStandardsIgnoreStart
             $results = $client->query(
                 $queryText,
                 null,
@@ -90,7 +89,6 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
                     'filter' => $filters
                 ]
             );
-            // @codingStandardsIgnoreEnd
         } catch (\Doofinder\Api\Search\Error $e) {
             $results = null;
             $this->_logger->critical($e->getMessage());

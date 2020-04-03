@@ -27,12 +27,13 @@ class Indexer implements \Magento\Framework\Event\ObserverInterface
      * Execute observer.
      *
      * @param \Magento\Framework\Event\Observer $observer
+     * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @codingStandardsIgnoreStart
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-    // @codingStandardsIgnoreEnd
+        // phpcs:enable
         if ($this->indexer->shouldIndexInvalidate()) {
             $this->indexer->invalidate();
         }

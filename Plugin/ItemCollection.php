@@ -6,6 +6,7 @@ use Magento\Catalog\Model\Layer\ContextInterface as Subject;
 use Magento\Search\Model\EngineResolver;
 use Magento\Catalog\Model\Layer\ItemCollectionProviderInterface;
 use Doofinder\Feed\Registry\LayerType;
+use Doofinder\Feed\Helper\StoreConfig;
 
 /**
  * Class ItemCollection
@@ -62,12 +63,14 @@ class ItemCollection
      * @param callable $proceed
      * @return ItemCollectionProviderInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
      */
     public function aroundGetCollectionProvider(
         Subject $subject,
         callable $proceed
     ) {
-        if ($this->engineResolver->getCurrentSearchEngine() == 'doofinder') {
+        // phpcs:enable
+        if ($this->engineResolver->getCurrentSearchEngine() == StoreConfig::DOOFINDER_SEARCH_ENGINE_NAME) {
             if ($this->layerType->getLayerType() == 'category') {
                 return $this->catItemCollection;
             } elseif ($this->layerType->getLayerType() == 'search') {

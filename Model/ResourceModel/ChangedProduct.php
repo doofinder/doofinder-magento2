@@ -68,13 +68,9 @@ class ChangedProduct extends AbstractDB
      * Initializes resource model.
      *
      * @return void
-     *
-     * @codingStandardsIgnoreStart Method has to be protected.
      */
     protected function _construct()
     {
-        /** @codingStandardsIgnoreEnd */
-
         $this->_init(
             self::TABLE_NAME,
             'entity_id'

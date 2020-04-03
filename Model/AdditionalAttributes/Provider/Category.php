@@ -7,6 +7,7 @@ use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\Category as CategoryF
 
 /**
  * Class Category
+ * The class responsible for providing Category attributes code
  */
 class Category implements AttributesProviderInterface
 {

@@ -56,7 +56,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Tax\Model\Config $taxConfig
      * @param \Magento\Framework\Url $frontendUrl
      * @param \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
-     * @codingStandardsIgnoreStart
      */
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory,
@@ -68,7 +67,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Url $frontendUrl,
         \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
     ) {
-        // * @codingStandardsIgnoreEnd
         $this->categoryColFactory = $categoryColFactory;
         $this->imageHelper = $imageHelper;
         $this->storeManager = $storeManager;

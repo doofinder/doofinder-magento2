@@ -75,10 +75,9 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
         $configs = [];
         $ignore = ['categories_in_navigation'];
         foreach ($storeCodes as $storeCode) {
-            $config = array_merge(
-                $this->scopeConfig->getValue($storeConfig::FEED_ATTRIBUTES_CONFIG, $scope, $storeCode),
-                $this->scopeConfig->getValue($storeConfig::FEED_SETTINGS_CONFIG, $scope, $storeCode)
-            );
+            $feedAttributes = $this->scopeConfig->getValue($storeConfig::FEED_ATTRIBUTES_CONFIG, $scope, $storeCode);
+            $feedSettings = $this->scopeConfig->getValue($storeConfig::FEED_SETTINGS_CONFIG, $scope, $storeCode);
+            $config = $feedAttributes + $feedSettings;
 
             $config = array_diff_key($config, array_flip($ignore));
             $configs[$storeCode] = $config;

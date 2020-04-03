@@ -62,7 +62,7 @@ class PerformDelayedUpdatesTest extends \Magento\Framework\TestFramework\Unit\Ba
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->commandOutput = $this->getMockBuilder(\Symfony\Component\Console\Output\Outputinterface::class)
+        $this->commandOutput = $this->getMockBuilder(\Symfony\Component\Console\Output\OutputInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -98,6 +98,8 @@ class PerformDelayedUpdatesTest extends \Magento\Framework\TestFramework\Unit\Ba
                     ->method('execute');
             });
 
+        $this->commandOutput->expects($this->atLeastOnce())->method('writeln');
+
         $this->testedClass->execute($this->input, $this->commandOutput);
     }
 
@@ -121,6 +123,8 @@ class PerformDelayedUpdatesTest extends \Magento\Framework\TestFramework\Unit\Ba
             ->method('emulateAreaCode');
         $this->processor->expects($this->never())
             ->method('execute');
+
+        $this->commandOutput->expects($this->never())->method('writeln');
 
         $this->testedClass->execute($this->input, $this->commandOutput);
     }
@@ -146,6 +150,8 @@ class PerformDelayedUpdatesTest extends \Magento\Framework\TestFramework\Unit\Ba
                 $processor->expects($this->once())
                     ->method('execute');
             });
+
+        $this->commandOutput->expects($this->atLeastOnce())->method('writeln');
 
         $this->testedClass->execute($this->input, $this->commandOutput);
     }
