@@ -11,7 +11,7 @@
   "license": "OSL-3.0",
   "private": true,
   "devDependencies": {
-    "grunt": "^1.0.2",
+    "grunt": "^1.1.0",
     "grunt-version": "^1.2.1"
   }
 }
