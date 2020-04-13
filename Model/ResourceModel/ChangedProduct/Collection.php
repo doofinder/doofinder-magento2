@@ -15,13 +15,9 @@ class Collection extends AbstractCollection
      * Initializes resource model.
      *
      * @return void
-     *
-     * @codingStandardsIgnoreStart Method has to be protected.
      */
     protected function _construct()
     {
-        /** @condingStandardsIgnoreEnd */
-
         $this->_init(
             ChangedProductModel::class,
             ChangedProductResourceModel::class
@@ -66,5 +62,4 @@ class Collection extends AbstractCollection
             );
         return $this;
     }
-
 }

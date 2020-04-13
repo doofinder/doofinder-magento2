@@ -24,13 +24,12 @@ class DummyTest extends Injectable
      *
      * @param FrontendPage $page
      * @return void
-     * @codingStandardsIgnoreStart
-     * Ignore method prefixed with double underscore
+     * @phpcs:disable PHPCompatibility.PHP.ReservedFunctionNames.MethodDoubleUnderscore
      */
     public function __inject(
         FrontendPage $page
     ) {
-    // @codingStandardsIgnoreEnd
+        // phpcs:enable
         $this->page = $page;
     }
 

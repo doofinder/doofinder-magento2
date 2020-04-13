@@ -8,6 +8,7 @@ use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\Price as PriceFieldNa
 
 /**
  * Class Price
+ * The class responsible for providing Price attributes code
  */
 class Price implements AttributesProviderInterface
 {

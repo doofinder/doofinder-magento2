@@ -15,7 +15,7 @@ class Magento implements FetcherInterface
     /**
      * @var string[]
      */
-    private $attributesExcludedFromMerge = [
+    private $attrsExcluded = [
         'status',
         'visibility',
         'tax_class_id'
@@ -29,7 +29,7 @@ class Magento implements FetcherInterface
     /**
      * @var array
      */
-    private $attributeOptionsCache;
+    private $attrOptionsCache;
 
     /**
      * @var DataProvider
@@ -164,7 +164,7 @@ class Magento implements FetcherInterface
         Attribute $attribute,
         array $attributeValues
     ) {
-        if (in_array($attribute->getAttributeCode(), $this->attributesExcludedFromMerge, true)) {
+        if (in_array($attribute->getAttributeCode(), $this->attrsExcluded, true)) {
             $attributeValues = [
                 $productId => $attributeValues[$productId] ?? '',
             ];
@@ -241,12 +241,12 @@ class Magento implements FetcherInterface
      */
     private function getAttributeOptions(Attribute $attribute)
     {
-        if (!isset($this->attributeOptionsCache[$attribute->getId()])) {
+        if (!isset($this->attrOptionsCache[$attribute->getId()])) {
             $options = $attribute->getOptions() ? $attribute->getOptions() : [];
-            $this->attributeOptionsCache[$attribute->getId()] = $options;
+            $this->attrOptionsCache[$attribute->getId()] = $options;
         }
 
-        return $this->attributeOptionsCache[$attribute->getId()];
+        return $this->attrOptionsCache[$attribute->getId()];
     }
 
     /**

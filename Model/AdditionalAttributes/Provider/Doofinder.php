@@ -7,6 +7,7 @@ use Doofinder\Feed\Model\Config\Indexer\Attributes;
 
 /**
  * Class Doofinder
+ * The class responsible for providing Doofinder attributes code
  */
 class Doofinder implements AttributesProviderInterface
 {

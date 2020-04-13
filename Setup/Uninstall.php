@@ -8,7 +8,8 @@ use Magento\Framework\Setup\ModuleContextInterface;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct;
 
 /**
- * Uninstall
+ * Class Uninstall
+ * Uninstall the module
  */
 class Uninstall implements UninstallInterface
 {
@@ -18,11 +19,12 @@ class Uninstall implements UninstallInterface
      * @param SchemaSetupInterface $setup
      * @param ModuleContextInterface $context
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @codingStandardsIgnoreStart
+     * @return void
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceAfterLastUsed
      */
     public function uninstall(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
-    // @codingStandardsIgnoreEnd
+        // phpcs:enable
         $setup->startSetup();
 
         $setup->getConnection()->dropTable(

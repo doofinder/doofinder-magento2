@@ -10,7 +10,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
-     * Module name
+     * Name of this module
      */
     const MODULE_NAME = 'Doofinder_Feed';
 
@@ -50,7 +50,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const CATALOG_SEARCH_ENGINE_CONFIG = 'catalog/search/engine';
 
     /**
-     * Doofinder search engine name
+     * Doofinder search engine name used as a search engine code
      */
     const DOOFINDER_SEARCH_ENGINE_NAME = 'doofinder';
 

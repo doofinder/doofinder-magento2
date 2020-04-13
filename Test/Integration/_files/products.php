@@ -1,6 +1,6 @@
 <?php
 
-// @codingStandardsIgnoreFile
+// @phpcs:disable
 
 /** @var array defaults */
 $defaults = [

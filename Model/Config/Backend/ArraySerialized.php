@@ -53,7 +53,7 @@ class ArraySerialized extends \Magento\Framework\App\Config\Value
      *
      * @return void
      */
-    protected function _afterLoad() // @codingStandardsIgnoreLine
+    protected function _afterLoad()
     {
         if (!is_array($this->getValue())) {
             $value = $this->getValue();

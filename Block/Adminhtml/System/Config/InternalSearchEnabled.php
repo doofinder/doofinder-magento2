@@ -4,16 +4,17 @@ namespace Doofinder\Feed\Block\Adminhtml\System\Config;
 
 /**
  * Internal search enabled
+ * Frontned model for "Is internal search enabled" field in Stores -> Configuration
  */
 class InternalSearchEnabled extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
-     * Catalog config page section
+     * Path to catalog config page section
      */
     const CATALOG_CONFIG_SECTION = 'catalog';
 
     /**
-     * Search engine fragment
+     * DOM Search engine fragment
      */
     const SEARCH_ENGINE_FRAGMENT = 'catalog_search-link';
 
@@ -41,11 +42,9 @@ class InternalSearchEnabled extends \Magento\Config\Block\System\Config\Form\Fie
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
-     * @codingStandardsIgnoreStart
      */
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
-    // @codingStandardsIgnoreEnd
         $enabled = $this->storeConfig->isInternalSearchEnabled();
         $element->setText(__('Internal search is ' . ($enabled ? 'enabled' : 'disabled') . '.'));
 
