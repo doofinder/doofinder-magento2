@@ -50,9 +50,9 @@ class Throttle
      */
     private function wait($seconds)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
         sleep($seconds);
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 
     /**
@@ -68,9 +68,9 @@ class Throttle
     private function throttle($name, $args, $counter = 1)
     {
         try {
-            // @codingStandardsIgnoreStart
+            // phpcs:disable
             return call_user_func_array([$this->obj, $name], $args);
-            // @codingStandardsIgnoreEnd
+            // phpcs:enable
         } catch (\Doofinder\Api\Management\Errors\ThrottledResponse $e) {
             if ($counter >= self::THROTTLE_RETRIES) {
                 throw $e;

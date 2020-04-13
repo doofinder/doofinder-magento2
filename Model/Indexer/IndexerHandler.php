@@ -10,7 +10,8 @@ use Doofinder\Feed\Registry\IndexerScope;
 use Doofinder\Feed\Model\ChangedProduct\Registration;
 
 /**
- * Indexer handler
+ * Class IndexerHandler
+ * The class responsible for indexing
  */
 class IndexerHandler implements IndexerInterface
 {
@@ -157,7 +158,9 @@ class IndexerHandler implements IndexerInterface
         $scopeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
         foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
             $docs = $this->mapper->get('delete')->map($batchDocuments, $scopeId);
-            $this->processor->delete($scopeId, $docs); // @codingStandardsIgnoreLine - it's not ModelLSD
+            // phpcs:disable Ecg.Performance.Loop.ModelLSD
+            $this->processor->delete($scopeId, $docs);
+            // phpcs:enable
         }
     }
 
@@ -178,10 +181,11 @@ class IndexerHandler implements IndexerInterface
      *
      * @param array $dimensions
      * @return boolean
+     * @phpcs:disable Squiz.Commenting.FunctionComment.TypeHintMissing
      */
-    // @codingStandardsIgnoreLine - do not hint array
     public function isAvailable($dimensions = [])
     {
+        // phpcs:enable
         return $this->indexerHelper->isAvailable($dimensions);
     }
 }

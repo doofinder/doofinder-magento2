@@ -15,10 +15,11 @@ use Magento\Framework\Search\Request\IndexScopeResolverInterface as TableResolve
 use Magento\Catalog\Model\Indexer\Product\Price\DimensionCollectionFactory;
 use Magento\Store\Model\Indexer\WebsiteDimensionProvider;
 
+// phpcs:disable
+
 /**
  * Class Index
  * The class used for backward compatibility
- * @codingStandardsIgnoreFile - it's a copy of Magento core class for backward compatibility
  * @SuppressWarnings(PHPMD.LongVariable)
  * @see \Magento\AdvancedSearch\Model\ResourceModel\Index
  * @TODO: consider refactoring
@@ -78,7 +79,6 @@ class Index extends AbstractDb
      * Implementation of abstract construct
      * @return void
      */
-    // @codingStandardsIgnoreLine
     protected function _construct()
     {
     }

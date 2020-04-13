@@ -12,12 +12,11 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Cache\Manager;
 use Exception;
 use Magento\Framework\App\Cache\Type\Config;
-
-// phpcs:disable MEQP2.SQL.MissedIndexes.MissedIndexes
-// phpcs:disable PSR2.Methods.FunctionCallSignature.Indent
+use Magento\Framework\Serialize\Serializer\Serialize;
 
 /**
- * Upgrades database schema.
+ * Class UpgradeSchema
+ * Upgrade database schema
  */
 class UpgradeSchema implements UpgradeSchemaInterface
 {
@@ -42,19 +41,27 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private $cacheManager;
 
     /**
+     * @var Serialize
+     */
+    private $phpSerialize;
+
+    /**
      * UpgradeSchema constructor.
      * @param Serializer $serializer
      * @param WriterInterface $configWriter
      * @param Manager $cacheManager
+     * @param Serialize $phpserialize
      */
     public function __construct(
         Serializer $serializer,
         WriterInterface $configWriter,
-        Manager $cacheManager
+        Manager $cacheManager,
+        Serialize $phpserialize
     ) {
         $this->serializer = $serializer;
         $this->configWriter = $configWriter;
         $this->cacheManager = $cacheManager;
+        $this->phpSerialize = $phpserialize;
     }
 
     /**
@@ -108,7 +115,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->getConnection()
             ->newTable(ChangedProduct::TABLE_NAME);
 
-        // phpcs:disable Indent
         $table->addColumn(
             ChangedProduct::FIELD_ID,
             Table::TYPE_INTEGER,
@@ -120,25 +126,23 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'primary' => true
             ],
             'Row ID'
-        )
-            ->addColumn(
-                ChangedProduct::FIELD_PRODUCT_ID,
-                Table::TYPE_INTEGER,
-                null,
-                [
-                    'nullable' => false
-                ],
-                'ID of a deleted product'
-            )
-            ->addColumn(
-                ChangedProduct::FIELD_OPERATION_TYPE,
-                Table::TYPE_TEXT,
-                null,
-                [
-                    'nullable' => false
-                ],
-                'Operation type'
-            );
+        )->addColumn(
+            ChangedProduct::FIELD_PRODUCT_ID,
+            Table::TYPE_INTEGER,
+            null,
+            [
+                'nullable' => false
+            ],
+            'ID of a deleted product'
+        )->addColumn(
+            ChangedProduct::FIELD_OPERATION_TYPE,
+            Table::TYPE_TEXT,
+            null,
+            [
+                'nullable' => false
+            ],
+            'Operation type'
+        );
 
         $this->setup
             ->getConnection()
@@ -214,35 +218,35 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     private function convertAdditionalAttributes()
     {
-        // phpcs:disable
         $connection = $this->setup->getConnection();
         $path = 'doofinder_config_index/feed_attributes/additional_attributes';
-        $additionalAttributes = $connection->fetchAll(
+        // phpcs:ignore Ecg.Performance.FetchAll.Found
+        $attrs = $connection->fetchAll(
             $connection->select()->from('core_config_data')->where('path = ?', $path)
         );
 
-        if ($additionalAttributes) {
-            foreach ($additionalAttributes as $additionalAttributesPhp) {
+        if ($attrs) {
+            foreach ($attrs as $attrsPhp) {
                 try {
-                    $additionalAttributesArray = unserialize($additionalAttributesPhp['value']);
+                    $attrsArray = $this->phpSerialize->unserialize($attrsPhp['value']);
                 } catch (Exception $exception) {
-                    $additionalAttributesArray = [];
+                    $attrsArray = [];
                 }
 
-                foreach ($additionalAttributesArray as &$attr) {
+                foreach ($attrsArray as &$attr) {
                     unset($attr['label']);
                 }
 
-                $additionalAttributesJson = $this->serializer->serialize($additionalAttributesArray);
+                $attrsJson = $this->serializer->serialize($attrsArray);
 
+                // phpcs:ignore Ecg.Performance.Loop.ModelLSD
                 $this->configWriter->save(
                     $path,
-                    $additionalAttributesJson,
-                    $additionalAttributesPhp['scope'],
-                    $additionalAttributesPhp['scope_id']
+                    $attrsJson,
+                    $attrsPhp['scope'],
+                    $attrsPhp['scope_id']
                 );
             }
         }
-        // phpcs:enable
     }
 }

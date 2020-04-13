@@ -32,18 +32,16 @@ class RouteParamsResolver
      * @param \Magento\Framework\Url\RouteParamsResolver $subject
      * @param array $data
      * @param boolean $unsetOldParams
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     *
      * @return array
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
      */
-    // @codingStandardsIgnoreLine
     public function beforeSetRouteParams(
         \Magento\Framework\Url\RouteParamsResolver $subject,
         array $data,
         $unsetOldParams = true
     ) {
+        // phpcs:enable
         if (isset($data['doofinder_product_url'])) {
             $params = $this->queryParamsResolver->getQueryParams();
             if (isset($params['___store'])) {

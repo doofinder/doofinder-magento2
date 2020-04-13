@@ -50,8 +50,9 @@ class DisallowedAttributesProvider
                         )
                     );
                 }
-
+                // phpcs:disable Magento2.Performance.ForeachArrayMerge.ForeachArrayMerge
                 $this->disallowedAttributes = array_merge($this->disallowedAttributes, $provider->getAttributes());
+                // phpcs:enable
             }
         }
 

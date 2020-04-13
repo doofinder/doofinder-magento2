@@ -34,11 +34,13 @@ class LayerResolver
      * @param string $layerType
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
      */
     public function beforeCreate(
         Subject $subject,
         $layerType
     ) {
+        // phpcs:enable
         $this->layerType->setLayerType($layerType);
         return [$layerType];
     }

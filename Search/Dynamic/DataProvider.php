@@ -14,6 +14,7 @@ use Doofinder\Feed\Search\Cache;
 
 /**
  * Class DataProvider
+ * Dynamic prices data provider
  */
 class DataProvider implements DataProviderInterface
 {
@@ -135,12 +136,14 @@ class DataProvider implements DataProviderInterface
      * @param EntityStorage $entityStorage
      * @return IntervalInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceBeforeLastUsed
      */
     public function getInterval(
         BucketInterface $bucket,
         array $dimensions,
         EntityStorage $entityStorage
     ) {
+        // phpcs:enable
         $entityIds = $entityStorage->getSource();
         $fieldName = $this->priceNameResolver->getFiledName();
         $dimension = current($dimensions);
@@ -162,6 +165,8 @@ class DataProvider implements DataProviderInterface
      * @param integer $range
      * @param EntityStorage $entityStorage
      * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceBeforeLastUsed
      */
     public function getAggregation(
         BucketInterface $bucket,
@@ -169,6 +174,7 @@ class DataProvider implements DataProviderInterface
         $range,
         EntityStorage $entityStorage
     ) {
+        // phpcs:enable
         $result = [];
 
         $res = $this->getFilteredResponse($entityStorage->getSource());

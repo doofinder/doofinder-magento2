@@ -16,9 +16,11 @@ class Delete implements MapInterface
      * @param integer $scopeId
      * @return array
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceAfterLastUsed
      */
     public function map(array $documents, $scopeId)
     {
+        // phpcs:enable
         return array_map(function ($productId) {
             return ['id' => $productId];
         }, $documents);

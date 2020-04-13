@@ -7,6 +7,7 @@ use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider;
 
 /**
  * Class Magento
+ * The class responsible for providing Magento attributes code
  */
 class Magento implements AttributesProviderInterface
 {

@@ -9,6 +9,7 @@ use Magento\Catalog\Model\Category;
 
 /**
  * Class ItemCollectionProvider
+ * The class responsible for providing Item Collection
  */
 class ItemCollectionProvider implements ItemCollectionProviderInterface
 {
@@ -30,9 +31,11 @@ class ItemCollectionProvider implements ItemCollectionProviderInterface
      * {@inheritDoc}
      * @param Category $category
      * @return Collection
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterface
      */
     public function getCollection(Category $category)
     {
+        // phpcs:enable
         return $this->collectionFactory->create();
     }
 }

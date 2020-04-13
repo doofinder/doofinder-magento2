@@ -4,6 +4,7 @@ namespace Doofinder\Feed\Block\Adminhtml\Form\Field;
 
 /**
  * Class AdditionalAttributes
+ * The class responsible for generating attributes list in custom frontend model on Stores -> Configuration page
  */
 class AdditionalAttributes extends \Magento\Framework\View\Element\Html\Select
 {
@@ -45,7 +46,7 @@ class AdditionalAttributes extends \Magento\Framework\View\Element\Html\Select
      *
      * @return mixed
      */
-    public function _toHtml()
+    protected function _toHtml()
     {
         if (!$this->getOptions()) {
             $attributes = $this->feedAttributes->toOptionArray();

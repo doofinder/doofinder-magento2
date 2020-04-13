@@ -2,23 +2,37 @@
 
 namespace Doofinder\Feed\Search;
 
+use Doofinder\Api\Management\Client;
+use Doofinder\Api\Management\ClientFactory;
+
 /**
- * Managemenet client factory
+ * Class ManagementClientFactory
+ * Factory class for API Management Client
  */
 class ManagementClientFactory
 {
     /**
+     * @var ClientFactory
+     */
+    private $clientFactory;
+
+    /**
+     * ManagementClientFactory constructor.
+     * @param ClientFactory $clientFactory
+     */
+    public function __construct(ClientFactory $clientFactory)
+    {
+        $this->clientFactory = $clientFactory;
+    }
+
+    /**
      * Create management client
      *
      * @param string $apiKey
-     * @return \Doofinder\Api\Management\Client
+     * @return Client
      */
     public function create($apiKey)
     {
-        // Ignore FoundDirectInstantiation warning
-        // cause this is factory
-        // @codingStandardsIgnoreStart
-        return new \Doofinder\Api\Management\Client($apiKey);
-        // @codingStandardsIgnoreEnd
+        return $this->clientFactory->create(['apiKey' => $apiKey]);
     }
 }

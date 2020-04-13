@@ -33,11 +33,11 @@ class Config
      * @param  \Closure $closure
      * @return boolean
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @codingStandardsIgnoreStart
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
      */
     public function aroundNeedPriceConversion(\Magento\Tax\Model\Config $taxConfig, \Closure $closure)
     {
-    // @codingStandardsIgnoreEnd
+        // phpcs:enable
         $needPriceConversion = $closure();
 
         // Already needs price conversion so do nothig
