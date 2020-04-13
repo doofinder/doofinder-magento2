@@ -21,7 +21,6 @@ class Price
      * Price constructor.
      * @param CustomerSession $customerSession
      */
-    // @codingStandardsIgnoreLine - Customer Session is passed as a Proxy by di.xml
     public function __construct(CustomerSession $customerSession)
     {
         $this->customerSession = $customerSession;

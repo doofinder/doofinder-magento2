@@ -5,7 +5,8 @@ namespace Doofinder\Feed\Model\Indexer;
 use Magento\Framework\Indexer\IndexStructureInterface;
 
 /**
- * Index structure
+ * Class IndexStructure
+ * The class responsible for managing operations on Doofinder index schema
  */
 class IndexStructure implements IndexStructureInterface
 {
@@ -53,9 +54,11 @@ class IndexStructure implements IndexStructureInterface
      * @param Dimension[] $dimensions
      * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceBeforeLastUsed
      */
     public function delete($index, array $dimensions = [])
     {
+        // phpcs:enable
         $this->action('deleteDoofinderIndex', $dimensions);
     }
 
@@ -65,9 +68,11 @@ class IndexStructure implements IndexStructureInterface
      * @param array $dimensions
      * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceBeforeLastUsed
      */
     public function create($index, array $fields, array $dimensions = [])
     {
+        // phpcs:enable
         $this->action('createDoofinderIndex', $dimensions);
     }
 

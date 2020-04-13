@@ -79,7 +79,9 @@ class Dynamic
             unset($value['from'], $value['to']);
 
             $rangeName = "{$from}_{$to}";
+            // phpcs:disable Magento2.Performance.ForeachArrayMerge.ForeachArrayMerge
             $resultData[$rangeName] = array_merge(['value' => $rangeName], $value);
+            // phpcs:enable
         }
         return $resultData;
     }

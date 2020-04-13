@@ -12,13 +12,10 @@ class ChangedProduct extends AbstractModel
 {
     /**
      * A constructor.
-     *
-     * @codingStandardsIgnoreStart Method has to be protected.
+     * @return void
      */
     protected function _construct()
     {
-        /** @condingStandardsIgnoreEnd */
-
         $this->_init(ChangedProductResourceModel::class);
     }
 }

@@ -8,6 +8,7 @@ use Magento\Framework\Search\Dynamic\DataProviderInterface;
 
 /**
  * Class Builder
+ * The class responsible for building aggregations for the search request
  * @SuppressWarnings(PHPMD.LongVariable)
  */
 class Builder

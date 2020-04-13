@@ -4,6 +4,7 @@ namespace Doofinder\Feed\Block;
 
 /**
  * Class Banner
+ * The class responsible for rendering Doofinder Banner
  */
 class Banner extends \Magento\Framework\View\Element\Template
 {

@@ -18,6 +18,7 @@ class Term
      * @param array $queryResult
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
      */
     public function build(
         DataProviderInterface $dataProvider,
@@ -25,6 +26,7 @@ class Term
         RequestBucketInterface $bucket,
         array $queryResult
     ) {
+        // phpcs:enable
         $values = [];
         if (!isset($queryResult['aggregations'][$bucket->getName()]['buckets'])) {
             return $values;

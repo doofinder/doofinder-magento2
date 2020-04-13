@@ -20,10 +20,12 @@ class Builder
     {
         $document = [];
         foreach ($this->fields as $field => $value) {
+            // phpcs:disable Magento2.Performance.ForeachArrayMerge.ForeachArrayMerge
             $document = array_merge(
                 $document,
                 $this->getField($field, $value)
             );
+            // phpcs:enable
         }
         $this->clear();
         return $document;

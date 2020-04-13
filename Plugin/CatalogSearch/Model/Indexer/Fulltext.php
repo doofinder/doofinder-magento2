@@ -46,10 +46,11 @@ class Fulltext
      * @param mixed ...$args
      * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @codingStandardsIgnoreLine - params are not needed
+     * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
      */
     public function beforeExecuteFull(FulltextIndexer $indexer, ...$args)
     {
+        // phpcs:enable
         if ($this->storeConfig->isInternalSearchEnabled()) {
             $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
         }

@@ -157,12 +157,12 @@ class ProductTest extends AbstractIntegrity
     {
         $product = $this->productRepository->get('simple');
 
+        // phpcs:disable Generic.Files.LineLength.TooLong
         $this->assertRegExp(
-            // @codingStandardsIgnoreStart
             '/https?:\/\/[^\/]+(:\d+)?\/(.*\/)?pub\/media\/catalog\/product\/cache\/((\d+?\/)?image\/)?[^\/]+\/\w\/\w\/magento_image\.jpg/',
-            // @codingStandardsIgnoreEnd
             $this->helper->getProductImageUrl($product)
         );
+        // phpcs:enable
     }
 
     /**

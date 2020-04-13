@@ -39,10 +39,12 @@ class Attributes implements ArrayInterface
         if (empty($this->options)) {
             foreach ($this->providers as $provider) {
                 if ($provider instanceof ArrayInterface) {
+                    // phpcs:disable Magento2.Performance.ForeachArrayMerge.ForeachArrayMerge
                     $this->options = array_merge(
                         $this->options,
                         $provider->toOptionArray()
                     );
+                    // phpcs:enable
                 }
             }
         }

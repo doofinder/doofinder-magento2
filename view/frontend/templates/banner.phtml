@@ -3,26 +3,25 @@
  * @var \Doofinder\Feed\Block\Banner $block
  */
 
-// @codingStandardsIgnoreFile
-
 $banner = $block->getBanner();
-if ($banner) : ?>
-<div class="search-result-banner">
-    <a href="<?php /* @escapeNotVerified */ echo $banner['link']; ?>"
-        <?php /* @escapeNotVerified */ echo $banner['blank'] ? 'target="_blank"' : ''; ?>
-        data-banner-id="<?php /* @escapeNotVerified */ echo $banner['id']; ?>">
-            <img src="<?php /* @escapeNotVerified */ echo $banner['image']; ?>">
-    </a>
-</div>
-<script type="text/x-magento-init">
-    {
-        ".search-result-banner": {
-            "banner": {
-                "ajaxUrl": "<?php /* @escapeNotVerified */ echo $block->getAjaxUrl(); ?>",
-                "bannerInsertionPoint": "<?php /* @escapeNotVerified */ echo $banner['insertion_point']; ?>",
-                "bannerInsertionMethod": "<?php /* @escapeNotVerified */ echo $banner['insertion_method']; ?>"
+?>
+<?php if ($banner): ?>
+    <div class="search-result-banner">
+        <a href="<?= $block->escapeHtml($banner['link']); ?>"
+            <?= $banner['blank'] ? 'target="_blank"' : ''; ?>
+            data-banner-id="<?= $block->escapeHtml($banner['id']); ?>">
+                <img src="<?= $block->escapeHtml($banner['image']); ?>" alt="Doofinder Banner"/>
+        </a>
+    </div>
+    <script type="text/x-magento-init">
+        {
+            ".search-result-banner": {
+                "banner": {
+                    "ajaxUrl": "<?= $block->escapeJs($block->getAjaxUrl()); ?>",
+                    "bannerInsertionPoint": "<?= $block->escapeJs($banner['insertion_point']); ?>",
+                    "bannerInsertionMethod": "<?= $block->escapeJs($banner['insertion_method']); ?>"
+                }
             }
         }
-    }
-</script>
-<?php endif;
+    </script>
+<?php endif ?>

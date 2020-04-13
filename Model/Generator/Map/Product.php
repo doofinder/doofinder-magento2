@@ -55,8 +55,8 @@ class Product implements MapInterface
      * @param string $field
      * @return mixed
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @phpcs:disable Generic.Metrics.CyclomaticComplexity.TooHigh
      */
-    // @codingStandardsIgnoreLine
     public function get(\Magento\Catalog\Model\Product $product, $field)
     {
         if (!$field) {
@@ -117,6 +117,7 @@ class Product implements MapInterface
         }
 
         return $this->getAttributeText($product, $field);
+        // phpcs:enable
     }
 
     /**
