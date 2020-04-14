@@ -50,9 +50,9 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
     private $productMetadata;
 
     /**
-     * @var \Magento\Framework\Module\ModuleListInterface
+     * @var \Doofinder\Feed\Helper\ComposerVersionProvider
      */
-    private $moduleList;
+    private $composerVersion;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
@@ -115,15 +115,12 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
         $this->storeConfig->expects($this->once())->method('getAllStores')->willReturn([$this->store]);
         $this->storeConfig->expects($this->once())->method('getStoreLanguage')->willReturn('EN');
 
-        $this->moduleList = $this->getMockBuilder(
-            \Magento\Framework\Module\ModuleListInterface::class
+        $this->composerVersion = $this->getMockBuilder(
+            \Doofinder\Feed\Helper\ComposerVersionProvider::class
         )->disableOriginalConstructor()->getMock();
-        $this->moduleList->expects($this->once())
-            ->method('getOne')
-            ->with($this->storeConfig::MODULE_NAME)
-            ->willReturn([
-                'setup_version' => 'k.l.m'
-            ]);
+        $this->composerVersion->expects($this->once())
+            ->method('getComposerVersion')
+            ->willReturn('k.l.m');
 
         $this->scopeConfig->method('getValue')->will($this->returnValueMap([
             ['general/locale/code', $scopeConfig::SCOPE_TYPE_DEFAULT, null, 'EN'],
@@ -134,7 +131,7 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
             [
                 'storeConfig' => $this->storeConfig,
                 'productMetadata' => $this->productMetadata,
-                'moduleList' => $this->moduleList,
+                'composerVersion' => $this->composerVersion,
                 'context' => $this->context,
             ]
         );

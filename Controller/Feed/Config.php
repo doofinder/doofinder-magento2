@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Controller\Feed;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\Module\ModuleListInterface;
+use Doofinder\Feed\Helper\ComposerVersionProvider;
 use Doofinder\Feed\Helper\StoreConfig;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Controller\ResultInterface;
@@ -21,9 +21,9 @@ class Config extends Action
     private $productMetadata;
 
     /**
-     * @var ModuleListInterface
+     * @var ComposerVersionProvider
      */
-    private $moduleList;
+    private $composerVersion;
 
     /**
      * @var StoreConfig
@@ -34,17 +34,17 @@ class Config extends Action
      * Config constructor.
      * @param Context $context
      * @param ProductMetadataInterface $productMetadata
-     * @param ModuleListInterface $moduleList
+     * @param ComposerVersionProvider $composerVersion
      * @param StoreConfig $storeConfig
      */
     public function __construct(
         Context $context,
         ProductMetadataInterface $productMetadata,
-        ModuleListInterface $moduleList,
+        ComposerVersionProvider $composerVersion,
         StoreConfig $storeConfig
     ) {
         $this->productMetadata = $productMetadata;
-        $this->moduleList = $moduleList;
+        $this->composerVersion = $composerVersion;
         $this->storeConfig = $storeConfig;
         parent::__construct($context);
     }
@@ -63,7 +63,7 @@ class Config extends Action
                 'version' => $this->productMetadata->getVersion(),
             ],
             'module' => [
-                'version' => $this->moduleList->getOne(StoreConfig::MODULE_NAME)['setup_version'],
+                'version' => $this->composerVersion->getComposerVersion(),
                 'options' => [
                     'language' => [],
                 ],
