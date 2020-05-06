@@ -22,6 +22,12 @@
             <argument name="processor" xsi:type="object">Doofinder\Feed\Model\ChangedProduct\Processor\Proxy</argument>
         </arguments>
     </type>
+    <type name="Doofinder\Feed\Helper\ComposerVersionProvider">
+        <arguments>
+            <argument name="driver" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+            <argument name="packageName" xsi:type="string">doofinder/doofinder-magento2</argument>
+        </arguments>
+    </type>
 
     <!-- Indexers -->
     <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
