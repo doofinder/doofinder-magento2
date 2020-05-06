@@ -63,7 +63,7 @@ class ComposerVersionProvider
      */
     private function getVendorPath()
     {
-        return require VENDOR_PATH; //phpcs:ignore -- constant leads to executable php file
+        return VENDOR_PATH; //phpcs:ignore -- constant leads to executable php file
     }
 
     /**
