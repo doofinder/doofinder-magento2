@@ -249,8 +249,24 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getDoofinderFields($storeId = null)
     {
-        $attributes = $this->scopeConfig->getValue(
-            self::FEED_ATTRIBUTES_CONFIG,
+        $attributes = [];
+        $attributes['brand'] = $this->scopeConfig->getValue(
+            self::FEED_ATTRIBUTES_CONFIG . '/brand',
+            $this->getScopeStore(),
+            $storeId
+        );
+        $attributes['image_link'] = $this->scopeConfig->getValue(
+            self::FEED_ATTRIBUTES_CONFIG . '/image_link',
+            $this->getScopeStore(),
+            $storeId
+        );
+        $attributes['mpn'] = $this->scopeConfig->getValue(
+            self::FEED_ATTRIBUTES_CONFIG . '/mpn',
+            $this->getScopeStore(),
+            $storeId
+        );
+        $attributes['additional_attributes'] = $this->scopeConfig->getValue(
+            self::FEED_ATTRIBUTES_CONFIG . '/additional_attributes',
             $this->getScopeStore(),
             $storeId
         );

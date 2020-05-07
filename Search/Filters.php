@@ -31,7 +31,7 @@ class Filters
      */
     public function get(RequestInterface $request)
     {
-        $filters = [];
+        $filters = ['filter' => [], 'sort' => []];
         $must = $request->getQuery()->getMust();
 
         foreach ($must as $filter) {
@@ -39,11 +39,22 @@ class Filters
 
             if ($ref->getField() == 'price') {
                 $fieldName = $this->priceNameResolver->getFiledName();
-                $filters[$fieldName] = $this->getPriceFilter($ref);
+                $filters['filter'][$fieldName] = $this->getPriceFilter($ref);
                 continue;
             }
 
-            $filters[$ref->getField()] = [$ref->getValue()];
+            $filters['filter'][$ref->getField()] = [$ref->getValue()];
+        }
+
+        if (!method_exists($request, 'getSort')) {
+            return $filters;
+        }
+        foreach ($request->getSort() as $sort) {
+            if ($sort['field'] == 'price') {
+                $filters['sort'][] = [$this->priceNameResolver->getFiledName() => $sort['direction']];
+                continue;
+            }
+            $filters['sort'][] = [$sort['field'] => $sort['direction']];
         }
 
         return $filters;
