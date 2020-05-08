@@ -36,6 +36,6 @@ class ItemCollectionProvider implements ItemCollectionProviderInterface
     public function getCollection(Category $category)
     {
         // phpcs:enable
-        return $this->collectionFactory->create();
+        return $this->collectionFactory->create()->addCategoryFilter($category);
     }
 }

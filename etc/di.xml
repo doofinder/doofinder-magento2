@@ -175,9 +175,28 @@
                 type="Doofinder\Feed\Plugin\LayerResolver"/>
     </type>
 
+    <virtualType name="doofinderSearchCriteriaResolverFactory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection\SearchCriteriaResolverFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Fulltext\Collection\SearchCriteriaResolver</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="doofinderSearchResultApplier\Factory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection\SearchResultApplierFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Fulltext\Collection\SearchResultApplier</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="doofinderTotalRecordsResolver\Factory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection\TotalRecordsResolverFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Fulltext\Collection\TotalRecordsResolver</argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="doofinderFulltextSearchCollection" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
         <arguments>
             <argument name="searchRequestName" xsi:type="string">quick_search_container</argument>
+            <argument name="searchCriteriaResolverFactory" xsi:type="object">doofinderSearchCriteriaResolverFactory</argument>
+            <argument name="searchResultApplierFactory" xsi:type="object">doofinderSearchResultApplier\Factory</argument>
+            <argument name="totalRecordsResolverFactory" xsi:type="object">doofinderTotalRecordsResolver\Factory</argument>
         </arguments>
     </virtualType>
     <virtualType name="doofinderFulltextSearchCollectionFactory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory">
@@ -186,15 +205,26 @@
         </arguments>
     </virtualType>
 
-    <type name="Doofinder\Feed\Model\Layer\Search\ItemCollectionProvider">
+    <virtualType name="doofinderAdvancedCollection" type="Magento\CatalogSearch\Model\ResourceModel\Advanced\Collection">
         <arguments>
-            <argument name="collectionFactory" xsi:type="object">doofinderFulltextSearchCollectionFactory</argument>
+            <argument name="searchRequestName" xsi:type="string">advanced_search_container</argument>
+            <argument name="searchCriteriaResolverFactory" xsi:type="object">doofinderSearchCriteriaResolverFactory</argument>
+            <argument name="searchResultApplierFactory" xsi:type="object">doofinderSearchResultApplier\Factory</argument>
+            <argument name="totalRecordsResolverFactory" xsi:type="object">doofinderTotalRecordsResolver\Factory</argument>
         </arguments>
-    </type>
+    </virtualType>
+    <virtualType name="doofinderAdvancedCollectionFactory" type="Magento\CatalogSearch\Model\ResourceModel\Advanced\CollectionFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">doofinderAdvancedCollection</argument>
+        </arguments>
+    </virtualType>
 
     <virtualType name="doofinderCategoryCollection" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
         <arguments>
             <argument name="searchRequestName" xsi:type="string">catalog_view_container</argument>
+            <argument name="searchCriteriaResolverFactory" xsi:type="object">doofinderSearchCriteriaResolverFactory</argument>
+            <argument name="searchResultApplierFactory" xsi:type="object">doofinderSearchResultApplier\Factory</argument>
+            <argument name="totalRecordsResolverFactory" xsi:type="object">doofinderTotalRecordsResolver\Factory</argument>
         </arguments>
     </virtualType>
     <virtualType name="doofinderCategoryCollectionFactory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory">
@@ -203,9 +233,21 @@
         </arguments>
     </virtualType>
 
+    <type name="Doofinder\Feed\Model\Layer\Search\ItemCollectionProvider">
+        <arguments>
+            <argument name="collectionFactory" xsi:type="object">doofinderFulltextSearchCollectionFactory</argument>
+        </arguments>
+    </type>
     <type name="Doofinder\Feed\Model\Layer\Category\ItemCollectionProvider">
         <arguments>
             <argument name="collectionFactory" xsi:type="object">doofinderCategoryCollectionFactory</argument>
+        </arguments>
+    </type>
+    <type name="Magento\CatalogSearch\Model\Search\ItemCollectionProvider">
+        <arguments>
+            <argument name="factories" xsi:type="array">
+                <item name="doofinder" xsi:type="object">doofinderAdvancedCollectionFactory</item>
+            </argument>
         </arguments>
     </type>
 

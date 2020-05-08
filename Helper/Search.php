@@ -69,14 +69,15 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
      * Perform a doofinder search on given key.
      *
      * @param string $queryText
-     * @param array $filters
-     * @return array The array od product ids from first page.
+     * @param array $options
+     * @return array The array of product ids
      */
-    public function performDoofinderSearch($queryText, array $filters = [])
+    public function performDoofinderSearch($queryText, array $options = [])
     {
         $hashId = $this->storeConfig->getHashId($this->getStoreCode());
         $apiKey = $this->storeConfig->getApiKey();
         $limit = $this->storeConfig->getSearchRequestLimit();
+        $options['rpp'] = $limit;
 
         $client = $this->searchFactory->create($hashId, $apiKey);
 
@@ -84,10 +85,7 @@ class Search extends \Magento\Framework\App\Helper\AbstractHelper
             $results = $client->query(
                 $queryText,
                 null,
-                [
-                    'rpp' => $limit,
-                    'filter' => $filters
-                ]
+                $options
             );
         } catch (\Doofinder\Api\Search\Error $e) {
             $results = null;
