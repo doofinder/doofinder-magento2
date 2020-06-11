@@ -3,7 +3,9 @@
 namespace Doofinder\Feed\Model\AdditionalAttributes\Provider;
 
 use Doofinder\Feed\Model\AdditionalAttributes\AttributesProviderInterface;
-use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider;
+use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory;
+use Magento\Eav\Model\Config;
+use Magento\Catalog\Model\Product;
 
 /**
  * Class Magento
@@ -12,9 +14,14 @@ use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider;
 class Magento implements AttributesProviderInterface
 {
     /**
-     * @var DataProvider
+     * @var CollectionFactory
      */
-    private $dataProvider;
+    private $collectionFactory;
+
+    /**
+     * @var Config
+     */
+    private $eavConfig;
 
     /**
      * @var array
@@ -23,11 +30,15 @@ class Magento implements AttributesProviderInterface
 
     /**
      * Magento constructor.
-     * @param DataProvider $dataProvider
+     * @param CollectionFactory $collectionFactory
+     * @param Config $eavConfig
      */
-    public function __construct(DataProvider $dataProvider)
-    {
-        $this->dataProvider = $dataProvider;
+    public function __construct(
+        CollectionFactory $collectionFactory,
+        Config $eavConfig
+    ) {
+        $this->collectionFactory = $collectionFactory;
+        $this->eavConfig = $eavConfig;
     }
 
     /**
@@ -37,7 +48,8 @@ class Magento implements AttributesProviderInterface
     public function getAttributes()
     {
         if (!$this->magentoAttributes) {
-            $attributes = $this->dataProvider->getSearchableAttributes();
+            $eavType = $this->eavConfig->getEntityType(Product::ENTITY);
+            $attributes = $this->collectionFactory->create()->setEntityTypeFilter($eavType);
             foreach ($attributes as $attribute) {
                 $this->magentoAttributes[] = $attribute->getAttributeCode();
             }

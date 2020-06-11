@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Eav\Model\Validator\Attribute\Code"
+                type="Doofinder\Feed\Model\Eav\Validator\Attribute\DoofinderCode"/>
     <type name="Magento\Config\Model\Config">
         <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
     </type>
@@ -159,13 +162,6 @@
             </argument>
         </arguments>
     </type>
-    <type name="Magento\AdvancedSearch\Model\SuggestedQueries">
-        <arguments>
-            <argument name="data" xsi:type="array">
-                <item name="doofinder" xsi:type="string">Magento\AdvancedSearch\Model\DataProvider\Suggestions</item>
-            </argument>
-        </arguments>
-    </type>
     <type name="Magento\Tax\Model\Config">
         <plugin name="doofinderFeedTaxConfig" type="Doofinder\Feed\Model\Tax\Plugin\Config"/>
     </type>
@@ -175,28 +171,9 @@
                 type="Doofinder\Feed\Plugin\LayerResolver"/>
     </type>
 
-    <virtualType name="doofinderSearchCriteriaResolverFactory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection\SearchCriteriaResolverFactory">
-        <arguments>
-            <argument name="instanceName" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Fulltext\Collection\SearchCriteriaResolver</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="doofinderSearchResultApplier\Factory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection\SearchResultApplierFactory">
-        <arguments>
-            <argument name="instanceName" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Fulltext\Collection\SearchResultApplier</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="doofinderTotalRecordsResolver\Factory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection\TotalRecordsResolverFactory">
-        <arguments>
-            <argument name="instanceName" xsi:type="string">Doofinder\Feed\Model\ResourceModel\Fulltext\Collection\TotalRecordsResolver</argument>
-        </arguments>
-    </virtualType>
-
     <virtualType name="doofinderFulltextSearchCollection" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
         <arguments>
             <argument name="searchRequestName" xsi:type="string">quick_search_container</argument>
-            <argument name="searchCriteriaResolverFactory" xsi:type="object">doofinderSearchCriteriaResolverFactory</argument>
-            <argument name="searchResultApplierFactory" xsi:type="object">doofinderSearchResultApplier\Factory</argument>
-            <argument name="totalRecordsResolverFactory" xsi:type="object">doofinderTotalRecordsResolver\Factory</argument>
         </arguments>
     </virtualType>
     <virtualType name="doofinderFulltextSearchCollectionFactory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory">
@@ -208,9 +185,6 @@
     <virtualType name="doofinderAdvancedCollection" type="Magento\CatalogSearch\Model\ResourceModel\Advanced\Collection">
         <arguments>
             <argument name="searchRequestName" xsi:type="string">advanced_search_container</argument>
-            <argument name="searchCriteriaResolverFactory" xsi:type="object">doofinderSearchCriteriaResolverFactory</argument>
-            <argument name="searchResultApplierFactory" xsi:type="object">doofinderSearchResultApplier\Factory</argument>
-            <argument name="totalRecordsResolverFactory" xsi:type="object">doofinderTotalRecordsResolver\Factory</argument>
         </arguments>
     </virtualType>
     <virtualType name="doofinderAdvancedCollectionFactory" type="Magento\CatalogSearch\Model\ResourceModel\Advanced\CollectionFactory">
@@ -222,9 +196,6 @@
     <virtualType name="doofinderCategoryCollection" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
         <arguments>
             <argument name="searchRequestName" xsi:type="string">catalog_view_container</argument>
-            <argument name="searchCriteriaResolverFactory" xsi:type="object">doofinderSearchCriteriaResolverFactory</argument>
-            <argument name="searchResultApplierFactory" xsi:type="object">doofinderSearchResultApplier\Factory</argument>
-            <argument name="totalRecordsResolverFactory" xsi:type="object">doofinderTotalRecordsResolver\Factory</argument>
         </arguments>
     </virtualType>
     <virtualType name="doofinderCategoryCollectionFactory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory">
@@ -241,13 +212,6 @@
     <type name="Doofinder\Feed\Model\Layer\Category\ItemCollectionProvider">
         <arguments>
             <argument name="collectionFactory" xsi:type="object">doofinderCategoryCollectionFactory</argument>
-        </arguments>
-    </type>
-    <type name="Magento\CatalogSearch\Model\Search\ItemCollectionProvider">
-        <arguments>
-            <argument name="factories" xsi:type="array">
-                <item name="doofinder" xsi:type="object">doofinderAdvancedCollectionFactory</item>
-            </argument>
         </arguments>
     </type>
 
@@ -304,7 +268,6 @@
             <argument name="entityMetadata" xsi:type="object">doofinderSearchEntityMetadata</argument>
         </arguments>
     </type>
-
 
     <type name="Doofinder\Feed\Search\Aggregation\Builder">
         <arguments>
