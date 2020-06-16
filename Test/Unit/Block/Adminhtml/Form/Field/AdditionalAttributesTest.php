@@ -42,7 +42,7 @@ class AdditionalAttributesTest extends \Magento\Framework\TestFramework\Unit\Bas
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
 

@@ -34,7 +34,7 @@ class ProductTest extends AbstractIntegrity
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp() : void
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 

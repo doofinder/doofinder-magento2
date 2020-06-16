@@ -27,7 +27,7 @@ class PerformDelayedUpdatesTest extends \Magento\Framework\TestFramework\Unit\Ba
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
 

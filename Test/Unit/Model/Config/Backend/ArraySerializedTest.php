@@ -42,7 +42,7 @@ class ArraySerializedTest extends \Magento\Framework\TestFramework\Unit\BaseTest
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
 

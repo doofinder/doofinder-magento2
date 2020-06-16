@@ -17,7 +17,7 @@ class SerializerTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
 

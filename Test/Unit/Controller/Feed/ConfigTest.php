@@ -65,7 +65,7 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
 
