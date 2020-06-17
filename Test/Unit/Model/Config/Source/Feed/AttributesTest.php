@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Model\Config\Source\Feed;
 /**
  * Test class for \Doofinder\Feed\Model\Config\Source\Feed\Attributes
  */
-class AttributesTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class AttributesTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Model\Config\Source\Feed\Attributes
@@ -27,10 +27,8 @@ class AttributesTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->catalogProvider = $this->getMockBuilder(\Doofinder\Feed\Model\Attributes\Catalog::class)
             ->setMethods(['toOptionArray'])
             ->disableOriginalConstructor()

@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Model\Generator\Map;
 /**
  * Test class for \Doofinder\Feed\Model\Generator\Map\Product
  */
-class ProductTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class ProductTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Model\Generator\Map\Product
@@ -47,10 +47,8 @@ class ProductTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->category = $this->getMockBuilder(\Magento\Catalog\Model\Category::class)
             ->disableOriginalConstructor()
             ->getMock();

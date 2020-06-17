@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Model\Attributes;
 /**
  * Test class for \Doofinder\Feed\Model\Attributes\Catalog
  */
-class CatalogTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class CatalogTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Model\Attributes\Catalog
@@ -32,10 +32,8 @@ class CatalogTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->eavConfig = $this->getMockBuilder(\Magento\Eav\Model\Config::class)
             ->disableOriginalConstructor()
             ->getMock();

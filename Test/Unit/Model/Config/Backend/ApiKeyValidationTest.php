@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\ApiKeyValidation
  */
-class ApiKeyValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -32,10 +32,8 @@ class ApiKeyValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
             ->disableOriginalConstructor()
             ->getMock();

@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\System\Config;
 /**
  * Test class for \Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled
  */
-class InternalSearchEnabledTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class InternalSearchEnabledTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Magento\Framework\Data\Form\Element\AbstractElement
@@ -37,10 +37,8 @@ class InternalSearchEnabledTest extends \Magento\Framework\TestFramework\Unit\Ba
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->element = $this->getMockBuilder(\Magento\Framework\Data\Form\Element\AbstractElement::class)
             ->setMethods(array_merge(
                 get_class_methods(\Magento\Framework\Data\Form\Element\AbstractElement::class),

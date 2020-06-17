@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Helper;
 /**
  * Test class for \Doofinder\Feed\Helper\Serializer
  */
-class SerializerTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class SerializerTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Helper\Serializer
@@ -17,10 +17,8 @@ class SerializerTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->helper = $this->objectManager->getObject(
             \Doofinder\Feed\Helper\Serializer::class
         );

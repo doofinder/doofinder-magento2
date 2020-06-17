@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\ArraySerialized
  */
-class ArraySerializedTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class ArraySerializedTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Magento\Framework\Model\Context
@@ -42,10 +42,8 @@ class ArraySerializedTest extends \Magento\Framework\TestFramework\Unit\BaseTest
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->context = $this->getMockBuilder(\Magento\Framework\Model\Context::class)
             ->disableOriginalConstructor()
             ->getMock();

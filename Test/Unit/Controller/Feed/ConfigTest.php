@@ -7,7 +7,7 @@ namespace Doofinder\Feed\Test\Unit\Controller\Feed;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class ConfigTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Controller\Feed\Config
@@ -65,10 +65,8 @@ class ConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
             ->disableOriginalConstructor()
             ->getMock();

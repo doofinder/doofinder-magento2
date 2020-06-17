@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Cron;
 /**
  * Test class for \Doofinder\Feed\Helper\Indexer
  */
-class IndexerTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class IndexerTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Helper\Indexer
@@ -42,10 +42,8 @@ class IndexerTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
             ->disableOriginalConstructor()
             ->getMock();

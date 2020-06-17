@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Plugin\CatalogSearch\Model\Adminhtml\System\C
 /**
  * Test class for \Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine
  */
-class EngineTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class EngineTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -32,10 +32,8 @@ class EngineTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
             ->disableOriginalConstructor()
             ->getMock();
