@@ -70,6 +70,9 @@ class Update implements MapInterface
             $fetcher->clear();
         }
 
+        $documents = array_filter($documents, function ($document) {
+            return isset($document['id']);
+        });
         return $documents;
     }
 }
