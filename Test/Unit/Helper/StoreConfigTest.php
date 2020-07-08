@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Helper;
 /**
  * Test class for \Doofinder\Feed\Helper\StoreConfig
  */
-class StoreConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class StoreConfigTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
@@ -47,10 +47,8 @@ class StoreConfigTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->scopeConfig = $this->getMockBuilder(\Magento\Framework\App\Config\ScopeConfigInterface::class)
             ->disableOriginalConstructor()
             ->getMock();

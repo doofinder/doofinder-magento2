@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Cron;
 /**
  * Test class for \Doofinder\Feed\Cron\PerformDelayedUpdates
  */
-class PerformDelayedUpdatesTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class PerformDelayedUpdatesTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Cron\PerformDelayedUpdates
@@ -27,10 +27,8 @@ class PerformDelayedUpdatesTest extends \Magento\Framework\TestFramework\Unit\Ba
      *
      * @return void
      */
-    public function setUp()
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->helper = $this->getMockBuilder(\Doofinder\Feed\Helper\Indexer::class)
             ->disableOriginalConstructor()
             ->getMock();

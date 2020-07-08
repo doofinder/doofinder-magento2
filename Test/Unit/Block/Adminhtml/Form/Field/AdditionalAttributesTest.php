@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Block\Adminhtml\Form\Field;
 /**
  * Test class for \Doofinder\Feed\Block\Adminhtml\Form\Field\AdditionalAttributes
  */
-class AdditionalAttributesTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class AdditionalAttributesTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Magento\Framework\View\Element\Context
@@ -42,10 +42,8 @@ class AdditionalAttributesTest extends \Magento\Framework\TestFramework\Unit\Bas
      *
      * @return void
      */
-    public function setUp()
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->context = $this->getMockBuilder(\Magento\Framework\View\Element\Context::class)
             ->disableOriginalConstructor()
             ->getMock();

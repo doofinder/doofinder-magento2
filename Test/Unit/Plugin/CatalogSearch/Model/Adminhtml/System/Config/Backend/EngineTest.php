@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Plugin\CatalogSearch\Model\Adminhtml\System\C
 /**
  * Test class for \Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine
  */
-class EngineTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class EngineTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -32,10 +32,8 @@ class EngineTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -85,10 +83,11 @@ class EngineTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      * Test beforeSave() method when search engine is invalid
      *
      * @return void
-     * @expectedException \Magento\Framework\Exception\ValidatorException
      */
     public function testBeforeSaveInvalidSearchEngine()
     {
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
+
         $this->engine->method('getValue')->willReturn('doofinder');
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
         $this->storeConfig->method('getStoreCodes')->willReturn(['store1', 'store3']);
@@ -118,11 +117,11 @@ class EngineTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
      * Test beforeSave() method when search engine is invalid
      *
      * @return void
-     * @expectedException \Magento\Framework\Exception\ValidatorException
      */
     public function testBeforeSaveNoApiKey()
     {
         $this->engine->method('getValue')->willReturn('doofinder');
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
         $this->plugin->beforeSave($this->engine);
     }
 }

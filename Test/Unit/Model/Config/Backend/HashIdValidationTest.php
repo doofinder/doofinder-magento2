@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\HashIdValidation
  */
-class HashIdValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class HashIdValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -32,10 +32,8 @@ class HashIdValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
      *
      * @return void
      */
-    public function setUp()
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -98,12 +96,12 @@ class HashIdValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
      * Test save() with empty hash id with engine enabled
      *
      * @return void
-     * @expectedException \Magento\Framework\Exception\ValidatorException
      */
     public function testSaveEmtpyEngineEnabled()
     {
         $this->resource->expects($this->never())->method('save');
         $this->storeConfig->method('isInternalSearchEnabled')->willReturn(true);
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
 
         $this->model->setValue(null);
         $this->model->save();
@@ -131,7 +129,6 @@ class HashIdValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
      * Test save() method
      *
      * @return void
-     * @expectedException \Magento\Framework\Exception\ValidatorException
      */
     public function testSaveNotUnique()
     {
@@ -141,6 +138,7 @@ class HashIdValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
         $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
             'sample_hash_id_2' => [],
         ]);
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
 
         $this->model->setValue('sample_hash_id_2');
         $this->model->save();
@@ -150,7 +148,6 @@ class HashIdValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
      * Test save() method with unavailable engine
      *
      * @return void
-     * @expectedException \Magento\Framework\Exception\ValidatorException
      */
     public function testSaveEngineNotAvailable()
     {
@@ -158,6 +155,7 @@ class HashIdValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
 
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
         $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([]);
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
 
         $this->model->setValue('sample_hash_id');
         $this->model->save();
