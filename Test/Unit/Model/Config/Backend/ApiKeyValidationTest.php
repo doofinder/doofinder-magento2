@@ -5,7 +5,7 @@ namespace Doofinder\Feed\Test\Unit\Model\Config\Backend;
 /**
  * Test class for \Doofinder\Feed\Model\Config\Backend\ApiKeyValidation
  */
-class ApiKeyValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTestCase
+class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
 {
     /**
      * @var \Doofinder\Feed\Helper\StoreConfig
@@ -32,10 +32,8 @@ class ApiKeyValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
      *
      * @return void
      */
-    public function setUp()
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->storeConfig = $this->getMockBuilder(\Doofinder\Feed\Helper\StoreConfig::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -76,12 +74,12 @@ class ApiKeyValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
      * Test save() method with empty value with engine enabled
      *
      * @return void
-     * @expectedException \Magento\Framework\Exception\ValidatorException
      */
     public function testSaveEmptyEngineEnabled()
     {
         $this->resource->expects($this->never())->method('save');
         $this->storeConfig->method('isInternalSearchEnabled')->willReturn(true);
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
 
         $this->model->setValue(null);
         $this->model->save();
@@ -122,13 +120,12 @@ class ApiKeyValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
      *
      * @param  string $value
      * @return void
-     * @expectedException \Magento\Framework\Exception\ValidatorException
      * @dataProvider providerTestSaveInvalidFormat
      */
     public function testSaveInvalidFormat($value)
     {
         $this->resource->expects($this->never())->method('save');
-
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
         $this->model->setValue($value);
         $this->model->save();
     }
@@ -154,7 +151,6 @@ class ApiKeyValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
      * Test save() method with invalid api key
      *
      * @return void
-     * @expectedException \Magento\Framework\Exception\ValidatorException
      */
     public function testSaveInvalidApiKey()
     {
@@ -162,6 +158,7 @@ class ApiKeyValidationTest extends \Magento\Framework\TestFramework\Unit\BaseTes
         $this->search->method('getDoofinderSearchEngines')->will(
             $this->throwException(new \Doofinder\Api\Management\Errors\NotAllowed())
         );
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
 
         $this->model->setValue('eu1-0000000000000000000000000000000000000000');
         $this->model->save();

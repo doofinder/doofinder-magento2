@@ -2,12 +2,12 @@
 
 namespace Doofinder\Feed\Test\Integration\Helper;
 
-use Magento\TestFramework\TestCase\AbstractIntegrity;
+use Doofinder\FeedCompatibility\Test\Integration\Base;
 
 /**
  * Test class for \Doofinder\Feed\Helper\Product
  */
-class ProductTest extends AbstractIntegrity
+class ProductTest extends Base
 {
     /**
      * @var \Doofinder\Feed\Helper\Product
@@ -34,7 +34,7 @@ class ProductTest extends AbstractIntegrity
      *
      * @return void
      */
-    public function setUp()
+    protected function setupTests()
     {
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
