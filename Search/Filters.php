@@ -4,6 +4,7 @@ namespace Doofinder\Feed\Search;
 
 use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\Price as PriceNameResolver;
 use Magento\Framework\Search\RequestInterface;
+use Magento\Framework\Api\SortOrder;
 
 /**
  * Class Filters
@@ -50,11 +51,16 @@ class Filters
             return $filters;
         }
         foreach ($request->getSort() as $sort) {
+            $direction = $sort['direction'];
+            if ($direction instanceof SortOrder) {
+                $direction = $direction->getDirection();
+            }
+
             if ($sort['field'] == 'price') {
-                $filters['sort'][] = [$this->priceNameResolver->getFiledName() => $sort['direction']];
+                $filters['sort'][] = [$this->priceNameResolver->getFiledName() => $direction];
                 continue;
             }
-            $filters['sort'][] = [$sort['field'] => $sort['direction']];
+            $filters['sort'][] = [$sort['field'] => $direction];
         }
 
         return $filters;
