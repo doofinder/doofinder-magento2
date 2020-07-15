@@ -1,8 +1,6 @@
 dist: trusty
 sudo: true
 language: php
-# php:
-#   - '7.1.3'
 
 services:
   - mysql
@@ -13,14 +11,16 @@ cache:
 
 matrix:
   include:
-  - php: 7.0.24
-    env: MAGENTO_VERSION=2.2.8
-  - php: 7.0.24
-    env: MAGENTO_VERSION=2.2.9
-  - php: 7.1.3
+  - php: 7.0
+    env: MAGENTO_VERSION=2.2.6
+  - php: 7.1
+    env: MAGENTO_VERSION=2.2.11
+  - php: 7.1
     env: MAGENTO_VERSION=2.3.1
-  - php: 7.1.3
-    env: MAGENTO_VERSION=2.3.2
+  - php: 7.2
+    env: MAGENTO_VERSION=2.3.3
+  - php: 7.3
+    env: MAGENTO_VERSION=2.3.5-p1
 
 env:
   global:
@@ -49,14 +49,9 @@ before_install:
 
 install:
   - composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition "$MAGENTO_PATH" "$MAGENTO_VERSION"
-  - composer config -d "$MAGENTO_PATH" minimum-stability "dev" 2>/dev/null
   - |-
     composer config -d "$MAGENTO_PATH" repositories.0 "{\"type\": \"path\", \"url\": \"$TRAVIS_BUILD_DIR\"}" 2>/dev/null
     composer config -d "$MAGENTO_PATH" repositories.1 "{\"type\": \"composer\", \"url\": \"https://repo.magento.com/\"}" 2>/dev/null
-    if [[ "$MAGENTO_VERSION" == *"2.1"* ]]; then
-      sed -i 's#"phpunit/phpunit": "4\.1\.0"#"phpunit/phpunit": "\~5\.1\.0"#' "$MAGENTO_PATH"/composer.json
-      composer update -d "$MAGENTO_PATH"
-    fi
   - composer require -d "$MAGENTO_PATH" "$MODULE_NAME @dev"
   - cp Test/ci/phpunit.unit.xml "$MAGENTO_PATH/dev/tests/unit/phpunit.xml"
   - cp Test/ci/phpunit.integration.xml "$MAGENTO_PATH/dev/tests/integration/phpunit.xml"
