@@ -6,6 +6,8 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
  * Store config helper
+ * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+ * @SuppressWarnings(PHPMD.ElseExpression)
  */
 class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -114,7 +116,8 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCurrentStore()
     {
-        if ($storeId = $this->_request->getParam('store')) {
+        $storeId = $this->_request->getParam('store');
+        if ($storeId) {
             return $this->storeManager->getStore($storeId);
         }
         return $this->storeManager->getStore();
@@ -149,7 +152,8 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $stores = [];
 
-        if ($websiteId = $this->_request->getParam('website')) {
+        $websiteId = $this->_request->getParam('website');
+        if ($websiteId) {
             $storeIds = $this->storeWebsiteRelation
                 ->getStoreByWebsiteId($websiteId);
 
@@ -183,7 +187,8 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getStoreCodes($onlyActive = true, $all = false)
     {
-        if (!$all && $storeId = $this->_request->getParam('store')) {
+        $storeId = $this->_request->getParam('store');
+        if (!$all && $storeId) {
             return [$this->storeManager->getStore($storeId)->getCode()];
         }
 
@@ -235,6 +240,33 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getApiKey()
     {
         return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/api_key');
+    }
+
+    /**
+     * @return string
+     */
+    public function getSearchServer()
+    {
+        return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/search_server');
+    }
+
+    /**
+     * @return string
+     */
+    public function getManagementServer()
+    {
+        return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/management_server');
+    }
+
+    /**
+     * Get value from store config save request. If it's not set, use the default one
+     * @return string
+     */
+    public function getManagementServerFromRequest()
+    {
+        $params = $this->_request->getParam('groups');
+        return $params['doofinder_account']['fields']['management_server']['value']
+            ?? $this->getManagementServer();
     }
 
     /**

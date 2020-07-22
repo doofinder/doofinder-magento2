@@ -13,7 +13,7 @@ class EngineTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
     private $storeConfig;
 
     /**
-     * @var \Doofinder\Feed\Helper\Search
+     * @var \Doofinder\Feed\Model\Api\SearchEngine
      */
     private $search;
 
@@ -38,7 +38,7 @@ class EngineTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->search = $this->getMockBuilder(\Doofinder\Feed\Helper\Search::class)
+        $this->search = $this->getMockBuilder(\Doofinder\Feed\Model\Api\SearchEngine::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -52,7 +52,7 @@ class EngineTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
             \Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Backend\Engine::class,
             [
                 'storeConfig' => $this->storeConfig,
-                'search' => $this->search,
+                'searchEngine' => $this->search,
             ]
         );
     }
@@ -67,14 +67,32 @@ class EngineTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
         $this->engine->method('getValue')->willReturn('doofinder');
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
         $this->storeConfig->method('getStoreCodes')->willReturn(['store1', 'store2']);
+        $this->storeConfig->method('getManagementServer')->willReturn('eu1-api.doofinder.con');
+        $this->storeConfig->method('getSearchServer')->willReturn('eu1-search.doofinder.con');
         $this->storeConfig->method('getHashId')->will($this->returnValueMap([
             ['store1', 'some_hash_1'],
             ['store2', 'some_hash_2'],
         ]));
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
+        $this->search->method('getSearchEngines')->willReturn([
             'some_hash_1' => [],
             'some_hash_2' => [],
         ]);
+
+        $this->plugin->beforeSave($this->engine);
+    }
+
+    /**
+     * @return void
+     */
+    public function testBeforeSaveWithoutServers()
+    {
+        $this->engine->method('getValue')->willReturn('doofinder');
+        $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
+        $this->storeConfig->method('getStoreCodes')->willReturn(['store1', 'store2']);
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
+        $this->expectExceptionMessage(
+            'Please configure Search and/or Management server address before enabling Doofinder search engine.'
+        );
 
         $this->plugin->beforeSave($this->engine);
     }
@@ -95,7 +113,7 @@ class EngineTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
             ['store1', 'some_hash_1'],
             ['store3', 'some_hash_3'],
         ]));
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
+        $this->search->method('getSearchEngines')->willReturn([
             'some_hash_1' => [],
             'some_hash_2' => [],
         ]);

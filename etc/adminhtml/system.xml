@@ -28,7 +28,7 @@
                 <field id="api_key"
                        translate="label"
                        type="text"
-                       sortOrder="1"
+                       sortOrder="10"
                        showInDefault="1"
                        showInStore="0"
                        showInWebsite="0">
@@ -36,6 +36,30 @@
                     <backend_model>Doofinder\Feed\Model\Config\Backend\ApiKeyValidation</backend_model>
                     <comment>
                         <![CDATA[ You need a Management API Key. Search-only keys won't work. ]]>
+                    </comment>
+                </field>
+                <field id="search_server"
+                       translate="label"
+                       type="text"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInStore="0"
+                       showInWebsite="0">
+                    <label>Search server</label>
+                    <comment>
+                        <![CDATA[ Address for the search server (eg. eu1-search.doofinder.com) ]]>
+                    </comment>
+                </field>
+                <field id="management_server"
+                       translate="label"
+                       type="text"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInStore="0"
+                       showInWebsite="0">
+                    <label>Management server</label>
+                    <comment>
+                        <![CDATA[ Address for the management server (eg. eu1-api.doofinder.com) ]]>
                     </comment>
                 </field>
             </group>

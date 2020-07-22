@@ -34,6 +34,7 @@ class RouteParamsResolver
      * @param boolean $unsetOldParams
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
      */
     public function beforeSetRouteParams(

@@ -52,7 +52,10 @@ class Adapter implements AdapterInterface
     public function query(RequestInterface $request)
     {
         $queryResults = $this->fetcher->fetch($request);
-        $documents = $this->getDocuments($queryResults[FetcherInterface::KEY_IDS]);
+        $documents = $this->getDocuments(
+            $queryResults[FetcherInterface::KEY_IDS],
+            $queryResults[FetcherInterface::KEY_TOTAL]
+        );
         $aggregations = $this->aggregationBuilder->build($request, $queryResults);
 
         $response = [
@@ -65,16 +68,14 @@ class Adapter implements AdapterInterface
 
     /**
      * @param array $rawResponse
-     * @return mixed
+     * @param integer $total
+     * @return array
      */
-    private function getDocuments(array $rawResponse)
+    private function getDocuments(array $rawResponse, $total)
     {
-        $score = count($rawResponse);
-
         foreach ($rawResponse as &$item) {
-            $item['_score'] = $score--;
+            $item['_score'] = $total--;
         }
-
         return $rawResponse;
     }
 }

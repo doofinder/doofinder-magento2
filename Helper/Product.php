@@ -9,6 +9,8 @@ use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
  * Product helper
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ElseExpression)
+ * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
  */
 class Product extends \Magento\Framework\App\Helper\AbstractHelper
 {

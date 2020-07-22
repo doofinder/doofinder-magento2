@@ -13,7 +13,7 @@ class HashIdValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
     private $storeConfig;
 
     /**
-     * @var \Doofinder\Feed\Helper\Search
+     * @var \Doofinder\Feed\Model\Api\SearchEngine
      */
     private $search;
 
@@ -45,7 +45,7 @@ class HashIdValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
             ['sample2', 'sample_hash_id_2'],
         ]));
 
-        $this->search = $this->getMockBuilder(\Doofinder\Feed\Helper\Search::class)
+        $this->search = $this->getMockBuilder(\Doofinder\Feed\Model\Api\SearchEngine::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -57,7 +57,7 @@ class HashIdValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
             \Doofinder\Feed\Model\Config\Backend\HashIdValidation::class,
             [
                 'storeConfig' => $this->storeConfig,
-                'search' => $this->search,
+                'searchEngine' => $this->search,
                 'resource' => $this->resource,
             ]
         );
@@ -71,7 +71,7 @@ class HashIdValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
     public function testSave()
     {
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
+        $this->search->method('getSearchEngines')->willReturn([
             'sample_hash_id' => [],
         ]);
 
@@ -117,7 +117,7 @@ class HashIdValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
         $this->resource->expects($this->once())->method('save');
 
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
+        $this->search->method('getSearchEngines')->willReturn([
             'sample_current_hash_id' => [],
         ]);
 
@@ -135,7 +135,7 @@ class HashIdValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
         $this->resource->expects($this->never())->method('save');
 
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([
+        $this->search->method('getSearchEngines')->willReturn([
             'sample_hash_id_2' => [],
         ]);
         $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
@@ -154,7 +154,7 @@ class HashIdValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
         $this->resource->expects($this->never())->method('save');
 
         $this->storeConfig->method('getApiKey')->willReturn('some-api-key');
-        $this->search->method('getDoofinderSearchEngines')->with('some-api-key')->willReturn([]);
+        $this->search->method('getSearchEngines')->willReturn([]);
         $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
 
         $this->model->setValue('sample_hash_id');

@@ -8,19 +8,14 @@ namespace Doofinder\Feed\Plugin\CatalogSearch\Model\Adminhtml\System\Config\Back
 class Engine
 {
     /**
-     * Search engine identifier
-     */
-    const SEARCH_ENGINE = 'doofinder';
-
-    /**
      * @var \Doofinder\Feed\Helper\StoreConfig
      */
     private $storeConfig;
 
     /**
-     * @var \Doofinder\Feed\Helper\Search
+     * @var \Doofinder\Feed\Model\Api\SearchEngine
      */
-    private $search;
+    private $searchEngine;
 
     /**
      * @var \Magento\Framework\Message\ManagerInterface
@@ -31,16 +26,16 @@ class Engine
      * Constructor
      *
      * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Doofinder\Feed\Helper\Search $search
+     * @param \Doofinder\Feed\Model\Api\SearchEngine $searchEngine
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
      */
     public function __construct(
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Helper\Search $search,
+        \Doofinder\Feed\Model\Api\SearchEngine $searchEngine,
         \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
         $this->storeConfig = $storeConfig;
-        $this->search = $search;
+        $this->searchEngine = $searchEngine;
         $this->messageManager = $messageManager;
     }
 
@@ -63,15 +58,22 @@ class Engine
             return $value;
         }
 
-        if (!$apiKey = $storeConfig->getApiKey()) {
+        if (!$storeConfig->getApiKey()) {
             throw new \Magento\Framework\Exception\ValidatorException(
                 __('Provide API key before enabling Doofinder search engine.')
             );
         }
 
-        $searchEngines = $this->search->getDoofinderSearchEngines($apiKey);
+        if (!$storeConfig->getManagementServer() || !$storeConfig->getSearchServer()) {
+            throw new \Magento\Framework\Exception\ValidatorException(
+                __('Please configure Search and/or Management server address before enabling Doofinder search engine.')
+            );
+        }
+
+        $searchEngines = $this->searchEngine->getSearchEngines();
         foreach ($storeConfig->getStoreCodes(false) as $storeCode) {
-            if (!$hashId = $storeConfig->getHashId($storeCode)) {
+            $hashId = $storeConfig->getHashId($storeCode);
+            if (!$hashId) {
                 throw new \Magento\Framework\Exception\ValidatorException(__(
                     'HashID for store %1 is required. ' .
                     'Please, set it before enabling Doofinder search engine.',

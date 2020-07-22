@@ -5,6 +5,8 @@
         <doofinder_config_config>
             <doofinder_account>
                 <api_key></api_key>
+                <management_server></management_server>
+                <search_server></search_server>
             </doofinder_account>
             <doofinder_search_engine>
                 <hash_id></hash_id>
