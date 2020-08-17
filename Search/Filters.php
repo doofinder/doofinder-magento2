@@ -3,6 +3,7 @@
 namespace Doofinder\Feed\Search;
 
 use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\Price as PriceNameResolver;
+use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\CategoryPosition as CategoryPositionNameResolver;
 use Magento\Framework\Search\RequestInterface;
 use Magento\Framework\Api\SortOrder;
 
@@ -18,12 +19,21 @@ class Filters
     private $priceNameResolver;
 
     /**
+     * @var CategoryPositionNameResolver
+     */
+    private $catPosNameResolver;
+
+    /**
      * Filters constructor.
      * @param PriceNameResolver $priceNameResolver
+     * @param CategoryPositionNameResolver $catPosNameResolver
      */
-    public function __construct(PriceNameResolver $priceNameResolver)
-    {
+    public function __construct(
+        PriceNameResolver $priceNameResolver,
+        CategoryPositionNameResolver $catPosNameResolver
+    ) {
         $this->priceNameResolver = $priceNameResolver;
+        $this->catPosNameResolver = $catPosNameResolver;
     }
 
     /**
@@ -34,6 +44,7 @@ class Filters
     {
         $filters = ['filter' => [], 'sort' => []];
         $must = $request->getQuery()->getMust();
+        $categoryId = null;
 
         foreach ($must as $filter) {
             $ref = $filter->getReference();
@@ -42,6 +53,9 @@ class Filters
                 $fieldName = $this->priceNameResolver->getFiledName();
                 $filters['filter'][$fieldName] = $this->getPriceFilter($ref);
                 continue;
+            }
+            if ($ref->getField() == 'category_ids') {
+                $categoryId = $ref->getValue();
             }
 
             $filters['filter'][$ref->getField()] = [$ref->getValue()];
@@ -56,11 +70,15 @@ class Filters
                 $direction = $direction->getDirection();
             }
 
-            if ($sort['field'] == 'price') {
-                $filters['sort'][] = [$this->priceNameResolver->getFiledName() => $direction];
-                continue;
+            $fieldName = $sort['field'];
+            if ($fieldName == 'price') {
+                $fieldName = $this->priceNameResolver->getFiledName();
+            } elseif ($fieldName == 'position' && $categoryId) {
+                $fieldName = $this->catPosNameResolver->getFiledName($categoryId);
+            } elseif ($fieldName == 'relevance') {
+                $fieldName = '_score';
             }
-            $filters['sort'][] = [$sort['field'] => $direction];
+            $filters['sort'][] = [$fieldName => $direction];
         }
 
         return $filters;
