@@ -5,6 +5,7 @@ namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 use Doofinder\Feed\Model\Indexer\Data\Map\Update\FetcherInterface;
 use Doofinder\Feed\Model\ResourceModel\Index;
 use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\Category as CategoryFieldNameResolver;
+use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\CategoryPosition as CategoryPositionNameResolver;
 
 /**
  * Class Category
@@ -18,6 +19,11 @@ class Category implements FetcherInterface
     private $index;
 
     /**
+     * @var CategoryPositionNameResolver
+     */
+    private $catPosNameResolver;
+
+    /**
      * @var array|null
      */
     private $processed;
@@ -25,11 +31,14 @@ class Category implements FetcherInterface
     /**
      * Category constructor.
      * @param Index $index
+     * @param CategoryPositionNameResolver $catPosNameResolver
      */
     public function __construct(
-        Index $index
+        Index $index,
+        CategoryPositionNameResolver $catPosNameResolver
     ) {
         $this->index = $index;
+        $this->catPosNameResolver = $catPosNameResolver;
     }
 
     /**
@@ -44,7 +53,11 @@ class Category implements FetcherInterface
 
         foreach ($this->processed as $productId => $categoryIds) {
             unset($this->processed[$productId]);
-            $this->processed[$productId][CategoryFieldNameResolver::ATTR_NAME] = array_keys($categoryIds);
+            foreach ($categoryIds as $categoryId => $categoryPosition) {
+                $this->processed[$productId][CategoryFieldNameResolver::ATTR_NAME][] = $categoryId;
+                $posName = $this->catPosNameResolver->getFiledName($categoryId);
+                $this->processed[$productId][$posName] = $categoryPosition;
+            }
         }
     }
 

@@ -71,11 +71,10 @@ class ItemCollection
     ) {
         // phpcs:enable
         if ($this->engineResolver->getCurrentSearchEngine() == StoreConfig::DOOFINDER_SEARCH_ENGINE_NAME) {
-            if ($this->layerType->getLayerType() == 'category') {
-                return $this->catItemCollection;
-            } elseif ($this->layerType->getLayerType() == 'search') {
+            if ($this->layerType->getLayerType() == 'search') {
                 return $this->searchItemCollection;
             }
+            return $this->catItemCollection;
         }
         return $proceed();
     }
