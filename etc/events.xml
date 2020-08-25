@@ -1,5 +1,9 @@
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="admin_system_config_changed_section_doofinder_config_data_feed">
-        <observer name="doofinder_feed_invalidate_index" instance="Doofinder\Feed\Observer\Indexer" />
+        <observer name="doofinder_feed_invalidate_index" instance="Doofinder\Feed\Observer\Indexer"/>
+    </event>
+    <event name="catalog_entity_attribute_save_before">
+        <observer name="doofinder_validate_attribute_code" instance="Doofinder\Feed\Observer\ValidateAttributeCode"/>
     </event>
 </config>
