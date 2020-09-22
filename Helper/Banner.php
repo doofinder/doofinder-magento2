@@ -49,32 +49,20 @@ class Banner extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getBanner()
     {
-        $bannerData = $this->searchHelper->getDoofinderBannerData();
         $isEnabled = (int) $this->storeConfig->isBannersDisplayEnabled($this->getStoreCode());
+        if (!$isEnabled) {
+            return null;
+        }
 
-        if ($bannerData && $isEnabled) {
-            $this->registerBannerDisplay($bannerData['id']);
+        $bannerData = $this->searchHelper->getDoofinderBannerData();
+
+        if ($bannerData) {
             $bannerData['insertion_point'] = $this->getInsertionPoint();
             $bannerData['insertion_method'] = $this->getInsertionMethod();
             return $bannerData;
         }
 
         return null;
-    }
-
-    /**
-     * Regsiter banner display event for statistics.
-     *
-     * @param integer $bannerId
-     * @return void
-     */
-    private function registerBannerDisplay($bannerId)
-    {
-        $hashId = $this->storeConfig->getHashId($this->getStoreCode());
-        $apiKey = $this->storeConfig->getApiKey();
-        $client = $this->searchFactory->create($hashId, $apiKey);
-
-        $client->registerBannerDisplay($bannerId);
     }
 
     /**
