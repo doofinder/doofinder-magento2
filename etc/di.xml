@@ -160,6 +160,11 @@
             </argument>
         </arguments>
     </type>
+    <type name="Doofinder\Feed\Search\Adapter">
+        <arguments>
+            <argument name="fetcher" xsi:type="object">Doofinder\Feed\Search\Adapter\AllFetcher</argument>
+        </arguments>
+    </type>
     <type name="Magento\Tax\Model\Config">
         <plugin name="doofinderFeedTaxConfig" type="Doofinder\Feed\Model\Tax\Plugin\Config"/>
     </type>
@@ -167,6 +172,13 @@
     <type name="Magento\Catalog\Model\Layer\Resolver">
         <plugin name="doo_set_layer_type"
                 type="Doofinder\Feed\Plugin\LayerResolver"/>
+    </type>
+
+    <type name="Doofinder\Feed\Search\Dynamic\DataProvider\SelectProvider">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+            <argument name="priceTableResolver" xsi:type="object">Magento\Catalog\Model\Indexer\Product\Price\PriceTableResolver</argument>
+        </arguments>
     </type>
 
     <virtualType name="doofinderFulltextSearchCollection" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
