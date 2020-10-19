@@ -18,7 +18,7 @@ class Throttle
     private $obj;
 
     /**
-     * @param object $obj
+     * @param mixed $obj
      */
     public function __construct($obj)
     {

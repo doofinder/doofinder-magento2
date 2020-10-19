@@ -7,7 +7,7 @@ use Magento\Framework\Search\Dynamic\DataProviderInterface;
 
 /**
  * Class Term
- * Builder for term buckets
+ * The class responsible for preparing bucket from Doofinder result.
  */
 class Term
 {
@@ -28,17 +28,21 @@ class Term
     ) {
         // phpcs:enable
         $values = [];
-        if (!isset($queryResult['aggregations'][$bucket->getName()]['buckets'])) {
+        if (!isset($queryResult['aggregation'][$bucket->getField()])) {
             return $values;
         }
-        $buckets = $queryResult['aggregations'][$bucket->getName()]['buckets'];
-        foreach ($buckets as $key => $resultBucket) {
-            $values[$key] = [
-                'value' => $key,
-                'count' => $resultBucket
-            ];
+        $facet = $queryResult['aggregation'][$bucket->getField()];
+
+        if (empty($facet['terms']['buckets'])) {
+            return $values;
         }
 
+        foreach ($facet['terms']['buckets'] as $facetBucket) {
+            $values[$facetBucket['key']] = [
+                'value' => $facetBucket['key'],
+                'count' => $facetBucket['doc_count']
+            ];
+        }
         return $values;
     }
 }

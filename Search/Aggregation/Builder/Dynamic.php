@@ -51,12 +51,10 @@ class Dynamic
         /** @var DynamicBucket $bucket */
         $algorithm = $this->algorithmRepository->get($bucket->getMethod(), ['dataProvider' => $dataProvider]);
 
-        $ids = [];
-        foreach ($queryResult as $product) {
-            if (isset($product['id'])) {
-                $ids[] = $product['id'];
-            }
+        if (!isset($queryResult['ids'])) {
+            return [];
         }
+        $ids = array_values($queryResult['ids']);
         $entityStorage = $this->entityStorageFactory->create($ids);
         $data = $algorithm->getItems($bucket, $dimensions, $entityStorage);
 
@@ -78,7 +76,7 @@ class Dynamic
             $to = is_numeric($value['to']) ? $value['to'] : '*';
             unset($value['from'], $value['to']);
 
-            $rangeName = "{$from}_{$to}";
+            $rangeName = sprintf('%s_%s', $from, $to);
             // phpcs:disable Magento2.Performance.ForeachArrayMerge.ForeachArrayMerge
             $resultData[$rangeName] = array_merge(['value' => $rangeName], $value);
             // phpcs:enable
