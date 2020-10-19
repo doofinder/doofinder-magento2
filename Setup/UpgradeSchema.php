@@ -113,7 +113,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     {
         $table = $this->setup
             ->getConnection()
-            ->newTable(ChangedProduct::TABLE_NAME);
+            ->newTable($this->setup->getTable(ChangedProduct::TABLE_NAME));
 
         $table->addColumn(
             ChangedProduct::FIELD_ID,
@@ -165,7 +165,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->getConnection();
 
         $connection->modifyColumn(
-            ChangedProduct::TABLE_NAME,
+            $this->setup->getTable(ChangedProduct::TABLE_NAME),
             ChangedProduct::FIELD_ID,
             [
                 'type' => Table::TYPE_BIGINT,
@@ -177,7 +177,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         );
 
         $connection->addColumn(
-            ChangedProduct::TABLE_NAME,
+            $this->setup->getTable(ChangedProduct::TABLE_NAME),
             ChangedProduct::FIELD_STORE_CODE,
             [
                 'type' => Table::TYPE_TEXT,
@@ -209,7 +209,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             return 'doofinder_config_index/feed_attributes/' . $path;
         }, $attributesToRemove);
 
-        $connection->delete('core_config_data', ['path IN (?)' => $attributesToRemove]);
+        $connection->delete($this->setup->getTable('core_config_data'), ['path IN (?)' => $attributesToRemove]);
     }
 
     /**
@@ -222,7 +222,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $path = 'doofinder_config_index/feed_attributes/additional_attributes';
         // phpcs:ignore Ecg.Performance.FetchAll.Found
         $attrs = $connection->fetchAll(
-            $connection->select()->from('core_config_data')->where('path = ?', $path)
+            $connection->select()->from($this->setup->getTable('core_config_data'))->where('path = ?', $path)
         );
 
         if ($attrs) {
