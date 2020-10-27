@@ -75,7 +75,7 @@ class Dynamic
         $resultData = [];
         foreach ($data as $value) {
             $from = is_numeric($value['from']) ? $value['from'] : '*';
-            $to = is_numeric($value['to']) ? $value['to'] : '*';
+            $to = is_numeric($value['to']) ? $value['to'] : '';
             unset($value['from'], $value['to']);
 
             $rangeName = "{$from}_{$to}";
