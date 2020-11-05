@@ -2,6 +2,8 @@
 
 namespace Doofinder\Feed\Model\Indexer\Data\Map\Update;
 
+use Magento\Framework\Phrase;
+
 /**
  * Class Builder
  * The class responsible for building product data for index
@@ -50,13 +52,40 @@ class Builder
             if (count($value) == 0) {
                 return [$field => $value];
             }
+
             $fields = [];
-            foreach ($value as $key => $val) {
-                $fields[$field][$key] = $val;
+            foreach ($value as $val) {
+                $val = $this->filterValue($val);
+                if (!$val) {
+                    continue;
+                }
+                $fields[$field][] = $this->filterValue($val);
             }
             return $fields;
         }
+
+        $value = $this->filterValue($value);
+        if (!$value) {
+            return [];
+        }
         return [$field => $value];
+    }
+
+    /**
+     * @param mixed $val
+     * @return mixed
+     */
+    private function filterValue($val)
+    {
+        if ($val instanceof Phrase) {
+            // Make sure that Phrase object is converted into string
+            return $val->render();
+        }
+        if (is_array($val) || is_object($val) || is_resource($val)) {
+            // Do not try to index multidimensional arrays/objects/resources
+            return null;
+        }
+        return $val;
     }
 
     /**
