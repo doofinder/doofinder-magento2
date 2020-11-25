@@ -78,6 +78,14 @@ class AllFetcher implements FetcherInterface
         // make the first request
         $results = $this->search->performDoofinderSearch($queryString, $filters);
 
+        if (!$results) {
+            return [
+                self::KEY_AGGREGATIONS => [],
+                self::KEY_IDS => [],
+                self::KEY_TOTAL => 0
+            ];
+        }
+
         // calculate needed requests based on the number of available products from API
         $resultsRequests = ceil((int) $results->getProperty('total') / $productsLimit);
         $resultsRequests--;
