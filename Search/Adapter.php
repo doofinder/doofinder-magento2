@@ -3,10 +3,9 @@
 namespace Doofinder\Feed\Search;
 
 use Magento\Framework\Search\AdapterInterface;
-use Doofinder\Feed\Helper\Search;
 use Magento\Framework\Search\RequestInterface;
 use Magento\Framework\Search\Response\QueryResponse;
-use Magento\Framework\Search\Request\QueryInterface;
+use Doofinder\Feed\Search\Adapter\FetcherInterface;
 
 /**
  * Class Adapter
@@ -25,48 +24,24 @@ class Adapter implements AdapterInterface
     private $aggregationBuilder;
 
     /**
-     * @var Search
+     * @var FetcherInterface
      */
-    private $search;
-
-    /**
-     * @var Filters
-     */
-    private $filters;
-
-    /**
-     * @var Cache
-     */
-    private $cache;
-
-    /**
-     * @var RequestAggregation
-     */
-    private $requestAggregation;
+    private $fetcher;
 
     /**
      * Adapter constructor.
      * @param ResponseFactory $responseFactory
      * @param Aggregation\Builder $aggregationBuilder
-     * @param Search $search
-     * @param Filters $filters
-     * @param Cache $cache
-     * @param RequestAggregation $requestAggregation
+     * @param FetcherInterface $fetcher
      */
     public function __construct(
         ResponseFactory $responseFactory,
         Aggregation\Builder $aggregationBuilder,
-        Search $search,
-        Filters $filters,
-        Cache $cache,
-        RequestAggregation $requestAggregation
+        FetcherInterface $fetcher
     ) {
         $this->responseFactory = $responseFactory;
         $this->aggregationBuilder = $aggregationBuilder;
-        $this->search = $search;
-        $this->filters = $filters;
-        $this->cache = $cache;
-        $this->requestAggregation = $requestAggregation;
+        $this->fetcher = $fetcher;
     }
 
     /**
@@ -76,63 +51,30 @@ class Adapter implements AdapterInterface
      */
     public function query(RequestInterface $request)
     {
-        $query = $request->getQuery();
-        $filters = $this->filters->get($request);
-
-        $rawResponse = $this->getDocuments(
-            $this->getQueryString($query),
-            $filters
-        );
-        $this->cache->setResponse($rawResponse);
-        $rawDocuments = $rawResponse;
-
-        $buckets = $request->getAggregation();
-        $aggregatesBuckets = $this->requestAggregation->get($buckets, $rawResponse);
-        $rawResponse['aggregations'] = $aggregatesBuckets;
-        $aggregations = $this->aggregationBuilder->build($request, $rawResponse);
+        $queryResults = $this->fetcher->fetch($request);
+        $documents = $this->getDocuments($queryResults[FetcherInterface::KEY_IDS]);
+        $aggregations = $this->aggregationBuilder->build($request, $queryResults);
 
         $response = [
-            'documents' => $rawDocuments,
+            'documents' => $documents,
             'aggregations' => $aggregations,
-            'total' => count($rawDocuments),
+            'total' => $queryResults[FetcherInterface::KEY_TOTAL],
         ];
         return $this->responseFactory->create($response);
     }
 
     /**
-     * Executes query and return raw response
-     *
-     * @param string $queryText
-     * @param array $filters
-     * @return array
+     * @param array $rawResponse
+     * @return mixed
      */
-    private function getDocuments($queryText, array $filters = [])
+    private function getDocuments(array $rawResponse)
     {
-        $results = $this->search->performDoofinderSearch($queryText, $filters);
-        $score = count($results);
+        $score = count($rawResponse);
 
-        foreach ($results as &$item) {
+        foreach ($rawResponse as &$item) {
             $item['_score'] = $score--;
         }
 
-        return $results;
-    }
-
-    /**
-     * Get query string
-     *
-     * @notice This may not be the right way
-     *
-     * @param QueryInterface $query
-     * @return string
-     */
-    private function getQueryString(QueryInterface $query)
-    {
-        $should = $query->getShould();
-        if (isset($should['search'])) {
-            return $should['search']->getValue();
-        }
-
-        return '';
+        return $rawResponse;
     }
 }

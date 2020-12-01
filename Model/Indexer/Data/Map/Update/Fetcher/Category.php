@@ -54,7 +54,7 @@ class Category implements FetcherInterface
         foreach ($this->processed as $productId => $categoryIds) {
             unset($this->processed[$productId]);
             foreach ($categoryIds as $categoryId => $categoryPosition) {
-                $this->processed[$productId][CategoryFieldNameResolver::ATTR_NAME][] = $categoryId;
+                $this->processed[$productId][CategoryFieldNameResolver::ATTR_NAME][] = (string) $categoryId;
                 $posName = $this->catPosNameResolver->getFiledName($categoryId);
                 $this->processed[$productId][$posName] = $categoryPosition;
             }
