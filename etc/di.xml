@@ -295,4 +295,6 @@
             </argument>
         </arguments>
     </type>
+
+    <preference for="Magento\CatalogSearch\Model\Layer\Filter\Price" type="Doofinder\Feed\Model\Layer\Filter\Price" />
 </config>
