@@ -65,9 +65,6 @@ class Builder
         }
 
         $value = $this->filterValue($value);
-        if (!$value) {
-            return [];
-        }
         return [$field => $value];
     }
 
