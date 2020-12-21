@@ -55,11 +55,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const DOOFINDER_SEARCH_ENGINE_NAME = 'doofinder';
 
     /**
-     * Search request limit used in query to Doofinder
-     */
-    const DOOFINDER_SEARCH_REQUEST_LIMIT = 100;
-
-    /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
@@ -305,16 +300,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             $this->getScopeStore(),
             $storeCode
         );
-    }
-
-    /**
-     * Get request limit for Doofinder search.
-     *
-     * @return integer
-     */
-    public function getSearchRequestLimit()
-    {
-        return self::DOOFINDER_SEARCH_REQUEST_LIMIT;
     }
 
     /**
