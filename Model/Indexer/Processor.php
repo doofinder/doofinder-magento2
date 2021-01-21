@@ -50,6 +50,9 @@ class Processor
             return;
         }
 
+        // reset indexes
+        $products = array_values($products);
+
         $this->performInStore($store, function () use ($store, $products) {
             $this->performUpdate($products);
         });
@@ -67,6 +70,9 @@ class Processor
         if (empty($productIds)) {
             return;
         }
+
+        // reset indexes
+        $productIds = array_values($productIds);
 
         $this->performInStore($store, function () use ($store, $productIds) {
             $this->performDelete($productIds);
