@@ -47,6 +47,11 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const SEARCH_ENGINE_CONFIG = 'doofinder_config_config/doofinder_search_engine';
 
     /**
+     * Path to statistics settings in config.xml/core_config_data
+     */
+    const STATS_CONFIG = 'doofinder_config_config/doofinder_stats';
+
+    /**
      * Path to catalog search engine setting
      */
     const CATALOG_SEARCH_ENGINE_CONFIG = 'catalog/search/engine';
@@ -461,6 +466,36 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::BANNERS_CONFIG . '/insertion_method',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Get selector for search result container.
+     *
+     * @param string|null $storeCode
+     * @return string
+     */
+    public function getSearchResultContainer($storeCode = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::STATS_CONFIG . '/search_product_container',
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
+    /**
+     * Get selector for search result link.
+     *
+     * @param string|null $storeCode
+     * @return string
+     */
+    public function getSearchResultLink($storeCode = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::STATS_CONFIG . '/search_product_link',
             $this->getScopeStore(),
             $storeCode
         );

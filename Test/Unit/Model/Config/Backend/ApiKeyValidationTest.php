@@ -108,7 +108,7 @@ class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
         $apiKey = 'eu1-0000000000000000000000000000000000000000';
         $this->resource->expects($this->never())->method('save');
         $this->search->method('getSearchEngines')->with($apiKey)->will(
-            $this->throwException(new \Doofinder\Management\Errors\NotAllowed())
+            $this->throwException(new \Doofinder\Management\Errors\NotAllowed('Error', 0, null, 'Error'))
         );
         $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
 

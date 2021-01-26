@@ -62,7 +62,7 @@ class Banner
      */
     public function registerBannerClick($bannerId)
     {
-        $this->search->registerBannerDisplay($bannerId);
+        $this->search->registerBannerClick($bannerId);
     }
 
     /**

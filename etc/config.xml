@@ -21,6 +21,10 @@
                 <insertion_point>.page-title</insertion_point>
                 <insertion_method>after</insertion_method>
             </doofinder_banners>
+            <doofinder_stats>
+                <search_product_container>.product-item</search_product_container>
+                <search_product_link>.product-item-photo, .product-item-link</search_product_link>
+            </doofinder_stats>
         </doofinder_config_config>
         <doofinder_config_index>
             <feed_attributes>

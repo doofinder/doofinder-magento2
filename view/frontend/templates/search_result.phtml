@@ -1,0 +1,19 @@
+<?php
+/**
+ * @var \Doofinder\Feed\Block\SearchResult $block
+ */
+?>
+
+<?php if ($block->isDoofinderEngineEnabled()): ?>
+    <script type="text/x-magento-init">
+        {
+            ".<?= $block->escapeQuote($block->getItemAnchorClass()) ?>": {
+                "doofinder/searchResult": {
+                    "registerClickUrl": "<?= $block->escapeJs($block->getAjaxUrl()) ?>",
+                    "productContainer": "<?= $block->escapeJs($block->getSearchResultContainer()) ?>",
+                    "productLink": "<?= $block->escapeJs($block->getSearchResultLink()) ?>"
+                }
+            }
+        }
+    </script>
+<?php endif; ?>

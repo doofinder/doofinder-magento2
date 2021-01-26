@@ -69,14 +69,33 @@ class Search
 
     /**
      * @param string|integer $bannerId
+     * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    // phpcs:disable
-    public function registerBannerDisplay($bannerId)
+    public function registerBannerClick($bannerId)
     {
-        // @TODO: implement this method
+        $hashId = $this->storeConfig->getHashId();
+        $this->getClient()->registerImageClick('', $hashId, $bannerId);
     }
-    // phpcs:enable
+
+    /**
+     * @param string|integer $productId
+     * @param string|null $query
+     * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function registerResultClick($productId, $query = null)
+    {
+        $hashId = $this->storeConfig->getHashId();
+
+        $options = [
+            'datatype' => 'product'
+        ];
+        if ($query) {
+            $options['query'] = $query;
+        }
+        $this->getClient()->registerClick('', $hashId, $productId, $options);
+    }
 
     /**
      * Init Doofinder Search from Doofinder API Library
