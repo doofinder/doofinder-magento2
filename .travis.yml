@@ -1,9 +1,10 @@
-dist: trusty
+dist: xenial
 root: true
 language: php
 
 services:
   - mysql
+  - elasticsearch
 
 cache:
   directories:
@@ -21,6 +22,8 @@ matrix:
     env: MAGENTO_VERSION=2.3.3
   - php: 7.3
     env: MAGENTO_VERSION=2.3.5-p1
+  - php: 7.4
+    env: MAGENTO_VERSION=2.4.1
 
 env:
   global:
@@ -39,7 +42,7 @@ env:
     - secure: DfmHJm+tis7WTjtvJKnxxPlXrd7jbRNgRKzhOScaW2Jo3vHSm09WZKiLFyR9ZoHoAnKbft2cyKGRw2pPlfZBe9/GwUVhTp6ndFKuNDVFyoRoVMJb+B9TS/LLCqtOy+NsUV2l6lDfeU8XNuKY6cVpznaL3Vugc5AhWsG96M+eZesaOjvr9zp35Y92iHhiYHvh16WlBhw+6Jjz2sGFawIP1cjC3tge6KYQrpvI5Jd+1q943NtnAr+t2IobI0KuNPie2K49T1W5WBijSL7xqAnQoUsc/Svu2WahrLjxQnE5HUQ0G2xut884ZYwRNROMItLtSDl7Sr18ZREyuK8WBGwuNoAxkNCSRh++4m4rNAjl0KeuyI/wJlyNPzAbCBYHH+IxdC06qriK8BPejeoB4nRbZd7aUX1QjD6Lrskm4n2o30yOK98WkvEYUkmNTG0qUkFSA2gHCPbOAiRbt2rS3eFtDGsrZy4Fr6o/RdYnu9D2x3Jutc9USPMCrPTzJBhjfn3fc8yvfFxKfqSxSzB4jhgC06iSTXzlo4xv4fOYg2xrsHr8JFc3GLt+WiwtEq9g9FlUTXJN4U6KmVabCqSlYSfAfK6w4iqUQYIjUbYR8m51u/kyGJb3rFwWyXJIgtKMgfink8i3MW8u5u2f4X8hAvFEjSB2JKpAV+p3Sm23HNkYBgo=
 
 before_install:
-  - composer self-update --rollback || composer --version
+  - composer self-update --1 || composer --version
   - mysql -e 'CREATE DATABASE magento_integration_tests;'
   - mysql -e "GRANT ALL PRIVILEGES ON magento_integration_tests.* TO 'magento'@'localhost' IDENTIFIED BY 'magento';"
   - mysql -e 'FLUSH PRIVILEGES;'
@@ -54,13 +57,11 @@ install:
     composer config -d "$MAGENTO_PATH" repositories.0 "{\"type\": \"path\", \"url\": \"$TRAVIS_BUILD_DIR\"}" 2>/dev/null
     composer config -d "$MAGENTO_PATH" repositories.1 "{\"type\": \"composer\", \"url\": \"https://repo.magento.com/\"}" 2>/dev/null
   - composer require -d "$MAGENTO_PATH" "$MODULE_NAME @dev"
-  - cp Test/ci/phpunit.unit.xml "$MAGENTO_PATH/dev/tests/unit/phpunit.xml"
-  - cp Test/ci/phpunit.integration.xml "$MAGENTO_PATH/dev/tests/integration/phpunit.xml"
   - cp Test/ci/install-config-mysql.php "$MAGENTO_PATH/dev/tests/integration/etc/install-config-mysql.php"
 
 script:
-  - bash -c 'cd "$MAGENTO_PATH/dev/tests/unit" && php ../../../vendor/bin/phpunit'
-  - bash -c 'cd "$MAGENTO_PATH/dev/tests/integration" && php ../../../vendor/bin/phpunit'
+  - bash -c 'cd "$MAGENTO_PATH/dev/tests/unit" && php ../../../vendor/bin/phpunit ../../../vendor/doofinder/doofinder-magento2/Test/Unit'
+  - bash -c 'cd "$MAGENTO_PATH/dev/tests/integration" && php ../../../vendor/bin/phpunit ../../../vendor/doofinder/doofinder-magento2/Test/Integration'
 
 before_deploy:
   - git archive --format=zip -o doofinder-magento2.zip $TRAVIS_TAG
