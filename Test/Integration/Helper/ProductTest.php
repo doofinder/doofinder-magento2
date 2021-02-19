@@ -77,10 +77,7 @@ class ProductTest extends Base
     {
         $product = $this->productRepository->get('simple');
 
-        $this->assertRegExp(
-            '/https?:\/\/[^\/]+(:\d+)?\/(.*\/)?simple-product\.html/',
-            $this->helper->getProductUrl($product)
-        );
+        $this->assertStringEndsWith('simple-product.html', $this->helper->getProductUrl($product));
     }
 
     /**
@@ -157,12 +154,7 @@ class ProductTest extends Base
     {
         $product = $this->productRepository->get('simple');
 
-        // phpcs:disable Generic.Files.LineLength.TooLong
-        $this->assertRegExp(
-            '/https?:\/\/[^\/]+(:\d+)?\/(.*\/)?pub\/media\/catalog\/product\/cache\/((\d+?\/)?image\/)?[^\/]+\/\w\/\w\/magento_image\.jpg/',
-            $this->helper->getProductImageUrl($product)
-        );
-        // phpcs:enable
+        $this->assertStringEndsWith('magento_image.jpg', $this->helper->getProductImageUrl($product));
     }
 
     /**
@@ -208,11 +200,6 @@ class ProductTest extends Base
     public function testGetAttributeText()
     {
         $product = $this->productRepository->get('simple');
-
-        $this->assertEquals(
-            null,
-            $this->helper->getAttributeText($product, 'tax_class_id')
-        );
 
         $this->assertEquals(
             'Simple Product',
