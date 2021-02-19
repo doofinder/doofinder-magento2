@@ -40,10 +40,7 @@ class InternalSearchEnabledTest extends \Doofinder\FeedCompatibility\Test\Unit\B
     protected function setupTests()
     {
         $this->element = $this->getMockBuilder(\Magento\Framework\Data\Form\Element\AbstractElement::class)
-            ->setMethods(array_merge(
-                get_class_methods(\Magento\Framework\Data\Form\Element\AbstractElement::class),
-                ['setText', 'setComment']
-            ))
+            ->setMethods(['setText', 'setComment', 'getHtmlId', 'getElementHtml'])
             ->disableOriginalConstructor()
             ->getMock();
 
