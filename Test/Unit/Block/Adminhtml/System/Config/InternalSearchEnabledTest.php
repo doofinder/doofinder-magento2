@@ -101,9 +101,7 @@ class InternalSearchEnabledTest extends \Doofinder\FeedCompatibility\Test\Unit\B
 
         $this->element->expects($this->once())->method('setText')->with('Internal search is disabled.');
         $this->element->expects($this->once())->method('setComment')->with(__(
-            'You can enable it %1 by choosing Doofinder in Search Engine field. '
-            . 'Enabling internal search requires catalog\'s Update On Save index mode. '
-            . 'Index mode will be automatically changed.',
+            'You can enable it %1 by choosing Doofinder in Search Engine field.',
             '<a href="http://example.com/link">here</a>'
         ));
 

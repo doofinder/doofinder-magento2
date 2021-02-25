@@ -4,12 +4,14 @@ namespace Doofinder\Feed\Search;
 
 use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\Price as PriceNameResolver;
 use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\CategoryPosition as CategoryPositionNameResolver;
+use Magento\Framework\Search\Request\QueryInterface;
 use Magento\Framework\Search\RequestInterface;
 use Magento\Framework\Api\SortOrder;
 
 /**
  * Class Filters
  * The class responsible for translating Magento filters for Doofinder engine
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 class Filters
 {
@@ -45,6 +47,7 @@ class Filters
         $filters = ['filter' => [], 'sort' => []];
         $must = $request->getQuery()->getMust();
         $categoryId = null;
+        $filters['query'] = $this->getQueryString($request->getQuery());
 
         foreach ($must as $filter) {
             $ref = $filter->getReference();
@@ -64,6 +67,7 @@ class Filters
         if (!method_exists($request, 'getSort')) {
             return $filters;
         }
+
         foreach ($request->getSort() as $sort) {
             $direction = $sort['direction'];
             if ($direction instanceof SortOrder) {
@@ -98,5 +102,19 @@ class Filters
             $filter['to'] = $ref->getTo();
         }
         return $filter;
+    }
+
+    /**
+     * @param QueryInterface $query
+     * @return string
+     */
+    private function getQueryString(QueryInterface $query)
+    {
+        $should = $query->getShould();
+        if (isset($should['search'])) {
+            return $should['search']->getValue();
+        }
+
+        return '';
     }
 }

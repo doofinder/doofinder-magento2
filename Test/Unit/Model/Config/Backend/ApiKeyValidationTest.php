@@ -13,7 +13,7 @@ class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
     private $storeConfig;
 
     /**
-     * @var \Doofinder\Feed\Helper\Search
+     * @var \Doofinder\Feed\Model\Api\SearchEngine
      */
     private $search;
 
@@ -38,7 +38,7 @@ class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->search = $this->getMockBuilder(\Doofinder\Feed\Helper\Search::class)
+        $this->search = $this->getMockBuilder(\Doofinder\Feed\Model\Api\SearchEngine::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -50,7 +50,7 @@ class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
             \Doofinder\Feed\Model\Config\Backend\ApiKeyValidation::class,
             [
                 'storeConfig' => $this->storeConfig,
-                'search' => $this->search,
+                'searchEngine' => $this->search,
                 'resource' => $this->resource,
             ]
         );
@@ -88,63 +88,14 @@ class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
     /**
      * Test save() method valid format validation
      *
-     * @param  string $value
      * @return void
-     * @dataProvider providerTestSaveValidFormat
      */
-    public function testSaveValidFormat($value)
+    public function testSaveValidFormat()
     {
         $this->resource->expects($this->once())->method('save');
 
-        $this->model->setValue($value);
+        $this->model->setValue('eu1-abcdef0123456789abcdef0123456789abcdef01');
         $this->model->save();
-    }
-
-    /**
-     * Data provider for 'testSaveValidFormat'
-     *
-     * @return array
-     */
-    public function providerTestSaveValidFormat()
-    {
-        return [
-            ['eu1-abcdef0123456789abcdef0123456789abcdef01'],
-            ['eu1-0123456789abcdef0123456789abcdef01234567'],
-            ['us1-abcdef0123456789abcdef0123456789abcdef01'],
-            ['us1-0123456789abcdef0123456789abcdef01234567'],
-        ];
-    }
-
-    /**
-     * Test save() method invalid format validation
-     *
-     * @param  string $value
-     * @return void
-     * @dataProvider providerTestSaveInvalidFormat
-     */
-    public function testSaveInvalidFormat($value)
-    {
-        $this->resource->expects($this->never())->method('save');
-        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
-        $this->model->setValue($value);
-        $this->model->save();
-    }
-
-    /**
-     * Data provider for 'testSaveInvalidFormat'
-     *
-     * @return array
-     */
-    public function providerTestSaveInvalidFormat()
-    {
-        return [
-            ['foo'],
-            ['foo-bar'],
-            ['eu1-foo'],
-            ['eu1-abcdef0123456789abcdef-0123456789abcdef0'],
-            ['eu1-abcdefg0123456789abcdef0123456789abcdef0'],
-            ['eu1-abcdef0123456789abcdef0123456789abcdef0'],
-        ];
     }
 
     /**
@@ -154,13 +105,14 @@ class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
      */
     public function testSaveInvalidApiKey()
     {
+        $apiKey = 'eu1-0000000000000000000000000000000000000000';
         $this->resource->expects($this->never())->method('save');
-        $this->search->method('getDoofinderSearchEngines')->will(
-            $this->throwException(new \Doofinder\Api\Management\Errors\NotAllowed())
+        $this->search->method('getSearchEngines')->with($apiKey)->will(
+            $this->throwException(new \Doofinder\Management\Errors\NotAllowed('Error', 0, null, 'Error'))
         );
         $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
 
-        $this->model->setValue('eu1-0000000000000000000000000000000000000000');
+        $this->model->setValue($apiKey);
         $this->model->save();
     }
 }

@@ -2,44 +2,34 @@
 
 namespace Doofinder\Feed\Helper;
 
+use Doofinder\Feed\Model\Api\Search;
+
 /**
  * Banner helper
  */
-class Banner extends \Magento\Framework\App\Helper\AbstractHelper
+class Banner
 {
     /**
-     * @var \Doofinder\Feed\Helper\Search
+     * @var Search
      */
-    private $searchHelper;
+    private $search;
 
     /**
-     * @var \Doofinder\Feed\Helper\StoreConfig
+     * @var StoreConfig
      */
     private $storeConfig;
 
     /**
-     * @var \Doofinder\Feed\Search\SearchClientFactory
-     */
-    private $searchFactory;
-
-    /**
      * Banner constructor.
-     *
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Doofinder\Feed\Helper\Search $searchHelper
-     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Doofinder\Feed\Search\SearchClientFactory $searchFactory
+     * @param Search $search
+     * @param StoreConfig $storeConfig
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Doofinder\Feed\Helper\Search $searchHelper,
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Search\SearchClientFactory $searchFactory
+        Search $search,
+        StoreConfig $storeConfig
     ) {
-        $this->searchHelper = $searchHelper;
+        $this->search = $search;
         $this->storeConfig = $storeConfig;
-        $this->searchFactory = $searchFactory;
-        parent::__construct($context);
     }
 
     /**
@@ -49,13 +39,12 @@ class Banner extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getBanner()
     {
-        $isEnabled = (int) $this->storeConfig->isBannersDisplayEnabled($this->getStoreCode());
+        $isEnabled = (bool) $this->storeConfig->isBannersDisplayEnabled($this->getStoreCode());
         if (!$isEnabled) {
             return null;
         }
 
-        $bannerData = $this->searchHelper->getDoofinderBannerData();
-
+        $bannerData = $this->search->getBannerData();
         if ($bannerData) {
             $bannerData['insertion_point'] = $this->getInsertionPoint();
             $bannerData['insertion_method'] = $this->getInsertionMethod();
@@ -66,18 +55,14 @@ class Banner extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Regsiter banner click event for statistics.
+     * Register banner click event for statistics.
      *
      * @param integer $bannerId
      * @return void
      */
     public function registerBannerClick($bannerId)
     {
-        $hashId = $this->storeConfig->getHashId($this->getStoreCode());
-        $apiKey = $this->storeConfig->getApiKey();
-        $client = $this->searchFactory->create($hashId, $apiKey);
-
-        $client->registerBannerClick($bannerId);
+        $this->search->registerBannerClick($bannerId);
     }
 
     /**

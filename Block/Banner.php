@@ -2,26 +2,31 @@
 
 namespace Doofinder\Feed\Block;
 
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
+use Doofinder\Feed\Helper\Banner as Helper;
+
 /**
  * Class Banner
  * The class responsible for rendering Doofinder Banner
  */
-class Banner extends \Magento\Framework\View\Element\Template
+class Banner extends Template
 {
     /**
-     * @var \Doofinder\Feed\Helper\Banner
+     * @var Helper
      */
-    private $banner;
+    private $helper;
 
     /**
-     * @param \Doofinder\Feed\Helper\Banner $banner
-     * @param \Magento\Framework\View\Element\Template\Context $context
+     * Banner constructor.
+     * @param Context $context
+     * @param Helper $helper
      */
     public function __construct(
-        \Doofinder\Feed\Helper\Banner $banner,
-        \Magento\Framework\View\Element\Template\Context $context
+        Context $context,
+        Helper $helper
     ) {
-        $this->banner = $banner;
+        $this->helper = $helper;
         parent::__construct($context);
     }
 
@@ -32,7 +37,7 @@ class Banner extends \Magento\Framework\View\Element\Template
      */
     public function getBanner()
     {
-        return $this->banner->getBanner();
+        return $this->helper->getBanner();
     }
 
     /**

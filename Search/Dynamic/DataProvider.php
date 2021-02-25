@@ -13,6 +13,7 @@ use Magento\Framework\Search\Dynamic\IntervalInterface;
 /**
  * Class DataProvider
  * The class responsible for providing dynamic prices
+ * @SuppressWarnings(PHPMD.UnusedFormalParameter)
  */
 class DataProvider implements DataProviderInterface
 {

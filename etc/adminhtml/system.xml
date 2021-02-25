@@ -10,7 +10,7 @@
         <section id="doofinder_config_config"
                  translate="label"
                  type="text"
-                 sortOrder="1"
+                 sortOrder="10"
                  showInDefault="1"
                  showInStore="1"
                  showInWebsite="1">
@@ -20,7 +20,7 @@
             <group id="doofinder_account"
                     translate="label"
                     type="text"
-                    sortOrder="1"
+                    sortOrder="10"
                     showInDefault="1"
                     showInWebsite="0"
                     showInStore="0">
@@ -28,7 +28,7 @@
                 <field id="api_key"
                        translate="label"
                        type="text"
-                       sortOrder="1"
+                       sortOrder="10"
                        showInDefault="1"
                        showInStore="0"
                        showInWebsite="0">
@@ -38,11 +38,35 @@
                         <![CDATA[ You need a Management API Key. Search-only keys won't work. ]]>
                     </comment>
                 </field>
+                <field id="search_server"
+                       translate="label"
+                       type="text"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInStore="0"
+                       showInWebsite="0">
+                    <label>Search server</label>
+                    <comment>
+                        <![CDATA[ Address for the search server (eg. eu1-search.doofinder.com) ]]>
+                    </comment>
+                </field>
+                <field id="management_server"
+                       translate="label"
+                       type="text"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInStore="0"
+                       showInWebsite="0">
+                    <label>Management server</label>
+                    <comment>
+                        <![CDATA[ Address for the management server (eg. eu1-api.doofinder.com) ]]>
+                    </comment>
+                </field>
             </group>
             <group id="doofinder_search_engine"
                     translate="label"
                     type="text"
-                    sortOrder="1"
+                    sortOrder="20"
                     showInDefault="1"
                     showInWebsite="0"
                     showInStore="1">
@@ -50,7 +74,7 @@
                 <field id="hash_id"
                        translate="label"
                        type="text"
-                       sortOrder="1"
+                       sortOrder="10"
                        showInDefault="0"
                        showInStore="1"
                        showInWebsite="0">
@@ -63,7 +87,7 @@
                 <field id="internal_search_enabled"
                        translate="label"
                        type="note"
-                       sortOrder="2"
+                       sortOrder="20"
                        showInDefault="1"
                        showInStore="0"
                        showInWebsite="0">
@@ -74,7 +98,7 @@
             <group id="doofinder_layer"
                    translate="label"
                    type="text"
-                   sortOrder="2"
+                   sortOrder="30"
                    showInDefault="1"
                    showInWebsite="0"
                    showInStore="1">
@@ -82,7 +106,7 @@
                 <field id="enabled"
                        translate="label"
                        type="select"
-                       sortOrder="1"
+                       sortOrder="10"
                        showInDefault="1"
                        showInStore="1"
                        showInWebsite="1">
@@ -95,7 +119,7 @@
                 <field id="script"
                        translate="label"
                        type="textarea"
-                       sortOrder="2"
+                       sortOrder="20"
                        showInDefault="0"
                        showInStore="1"
                        showInWebsite="0">
@@ -109,7 +133,7 @@
             <group id="doofinder_banners"
                    translate="label"
                    type="text"
-                   sortOrder="2"
+                   sortOrder="40"
                    showInDefault="1"
                    showInWebsite="0"
                    showInStore="1">
@@ -117,7 +141,7 @@
                 <field id="enabled"
                        translate="label"
                        type="select"
-                       sortOrder="1"
+                       sortOrder="10"
                        showInDefault="1"
                        showInStore="1"
                        showInWebsite="1">
@@ -130,7 +154,7 @@
                 <field id="insertion_point"
                        translate="label"
                        type="text"
-                       sortOrder="1"
+                       sortOrder="20"
                        showInDefault="1"
                        showInStore="1"
                        showInWebsite="1">
@@ -139,7 +163,7 @@
                 <field id="insertion_method"
                        translate="label"
                        type="select"
-                       sortOrder="1"
+                       sortOrder="30"
                        showInDefault="1"
                        showInStore="1"
                        showInWebsite="1">
@@ -147,92 +171,75 @@
                     <source_model>Doofinder\Feed\Model\Config\Source\Banner\Insertion</source_model>
                 </field>
             </group>
+            <group id="doofinder_stats"
+                   translate="label"
+                   type="text"
+                   sortOrder="50"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Statistics</label>
+                <field id="search_product_container"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="10"
+                       canRestore="1"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Product container in search results</label>
+                    <comment>CSS selector for the individual product container on the search results page.</comment>
+                </field>
+                <field id="search_product_link"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="20"
+                       canRestore="1"
+                       showInDefault="1"
+                       showInStore="1"
+                       showInWebsite="1">
+                    <label>Product link(s) in search results</label>
+                    <comment>
+                        <![CDATA[CSS selector for the product link(s) in the container on the search results page. It should point to &lt;a&gt; element(s).]]>
+                    </comment>
+                </field>
+            </group>
         </section>
         <section id="doofinder_config_index"
                 translate="label"
                 type="text"
-                sortOrder="2"
+                sortOrder="20"
                 showInDefault="1"
                 showInWebsite="1"
                 showInStore="1">
             <label>Index Settings</label>
             <tab>doofinder_config</tab>
             <resource>Doofinder_Feed::config</resource>
-            <group id="feed_attributes"
-            translate="label"
-            type="text"
-            sortOrder="2"
-            showInDefault="1"
-            showInWebsite="1"
-            showInStore="1">
-                <label>Attributes</label>
-                <field id="brand"
-                    translate="label"
-                    type="select"
-                    sortOrder="4"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Brand</label>
-                    <source_model>doofinderAttributesAll</source_model>
-                </field>
-                <field id="image_link"
-                    translate="label"
-                    type="select"
-                    sortOrder="7"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Image link</label>
-                    <source_model>doofinderAttributesImages</source_model>
-                </field>
-                <field id="mpn"
-                    translate="label"
-                    type="select"
-                    sortOrder="10"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>MPN</label>
-                    <source_model>doofinderAttributesAll</source_model>
-                </field>
-                <field id="additional_attributes"
-                    translate="label comment"
-                    sortOrder="12"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Additional Attributes</label>
-                    <frontend_model>Doofinder\Feed\Block\Adminhtml\Map\Additional</frontend_model>
-                    <backend_model>Doofinder\Feed\Model\Config\Backend\AdditionalAttributes</backend_model>
-                    <comment>Field names must be in lowercase and contain no whitespaces.</comment>
-                </field>
-            </group>
             <group id="feed_settings"
-                translate="label"
-                type="text"
-                sortOrder="1"
-                showInDefault="1"
-                showInWebsite="1"
-                showInStore="1">
+                   translate="label"
+                   type="text"
+                   sortOrder="10"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
                 <label>Settings</label>
                 <field id="export_product_prices"
-                    translate="label"
-                    type="select"
-                    sortOrder="2"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
+                       translate="label"
+                       type="select"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Export Product Prices</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="price_tax_mode"
-                    translate="label"
-                    type="select"
-                    sortOrder="2"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
+                       translate="label"
+                       type="select"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Price Export Mode</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Feed\PriceTaxMode</source_model>
                     <comment>
@@ -240,29 +247,79 @@
                     </comment>
                 </field>
                 <field id="image_size"
-                    translate="label"
-                    type="text"
-                    sortOrder="2"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
+                       translate="label"
+                       type="text"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Image size</label>
                     <comment>
                         <![CDATA[Export product image with given width. Leave empty to use original size.]]>
                     </comment>
                 </field>
                 <field id="categories_in_navigation"
-                    translate="label"
-                    type="select"
-                    sortOrder="10"
-                    showInDefault="1"
-                    showInWebsite="0"
-                    showInStore="1">
+                       translate="label"
+                       type="select"
+                       sortOrder="40"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="1">
                     <label>Export only categories present in navigation menus</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                         <![CDATA[Whether this option is enabled or not, only active categories will be exported.]]>
                     </comment>
+                </field>
+            </group>
+            <group id="feed_attributes"
+                   translate="label"
+                   type="text"
+                   sortOrder="20"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Attributes</label>
+                <field id="brand"
+                       translate="label"
+                       type="select"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Brand</label>
+                    <source_model>doofinderAttributesAll</source_model>
+                </field>
+                <field id="image_link"
+                       translate="label"
+                       type="select"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Image link</label>
+                    <source_model>doofinderAttributesImages</source_model>
+                </field>
+                <field id="mpn"
+                       translate="label"
+                       type="select"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>MPN</label>
+                    <source_model>doofinderAttributesAll</source_model>
+                </field>
+                <field id="additional_attributes"
+                       translate="label comment"
+                       sortOrder="40"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Additional Attributes</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\Map\Additional</frontend_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\AdditionalAttributes</backend_model>
+                    <comment>Field names must be in lowercase and contain no whitespaces.</comment>
                 </field>
             </group>
         </section>

@@ -105,6 +105,14 @@ class IndexerHandler implements IndexerInterface
     }
 
     /**
+     * @return boolean
+     */
+    private function isFullReindex()
+    {
+        return $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_FULL;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param  mixed $dimensions
@@ -129,7 +137,15 @@ class IndexerHandler implements IndexerInterface
         $scopeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
         foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
             $docs = $this->mapper->get('update')->map($batchDocuments, $scopeId);
-            $this->processor->update($scopeId, $docs);
+            if ($this->isFullReindex()) {
+                $this->processor->add($docs, $dimensions);
+                continue;
+            }
+            $this->processor->update($docs, $dimensions);
+        }
+
+        if ($this->isFullReindex()) {
+            $this->processor->switchIndex($dimensions);
         }
     }
 
@@ -159,7 +175,7 @@ class IndexerHandler implements IndexerInterface
         foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
             $docs = $this->mapper->get('delete')->map($batchDocuments, $scopeId);
             // phpcs:disable Ecg.Performance.Loop.ModelLSD
-            $this->processor->delete($scopeId, $docs);
+            $this->processor->delete($docs, $dimensions);
             // phpcs:enable
         }
     }
@@ -167,12 +183,11 @@ class IndexerHandler implements IndexerInterface
     /**
      * {@inheritdoc}
      *
-     * @param  mixed $dimensions
+     * @param mixed $dimensions
      * @return void
      */
     public function cleanIndex($dimensions)
     {
-        $this->indexStructure->delete(null, $dimensions);
         $this->indexStructure->create(null, [], $dimensions);
     }
 

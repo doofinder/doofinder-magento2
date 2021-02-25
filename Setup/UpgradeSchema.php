@@ -13,6 +13,7 @@ use Magento\Framework\App\Cache\Manager;
 use Exception;
 use Magento\Framework\App\Cache\Type\Config;
 use Magento\Framework\Serialize\Serializer\Serialize;
+use Doofinder\Feed\Helper\StoreConfig;
 
 /**
  * Class UpgradeSchema
@@ -46,22 +47,30 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private $phpSerialize;
 
     /**
+     * @var StoreConfig
+     */
+    private $storeConfig;
+
+    /**
      * UpgradeSchema constructor.
      * @param Serializer $serializer
      * @param WriterInterface $configWriter
      * @param Manager $cacheManager
      * @param Serialize $phpserialize
+     * @param StoreConfig $storeConfig
      */
     public function __construct(
         Serializer $serializer,
         WriterInterface $configWriter,
         Manager $cacheManager,
-        Serialize $phpserialize
+        Serialize $phpserialize,
+        StoreConfig $storeConfig
     ) {
         $this->serializer = $serializer;
         $this->configWriter = $configWriter;
         $this->cacheManager = $cacheManager;
         $this->phpSerialize = $phpserialize;
+        $this->storeConfig = $storeConfig;
     }
 
     /**
@@ -98,6 +107,12 @@ class UpgradeSchema implements UpgradeSchemaInterface
             // because during upgrade, some modules can run indexer
             // and Magento will read old values from cache
             // instead of fixed ones from database
+            $this->cacheManager->flush([Config::CACHE_TAG]);
+        }
+
+        if (version_compare($context->getVersion(), '0.3.1', '<')) {
+            // same reason as above
+            $this->configureApiServers();
             $this->cacheManager->flush([Config::CACHE_TAG]);
         }
 
@@ -248,5 +263,42 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 );
             }
         }
+    }
+
+    /**
+     * @return void
+     */
+    private function configureApiServers()
+    {
+        $apiKey = $this->storeConfig->getApiKey();
+        if (!$apiKey) {
+            // api key is not configured
+            return;
+        }
+
+        if ($this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) {
+            // servers are configured
+            return;
+        }
+
+        preg_match('/^.*?\-/', $apiKey, $serverPrefix);
+        if (!$serverPrefix[0]) {
+            // something went wrong, can't find server prefix
+            return;
+        }
+
+        $searchServer = $serverPrefix[0] . 'search.doofinder.com';
+        $managementServer = $serverPrefix[0] . 'api.doofinder.com';
+
+        $searchServerPath = $this->storeConfig::ACCOUNT_CONFIG . '/search_server';
+        $managementServerPath = $this->storeConfig::ACCOUNT_CONFIG . '/management_server';
+        $this->configWriter->save(
+            $searchServerPath,
+            $searchServer
+        );
+        $this->configWriter->save(
+            $managementServerPath,
+            $managementServer
+        );
     }
 }
