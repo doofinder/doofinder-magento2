@@ -21,8 +21,8 @@ class Delete implements MapInterface
     public function map(array $documents, $scopeId)
     {
         // phpcs:enable
-        return array_map(function ($productId) {
+        return array_values(array_map(function ($productId) {
             return ['id' => $productId];
-        }, $documents);
+        }, $documents));
     }
 }

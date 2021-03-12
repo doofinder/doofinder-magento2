@@ -105,10 +105,18 @@ class Indexer
     public function createDoofinderIndexTemp(array $dimensions, $indexName)
     {
         $hashId = $this->getHashId($dimensions);
-        $this->getClient()->createTemporaryIndex(
-            $hashId,
-            $indexName
-        );
+        try {
+            $this->getClient()->createTemporaryIndex(
+                $hashId,
+                $indexName
+            );
+        } catch (\Exception $exception) {
+            $this->getClient()->deleteTemporaryIndex($hashId, $indexName);
+            $this->getClient()->createTemporaryIndex(
+                $hashId,
+                $indexName
+            );
+        }
     }
 
     /**
