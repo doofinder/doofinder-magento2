@@ -94,6 +94,20 @@
                     <label>Use Doofinder for Internal Search</label>
                     <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled</frontend_model>
                 </field>
+                <field id="doofinder_indices_update_mode"
+                       translate="label"
+                       type="select"
+                       sortOrder="30"
+                       showInDefault="0"
+                       showInStore="1"
+                       showInWebsite="0">
+                    <label>Indices Update Mode</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Indices\UpdateMode</source_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\IndicesUpdateModeValidation</backend_model>
+                    <comment>
+                        <![CDATA[ Set which update mode to use. Update using a feed file or update using Doofinder's API. ]]>
+                    </comment>
+                </field>
             </group>
             <group id="doofinder_layer"
                    translate="label"

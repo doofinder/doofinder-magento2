@@ -106,27 +106,16 @@ class IndexerTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
     }
 
     /**
-     * @param boolean $isSearchEnabled
-     * @param boolean $isScheduled
+     * @param boolean $isApiEnable
      * @param boolean $result
      * @return void
      * @dataProvider isDelayedUpdatesEnabledDataProvider
      */
-    public function testIsDelayedUpdatesEnabled($isSearchEnabled, $isScheduled, $result)
+    public function testIsDelayedUpdatesEnabled($isApiEnable, $result)
     {
         $this->storeConfig->expects($this->once())
-            ->method('isInternalSearchEnabled')
-            ->willReturn($isSearchEnabled);
-
-        if ($isSearchEnabled) {
-            $this->indexerRegistry->expects($this->once())
-                ->method('get')
-                ->with(\Magento\CatalogSearch\Model\Indexer\Fulltext::INDEXER_ID)
-                ->willReturn($this->indexer);
-            $this->indexer->expects($this->once())
-                ->method('isScheduled')
-                ->willReturn($isScheduled);
-        }
+            ->method('isUpdateByApiEnable')
+            ->willReturn($isApiEnable);
 
         $this->assertEquals(
             $result,
@@ -140,10 +129,8 @@ class IndexerTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
     public function isDelayedUpdatesEnabledDataProvider()
     {
         return [
-            [true, false, true],
-            [true, true, false],
-            [false, true, false],
-            [false, false, false]
+            [false, false],
+            [true, true]
         ];
     }
 

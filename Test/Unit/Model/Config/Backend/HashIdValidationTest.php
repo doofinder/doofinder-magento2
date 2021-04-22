@@ -88,6 +88,22 @@ class HashIdValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
     {
         $this->resource->expects($this->once())->method('save');
 
+        $this->model->setData('fieldset_data', ['doofinder_indices_update_mode' => 'feed']);
+        $this->model->setValue(null);
+        $this->model->save();
+    }
+
+    /**
+     * Test save() method with empty hash id and indices update mode set to "Doofinder API"
+     *
+     * @return void
+     */
+    public function testSaveEmptyAndDoofinderApi()
+    {
+        $this->resource->method('save');
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
+
+        $this->model->setData('fieldset_data', ['doofinder_indices_update_mode' => 'api']);
         $this->model->setValue(null);
         $this->model->save();
     }
