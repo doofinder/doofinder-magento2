@@ -63,6 +63,8 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
             throw new \Magento\Framework\Exception\ValidatorException(
                 __('HashID cannot be empty when Doofinder engine is enabled.')
             );
+        } else {
+            $this->validateIndiceUpdateMode($hashId);
         }
 
         if ($this->storeConfig->isSingleStoreMode()) {
@@ -139,4 +141,30 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
             );
         }
     }
+
+    /**
+     * Check if, when hash id is null, the indices update mode is not "Doofinder API".
+     *
+     * @param  string $hashId
+     * @return void
+     * @throws \Magento\Framework\Exception\ValidatorException Search engine unavailable.
+     */
+    private function validateIndiceUpdateMode($hashId)
+    {
+        if ($hashId) {
+            return;
+        }
+
+        if ( 
+            $this->getFieldsetDataValue('doofinder_indices_update_mode') == \Doofinder\Feed\Helper\StoreConfig::DOOFINDER_INDICES_UPDATE_API 
+            || ($this->getFieldsetDataValue('doofinder_indices_update_mode') == null && $this->storeConfig->isUpdateByApiEnable())
+        ) {
+            throw new \Magento\Framework\Exception\ValidatorException(
+                __('HashID cannot be empty when Indices Update Mode is "Doofinder API".')
+            );
+        }
+
+        return;
+    }
+        
 }

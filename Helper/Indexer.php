@@ -200,15 +200,7 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isDelayedUpdatesEnabled()
     {
-        if (!$this->storeConfig->isInternalSearchEnabled()) {
-            return false;
-        }
-
-        if ($this->isScheduled()) {
-            return false;
-        }
-
-        return true;
+        return $this->storeConfig->isUpdateByApiEnable();
     }
 
     /**

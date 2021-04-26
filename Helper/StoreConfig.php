@@ -62,6 +62,21 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     const DOOFINDER_SEARCH_ENGINE_NAME = 'doofinder';
 
     /**
+     * Path to indices update mode
+     */
+    const INDICES_UPDATE_MODE = 'doofinder_config_config/doofinder_search_engine/doofinder_indices_update_mode';
+
+    /**
+     * Doofinder indices update type api as update type code
+     */
+    const DOOFINDER_INDICES_UPDATE_API = 'api';
+
+    /**
+     * Doofinder indices update type feed as update type code
+     */
+    const DOOFINDER_INDICES_UPDATE_FEED = 'feed';
+
+    /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
@@ -499,5 +514,37 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             $this->getScopeStore(),
             $storeCode
         );
+    }
+
+    /**
+     * Check if update indices by feed is enabled.
+     *
+     * @return boolean
+     */
+    public function isUpdateByFeedEnable()
+    {
+        $mode = $this->scopeConfig->getValue(
+            self::INDICES_UPDATE_MODE,
+            $this->getScopeStore(),
+            null
+        );
+
+        return $mode == self::DOOFINDER_INDICES_UPDATE_FEED;
+    }
+
+    /**
+     * Check if update indices by api is enabled.
+     *
+     * @return boolean
+     */
+    public function isUpdateByApiEnable()
+    {
+        $mode = $this->scopeConfig->getValue(
+            self::INDICES_UPDATE_MODE,
+            $this->getScopeStore(),
+            null
+        );
+
+        return $mode == self::DOOFINDER_INDICES_UPDATE_API;
     }
 }
