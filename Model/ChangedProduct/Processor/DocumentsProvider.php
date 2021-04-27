@@ -34,7 +34,7 @@ class DocumentsProvider
     public function getDeleted(ChangedProductCollection $collection)
     {
         if ($collection->getSize() === 0) {
-            yield [];
+            return;
         }
 
         foreach ($collection as $item) {
