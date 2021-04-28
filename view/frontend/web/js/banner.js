@@ -1,5 +1,5 @@
 define(["jquery"], function($) { // eslint-disable-line no-undef
-  $.widget('banner.js', {
+  $.widget('doofinder.banner', {
     _create: function() {
       this.setLocation();
       this.watchClick();
@@ -56,5 +56,5 @@ define(["jquery"], function($) { // eslint-disable-line no-undef
     }
   });
 
-  return $.banner.js;
+  return $.doofinder.banner;
 });

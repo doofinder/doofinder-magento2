@@ -5,11 +5,8 @@
     "require": {
         "magento/framework": ">=101.0.6",
         "sabre/xml": "^1.4||^2.0",
-        "doofinder/doofinder": "^5.7",
+        "doofinder/doofinder": "^6.0",
         "doofinder/doofinder-magento2-es-compat": "*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "5.1.0"
     },
     "type": "magento2-module",
     "license": [

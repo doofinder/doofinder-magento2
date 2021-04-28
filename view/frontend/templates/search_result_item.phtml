@@ -1,0 +1,12 @@
+<?php
+/**
+ * @var \Doofinder\Feed\Block\SearchResultItem $block
+ */
+?>
+
+<?php $product = $block->getProduct(); ?>
+<?php if ($product): ?>
+    <span class="<?= $block->escapeQuote($block->getElementClass()) ?>"
+          data-product-id="<?= /* @noEscape */ $product->getId() ?>"
+          style="display: none;"></span>
+<?php endif; ?>

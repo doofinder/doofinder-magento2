@@ -27,9 +27,10 @@ class RegisterClick extends \Magento\Framework\App\Action\Action
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Doofinder\Feed\Helper\Banner $banner
     ) {
+        parent::__construct($context);
+
         $this->resultJsonFactory = $resultJsonFactory;
         $this->banner = $banner;
-        parent::__construct($context);
     }
 
     /**

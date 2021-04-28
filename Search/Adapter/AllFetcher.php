@@ -2,16 +2,18 @@
 
 namespace Doofinder\Feed\Search\Adapter;
 
-use Doofinder\Feed\Helper\Search;
+use Doofinder\Feed\Model\Api\Search;
 use Magento\Framework\Search\RequestInterface;
-use Magento\Framework\Search\Request\QueryInterface;
 use Doofinder\Feed\Search\Facets;
 use Doofinder\Feed\Search\Filters;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class AllFetcher
  * The class responsible for handling search request to Doofinder
  * This fetcher is fetching all product ids with all facets
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  */
 class AllFetcher implements FetcherInterface
 {
@@ -31,19 +33,27 @@ class AllFetcher implements FetcherInterface
     private $facets;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * AllFetcher constructor.
      * @param Search $search
      * @param Filters $filters
      * @param Facets $facets
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Search $search,
         Filters $filters,
-        Facets $facets
+        Facets $facets,
+        LoggerInterface $logger
     ) {
         $this->search = $search;
         $this->filters = $filters;
         $this->facets = $facets;
+        $this->logger = $logger;
     }
 
     /**
@@ -53,9 +63,7 @@ class AllFetcher implements FetcherInterface
     public function fetch(RequestInterface $request)
     {
         // prepare basic data
-        $query = $request->getQuery();
         $filters = $this->filters->get($request);
-        $queryString = $this->getQueryString($query);
         $buckets = $request->getAggregation();
 
         $productsLimit = self::DOOFINDER_SEARCH_REQUEST_LIMIT;
@@ -74,9 +82,13 @@ class AllFetcher implements FetcherInterface
         // add facets to request and remove from prepared buckets
         $filters['facets'] = array_slice($preparedBuckets, 0, $facetsLimit - 1);
         array_splice($preparedBuckets, 0, $facetsLimit - 1);
-
-        // make the first request
-        $results = $this->search->performDoofinderSearch($queryString, $filters);
+        try {
+            // make the first request
+            $results = $this->search->execute($filters);
+        } catch (\Exception $exception) {
+            $this->logger->error($exception);
+            $results = null;
+        }
 
         if (!$results) {
             return [
@@ -109,7 +121,12 @@ class AllFetcher implements FetcherInterface
                 }
                 // increase page and make the request
                 $filters['page'] = $i + 1;
-                $results = $this->search->performDoofinderSearch($queryString, $filters);
+                try {
+                    $results = $this->search->execute($filters);
+                } catch (\Exception $exception) {
+                    $this->logger->error($exception);
+                    continue;
+                }
                 // phpcs:disable Magento2.Performance.ForeachArrayMerge.ForeachArrayMerge
                 // merge response into arrays
                 $dooFacets = array_merge($dooFacets, $results->getFacets());
@@ -129,7 +146,12 @@ class AllFetcher implements FetcherInterface
                     $filters['page'] = $i + 1;
                 }
 
-                $results = $this->search->performDoofinderSearch($queryString, $filters);
+                try {
+                    $results = $this->search->execute($filters);
+                } catch (\Exception $exception) {
+                    $this->logger->error($exception);
+                    continue;
+                }
                 // phpcs:disable Magento2.Performance.ForeachArrayMerge.ForeachArrayMerge
                 // merge facets into array
                 $dooFacets = array_merge($dooFacets, $results->getFacets());
@@ -154,23 +176,5 @@ class AllFetcher implements FetcherInterface
             self::KEY_IDS => $dooProducts,
             self::KEY_TOTAL => $results->getProperty('total')
         ];
-    }
-
-    /**
-     * Get query string
-     *
-     * @notice This may not be the right way
-     *
-     * @param QueryInterface $query
-     * @return string
-     */
-    private function getQueryString(QueryInterface $query)
-    {
-        $should = $query->getShould();
-        if (isset($should['search'])) {
-            return $should['search']->getValue();
-        }
-
-        return '';
     }
 }

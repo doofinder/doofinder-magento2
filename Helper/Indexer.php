@@ -23,9 +23,9 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     private $indexerRegistry;
 
     /**
-     * @var Search
+     * @var \Doofinder\Feed\Model\Api\SearchEngine
      */
-    private $search;
+    private $searchEngine;
 
     /**
      * @var \Magento\Framework\Search\Request\DimensionFactory
@@ -44,20 +44,20 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\App\Helper\Context $context
      * @param StoreConfig $storeConfig
      * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
-     * @param Search $search
+     * @param \Doofinder\Feed\Model\Api\SearchEngine $searchEngine
      * @param \Magento\Framework\Search\Request\DimensionFactory $dimensionFactory
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         StoreConfig $storeConfig,
         \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry,
-        Search $search,
+        \Doofinder\Feed\Model\Api\SearchEngine $searchEngine,
         \Magento\Framework\Search\Request\DimensionFactory $dimensionFactory
     ) {
         parent::__construct($context);
         $this->storeConfig = $storeConfig;
         $this->indexerRegistry = $indexerRegistry;
-        $this->search = $search;
+        $this->searchEngine = $searchEngine;
         $this->dimensionFactory = $dimensionFactory;
     }
 
@@ -217,7 +217,7 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isAvailable(array $dimensions = [])
     {
-        if (!$apiKey = $this->storeConfig->getApiKey()) {
+        if (!$this->storeConfig->getApiKey()) {
             return false;
         }
 
@@ -227,7 +227,7 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
 
         $storeId = $this->getStoreIdFromDimensions($dimensions);
         $hashId = $this->storeConfig->getHashId($storeId);
-        $searchEngines = $this->search->getDoofinderSearchEngines($apiKey);
+        $searchEngines = $this->searchEngine->getSearchEngines();
 
         if (!isset($searchEngines[$hashId])) {
             return false;

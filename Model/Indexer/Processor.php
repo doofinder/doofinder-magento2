@@ -2,121 +2,79 @@
 
 namespace Doofinder\Feed\Model\Indexer;
 
+use Doofinder\Feed\Model\Api\Indexer;
+
 /**
- * Search processor
+ * Class Processor
+ * The class responsible for managing data on Doofinder Index
  */
 class Processor
 {
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var Indexer
      */
-    private $storeManager;
+    private $api;
 
     /**
-     * @var \Doofinder\Feed\Helper\StoreConfig
-     */
-    private $storeConfig;
-
-    /**
-     * @var \Doofinder\Feed\Helper\Search
-     */
-    private $searchHelper;
-
-    /**
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Doofinder\Feed\Helper\Search $searchHelper
+     * Processor constructor.
+     * @param Indexer $indexer
      */
     public function __construct(
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Helper\Search $searchHelper
+        Indexer $indexer
     ) {
-        $this->storeManager = $storeManager;
-        $this->storeConfig = $storeConfig;
-        $this->searchHelper = $searchHelper;
+        $this->api = $indexer;
     }
 
     /**
-     * Update index items
-     *
-     * @param  string $store
-     * @param  Product[] $products
+     * Add products to new Doofinder index
+     * @param array $products
+     * @param array $dimensions
      * @return void
      */
-    public function update($store, array $products)
+    public function add(array $products, array $dimensions)
     {
         if (empty($products)) {
             return;
         }
-
-        // reset indexes
         $products = array_values($products);
-
-        $this->performInStore($store, function () use ($store, $products) {
-            $this->performUpdate($products);
-        });
+        $this->api->addItems($products, $dimensions, IndexStructure::INDEX_NAME);
     }
 
     /**
-     * Delete index items
-     *
-     * @param  string $store
-     * @param  integer[] $productIds
+     * Update created items
+     * @param array $products
+     * @param array $dimensions
      * @return void
      */
-    public function delete($store, array $productIds)
+    public function update(array $products, array $dimensions)
     {
-        if (empty($productIds)) {
+        if (empty($products)) {
             return;
         }
-
-        // reset indexes
-        $productIds = array_values($productIds);
-
-        $this->performInStore($store, function () use ($store, $productIds) {
-            $this->performDelete($productIds);
-        });
+        $products = array_values($products);
+        $this->api->updateItems($products, $dimensions, IndexStructure::INDEX_NAME);
     }
 
     /**
-     * Perform in store
-     *
-     * @param  string $storeId
-     * @param  \Closure $closure
+     * @param array $products
+     * @param array $dimensions
      * @return void
      */
-    private function performInStore($storeId, \Closure $closure)
+    public function delete(array $products, array $dimensions)
     {
-        $originalStoreCode = $this->storeConfig->getStoreCode();
-
-        $this->storeManager->setCurrentStore($storeId);
-
-        // Call given closure
-        $closure();
-
-        $this->storeManager->setCurrentStore($originalStoreCode);
+        if (empty($products)) {
+            return;
+        }
+        $this->api->deleteItems($products, $dimensions, IndexStructure::INDEX_NAME);
     }
 
     /**
-     * Update products in Doofinder index
-     *
-     * @param  Product[] $products
+     * Replace temporary index with the main one
+     * @param array $dimensions
      * @return void
      */
-    private function performUpdate(array $products)
+    public function switchIndex(array $dimensions)
     {
-        $this->searchHelper->updateDoofinderItems($products);
-    }
-
-    /**
-     * Delete products in Doofinder index
-     *
-     * @param  array $productIds
-     * @return void
-     */
-    private function performDelete(array $productIds)
-    {
-        $this->searchHelper->deleteDoofinderItems($productIds);
+        $this->api->switchIndex($dimensions, IndexStructure::INDEX_NAME);
     }
 }

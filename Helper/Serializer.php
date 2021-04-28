@@ -6,6 +6,7 @@ use Zend\Serializer\Serializer as ZendSerializer;
 
 /**
  * Helper class for serialization/deserialization
+ * @SuppressWarnings(PHPMD.StaticAccess)
  */
 class Serializer
 {
