@@ -58,7 +58,36 @@
                 type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext"
                 sortOrder="1" />
     </type>
+    <!-- plugins "on schedule" -->
+    <type name="Magento\Catalog\Model\ResourceModel\Product">
+        <plugin name="doofinder_catalogsearchFulltextProduct" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Product"/>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Price\BasePriceStorage">
+        <plugin name="doofinder_catalogsearchFulltextProductPrice" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Product\Price"/>
+    </type>
+    <type name="Magento\CatalogInventory\Model\ResourceModel\Stock\Item">
+        <plugin name="doofinder_catalogsearchFulltextStockItem" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\StockItem"/>
+    </type>
 
+    <type name="Magento\Catalog\Model\ResourceModel\Category">
+            <plugin name="doofinder_catalogsearchFulltextCategory" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Category"/>
+    </type>
+
+    <!--<type name="Magento\Catalog\Model\ResourceModel\Category">
+        <plugin name="catalogsearchFulltextCategory" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Category"/>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Action">
+        <plugin name="catalogsearchFulltextMassAction" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Product\Action"/>
+    </type>
+    <type name="Magento\Catalog\Model\Indexer\Product\Category\Action\Rows">
+        <plugin name="catalogsearchFulltextCategoryAssignment" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Product\Category\Action\Rows"/>
+    </type>
+    <type name="Magento\Store\Model\ResourceModel\Store">
+        <plugin name="catalogsearchFulltextIndexerStoreView" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Store\View" />
+    </type>
+    <type name="Magento\Store\Model\ResourceModel\Group">
+        <plugin name="catalogsearchFulltextIndexerStoreGroup" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Store\Group"/>
+    </type>-->
     <type name="Doofinder\Feed\Model\Config\Indexer\Attributes">
         <arguments>
             <argument name="attributes" xsi:type="array">

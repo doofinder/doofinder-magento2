@@ -174,10 +174,10 @@ class Index extends AbstractDb
         }
 
         $result = [];
-        foreach ($connection->fetchAll($select) as $row) {
+        foreach ($connection->fetchAll($select) as $row) {                     
             $result[$row['product_id']][$row['category_id']] = $row['position'];
         }
-
+    
         return $result;
     }
 }

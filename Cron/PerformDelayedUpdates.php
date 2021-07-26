@@ -38,11 +38,7 @@ class PerformDelayedUpdates
      * @return void
      */
     public function execute()
-    {
-        if (!$this->helper->isDelayedUpdatesEnabled()) {
-            return;
-        }
-
+    {   
         $this->processor->execute();
     }
 }

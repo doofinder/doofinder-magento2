@@ -516,20 +516,22 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
+    public function getUpdateMode($storeCode = null) {
+        return $this->scopeConfig->getValue(
+            self::INDICES_UPDATE_MODE,
+            $this->getScopeStore(),
+            $storeCode
+        );
+    }
+
     /**
      * Check if update indices by feed is enabled.
      *
      * @return boolean
      */
-    public function isUpdateByFeedEnable()
+    public function isUpdateByFeedEnable($storeCode = null)
     {
-        $mode = $this->scopeConfig->getValue(
-            self::INDICES_UPDATE_MODE,
-            $this->getScopeStore(),
-            null
-        );
-
-        return $mode == self::DOOFINDER_INDICES_UPDATE_FEED;
+        return $this->getUpdateMode($storeCode) == self::DOOFINDER_INDICES_UPDATE_FEED;
     }
 
     /**
@@ -537,14 +539,8 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return boolean
      */
-    public function isUpdateByApiEnable()
+    public function isUpdateByApiEnable($storeCode = null)
     {
-        $mode = $this->scopeConfig->getValue(
-            self::INDICES_UPDATE_MODE,
-            $this->getScopeStore(),
-            null
-        );
-
-        return $mode == self::DOOFINDER_INDICES_UPDATE_API;
+        return $this->getUpdateMode($storeCode) == self::DOOFINDER_INDICES_UPDATE_API;
     }
 }
