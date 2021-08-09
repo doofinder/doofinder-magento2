@@ -6,4 +6,5 @@
     <event name="catalog_entity_attribute_save_before">
         <observer name="doofinder_validate_attribute_code" instance="Doofinder\Feed\Observer\ValidateAttributeCode"/>
     </event>
+
 </config>

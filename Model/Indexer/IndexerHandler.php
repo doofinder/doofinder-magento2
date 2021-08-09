@@ -101,7 +101,8 @@ class IndexerHandler implements IndexerInterface
     private function canProceed()
     {
         return $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_FULL
-            || $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_DELAYED;
+            || $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_DELAYED
+            || $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_ON_SAVE;
     }
 
     /**

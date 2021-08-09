@@ -10,6 +10,7 @@ class IndexerScope
 {
     const SCOPE_FULL = 'indexer_execute_full';
     const SCOPE_DELAYED = 'indexer_execute_delayed';
+    const SCOPE_ON_SAVE = 'indexer_execute_on_save';
 
     /**
      * @var string

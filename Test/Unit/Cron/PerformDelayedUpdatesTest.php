@@ -49,30 +49,10 @@ class PerformDelayedUpdatesTest extends \Doofinder\FeedCompatibility\Test\Unit\B
     /**
      * @return void
      */
-    public function testExecuteEnabled()
+    public function testExecute()
     {
-        $this->helper->expects($this->once())
-            ->method('isDelayedUpdatesEnabled')
-            ->willReturn(true);
-
         $this->processor->expects($this->once())
             ->method('execute');
-        $this->testedClass->execute();
-    }
-
-    /**
-     * @return void
-     */
-    public function testExecuteDisabled()
-    {
-
-        $this->helper->expects($this->once())
-            ->method('isDelayedUpdatesEnabled')
-            ->willReturn(false);
-
-        $this->processor->expects($this->never())
-            ->method('execute');
-
         $this->testedClass->execute();
     }
 }
