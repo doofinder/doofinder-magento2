@@ -341,7 +341,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         // Fix servers - add https protocol
         $searchServer = $this->storeConfig->getSearchServer();
-        if ($searchServer && !str_contains($searchServer, 'https://')) {
+        if ($searchServer && strpos($searchServer, 'https://') === false) {
             $searchServer = 'https://' . $searchServer;
             $this->configWriter->save(
                 $this->storeConfig::ACCOUNT_CONFIG . '/search_server',
@@ -349,7 +349,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
         $managementServer = $this->storeConfig->getManagementServer();
-        if ($managementServer && !str_contains($managementServer, 'https://')) {
+        if ($managementServer && strpos($managementServer, 'https://') === false) {
             $managementServer = 'https://' . $managementServer;
             $this->configWriter->save(
                 $this->storeConfig::ACCOUNT_CONFIG . '/management_server',
