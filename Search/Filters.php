@@ -58,7 +58,8 @@ class Filters
                 $categoryId = $ref->getValue();
             }
 
-            $filters['filter'][$ref->getField()] = [$ref->getValue()];
+            $value = $this->getFilterValue($ref->getValue());
+            $filters['filter'][$ref->getField()] = [$value];
         }
 
         if (!method_exists($request, 'getSort')) {
@@ -82,6 +83,21 @@ class Filters
         }
 
         return $filters;
+    }
+
+    /**
+     * Clear value from nested arrays
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    private function getFilterValue($value)
+    {
+        if (is_array($value) && count($value) === 1) {
+            $value = reset($value);
+            return $this->getFilterValue($value);
+        }
+        return $value;
     }
 
     /**
