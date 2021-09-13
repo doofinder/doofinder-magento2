@@ -84,16 +84,7 @@
                         <![CDATA[ You must configure a "hashid" for each store view. ]]>
                     </comment>
                 </field>
-                <field id="internal_search_enabled"
-                       translate="label"
-                       type="note"
-                       sortOrder="20"
-                       showInDefault="1"
-                       showInStore="0"
-                       showInWebsite="0">
-                    <label>Use Doofinder for Internal Search</label>
-                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled</frontend_model>
-                </field>
+                
                 <field id="doofinder_indices_update_mode"
                        translate="label"
                        type="select"

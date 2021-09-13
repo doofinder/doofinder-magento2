@@ -136,9 +136,11 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
         $searchEngines = $this->searchEngine->getSearchEngines();
 
         if (!isset($searchEngines[$hashId])) {
+
             throw new \Magento\Framework\Exception\ValidatorException(
                 __('Search engine with HashID %1 does not exist in your account.', $hashId)
             );
+            
         }
     }
 

@@ -24,7 +24,7 @@ class Product
         $this->objectManager = Bootstrap::getObjectManager();
         $this->productCollectionFactory = $this->objectManager->create(ProductCollectionFactory::class);
         $this->productRepository = $this->objectManager->create(ProductRepositoryInterface::class);
-        $this->objectManager->get('Magento\Framework\Registry')->register('isSecureArea', true);
+        $this->objectManager->get('Magento\Framework\Registry')->register('isSecureArea', true, true);
     }
 
     public function deleteAllProducts() {

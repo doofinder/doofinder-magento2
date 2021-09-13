@@ -1,12 +1,11 @@
 {
     "name": "doofinder/doofinder-magento2",
-    "version": "0.5.3-dev",
+    "version": "0.5.14-dev",
     "description": "Doofinder module for Magento 2",
     "require": {
         "magento/framework": ">=101.0.6",
         "sabre/xml": "^1.4||^2.0",
-        "doofinder/doofinder": "^6.0",
-        "doofinder/doofinder-magento2-es-compat": "*"
+        "doofinder/doofinder": "6.1.*"
     },
     "type": "magento2-module",
     "license": [

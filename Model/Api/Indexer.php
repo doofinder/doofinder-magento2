@@ -7,6 +7,8 @@ use Doofinder\Management\ManagementClient;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Helper\Serializer;
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
+
 
 /**
  * Class Indexer
@@ -38,6 +40,14 @@ class Indexer
      * @var Serializer
      */
     private $serializer;
+    
+    /**
+     * logger
+     *
+     * @var mixed
+     */
+    private $logger;
+
 
     /**
      * Indexer constructor.
@@ -50,12 +60,15 @@ class Indexer
         ManagementClientFactory $managementClientFactory,
         StoreConfig $storeConfig,
         IndexerHelper $indexerHelper,
-        Serializer $serializer
+        Serializer $serializer,
+        PsrLoggerInterface $logger
     ) {
         $this->managementClientFactory = $managementClientFactory;
         $this->storeConfig = $storeConfig;
         $this->indexerHelper = $indexerHelper;
         $this->serializer = $serializer;
+        $this->logger = $logger;
+
     }
 
     /**
@@ -64,6 +77,7 @@ class Indexer
      * @param string $indexName
      * @return void
      */
+
     public function deleteDoofinderIndex(array $dimensions, $indexName)
     {
         $hashId = $this->getHashId($dimensions);
@@ -105,7 +119,8 @@ class Indexer
     public function createDoofinderIndexTemp(array $dimensions, $indexName)
     {
         $hashId = $this->getHashId($dimensions);
-        try {
+        try 
+        {
             $this->getClient()->createTemporaryIndex(
                 $hashId,
                 $indexName
@@ -116,6 +131,9 @@ class Indexer
                 $hashId,
                 $indexName
             );
+            //logging caught error
+            $this->logger->error($exception->getMessage());    
+
         }
     }
 
@@ -135,6 +153,8 @@ class Indexer
             );
             return (bool) $index->getName();
         } catch (\Exception $exception) {
+            //logging caught error
+            $this->logger->error($exception->getMessage());    
             return false;
         }
     }
@@ -147,13 +167,23 @@ class Indexer
      * @return void
      */
     public function addItems(array $items, array $dimensions, $indexName)
-    {
-        $hashId = $this->getHashId($dimensions);
-        $this->getClient()->createTempBulk(
-            $hashId,
-            $indexName,
-            $this->serializer->serialize($items)
-        );
+    { 
+       
+            try
+            {
+                $hashId = $this->getHashId($dimensions);
+                $this->getClient()->createTempBulk(
+                    $hashId,
+                    $indexName,
+                    $this->serializer->serialize($items)
+                );
+             }
+            catch(\Exception $ex)
+            {   
+                $this->logger->error($ex->getMessage());    
+            }               
+        
+
     }
 
     /**
@@ -163,15 +193,35 @@ class Indexer
      * @param string $indexName
      * @return void
      */
+
     public function updateItems(array $items, array $dimensions, $indexName)
     {
-        $hashId = $this->getHashId($dimensions);
-        $this->getClient()->createBulk(
-            $hashId,
-            $indexName,
-            $this->serializer->serialize($items)
-        );
-    }
+     
+        $count = 2;           
+        do
+        {          
+            try
+            {                                            
+              $hashId = $this->getHashId($dimensions);                
+               $this->getClient()->createBulk(
+                    $hashId,
+                    $indexName,
+                    $this->serializer->serialize($items)
+                );                
+              
+            break;
+                
+            }
+            catch(\Exception $ex)
+            {   
+               $count =$count - 1;
+               //log here
+               $this->logger->error($ex->getMessage());    
+
+            }               
+        
+           }while($count > 0);
+     }
 
     /**
      * @param array $items
@@ -181,12 +231,21 @@ class Indexer
      */
     public function deleteItems(array $items, array $dimensions, $indexName)
     {
-        $hashId = $this->getHashId($dimensions);
-        $this->getClient()->deleteBulk(
-            $hashId,
-            $indexName,
-            $this->serializer->serialize($items)
-        );
+      
+            $hashId = $this->getHashId($dimensions);
+            try
+            {                      
+                $this->getClient()->deleteBulk(
+                    $hashId,
+                    $indexName,
+                    $this->serializer->serialize($items)
+                );
+            
+            }
+            catch(\Exception $ex)
+            {
+                $this->logger->error($ex->getMessage());
+            }
     }
 
     /**
@@ -229,3 +288,4 @@ class Indexer
         return $this->storeConfig->getHashId($storeId);
     }
 }
+

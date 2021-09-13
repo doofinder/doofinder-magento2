@@ -16,6 +16,8 @@ use Doofinder\Feed\Registry\IndexerScope;
 use Doofinder\Feed\Model\ChangedProduct\Registration;
 use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Helper\StoreConfig;
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
+
 
 /**
  * Catalog search indexer plugin for catalog product used to register product
@@ -73,6 +75,15 @@ class Price extends AbstractPlugin
      */
     private $fullActionFactory;
 
+      /**
+     * logger
+     *
+     * @var mixed
+     */
+    private $logger;
+
+
+
     /**
      * @param Registration $registration
      * @param StoreConfig $storeConfig
@@ -95,7 +106,8 @@ class Price extends AbstractPlugin
         FulltextResource $fulltextResource,
         IndexerHandlerFactory $indexerHandlerFactory,
         ConfigInterface $config,
-        FullFactory $fullActionFactory
+        FullFactory $fullActionFactory,
+        PsrLoggerInterface $logger
     ) {
         $this->registration = $registration;
         $this->storeConfig = $storeConfig;
@@ -107,6 +119,8 @@ class Price extends AbstractPlugin
         $this->indexerHandlerFactory = $indexerHandlerFactory;
         $this->config = $config;
         $this->fullActionFactory = $fullActionFactory;
+        $this->logger = $logger;
+
     }
     /**
      * @param ItemResourceModel $subject
@@ -124,6 +138,11 @@ class Price extends AbstractPlugin
         $stores = $this->storeConfig->getAllStores();
         $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
         $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+        try {
+            $indexerHandler = $this->createDoofinderIndexerHandler($data);
+        } catch (\LogicException $e) {
+            return $result;
+        }
         $indexerHandler = $this->createDoofinderIndexerHandler($data);
         $fullAction = $this->createFullAction($data);
         foreach($stores as $store) {
@@ -136,6 +155,7 @@ class Price extends AbstractPlugin
                         }
                     } catch (\Exception $e) {
                         // TODO: log exception
+                        $this->logger->error($e->getMessage());
                         continue;
                     }
                 }
@@ -143,6 +163,11 @@ class Price extends AbstractPlugin
 
             if ($indexer->isScheduled()) {
                 foreach ($entityIds as $id) {
+                    
+                    $this->registration->registerDelete(
+                        $id,
+                        $store->getCode()
+                        );
                     $this->registration->registerUpdate(
                         $id, 
                         $store->getCode()

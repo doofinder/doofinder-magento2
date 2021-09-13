@@ -47,6 +47,7 @@ class ApiKeyValidation extends \Magento\Framework\App\Config\Value
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
 
+  
     /**
      * Save configuration.
      *
@@ -56,12 +57,13 @@ class ApiKeyValidation extends \Magento\Framework\App\Config\Value
     public function save()
     {
         $apiKey = $this->getValue();
+       
         if ($apiKey) {
             try {
                 $this->searchEngine->getSearchEngines($apiKey);
             } catch (\Doofinder\Management\Errors\NotAllowed $exception) {
                 throw new \Magento\Framework\Exception\ValidatorException(
-                    __('API key %1 is invalid.', $apiKey)
+                    __('Provided API key %1 is invalid.', $apiKey)
                 );
             }
         } elseif ($this->storeConfig->isInternalSearchEnabled()) {

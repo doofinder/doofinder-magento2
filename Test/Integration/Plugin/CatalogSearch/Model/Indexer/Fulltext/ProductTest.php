@@ -9,12 +9,12 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\CatalogSearch\Model\Indexer\Fulltext as FulltextIndexer;
 use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\TestFramework\TestCase\AbstractBackendController;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedProduct\Processor\CollectionProvider;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResource;
 use Magento\Catalog\Api\Data\ProductExtensionInterfaceFactory;
+use Doofinder\FeedCompatibility\Test\Integration\Base;
 
 use Doofinder\Feed\Test\Helper\Configuration as ConfigurationHelper;
 use Doofinder\Feed\Test\Helper\Product as ProductHelper;
@@ -23,9 +23,9 @@ use Doofinder\Feed\Test\Helper\Product as ProductHelper;
  * Provide tests for the plugin.
  *
  * @magentoAppArea adminhtml
- * @magentoDbIsolation disabled
+ * @magentoDbIsolation enabled
  */
-class ProductTest extends \PHPUnit\Framework\TestCase
+class ProductTest extends Base
 {
     /** @var ObjectManagerInterface */
     private $objectManager;
@@ -51,7 +51,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setupTests()
     {
         $this->objectManager = Bootstrap::getObjectManager();
         $this->mutableScopeConfig = $this->objectManager->create(MutableScopeConfigInterface::class);
@@ -66,7 +66,7 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     /**
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function tearDownTests()
     {
         $this->configHelper->cleanConfig();
         $this->productHelper->deleteAllProducts();
@@ -98,7 +98,6 @@ class ProductTest extends \PHPUnit\Framework\TestCase
 
         $this->resetRegisterCollections($fixtureStoreCode);
         $this->configHelper->cleanConfig();
-        $product->delete();
     }
 
     /**

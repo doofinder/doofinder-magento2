@@ -65,6 +65,7 @@ class Update implements MapInterface
                 $this->builder->addFields(
                     $fetcher->get($productId)
                 );
+                
                 $documents[$productId] = array_merge_recursive($documents[$productId], $this->builder->build());
             }
             $fetcher->clear();
