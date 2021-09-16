@@ -148,19 +148,17 @@ class Product extends AbstractPlugin
 
     public function afterSave(ResourceProduct $productResource, $result, AbstractModel $product)
     {
-       
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
             $stores = $this->storeConfig->getAllStores();
             $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID); 
-            $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-            
-            $indexerHandler = $this->createDoofinderIndexerHandler($data);
-            $fullAction = $this->createFullAction($data);
-
             foreach($stores as $store) 
             {
                 //check if its update by API set
                 if ($this->storeConfig->isUpdateByApiEnable($store->getCode()))
-                {             
+                {       
+                   
+
                     //check the isScheduled variable if true
                     if($indexer->isScheduled()) 
                     {
@@ -177,6 +175,16 @@ class Product extends AbstractPlugin
                     }
                     else
                     {
+                        $data = $this->config->getIndexers()['catalogsearch_fulltext'];          
+                        $fullAction = $this->createFullAction($data);
+                        try
+                        {
+                            $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                        }
+                        catch (\LogicException $e) 
+                        {
+                            $this->logger->error($e->getMessage()); 
+                        }
                         //if it is false  its on save
                         //get dimensions
                         $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
@@ -221,7 +229,8 @@ class Product extends AbstractPlugin
                    
                 }
 
-            }                  
+            }      
+        }            
         return $result;
     }
 
@@ -236,12 +245,11 @@ class Product extends AbstractPlugin
      */
     public function afterDelete(ResourceProduct $productResource, $result, AbstractModel $product)
     {
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
         $stores = $this->storeConfig->getAllStores();
         $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-            
-        $indexerHandler = $this->createDoofinderIndexerHandler($data);
-        $fullAction = $this->createFullAction($data);
+       
 
         foreach($stores as $store) {
             //validate 
@@ -257,6 +265,15 @@ class Product extends AbstractPlugin
                 }
                 else
                 {
+                    $data = $this->config->getIndexers()['catalogsearch_fulltext'];        
+                    $fullAction = $this->createFullAction($data);
+                    try
+                    {
+                       $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                    }catch (\LogicException $e) 
+                    {
+                        $this->logger->error($e->getMessage()); 
+                    }
                     //its on save mode
                     $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
                     $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
@@ -291,7 +308,7 @@ class Product extends AbstractPlugin
                     }
                 }
             }
-
+        }
         }
         return $result;
     }

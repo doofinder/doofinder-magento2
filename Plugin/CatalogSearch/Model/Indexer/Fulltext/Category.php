@@ -152,6 +152,8 @@ class Category extends AbstractPlugin
      */
     public function aroundSave(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
     {
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
         //get the old category name
         $origname = $category->getOrigData('name');
         //get the category new name
@@ -183,6 +185,7 @@ class Category extends AbstractPlugin
             $this->logger->error($ex->getMessage());    
             return $result;
         }
+    }
         return $result;
     }
     
@@ -197,12 +200,6 @@ class Category extends AbstractPlugin
         //we know the products are affected  if this is not null
         $stores = $this->storeConfig->getAllStores();
         $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-
-        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-
-        $indexerHandler = $this->createDoofinderIndexerHandler($data);
-
-        $fullAction = $this->createFullAction($data);
         //
         foreach ($stores as $store) {
             if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
@@ -233,6 +230,9 @@ class Category extends AbstractPlugin
                 {
                     try 
                     {
+                        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+                        $fullAction = $this->createFullAction($data);
+                        $indexerHandler = $this->createDoofinderIndexerHandler($data);
                         //get dimensions
                         $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
                        //get store id and cast to integer
@@ -280,20 +280,15 @@ class Category extends AbstractPlugin
 
     public function aroundDelete(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
     {
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
         //get the products that will be affected
         $allproducts = $this->getIdsOnly($category->getProductCollection());
 
         $result = $proceed($category);
         $stores = $this->storeConfig->getAllStores();
         $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-  
-        $indexerHandler = $this->createDoofinderIndexerHandler($data);
-   
-        $fullAction = $this->createFullAction($data);
-
-        
-
+       
         foreach ($stores as $store) {
             if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
 
@@ -321,6 +316,10 @@ class Category extends AbstractPlugin
                 {
                     try 
                     {
+                        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+                       
+                        $indexerHandler = $this->createDoofinderIndexerHandler($data);                   
+                        $fullAction = $this->createFullAction($data);
                         $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
                         //get store id and cast to integer
                         $storeId = (int)$this->indexerHelper->getStoreIdFromDimensions($dimensions);
@@ -347,6 +346,7 @@ class Category extends AbstractPlugin
                 }
             }
         }
+    }
         return $result;
     }
 }

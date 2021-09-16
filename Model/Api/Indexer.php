@@ -47,8 +47,6 @@ class Indexer
      * @var mixed
      */
     private $logger;
-
-
     /**
      * Indexer constructor.
      * @param ManagementClientFactory $managementClientFactory
@@ -121,10 +119,13 @@ class Indexer
         $hashId = $this->getHashId($dimensions);
         try 
         {
-            $this->getClient()->createTemporaryIndex(
+           $response =  $this->getClient()->createTemporaryIndex(
                 $hashId,
                 $indexName
             );
+            
+            $this->logger->info('CreateIndex'.$hashId.' Index '.$indexName.' Reponse '.$response);    
+
         } catch (\Exception $exception) {
             $this->getClient()->deleteTemporaryIndex($hashId, $indexName);
             $this->getClient()->createTemporaryIndex(
@@ -132,7 +133,7 @@ class Indexer
                 $indexName
             );
             //logging caught error
-            $this->logger->error($exception->getMessage());    
+            $this->logger->error('Doofinder : CreateIndex '.$hashId.' Index '.$indexName.' Error '.$exception->getMessage());    
 
         }
     }
@@ -146,7 +147,8 @@ class Indexer
     public function isIndexExists($indexName, array $dimensions)
     {
         $hashId = $this->getHashId($dimensions);
-        try {
+        try 
+        {
             $index = $this->getClient()->getIndex(
                 $hashId,
                 $indexName
@@ -154,7 +156,7 @@ class Indexer
             return (bool) $index->getName();
         } catch (\Exception $exception) {
             //logging caught error
-            $this->logger->error($exception->getMessage());    
+            $this->logger->error('Doofinder : '.$exception->getMessage());    
             return false;
         }
     }
@@ -172,15 +174,17 @@ class Indexer
             try
             {
                 $hashId = $this->getHashId($dimensions);
-                $this->getClient()->createTempBulk(
+                $response = $this->getClient()->createTempBulk(
                     $hashId,
                     $indexName,
                     $this->serializer->serialize($items)
                 );
+                $this->logger->info('Doofinder : AddItems '.$hashId.' Index :  '.$indexName.' Response '.$response);    
+
              }
             catch(\Exception $ex)
             {   
-                $this->logger->error($ex->getMessage());    
+                $this->logger->error('Doofinder : AddItems '.$hashId.' Index  : '.$indexName.' '.$ex->getMessage());    
             }               
         
 
@@ -203,12 +207,13 @@ class Indexer
             try
             {                                            
               $hashId = $this->getHashId($dimensions);                
-               $this->getClient()->createBulk(
+              $response = $this->getClient()->createBulk(
                     $hashId,
                     $indexName,
                     $this->serializer->serialize($items)
                 );                
-              
+                $this->logger->info('Doofinder : UpateItems '.$hashId.' Index :  '.$indexName.' Response '.$response);    
+
             break;
                 
             }
@@ -216,7 +221,8 @@ class Indexer
             {   
                $count =$count - 1;
                //log here
-               $this->logger->error($ex->getMessage());    
+               $this->logger->error('Doofinder : UpateItems '.$hashId.' Index  : '.$indexName.' '.$ex->getMessage());    
+
 
             }               
         
@@ -235,16 +241,18 @@ class Indexer
             $hashId = $this->getHashId($dimensions);
             try
             {                      
-                $this->getClient()->deleteBulk(
+               $response =  $this->getClient()->deleteBulk(
                     $hashId,
                     $indexName,
                     $this->serializer->serialize($items)
                 );
-            
+            $this->logger->info('Doofinder : DeleteItems '.$hashId.' Index :  '.$indexName.' Response '.$response);    
+
             }
             catch(\Exception $ex)
             {
-                $this->logger->error($ex->getMessage());
+                $this->logger->error('Doofinder : DeleteItems '.$hashId.' Index  : '.$indexName.' '.$ex->getMessage());    
+
             }
     }
 

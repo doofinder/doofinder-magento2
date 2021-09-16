@@ -99,6 +99,7 @@ class IndexerHandler implements IndexerInterface
      * Check if indexer mode is Index on Save
      * @return boolean
      */
+   
     private function canProceed()
     {
         return $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_FULL

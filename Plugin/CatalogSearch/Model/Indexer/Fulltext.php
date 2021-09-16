@@ -147,6 +147,7 @@ class Fulltext
 
     public function beforeExecuteByDimensions(FulltextIndexer $indexer, array $dimensions, \Traversable $entityIds = null)
     {       
+
             if ($this->indexerScope->getIndexerScope() != null) {
                 return;
             }
@@ -172,35 +173,40 @@ class Fulltext
      */
     public function afterExecuteByDimensions(FulltextIndexer $indexer, $result, array $dimensions, \Traversable $entityIds = null)
     {
-        $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);      
-        if (
-            $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_ON_SAVE ||
-            $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_FULL
-        ) {
-            $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-            $indexerHandler = $this->createDoofinderIndexerHandler($data);
-            $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-            $fullAction = $this->createFullAction($data);
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
+             $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);      
+            if (
+                $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_ON_SAVE ||
+                $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_FULL
+            ) {
+                $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+                $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
+                $fullAction = $this->createFullAction($data);
 
-            if (null === $entityIds) {
-                try {
-                    // reindexall
-                    $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
-                    // create temp index
-                    $this->indexStructure->create(null, [], $dimensions);
-                    // // add items temp index, switch temporary index to the main one
-                    $indexerHandler->saveIndex(
-                        $dimensions,
-                        $fullAction->rebuildStoreIndex($storeId)
-                    );
-                } catch(\Exception $e) {
-                      return $result;
-                } finally {
-                    $this->indexerScope->setIndexerScope(null);
-                    return $result;
-                }
-             } 
-         
+                if (null === $entityIds) {
+                    try {
+                        // reindexall
+                        $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
+                        // create temp index
+                        $this->indexStructure->create(null, [], $dimensions);
+                        // // add items temp index, switch temporary index to the main one
+                        $indexerHandler->saveIndex(
+                            $dimensions,
+                            $fullAction->rebuildStoreIndex($storeId)
+                        );
+                    } catch(\Exception $e) {
+                        $this->logger->error('Doofinder : afterExecuteByDimensions '.$e->getMessage());    
+                        return $result;
+                    } finally {
+                        $this->indexerScope->setIndexerScope(null);
+                        return $result;
+                    }
+                } 
+            
+            }
+        
         }
         
         return $result;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Doofinder\Feed\Test\Integration\Model\Indexer\Data\Map\Update\Fetcher;
+namespace Doofinder\Feed\Test\Api;
 
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\Framework\App\Config\MutableScopeConfigInterface;
@@ -9,26 +9,22 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\CatalogSearch\Model\Indexer\Fulltext as FulltextIndexer;
 use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\TestFramework\TestCase\AbstractBackendController;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedProduct\Processor\CollectionProvider;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResource;
-use Magento\Catalog\Api\Data\ProductExtensionInterfaceFactory;
-
-use Magento\Indexer\Model\Indexer;
+use Doofinder\FeedCompatibility\Test\Api\BaseWebapi;
 
 use Doofinder\Feed\Test\Helper\Configuration as ConfigurationHelper;
 use Doofinder\Feed\Test\Helper\Product as ProductHelper;
-use Doofinder\Feed\Model\Indexer\Data\Mapper;
 
 /**
  * Provide tests for the plugin.
  *
  * @magentoAppArea adminhtml
- * @magentoDbIsolation enabled
+ * @magentoDbIsolation disabled
  */
-class ProductTest extends \PHPUnit\Framework\TestCase
+class CategoryTest extends BaseWebapi
 {
     /** @var ObjectManagerInterface */
     private $objectManager;
@@ -51,16 +47,10 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     /** @var ProductHelper */
     private $productHelper;
 
-    /** @var Mapper */
-    private $mapper;
-
-    /** @var Indexer */
-    private $indexer;
-
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setupTests()
     {
         $this->objectManager = Bootstrap::getObjectManager();
         $this->mutableScopeConfig = $this->objectManager->create(MutableScopeConfigInterface::class);
@@ -69,49 +59,47 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $this->storeManager = $this->objectManager->create(StoreManagerInterface::class);
         $this->configHelper = $this->objectManager->create(ConfigurationHelper::class);
         $this->productHelper = $this->objectManager->create(ProductHelper::class);
-        $this->mapper = $this->objectManager->create(Mapper::class);
-        $this->indexer = $this->objectManager->create(Indexer::class);
+        $this->configHelper->cleanConfig();
+        $this->configHelper->setupDoofinder();
+        $this->configHelper->setupConfigScenario1();
+        $this->resetRegisterCollections('default');
     }
 
     /**
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function tearDownTests()
     {
+        $this->configHelper->cleanConfig();
+        $this->resetRegisterCollections('default');
+        $this->roductHelper->deleteAllProducts();
     }
+    
 
     /**
-     * Test register product save
-     * 
-     * @magentoDataFixture ../../../../app/code/Doofinder/Feed/Test/Integration/_files/attribute_for_caching.php
-     * @magentoDataFixture ../../../../app/code/Doofinder/Feed/Test/Integration/_files/product_simple.php
+     * Test  on delete action
+     *
+     * @magentoApiDataFixture ../../../../app/code/Doofinder/Feed/Test/Integration/_files/category.php
      */
-    public function testMapCustomAttribute(): void
+    public function testDeleteCategory()
     {
         $fixtureProductId = 1;
-        $fixtureStoreId = 0;
-        $fixtureAttributeCode = 'foo';
-        
-        $product = $this->productRepository->getById($fixtureProductId);
-        $product->setData($fixtureAttributeCode, 'test');
-        $product->save();
-        $this->reindexAll();
+        $fixtureSKU = 'simple';
+        $fixtureStoreCode = 'default';
 
-        $batchDocuments = [
-            $fixtureProductId => [],
+        $serviceInfo = [
+            'rest' => [
+                'resourcePath' => '/V1/products/'.$fixtureSKU,
+                'httpMethod' => \Magento\Framework\Webapi\Rest\Request::HTTP_METHOD_DELETE,
+            ],
         ];
+        $result = $this->_webApiCall($serviceInfo, []);
 
+        $collection = $this->collectionProvider->get(ChangedProductResource::OPERATION_DELETE, $fixtureStoreCode);
 
-        $docs = $this->mapper->get('update')->map($batchDocuments, $product->getStoreId());
-
-        $this->assertNotNull($docs);
-        $this->assertEquals(1, count($docs));
-        $doc = current($docs);
-        $this->assertTrue(isset($doc[$fixtureAttributeCode]));
-    }
-
-    private function reindexAll() {
-        $this->indexer->load('catalogsearch_fulltext');
-        $this->indexer->reindexAll();
+        $items = $collection->getItems();
+        $this->assertEquals(1, count($items));
+        $item = current($items);
+        $this->assertEquals($fixtureProductId, $item->getProductEntityId());
     }
 }

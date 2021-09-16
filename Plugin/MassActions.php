@@ -137,14 +137,12 @@ class MassActions extends AbstractPlugin
     {
         try
         {
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
             //get the affected ids
             $stores = $this->storeConfig->getAllStores();
             $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID); 
-            $data = $this->config->getIndexers()['catalogsearch_fulltext'];
             
-            $indexerHandler = $this->createDoofinderIndexerHandler($data);
-            $fullAction = $this->createFullAction($data);
-
             foreach($stores as $store) 
             {
                 //check if its update by API set
@@ -171,7 +169,7 @@ class MassActions extends AbstractPlugin
                             }
                             catch(\Exception $e) 
                             {
-                                $this->logger->error($e->getMessage());                     
+                                $this->logger->error($e->getMessage());              
 
                             }
                         
@@ -180,9 +178,11 @@ class MassActions extends AbstractPlugin
                     else
                     {
                         //if it is false  its on save
-                          
                         try 
                         {
+                            $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+                            $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                            $fullAction = $this->createFullAction($data);
                              //get dimensions
                             $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
                             //get storeid
@@ -202,7 +202,6 @@ class MassActions extends AbstractPlugin
                             );
 
                             //save index
-        
                             $indexerHandler->saveIndex(
                                 $dimensions,
                                 $fullAction->rebuildStoreIndex($storeId, $newproductIds)
@@ -219,11 +218,12 @@ class MassActions extends AbstractPlugin
                 
                 }
 
-            }      
+            }   
+        }   
         }
         catch(Exception $er)
         {
-            $this->logger->error("Error ".$er);  
+            $this->logger->error($er->getMessage());  
         }     
         return $action;
     }

@@ -84,6 +84,8 @@ class StockItem extends AbstractPlugin
      */
     public function aroundSave(ResourceStockItem $subject, callable $proceed, AbstractModel $stockItem)
     {
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
         $origStockItem = $this->getOriginalStockItem($stockItem->getProductId());
               
         $result = $proceed($stockItem);
@@ -99,6 +101,8 @@ class StockItem extends AbstractPlugin
                 }
             }
         }
+    }
+     
         return $result;
     }
 
