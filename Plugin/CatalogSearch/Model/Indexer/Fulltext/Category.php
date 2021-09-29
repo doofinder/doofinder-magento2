@@ -2,11 +2,11 @@
 
 namespace Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext;
 
+use ArrayIterator;
 use Magento\Catalog\Model\ResourceModel\Category as ResourceCategory;
 use Doofinder\Feed\Registry\IndexerScope;
 use Magento\Framework\Model\AbstractModel;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Plugin\AbstractPlugin;
-use Magento\Store\Model\StoreDimensionProvider;
 use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\CatalogSearch\Model\Indexer\Fulltext as FulltextIndexer;
 use Doofinder\Feed\Model\ChangedProduct\Registration;
@@ -16,10 +16,7 @@ use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\FullFactory;
 use Magento\CatalogSearch\Model\ResourceModel\Fulltext as FulltextResource;
 use Magento\Framework\Indexer\ConfigInterface;
-
-
-
-
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
 /**
  * Catalog search indexer plugin for catalog category.
@@ -32,11 +29,6 @@ class Category extends AbstractPlugin
     private $registration;
 
     /**
-     * @var StoreDimensionProvider
-     */
-    private $storeDimensionProvider;
-
-    /**
      * @var StoreConfig
      */
     private $storeConfig;
@@ -45,33 +37,66 @@ class Category extends AbstractPlugin
      * @var IndexerRegistry
      */
     protected $indexerRegistry;
-
+    
+    /**
+     * indexerScope
+     *
+     * @var mixed
+     */
     private $indexerScope;
-
+    
+    /**
+     * indexerHelper
+     *
+     * @var mixed
+     */
     private $indexerHelper;
-
+    
+    /**
+     * config
+     *
+     * @var mixed
+     */
     protected $config;
-
+    
+    /**
+     * indexerHandlerFactory
+     *
+     * @var mixed
+     */
     private $indexerHandlerFactory;
-
+    
+    /**
+     * fullActionFactory
+     *
+     * @var mixed
+     */
     private $fullActionFactory;
-
+    
+    /** 
+     * fulltextResource
+     *
+     * @var mixed
+     */
     private $fulltextResource;
-
-
+    
+    /**
+     * logger
+     *
+     * @var mixed
+     */
+    private $logger;
 
 
 
 
     /**
-     * @param Registration $registration
-     * @param StoreDimensionProvider $storeDimensionProvider
+     * @param Registration $registration=
      * @param StoreConfig $storeConfig
      * @param IndexerRegistry $indexerRegistry
      */
     public function __construct(
         Registration $registration,
-        StoreDimensionProvider $storeDimensionProvider,
         IndexerScope $indexerScope,
         StoreConfig $storeConfig,
         IndexerRegistry $indexerRegistry,
@@ -79,10 +104,11 @@ class Category extends AbstractPlugin
         ConfigInterface $config,
         IndexerHandlerFactory $indexerHandlerFactory,
         FullFactory $fullActionFactory,
-        FulltextResource $fulltextResource
+        FulltextResource $fulltextResource,
+        PsrLoggerInterface $logger
+
     ) {
         $this->registration = $registration;
-        $this->storeDimensionProvider = $storeDimensionProvider;
         $this->storeConfig = $storeConfig;
         $this->indexerRegistry = $indexerRegistry;
         $this->indexerScope = $indexerScope;
@@ -91,150 +117,236 @@ class Category extends AbstractPlugin
         $this->indexerHandlerFactory = $indexerHandlerFactory;
         $this->fullActionFactory = $fullActionFactory;
         $this->fulltextResource = $fulltextResource;
-
-
+        $this->logger = $logger;
     }
-
-   public function getIdsOnly($allproducts)
-   {
-    $entityIds = [];
+    
+    /**
+     * getIdsOnly
+     *
+     * @param  mixed $allproducts
+     */
+    public function getIdsOnly($allproducts)
+    {
+        //set empty array
+        $entityIds = [];
         try 
         {
-            foreach ($allproducts as $product) 
-            {
-                $entityIds[] = $product->getId();
+            foreach ($allproducts as $product) {
+                //just get the id only
+                $entityIds[] = (int)$product->getId();
             }
-        return $entityIds;
-        } catch(\Exception $e) {
+            //return created product ids as array
+            return $entityIds;
+        } catch (\Exception $e) {
             return [];
         }
-
-   }
-
+    }
+     
+    /**
+     * aroundSave
+     *
+     * @param  mixed $resourceCategory
+     * @param  mixed $proceed
+     * @param  mixed $category
+     * @return void
+     */
     public function aroundSave(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
     {
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
         //get the old category name
         $origname = $category->getOrigData('name');
-
         //get the category new name
         $newname = $category->getData('name');
         $result = $proceed($category);
 
-        //check if there is a change in name then we get all affectec products
-        if ($origname != $newname) {
-            if (is_array($category->getAffectedProductIds())) {
-                    $this->updateDoofinder($category->getAffectedProductIds());
+        try {
+            //check if there is a change in name then we get all affectec products
+            if ($origname != $newname) {
+
+                if (is_array($category->getAffectedProductIds())) {
+                    $this->updateDoofinder(array_values($category->getAffectedProductIds()));
+                } else {
+
+                    //fetch all products assigned to this category
+                    $allproducts = $this->getIdsOnly($category->getProductCollection());
+                    //if the name has changed then we check for the affected items
+                    $this->updateDoofinder($allproducts);
+                }
             } else {
-
-                //fetch all products assigned to this category
-                $allproducts = $this->getIdsOnly($category->getProductCollection());
-                //if the name has changed then we check for the affected items
-                $this->updateDoofinder($allproducts);
- 
+                //if the name has not changed then we just get the affected items
+                $affectedProducts = $category->getAffectedProductIds();
+                if (is_array($affectedProducts)) {
+                    $this->updateDoofinder(array_values($affectedProducts));
+                }
             }
-
-        } else {
-            //if the name has not changed then we just get the affected items
-            $affectedProducts = $category->getAffectedProductIds();
-            $entityIds = [];
-            foreach ( $affectedProducts as $product) 
-            {
-                $entityIds[] = $product;
-            }
-            if (is_array($affectedProducts)) {
-                    $this->updateDoofinder($entityIds);
-            }
+        } catch (\Exception $ex) 
+        {
+            $this->logger->error($ex->getMessage());    
+            return $result;
         }
-
+    }
         return $result;
     }
-
-
-    public function updateDoofinder($productarray)
+    
+    /**
+     * updateDoofinder
+     *
+     * @param  mixed $productarray
+     * @return void
+     */
+    private function updateDoofinder($productarray)
     {
         //we know the products are affected  if this is not null
         $stores = $this->storeConfig->getAllStores();
         $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-
-        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-        $indexerHandler = $this->createDoofinderIndexerHandler($data);
-        $fullAction = $this->createFullAction($data);
-
+        //
         foreach ($stores as $store) {
             if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
-                if($indexer->isScheduled()) 
+                if ($indexer->isScheduled()) 
                 {
-                    foreach($productarray as $id)
-                    {
-                        $this->registration->registerUpdate(
-                            $id,
-                            $store->getCode()
-                        );
-                 }
-                }
-                else
+                    foreach ($productarray as $id) {
+                        try
+                        {
+                            //delete 
+                            $this->registration->registerDelete(
+                                $id,
+                                $store->getCode()
+                                );
+
+                            //recreate using update
+                            $this->registration->registerUpdate(
+                                $id,
+                                $store->getCode()
+                            );
+                         }
+                        catch (\Exception $ex) 
+                        {
+                            $this->logger->error($ex->getMessage());
+                        }
+                    }
+                } 
+                else 
                 {
                     try 
                     {
+                        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+                        $fullAction = $this->createFullAction($data);
+                        $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                        //get dimensions
                         $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
+                       //get store id and cast to integer
+                        $storeId = (int)$this->indexerHelper->getStoreIdFromDimensions($dimensions);
+
                         $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
+                       //
                         $productIds = array_unique(
                             array_merge($productarray, $this->fulltextResource->getRelationsByChild($productarray))
+                        );
+                        
+                        $indexerHandler->deleteIndex(
+                            $dimensions,
+                            new \ArrayIterator($productIds)
                         );
 
                         $indexerHandler->saveIndex(
                             $dimensions,
-                            $fullAction->rebuildStoreIndex($store->getCode(), $productIds)
+                            $fullAction->rebuildStoreIndex($storeId,$productIds)
                         );
-                } catch(\Exception $e) {
-                    throw $e;
-                } finally {
-                    $this->indexerScope->setIndexerScope(null);
-                }
 
+                    } catch (\Exception $ex) {
+                        //log the caught error
+                        $this->logger->error($ex->getMessage());
+                    }
+                     finally {
+                        $this->indexerScope->setIndexerScope(null);
+                        return;
+                    }
                 }
             }
         }
     }
 
-    private function createDoofinderIndexerHandler(array $data = []) {
+    private function createDoofinderIndexerHandler(array $data = [])
+    {
         return $this->indexerHandlerFactory->create($data);
     }
 
-    private function createFullAction(array $data) {
+    private function createFullAction(array $data)
+    {
         return $this->fullActionFactory->create(['data' => $data]);
     }
 
 
- 
-
     public function aroundDelete(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
     {
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
         //get the products that will be affected
         $allproducts = $this->getIdsOnly($category->getProductCollection());
 
         $result = $proceed($category);
         $stores = $this->storeConfig->getAllStores();
         $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-        $indexerHandler = $this->createDoofinderIndexerHandler($data);
-        $fullAction = $this->createFullAction($data);
-
+       
         foreach ($stores as $store) {
             if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
 
-                if ($indexer->isScheduled()) 
-                {
+                if ($indexer->isScheduled()) {
                     foreach ($allproducts  as $productid) {
+                        try
+                        {
                         $this->registration->registerDelete(
                             $productid,
                             $store->getCode()
                         );
+
+                        $this->registration->registerUpdate(
+                            $productid,
+                            $store->getCode()
+                        );
+                    }
+                    catch (\Exception $ex) 
+                    {
+                        $this->logger->error($ex->getMessage());
+                    }
                     }
                 }
-               
+                else
+                {
+                    try 
+                    {
+                        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+                       
+                        $indexerHandler = $this->createDoofinderIndexerHandler($data);                   
+                        $fullAction = $this->createFullAction($data);
+                        $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
+                        //get store id and cast to integer
+                        $storeId = (int)$this->indexerHelper->getStoreIdFromDimensions($dimensions);
+                        //
+                        $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
+                        //
+                        $productIds = array_unique(array_merge($allproducts, $this->fulltextResource->getRelationsByChild($allproducts)));
+
+                        $indexerHandler->saveIndex(
+                            $dimensions,
+                            $fullAction->rebuildStoreIndex($storeId,$productIds)
+                        );
+                     
+                    }
+                    catch (\Exception $ex) 
+                    {
+                        $this->logger->error($ex->getMessage());
+                    } 
+                    finally 
+                    {
+                        $this->indexerScope->setIndexerScope(null);
+                        return;
+                    }
+                }
             }
         }
+    }
         return $result;
     }
 }

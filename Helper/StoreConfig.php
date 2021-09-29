@@ -285,8 +285,9 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getManagementServerFromRequest()
     {
         $params = $this->_request->getParam('groups');
-        return $params['doofinder_account']['fields']['management_server']['value']
+       return  $params['doofinder_account']['fields']['management_server']['value']
             ?? $this->getManagementServer();
+         
     }
 
     /**

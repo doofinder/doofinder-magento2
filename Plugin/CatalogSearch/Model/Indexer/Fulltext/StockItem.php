@@ -4,7 +4,6 @@ namespace Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext;
 
 use Magento\CatalogInventory\Model\ResourceModel\Stock\Item as ResourceStockItem;
 use Magento\Framework\Model\AbstractModel;
-use Magento\Store\Model\StoreDimensionProvider;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Plugin\AbstractPlugin;
 use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\CatalogSearch\Model\Indexer\Fulltext as FulltextIndexer;
@@ -25,10 +24,6 @@ class StockItem extends AbstractPlugin
      */
     private $registration;
 
-    /**
-     * @var StoreDimensionProvider
-     */
-    private $storeDimensionProvider;
 
     /**
      * @var StoreConfig
@@ -57,7 +52,6 @@ class StockItem extends AbstractPlugin
 
     /**
      * @param Registration $registration
-     * @param StoreDimensionProvider $storeDimensionProvider
      * @param StoreConfig $storeConfig
      * @param IndexerRegistry $indexerRegistry
      * @param StockRegistryInterface $stockRegistry
@@ -66,7 +60,6 @@ class StockItem extends AbstractPlugin
      */
     public function __construct(
         Registration $registration,
-        StoreDimensionProvider $storeDimensionProvider,
         StoreConfig $storeConfig,
         IndexerRegistry $indexerRegistry,
         StockRegistryInterface $stockRegistry,
@@ -74,7 +67,6 @@ class StockItem extends AbstractPlugin
         StockItemCriteriaInterfaceFactory $stockItemCriteriaFactory
     ) {
         $this->registration = $registration;
-        $this->storeDimensionProvider = $storeDimensionProvider;
         $this->storeConfig = $storeConfig;
         $this->indexerRegistry = $indexerRegistry;
         $this->stockRegistry = $stockRegistry;
@@ -92,6 +84,8 @@ class StockItem extends AbstractPlugin
      */
     public function aroundSave(ResourceStockItem $subject, callable $proceed, AbstractModel $stockItem)
     {
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
         $origStockItem = $this->getOriginalStockItem($stockItem->getProductId());
               
         $result = $proceed($stockItem);
@@ -107,6 +101,8 @@ class StockItem extends AbstractPlugin
                 }
             }
         }
+    }
+     
         return $result;
     }
 

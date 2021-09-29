@@ -9,12 +9,12 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\CatalogSearch\Model\Indexer\Fulltext as FulltextIndexer;
 use Magento\Framework\Indexer\IndexerInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\TestFramework\TestCase\AbstractBackendController;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedProduct\Processor\CollectionProvider;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResource;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Doofinder\FeedCompatibility\Test\Api\BaseWebapi;
 
 use Doofinder\Feed\Test\Helper\Configuration as ConfigurationHelper;
 use Doofinder\Feed\Test\Helper\Product as ProductHelper;
@@ -25,7 +25,7 @@ use Doofinder\Feed\Test\Helper\Product as ProductHelper;
  * @magentoAppArea adminhtml
  * @magentoDbIsolation disabled
  */
-class StockItemUpdate extends \Magento\TestFramework\TestCase\WebapiAbstract
+class StockItemUpdate extends BaseWebapi
 {
     /** @var ObjectManagerInterface */
     private $objectManager;
@@ -54,10 +54,8 @@ class StockItemUpdate extends \Magento\TestFramework\TestCase\WebapiAbstract
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->objectManager = Bootstrap::getObjectManager();
         $this->mutableScopeConfig = $this->objectManager->create(MutableScopeConfigInterface::class);
         $this->productRepository = $this->objectManager->create(ProductRepositoryInterface::class);
@@ -75,13 +73,11 @@ class StockItemUpdate extends \Magento\TestFramework\TestCase\WebapiAbstract
     /**
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function tearDownTests()
     {
         $this->configHelper->cleanConfig();
         $this->resetRegisterCollections('default');
-        //$this->deleteProducts([$fixtureSKU]);
         $this->productHelper->deleteAllProducts();
-        parent::tearDown();
     }
 
     private function resetRegisterCollections($storeCode) {

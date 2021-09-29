@@ -124,7 +124,7 @@ class Processor
         $storeCode = $this->indexerHelper->getStoreCodeFromDimensions($dimensions);
         $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
         $collection = $this->collectionProvider->get(ChangedProductResource::OPERATION_UPDATE, $storeCode);
-
+       
         $this->indexerHandler->saveIndex(
             $dimensions,
             $this->documentsProvider->getUpdated($collection, $storeId)

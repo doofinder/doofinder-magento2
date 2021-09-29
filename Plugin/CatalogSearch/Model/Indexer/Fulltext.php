@@ -15,6 +15,8 @@ use Doofinder\Feed\Model\Indexer\IndexerHandlerFactory;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\FullFactory;
 use Magento\Framework\App\ObjectManager;
 use Doofinder\Feed\Model\Indexer\IndexStructure;
+use Exception;
+use finfo;
 
 // phpcs:disable Squiz.Commenting.FunctionComment.MissingParamTag
 // phpcs:disable Squiz.Commenting.FunctionComment.MissingParamName
@@ -82,6 +84,9 @@ class Fulltext
      */
     private $fullActionFactory;
 
+    protected $logger;
+
+
     /**
      * A constructor.
      *
@@ -108,7 +113,9 @@ class Fulltext
         ChangedProductFactory $changedFactory,
         IndexerHelper $indexerHelper,
         IndexerHandlerFactory $indexerHandlerFactory,
-        IndexStructure $indexStructure
+        IndexStructure $indexStructure,
+        \Psr\Log\LoggerInterface $logger
+
     ) {
         $this->fullActionFactory = $fullActionFactory;
         $this->storeConfig = $storeConfig;
@@ -121,6 +128,8 @@ class Fulltext
         $this->indexerHelper = $indexerHelper;
         $this->indexerHandlerFactory = $indexerHandlerFactory;
         $this->indexStructure = $indexStructure;
+        $this->logger = $logger;
+
     }
 
     /**
@@ -137,19 +146,24 @@ class Fulltext
     }
 
     public function beforeExecuteByDimensions(FulltextIndexer $indexer, array $dimensions, \Traversable $entityIds = null)
-    {
-        if ($this->indexerScope->getIndexerScope() != null) {
-            return;
-        }
-        $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-        if ($this->storeConfig->isUpdateByApiEnable($storeId)) {
-            if ($this->indexerHelper->isScheduled()) {
-                $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_DELAYED);
-            } else {
-                $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
+    {       
+
+            if ($this->indexerScope->getIndexerScope() != null) {
+                return;
             }
+            
+            $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
+            if ($this->storeConfig->isUpdateByApiEnable($storeId)) {
+                if ($this->indexerHelper->isScheduled()) {
+                    $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_DELAYED);
+                } 
+                else 
+                {
+                     $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);  
+                }
         }
     }
+
 
     /**
      * Execute after plugin (update/delete on doofinder indice) ONLY when theese conditions are met:
@@ -159,55 +173,40 @@ class Fulltext
      */
     public function afterExecuteByDimensions(FulltextIndexer $indexer, $result, array $dimensions, \Traversable $entityIds = null)
     {
-        $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-        if (
-            $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_ON_SAVE ||
-            $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_FULL
-        ) {
-            $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-            $indexerHandler = $this->createDoofinderIndexerHandler($data);
-            $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-            $fullAction = $this->createFullAction($data);
-            if (null === $entityIds) {
-                try {
-                    // reindexall
-                    $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
-                    // create temp index
-                    $this->indexStructure->create(null, [], $dimensions);
-                    // add items temp index, switch temporary index to the main one
-                    $indexerHandler->saveIndex(
-                        $dimensions,
-                        $fullAction->rebuildStoreIndex($storeId)
-                    );
-                } catch(\Exception $e) {
-                    throw $e;
-                } finally {
-                    $this->indexerScope->setIndexerScope(null);
-                }
-            } else {
-                try {
-                    $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
-                    $entityIds = iterator_to_array($entityIds);
-                    $productIds = array_unique(
-                        array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds))
-                    );
-                    
-                    $indexerHandler->deleteIndex(
-                        $dimensions,
-                        new \ArrayIterator($productIds)
-                    );
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
+             $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);      
+            if (
+                $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_ON_SAVE ||
+                $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_FULL
+            ) {
+                $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+                $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
+                $fullAction = $this->createFullAction($data);
 
-                    $indexerHandler->saveIndex(
-                        $dimensions,
-                        $fullAction->rebuildStoreIndex($storeId, $productIds)
-                    );
-
-                } catch(\Exception $e) {
-                    throw $e;
-                } finally {
-                    $this->indexerScope->setIndexerScope(null);
-                }
+                if (null === $entityIds) {
+                    try {
+                        // reindexall
+                        $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
+                        // create temp index
+                        $this->indexStructure->create(null, [], $dimensions);
+                        // // add items temp index, switch temporary index to the main one
+                        $indexerHandler->saveIndex(
+                            $dimensions,
+                            $fullAction->rebuildStoreIndex($storeId)
+                        );
+                    } catch(\Exception $e) {
+                        $this->logger->error('Doofinder : afterExecuteByDimensions '.$e->getMessage());    
+                        return $result;
+                    } finally {
+                        $this->indexerScope->setIndexerScope(null);
+                        return $result;
+                    }
+                } 
+            
             }
+        
         }
         
         return $result;

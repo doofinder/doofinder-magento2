@@ -73,6 +73,10 @@
             <plugin name="doofinder_catalogsearchFulltextCategory" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Category"/>
     </type>
 
+    <type name="Magento\Catalog\Model\Product\Action">
+        <plugin name="catalogsearchFulltextMassActions" type="Doofinder\Feed\Plugin\MassActions"/>
+    </type>
+
     <!--<type name="Magento\Catalog\Model\ResourceModel\Category">
         <plugin name="catalogsearchFulltextCategory" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Category"/>
     </type>

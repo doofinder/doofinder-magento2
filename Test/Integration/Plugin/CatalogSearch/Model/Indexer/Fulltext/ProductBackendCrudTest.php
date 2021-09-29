@@ -5,10 +5,10 @@ namespace Doofinder\Feed\Test\Integration\Plugin\CatalogSearch\Model\Indexer\Ful
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\TestFramework\TestCase\AbstractBackendController;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Doofinder\Feed\Model\ChangedProduct\Processor\CollectionProvider;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResource;
+use Doofinder\FeedCompatibility\Test\Integration\BaseBackendController;
 
 use Doofinder\Feed\Test\Helper\Configuration as ConfigurationHelper;
 use Doofinder\Feed\Test\Helper\Product as ProductHelper;
@@ -17,9 +17,9 @@ use Doofinder\Feed\Test\Helper\Product as ProductHelper;
  * Provide tests for the plugin.
  *
  * @magentoAppArea adminhtml
- * @magentoDbIsolation disabled
+ * @magentoDbIsolation enabled
  */
-class ProductBackendCrudTest extends AbstractBackendController
+class ProductBackendCrudTest extends BaseBackendController
 {
     /** @var ObjectManagerInterface */
     private $objectManager;
@@ -42,10 +42,8 @@ class ProductBackendCrudTest extends AbstractBackendController
     /**
      * @inheritdoc
      */
-    protected function setUp()
+    protected function setupTests()
     {
-        parent::setUp();
-
         $this->objectManager = Bootstrap::getObjectManager();
         $this->productRepository = $this->objectManager->create(ProductRepositoryInterface::class);
         $this->collectionProvider = $this->objectManager->create(CollectionProvider::class);
@@ -61,12 +59,11 @@ class ProductBackendCrudTest extends AbstractBackendController
     /**
      * @inheritdoc
      */
-    protected function tearDown()
+    protected function tearDownTests()
     {
         $this->configHelper->cleanConfig();
         $this->resetRegisterCollections('default');
         $this->productHelper->deleteAllProducts();
-        parent::tearDown();
     }
 
     /**
@@ -74,6 +71,7 @@ class ProductBackendCrudTest extends AbstractBackendController
      *
      * @dataProvider saveActionWithAlreadyExistingUrlKeyDataProvider
      * @magentoDbIsolation disabled
+     * 
      * @param array $postData
      * @return void
      */
@@ -137,8 +135,9 @@ class ProductBackendCrudTest extends AbstractBackendController
 
     /**
      * Test edit product
-     *
+     * 
      * @magentoDbIsolation disabled
+     *
      * @magentoDataFixture ../../../../app/code/Doofinder/Feed/Test/Integration/_files/product_simple.php
      */
     public function testEditProduct()
@@ -168,8 +167,9 @@ class ProductBackendCrudTest extends AbstractBackendController
 
     /**
      * Test delete product
-     *
+     * 
      * @magentoDbIsolation disabled
+     *
      * @magentoDataFixture ../../../../app/code/Doofinder/Feed/Test/Integration/_files/product_simple.php
      */
     public function testDeleteProduct()

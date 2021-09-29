@@ -16,6 +16,8 @@ use Doofinder\Feed\Registry\IndexerScope;
 use Doofinder\Feed\Model\ChangedProduct\Registration;
 use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Helper\StoreConfig;
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
+
 
 /**
  * Catalog search indexer plugin for catalog product used to register product
@@ -73,6 +75,15 @@ class Price extends AbstractPlugin
      */
     private $fullActionFactory;
 
+      /**
+     * logger
+     *
+     * @var mixed
+     */
+    private $logger;
+
+
+
     /**
      * @param Registration $registration
      * @param StoreConfig $storeConfig
@@ -95,7 +106,8 @@ class Price extends AbstractPlugin
         FulltextResource $fulltextResource,
         IndexerHandlerFactory $indexerHandlerFactory,
         ConfigInterface $config,
-        FullFactory $fullActionFactory
+        FullFactory $fullActionFactory,
+        PsrLoggerInterface $logger
     ) {
         $this->registration = $registration;
         $this->storeConfig = $storeConfig;
@@ -107,6 +119,8 @@ class Price extends AbstractPlugin
         $this->indexerHandlerFactory = $indexerHandlerFactory;
         $this->config = $config;
         $this->fullActionFactory = $fullActionFactory;
+        $this->logger = $logger;
+
     }
     /**
      * @param ItemResourceModel $subject
@@ -119,54 +133,72 @@ class Price extends AbstractPlugin
      */
     public function afterUpdate(BasePriceStorage $basePriceStorage, $result, array $prices)
     {
-        $entityIds = array();
-        $productModel = $this->productFactory->create();
-        $stores = $this->storeConfig->getAllStores();
-        $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-        $indexerHandler = $this->createDoofinderIndexerHandler($data);
-        $fullAction = $this->createFullAction($data);
-        foreach($stores as $store) {
-            if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
-                foreach ($prices as $price) {
-                    try {
-                        $sku = $price->getSku();
-                        if(!isset($entityIds[$sku])) {
-                            $entityIds[$sku] = $productModel->getIdBySku($sku);
+        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        {
+            $entityIds = array();
+            $productModel = $this->productFactory->create();
+            $stores = $this->storeConfig->getAllStores();
+            $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
+            
+            foreach($stores as $store) {
+                if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
+                    foreach ($prices as $price) {
+                        try 
+                        {
+                            $sku = $price->getSku();
+                            if(!isset($entityIds[$sku])) {
+                                $entityIds[$sku] = $productModel->getIdBySku($sku);
+                            }
+                        } catch (\Exception $e) {
+                            // TODO: log exception
+                            $this->logger->error($e->getMessage());
+                            continue;
                         }
-                    } catch (\Exception $e) {
-                        // TODO: log exception
-                        continue;
                     }
-                }
-            } 
+                } 
 
-            if ($indexer->isScheduled()) {
-                foreach ($entityIds as $id) {
-                    $this->registration->registerUpdate(
-                        $id, 
-                        $store->getCode()
-                    );
-                }
-            } else {
-                try {
-                    $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
-                    $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
-                    $productIds = array_unique(
-                        array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds))
-                    );
-                    $indexerHandler->deleteIndex(
-                        $dimensions,
-                        new \ArrayIterator($productIds)
-                    );
-                    $indexerHandler->saveIndex(
-                        $dimensions,
-                        $fullAction->rebuildStoreIndex($store->getId(), $productIds)
-                    );
-                } catch(\Exception $e) {
-                    throw $e;
-                } finally {
-                    $this->indexerScope->setIndexerScope(null);
+                if ($indexer->isScheduled()) {
+                    foreach ($entityIds as $id) {
+                        
+                        $this->registration->registerDelete(
+                            $id,
+                            $store->getCode()
+                            );
+                        $this->registration->registerUpdate(
+                            $id, 
+                            $store->getCode()
+                        );
+                    }
+                } else 
+                {
+                    try 
+                    {
+                        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+                        
+                        $fullAction = $this->createFullAction($data);
+                        
+                        $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                        
+                        $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
+                    
+                        $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
+                        
+                        $productIds = array_unique(
+                            array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds))
+                        );
+                        $indexerHandler->deleteIndex(
+                            $dimensions,
+                            new \ArrayIterator($productIds)
+                        );
+                        $indexerHandler->saveIndex(
+                            $dimensions,
+                            $fullAction->rebuildStoreIndex($store->getId(), $productIds)
+                        );
+                    } catch(\Exception $e) {
+                        throw $e;
+                    } finally {
+                        $this->indexerScope->setIndexerScope(null);
+                    }
                 }
             }
         }

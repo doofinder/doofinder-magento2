@@ -8,6 +8,7 @@ use Magento\Framework\Indexer\SaveHandler\IndexerInterface;
 use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Registry\IndexerScope;
 use Doofinder\Feed\Model\ChangedProduct\Registration;
+use Exception;
 
 /**
  * Class IndexerHandler
@@ -98,6 +99,7 @@ class IndexerHandler implements IndexerInterface
      * Check if indexer mode is Index on Save
      * @return boolean
      */
+   
     private function canProceed()
     {
         return $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_FULL
@@ -136,15 +138,18 @@ class IndexerHandler implements IndexerInterface
         }
 
         $scopeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-        foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
-            $docs = $this->mapper->get('update')->map($batchDocuments, $scopeId);
-            if ($this->isFullReindex()) {
-                $this->processor->add($docs, $dimensions);
-                continue;
+       
+            foreach ($this->batch->getItems($documents, $this->batchSize) as $batchDocuments) {
+               
+                $docs = $this->mapper->get('update')->map($batchDocuments, $scopeId);
+              
+                if ($this->isFullReindex()) {
+                    $this->processor->add($docs, $dimensions);
+                    continue;
+                }
+                $this->processor->update($docs, $dimensions);
             }
-            $this->processor->update($docs, $dimensions);
-        }
-
+   
         if ($this->isFullReindex()) {
             $this->processor->switchIndex($dimensions);
         }
