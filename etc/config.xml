@@ -3,11 +3,22 @@
     xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <doofinder_config_config>
+        
+            <doofinder_settings>
+                <doofinder_enabled>1</doofinder_enabled>
+            </doofinder_settings>
+
             <doofinder_account>
                 <api_key></api_key>
                 <management_server></management_server>
                 <search_server></search_server>
             </doofinder_account>
+             <doofinder_logging>
+                <fullindexing_enabled>1</fullindexing_enabled>
+                <doofinder_loglevel>[]</doofinder_loglevel>
+             </doofinder_logging>
+             
+
             <doofinder_search_engine>
                 <hash_id></hash_id>
                 <internal_search_enabled>0</internal_search_enabled>

@@ -14,7 +14,11 @@ use Doofinder\Feed\Model\Indexer\IndexStructure;
 use Magento\Framework\Indexer\ConfigInterface;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\FullFactory;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
+use Doofinder\Feed\Helper\Logger;
 use Magento\CatalogSearch\Model\ResourceModel\Fulltext as FulltextResource;
+
+use \Doofinder\Search\Client as SearchClient;
+
 
 use Exception;
 
@@ -95,6 +99,13 @@ class Product extends AbstractPlugin
      * @var mixed
      */
     private $fulltextResource;
+    
+    /**
+     * doofinderLogger
+     *
+     * @var mixed
+     */
+    private $doofinderLogger;
 
 
     /**
@@ -120,8 +131,8 @@ class Product extends AbstractPlugin
         IndexerScope $indexerScope,
         FullFactory $fullActionFactory,
         PsrLoggerInterface $logger,
-        FulltextResource $fulltextResource  
-
+        FulltextResource $fulltextResource,
+        Logger $doofinderlogger
 
     ) {
         $this->registration = $registration;
@@ -135,7 +146,12 @@ class Product extends AbstractPlugin
         $this->fullActionFactory = $fullActionFactory;
         $this->logger = $logger;
         $this->fulltextResource = $fulltextResource;
+        $this->doofinderLogger = $doofinderlogger;
+
     }
+
+    
+
     /**
      * Reindex on product save.
      *
@@ -145,11 +161,13 @@ class Product extends AbstractPlugin
      * @return ResourceProduct
      * @throws \Exception
      */
+    
 
     public function afterSave(ResourceProduct $productResource, $result, AbstractModel $product)
     {
-        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
-        {
+       // $product->setData('sed_extra_days',"Delivery estimated by 12 of November");
+          if ($this->storeConfig->isDoofinderFeedConfigured())
+          {
             $stores = $this->storeConfig->getAllStores();
             $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID); 
             foreach($stores as $store) 
@@ -158,7 +176,6 @@ class Product extends AbstractPlugin
                 if ($this->storeConfig->isUpdateByApiEnable($store->getCode()))
                 {       
                    
-
                     //check the isScheduled variable if true
                     if($indexer->isScheduled()) 
                     {
@@ -167,11 +184,16 @@ class Product extends AbstractPlugin
                             $product->getId(), 
                             $store->getCode()
                             );
+
                             //if true use registerUpdate
                             $this->registration->registerUpdate(
                                 $product->getId(), 
                                 $store->getCode()
                             );
+
+                            $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSchedule'],'Location'=>['function'=>'afterSave','product'=>['productid'=>$product->getId(),'storecode'=> $store->getCode()]]);
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);
+
                     }
                     else
                     {
@@ -183,7 +205,7 @@ class Product extends AbstractPlugin
                         }
                         catch (\LogicException $e) 
                         {
-                            $this->logger->error($e->getMessage()); 
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterSave'],'exception'=>['message'=>$e->getMessage(),'stacktrace'=>$e->getTraceAsString()]));
                         }
                         //if it is false  its on save
                         //get dimensions
@@ -216,12 +238,19 @@ class Product extends AbstractPlugin
                                 $dimensions,
                                 $fullAction->rebuildStoreIndex($storeId, $productIds)
                             );
-        
-                        } catch(\Exception $e) 
-                        {
-                            $this->logger->error($e->getMessage());                             
 
-                        } finally {
+                            $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterSave','product'=>['productid'=>$product->getId(),'storecode'=> $store->getCode()]]);
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);
+        
+                        } 
+                        catch(\Exception $e) 
+                        {
+                            $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterSave','product'=>['productid'=>$product->getId(),'storecode'=> $store->getCode()],'exception'=>['message'=>$e->getMessage(),'stacktrace'=>$e->getTraceAsString()]]);
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);                          
+
+                        }
+                        finally 
+                        {
                              $this->indexerScope->setIndexerScope(null);
                             return $result;
                         }
@@ -230,7 +259,7 @@ class Product extends AbstractPlugin
                 }
 
             }      
-        }            
+          }            
         return $result;
     }
 
@@ -245,7 +274,8 @@ class Product extends AbstractPlugin
      */
     public function afterDelete(ResourceProduct $productResource, $result, AbstractModel $product)
     {
-        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+
+        if ($this->storeConfig->isDoofinderFeedConfigured())
         {
         $stores = $this->storeConfig->getAllStores();
         $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
@@ -262,6 +292,8 @@ class Product extends AbstractPlugin
                         $product->getId(), 
                         $store->getCode()
                     );
+
+                    $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSchedule'],'Location'=>['function'=>'afterDelete','product'=>$product->getId()]));
                 }
                 else
                 {
@@ -294,11 +326,14 @@ class Product extends AbstractPlugin
                             $dimensions,
                             $fullAction->rebuildStoreIndex($storeId, $productIds)
                         );
+                        $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterDelete','product'=>$product->getId()]);
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);
     
                     } catch(\Exception $e) 
                     {
-                        //log any cought error here
-                        $this->logger->error($e->getMessage());    
+                        //log any cought error here                    
+                        $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterDelete','exception'=>['message'=>$e->getMessage()]]);
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);
 
                     } 
                     finally 

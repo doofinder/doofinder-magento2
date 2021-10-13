@@ -17,6 +17,8 @@
             <label>Configuration</label>
             <tab>doofinder_config</tab>
             <resource>Doofinder_Feed::config</resource>
+
+       
             <group id="doofinder_account"
                     translate="label"
                     type="text"
@@ -47,7 +49,7 @@
                        showInWebsite="0">
                     <label>Search server</label>
                     <comment>
-                        <![CDATA[ Address for the search server (eg. eu1-search.doofinder.com) ]]>
+                        <![CDATA[ Address for the search server (eg. https://eu1-search.doofinder.com) ]]>
                     </comment>
                 </field>
                 <field id="management_server"
@@ -59,7 +61,70 @@
                        showInWebsite="0">
                     <label>Management server</label>
                     <comment>
-                        <![CDATA[ Address for the management server (eg. eu1-api.doofinder.com) ]]>
+                        <![CDATA[ Address for the management server (eg. https://eu1-api.doofinder.com) ]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="doofinder_logging"
+                   translate="label"
+                   type="text"
+                   sortOrder="20"
+                   showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Logging</label>
+
+                 <field id="doofinder_loglevel"
+                       translate="label"
+                       type="select"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInStore="0"
+                       showInWebsite="0">
+                    <label>Log severity level</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Level\LogLevel</source_model>
+                <comment>
+                        <![CDATA[ Raise or lower the log severity level.]]>
+                    </comment>
+                </field>
+
+                <field id="fullindexing_enabled"
+                       translate="label"
+                       type="select"
+                       sortOrder="40"
+                       showInDefault="1"
+                       showInStore="0"
+                       showInWebsite="0">
+                    <label>Full Indexing Logs</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[ Activate/deactivate recording of logs during indexing.]]>
+                    </comment>
+
+                </field>
+
+                
+            </group>
+               <group id="doofinder_attributesconversion"
+                   translate="label"
+                   type="text"
+                   sortOrder="30"
+                   showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Attributes type conversion</label>
+            
+               <field id="searchableproduct_attributes"
+                       translate="label"
+                       type="multiselect"
+                       sortOrder="50"
+                       showInDefault="1"
+                       showInStore="0"
+                       showInWebsite="0">
+                    <label>Choose attributes</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\SearchableAttributes</source_model>
+                <comment>
+                        <![CDATA[ Selected attributes will be converted to (int) before being sent to Doofinder.]]>
                     </comment>
                 </field>
             </group>
@@ -100,6 +165,7 @@
                     </comment>
                 </field>
             </group>
+
             <group id="doofinder_layer"
                    translate="label"
                    type="text"

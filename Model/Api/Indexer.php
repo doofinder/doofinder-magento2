@@ -8,6 +8,8 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Helper\Serializer;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
+use Doofinder\Feed\Helper\Logger;
+use Doofinder\Feed\Helper\Utils;
 
 
 /**
@@ -47,6 +49,16 @@ class Indexer
      * @var mixed
      */
     private $logger;
+
+    /**
+     * doofinderLogger
+     *
+     * @var mixed
+     */
+    private $doofinderLogger;
+
+
+    
     /**
      * Indexer constructor.
      * @param ManagementClientFactory $managementClientFactory
@@ -59,13 +71,16 @@ class Indexer
         StoreConfig $storeConfig,
         IndexerHelper $indexerHelper,
         Serializer $serializer,
-        PsrLoggerInterface $logger
+        PsrLoggerInterface $logger,
+        Logger $doofinderlogger
+
     ) {
         $this->managementClientFactory = $managementClientFactory;
         $this->storeConfig = $storeConfig;
         $this->indexerHelper = $indexerHelper;
         $this->serializer = $serializer;
         $this->logger = $logger;
+        $this->doofinderLogger = $doofinderlogger;
 
     }
 
@@ -78,11 +93,22 @@ class Indexer
 
     public function deleteDoofinderIndex(array $dimensions, $indexName)
     {
-        $hashId = $this->getHashId($dimensions);
-        $this->getClient()->deleteIndex(
-            $hashId,
-            $indexName
-        );
+        $response = null;
+        try
+        {                    
+            $hashId = $this->getHashId($dimensions);
+            $response = $this->getClient()->deleteIndex(
+                $hashId,
+                $indexName
+            );
+            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'deleteDoofinderIndex','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId],'response'=>Utils::validateJSON($response)]));  
+        }
+        catch (\Exception $exception) 
+        {
+            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'deleteDoofinderIndex','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId],'response'=>Utils::validateJSON($response)],'exception'=>['message'=>$exception->getMessage(),'stacktrace'=>$exception->getTraceAsString()]));  
+
+        }
+
     }
 
     /**
@@ -93,19 +119,44 @@ class Indexer
      */
     public function createDoofinderIndex(array $dimensions, $indexName)
     {
-        $hashId = $this->getHashId($dimensions);
-        $options = [
-            'options' => [
-                'exclude_out_of_stock_items' => false,
-                'group_variants' => false,
-            ],
-            'name' => $indexName,
-            'preset' => 'product'
-        ];
-        $this->getClient()->createIndex(
-            $hashId,
-            $this->serializer->serialize($options)
-        );
+        $response = null;
+        try
+        {
+            $hashId = $this->getHashId($dimensions);
+            $options = [
+                'options' => [
+                    'exclude_out_of_stock_items' => false,
+                    'group_variants' => false,
+                ],
+                'name' => $indexName,
+                'preset' => 'product'
+            ];
+           $response =  $this->getClient()->createIndex(
+                $hashId,
+                $this->serializer->serialize($options)
+            );
+
+            //loging
+          
+            if($this->storeConfig->isIndexingLogsAllowed())
+            {
+             $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'createDoofinderIndex','payload'=>['hashid'=> $hashId,'options'=> $options],'response'=>Utils::validateJSON($response)]));  
+            }
+            else
+            {
+                 $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'createDoofinderIndex'],'response'=>Utils::validateJSON($response)));  
+            }
+        } catch (\Exception $exception) {
+
+            if($this->storeConfig->isIndexingLogsAllowed())
+            {
+                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'createDoofinderIndex','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'options'=>$options],'response'=>Utils::validateJSON($response)],'exception'=>['message'=>$exception->getMessage(),'stacktrace'=>$exception->getTraceAsString()]));  
+            }
+            else
+            {
+                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'createDoofinderIndex','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId],'response'=>Utils::validateJSON($response)],'exception'=>['message'=>$exception->getMessage(),'stacktrace'=>$exception->getTraceAsString()]));  
+            }
+        }
     }
 
     /**
@@ -114,27 +165,29 @@ class Indexer
      * @param string $indexName
      * @return void
      */
+    
     public function createDoofinderIndexTemp(array $dimensions, $indexName)
     {
         $hashId = $this->getHashId($dimensions);
+        $response = null;
         try 
         {
            $response =  $this->getClient()->createTemporaryIndex(
                 $hashId,
                 $indexName
             );
-            
-            $this->logger->info('CreateIndex'.$hashId.' Index '.$indexName.' Reponse '.$response);    
+           
+            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'createDoofinderIndexTemp','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId],'response'=>Utils::validateJSON($response)]));  
 
         } catch (\Exception $exception) {
             $this->getClient()->deleteTemporaryIndex($hashId, $indexName);
-            $this->getClient()->createTemporaryIndex(
+          
+           $response =  $this->getClient()->createTemporaryIndex(
                 $hashId,
                 $indexName
             );
             //logging caught error
-            $this->logger->error('Doofinder : CreateIndex '.$hashId.' Index '.$indexName.' Error '.$exception->getMessage());    
-
+            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'createDoofinderIndexTemp','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId],'response'=>Utils::validateJSON($response),'exception'=>['message'=>$exception->getMessage(),'stacktrace'=>$exception->getTraceAsString()]]));  
         }
     }
 
@@ -153,10 +206,12 @@ class Indexer
                 $hashId,
                 $indexName
             );
+
             return (bool) $index->getName();
         } catch (\Exception $exception) {
             //logging caught error
-            $this->logger->error('Doofinder : '.$exception->getMessage());    
+            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'isIndexExists','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId]],'exception'=>['message'=>$exception->getMessage(),'stacktrace'=>$exception->getTraceAsString()]));  
+  
             return false;
         }
     }
@@ -170,24 +225,37 @@ class Indexer
      */
     public function addItems(array $items, array $dimensions, $indexName)
     { 
-       
+        $response = null;
+        $hashId = $this->getHashId($dimensions);
             try
-            {
-                $hashId = $this->getHashId($dimensions);
+            {              
                 $response = $this->getClient()->createTempBulk(
                     $hashId,
                     $indexName,
                     $this->serializer->serialize($items)
                 );
-                $this->logger->info('Doofinder : AddItems '.$hashId.' Index :  '.$indexName.' Response '.$response);    
+
+                if($this->storeConfig->isIndexingLogsAllowed())
+                {
+                  $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'addItems','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'items'=>$items],'response'=>Utils::validateJSON($response)]));  
+                }
+                else
+                {
+                  $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'addItems','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'itemscount'=>count($items)],'response'=>Utils::validateJSON($response)]));  
+                }
 
              }
             catch(\Exception $ex)
             {   
-                $this->logger->error('Doofinder : AddItems '.$hashId.' Index  : '.$indexName.' '.$ex->getMessage());    
+                if($this->storeConfig->isIndexingLogsAllowed())
+                {
+                    $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'addItems','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'items'=>$items],'reponse'=>Utils::validateJSON($response)],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
+                }
+                else
+                {
+                    $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'addItems','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'itemscount'=>count($items)],'reponse'=>Utils::validateJSON($response)],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
+                }
             }               
-        
-
     }
 
     /**
@@ -200,30 +268,29 @@ class Indexer
 
     public function updateItems(array $items, array $dimensions, $indexName)
     {
-     
-        $count = 2;           
+        $hashId = $this->getHashId($dimensions);           
+
+        $count = 2;   
+
+        $response = null;
         do
         {          
             try
             {                                            
-              $hashId = $this->getHashId($dimensions);                
               $response = $this->getClient()->createBulk(
                     $hashId,
                     $indexName,
                     $this->serializer->serialize($items)
-                );                
-                $this->logger->info('Doofinder : UpateItems '.$hashId.' Index :  '.$indexName.' Response '.$response);    
-
-            break;
-                
+                );          
+   
+                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'updateItems','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'items'=>$items],'response'=>Utils::validateJSON($response)]));  
+               break;                
             }
             catch(\Exception $ex)
             {   
                $count =$count - 1;
                //log here
-               $this->logger->error('Doofinder : UpateItems '.$hashId.' Index  : '.$indexName.' '.$ex->getMessage());    
-
-
+               $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'updateItems','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'items'=>$items]],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
             }               
         
            }while($count > 0);
@@ -239,6 +306,7 @@ class Indexer
     {
       
             $hashId = $this->getHashId($dimensions);
+            $response = null;
             try
             {                      
                $response =  $this->getClient()->deleteBulk(
@@ -246,13 +314,15 @@ class Indexer
                     $indexName,
                     $this->serializer->serialize($items)
                 );
-            $this->logger->info('Doofinder : DeleteItems '.$hashId.' Index :  '.$indexName.' Response '.$response);    
+
+                //log
+               $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'deleteItems','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'items'=>$items],'response'=>Utils::validateJSON($response)]));  
 
             }
             catch(\Exception $ex)
             {
-                $this->logger->error('Doofinder : DeleteItems '.$hashId.' Index  : '.$indexName.' '.$ex->getMessage());    
-
+                //error log
+                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'deleteItems','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'items'=>$items]],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
             }
     }
 

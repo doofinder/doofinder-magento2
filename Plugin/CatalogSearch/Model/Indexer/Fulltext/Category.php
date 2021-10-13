@@ -17,6 +17,7 @@ use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\FullFactory;
 use Magento\CatalogSearch\Model\ResourceModel\Fulltext as FulltextResource;
 use Magento\Framework\Indexer\ConfigInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
+use Doofinder\Feed\Helper\Logger;
 
 /**
  * Catalog search indexer plugin for catalog category.
@@ -86,6 +87,14 @@ class Category extends AbstractPlugin
      * @var mixed
      */
     private $logger;
+    
+    /**
+     * doofinderLogger
+     *
+     * @var mixed
+     */
+    private $doofinderLogger;
+
 
 
 
@@ -105,7 +114,9 @@ class Category extends AbstractPlugin
         IndexerHandlerFactory $indexerHandlerFactory,
         FullFactory $fullActionFactory,
         FulltextResource $fulltextResource,
-        PsrLoggerInterface $logger
+        PsrLoggerInterface $logger,
+        Logger $doofinderlogger
+
 
     ) {
         $this->registration = $registration;
@@ -118,7 +129,10 @@ class Category extends AbstractPlugin
         $this->fullActionFactory = $fullActionFactory;
         $this->fulltextResource = $fulltextResource;
         $this->logger = $logger;
+        $this->doofinderLogger = $doofinderlogger;
+
     }
+
     
     /**
      * getIdsOnly
@@ -152,7 +166,7 @@ class Category extends AbstractPlugin
      */
     public function aroundSave(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
     {
-        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        if ($this->storeConfig->isDoofinderFeedConfigured())
         {
         //get the old category name
         $origname = $category->getOrigData('name');
@@ -182,7 +196,8 @@ class Category extends AbstractPlugin
             }
         } catch (\Exception $ex) 
         {
-            $this->logger->error($ex->getMessage());    
+            //log
+            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category'],'Location'=>['function'=>'aroundSave','category'=>$category],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
             return $result;
         }
     }
@@ -219,10 +234,13 @@ class Category extends AbstractPlugin
                                 $id,
                                 $store->getCode()
                             );
+                            //log
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundSave','product'=>$id,'storecode'=>$store->getCode()]));  
+
                          }
                         catch (\Exception $ex) 
                         {
-                            $this->logger->error($ex->getMessage());
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundSave','product'=>$id,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
                         }
                     }
                 } 
@@ -254,9 +272,14 @@ class Category extends AbstractPlugin
                             $fullAction->rebuildStoreIndex($storeId,$productIds)
                         );
 
+                        //log
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSave'],'Location'=>['function'=>'aroundSave','product'=> $productIds,'storecode'=>$store->getCode()]));  
+
+
                     } catch (\Exception $ex) {
                         //log the caught error
-                        $this->logger->error($ex->getMessage());
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSave'],'Location'=>['function'=>'aroundSave','product'=>$id,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
+
                     }
                      finally {
                         $this->indexerScope->setIndexerScope(null);
@@ -280,7 +303,7 @@ class Category extends AbstractPlugin
 
     public function aroundDelete(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
     {
-        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        if ($this->storeConfig->isDoofinderFeedConfigured())
         {
         //get the products that will be affected
         $allproducts = $this->getIdsOnly($category->getProductCollection());
@@ -296,19 +319,21 @@ class Category extends AbstractPlugin
                     foreach ($allproducts  as $productid) {
                         try
                         {
-                        $this->registration->registerDelete(
-                            $productid,
-                            $store->getCode()
-                        );
+                            $this->registration->registerDelete(
+                                $productid,
+                                $store->getCode()
+                            );
 
-                        $this->registration->registerUpdate(
-                            $productid,
-                            $store->getCode()
-                        );
+                            $this->registration->registerUpdate(
+                                $productid,
+                                $store->getCode()
+                            );
+                           $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=> $productid,'storecode'=>$store->getCode()]));  
+
                     }
                     catch (\Exception $ex) 
                     {
-                        $this->logger->error($ex->getMessage());
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productid,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
                     }
                     }
                 }
@@ -332,11 +357,14 @@ class Category extends AbstractPlugin
                             $dimensions,
                             $fullAction->rebuildStoreIndex($storeId,$productIds)
                         );
+
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productIds,'storecode'=>$store->getCode()]));  
+
                      
                     }
                     catch (\Exception $ex) 
                     {
-                        $this->logger->error($ex->getMessage());
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productIds,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
                     } 
                     finally 
                     {
