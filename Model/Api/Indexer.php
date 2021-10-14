@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Doofinder\Feed\Helper\Logger;
 use Doofinder\Feed\Helper\Utils;
 
-
 /**
  * Class Indexer
  * The class responsible for communicating between Magento and Doofinder API Library
@@ -57,8 +56,9 @@ class Indexer
      */
     private $doofinderLogger;
 
+  
+  
 
-    
     /**
      * Indexer constructor.
      * @param ManagementClientFactory $managementClientFactory
