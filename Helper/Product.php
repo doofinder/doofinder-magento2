@@ -356,31 +356,35 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getProductAvailability(\Magento\Catalog\Model\Product $product)
     {
-        if ($this->getStockItem($product->getId())->getIsInStock()) {
-            return $this->getInStockLabel();
+        //In Stock -> Em Stock | Out of Stock -> Sem Stock
+        if ($this->getStockItem($product->getId())->getIsInStock())
+        {            
+         return $this->getInStockLabel();
         }
+        return  $this->getOutOfStockLabel();
+         
 
-        return $this->getOutOfStockLabel();
+        //translate labels to portuguese
     }
 
     /**
-     * Get product 'out of stock' label
+     * Get product EN ='out of stock' PT ='Sem Stock' label
      *
      * @return string
      */
     public function getOutOfStockLabel()
     {
-        return 'out of stock';
+        return __(__('out of stock'));
     }
 
     /**
-     * Get product 'in stock' label
+     * Get product EN ='in stock' PT ='Em Stock' label
      *
      * @return string
      */
     public function getInStockLabel()
     {
-        return 'in stock';
+        return __(__('in stock'));
     }
 
     /**

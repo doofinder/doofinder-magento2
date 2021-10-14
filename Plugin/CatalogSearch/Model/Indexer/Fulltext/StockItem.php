@@ -12,6 +12,8 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\CatalogInventory\Api\StockItemRepositoryInterface;
 use Magento\CatalogInventory\Api\StockItemCriteriaInterfaceFactory;
+use Doofinder\Feed\Helper\Logger;
+
 
 /**
  * Catalog search indexer plugin for catalog product used to register product
@@ -50,6 +52,15 @@ class StockItem extends AbstractPlugin
      */
     protected $stockItemCriteriaFactory;
 
+    
+    /**
+     * doofinderLogger
+     *
+     * @var mixed
+     */
+    private $doofinderLogger;
+
+
     /**
      * @param Registration $registration
      * @param StoreConfig $storeConfig
@@ -64,7 +75,8 @@ class StockItem extends AbstractPlugin
         IndexerRegistry $indexerRegistry,
         StockRegistryInterface $stockRegistry,
         StockItemRepositoryInterface $stockItemRepository,
-        StockItemCriteriaInterfaceFactory $stockItemCriteriaFactory
+        StockItemCriteriaInterfaceFactory $stockItemCriteriaFactory,
+        Logger $doofinderlogger
     ) {
         $this->registration = $registration;
         $this->storeConfig = $storeConfig;
@@ -72,6 +84,8 @@ class StockItem extends AbstractPlugin
         $this->stockRegistry = $stockRegistry;
         $this->stockItemRepository = $stockItemRepository;
         $this->stockItemCriteriaFactory = $stockItemCriteriaFactory;
+        $this->doofinderLogger = $doofinderlogger;
+
     }
     /**
      * @param ItemResourceModel $subject
@@ -84,28 +98,38 @@ class StockItem extends AbstractPlugin
      */
     public function aroundSave(ResourceStockItem $subject, callable $proceed, AbstractModel $stockItem)
     {
-        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        if ($this->storeConfig->isDoofinderFeedConfigured())
         {
-        $origStockItem = $this->getOriginalStockItem($stockItem->getProductId());
-              
-        $result = $proceed($stockItem);
-        if ($this->registerUpdate($origStockItem, $stockItem)) {
-            $stores = $this->storeConfig->getAllStores();
-            $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-            foreach($stores as $store) {
-                if ($this->storeConfig->isUpdateByApiEnable($store->getCode()) && $indexer->isScheduled()) {
-                    $this->registration->registerUpdate(
-                        $stockItem->getProductId(), 
-                        $store->getCode()
-                    );
+            $origStockItem = $this->getOriginalStockItem($stockItem->getProductId());
+                
+            $result = $proceed($stockItem);
+            if ($this->registerUpdate($origStockItem, $stockItem)) 
+            {
+                $stores = $this->storeConfig->getAllStores();
+                $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
+                foreach($stores as $store) 
+                {
+                    if ($this->storeConfig->isUpdateByApiEnable($store->getCode()) && $indexer->isScheduled()) 
+                    {
+                        $this->registration->registerUpdate(
+                            $stockItem->getProductId(), 
+                            $store->getCode()
+                        );
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'StockItem','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundSave','product'=>['productid'=> $stockItem->getProductId(),'storecode'=> $store->getCode()]]));  
+                    }
                 }
             }
         }
-    }
      
         return $result;
     }
-
+    
+    /**
+     * getOriginalStockItem
+     *
+     * @param  mixed $productId
+     * @return void
+     */
     private function getOriginalStockItem($productId) {
         $criteria = $this->stockItemCriteriaFactory->create();
         $criteria->setProductsFilter($productId);
@@ -113,7 +137,14 @@ class StockItem extends AbstractPlugin
         $stockItem = current($collection->getItems());
         return $stockItem;
     }
-
+    
+    /**
+     * registerUpdate
+     *
+     * @param  mixed $origStockItem
+     * @param  mixed $stockItem
+     * @return void
+     */
     private function registerUpdate($origStockItem, $stockItem) {
         if ($origStockItem && $origStockItem->getIsInStock() != $stockItem->getIsInStock()) {
             return true;

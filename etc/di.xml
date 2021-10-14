@@ -60,7 +60,7 @@
     </type>
     <!-- plugins "on schedule" -->
     <type name="Magento\Catalog\Model\ResourceModel\Product">
-        <plugin name="doofinder_catalogsearchFulltextProduct" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Product"/>
+        <plugin name="doofinder_catalogsearchFulltextProduct" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Product" sortOrder="1000"/>
     </type>
     <type name="Magento\Catalog\Model\Product\Price\BasePriceStorage">
         <plugin name="doofinder_catalogsearchFulltextProductPrice" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Product\Price"/>
@@ -76,6 +76,12 @@
     <type name="Magento\Catalog\Model\Product\Action">
         <plugin name="catalogsearchFulltextMassActions" type="Doofinder\Feed\Plugin\MassActions"/>
     </type>
+<!-- doofinder logger -->
+    <!-- <type name="Doofinder\Feed\Helper\Logger">
+    <arguments>
+        <argument name="logger" xsi:type="object">DoofinderLogger</argument>
+    </arguments>
+</type> -->
 
     <!--<type name="Magento\Catalog\Model\ResourceModel\Category">
         <plugin name="catalogsearchFulltextCategory" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Category"/>
@@ -118,6 +124,14 @@
             </argument>
         </arguments>
     </type>
+   <!-- doofinder logger virtualtype-->
+    <!-- <virtualType name="DoofinderLogger" type="Magento\Framework\Logger\Monolog">
+    <arguments>
+        <argument name="handlers" xsi:type="array">
+            <item name="error" xsi:type="object">Doofinder\Feed\Logger\Handler\ErrorHandler</item>
+        </argument>
+    </arguments>
+    </virtualType> -->
 
     <virtualType name="doofinderAttributesAll" type="Doofinder\Feed\Model\Config\Source\Feed\Attributes">
         <arguments>

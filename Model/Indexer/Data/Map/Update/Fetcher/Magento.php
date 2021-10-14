@@ -3,6 +3,7 @@
 namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 
 use Doofinder\Feed\Model\Indexer\Data\Map\Update\FetcherInterface;
+use Exception;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider;
 use Magento\Eav\Model\Entity\Attribute;
 
@@ -40,6 +41,13 @@ class Magento implements FetcherInterface
      * @var array|null
      */
     private $processed;
+    
+    /**
+     * storeConfig
+     *
+     * @var mixed
+     */
+    private $storeConfig;
 
     /**
      * Magento constructor.
@@ -47,11 +55,14 @@ class Magento implements FetcherInterface
      * @param array $excludedAttributes
      */
     public function __construct(
+        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
         DataProvider $dataProvider,
         array $excludedAttributes = []
     ) {
         $this->dataProvider = $dataProvider;
         $this->excludedAttributes = $excludedAttributes;
+        $this->storeConfig = $storeConfig;
+
     }
 
     /**
@@ -147,6 +158,7 @@ class Magento implements FetcherInterface
                 }
             }
         }
+        //
 
         return $productAttributes;
     }
@@ -170,17 +182,79 @@ class Magento implements FetcherInterface
             ];
         }
 
-        if ($attribute->getFrontendInput() === 'multiselect') {
+        if ($attribute->getFrontendInput() === 'multiselect') 
+        {
             $attributeValues = $this->prepareMultiselectValues($attributeValues);
         }
 
         if ($this->isAttributeDate($attribute)) {
+            //check the input type
             foreach ($attributeValues as $key => $attributeValue) {
                 $attributeValues[$key] = $attributeValue;
             }
         }
 
+        if ($this->convertAttributeType($attribute)) 
+        {
+            // 
+            foreach ($attributeValues as $key => $attributeValue) 
+            {
+                $attributeValues[$key] = $this->changeType('int',$attributeValue);
+            }
+        }
+
         return $attributeValues;
+    }
+        
+    /**
+     * changeType
+     *
+     * @param  mixed $type
+     * @param  mixed $value
+     * @return void
+     */
+    public function changeType($type,$value)
+    {
+        $converted=null;
+
+        switch($type)
+        {
+            case 'int':
+                try
+                {
+                     $converted = (int)$value;
+                }
+                catch(Exception $ex)
+                {
+                    $converted = $value;
+                }
+            break;
+
+        }
+        return $converted;
+    }
+    /**
+     * convertAttributeType
+     *
+     * @param  mixed $attribute
+     * @return void
+     */
+    private function convertAttributeType($attribute)
+    {
+        try
+        {
+            if (in_array($attribute->getAttributeCode(), $this->storeConfig->getAttributesForConversion(), true)) 
+            {
+                return true;
+            }
+            return false;
+        }
+        catch(Exception $ex)
+        {
+            return false;
+        }
+           
+        
     }
 
     /**

@@ -17,7 +17,7 @@ use Doofinder\Feed\Model\ChangedProduct\Registration;
 use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Helper\StoreConfig;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
-
+use Doofinder\Feed\Helper\Logger;
 
 /**
  * Catalog search indexer plugin for catalog product used to register product
@@ -81,6 +81,13 @@ class Price extends AbstractPlugin
      * @var mixed
      */
     private $logger;
+    
+    /**
+     * doofinderLogger
+     *
+     * @var mixed
+     */
+    private $doofinderLogger;
 
 
 
@@ -107,7 +114,9 @@ class Price extends AbstractPlugin
         IndexerHandlerFactory $indexerHandlerFactory,
         ConfigInterface $config,
         FullFactory $fullActionFactory,
-        PsrLoggerInterface $logger
+        PsrLoggerInterface $logger,
+        Logger $doofinderlogger
+
     ) {
         $this->registration = $registration;
         $this->storeConfig = $storeConfig;
@@ -120,6 +129,8 @@ class Price extends AbstractPlugin
         $this->config = $config;
         $this->fullActionFactory = $fullActionFactory;
         $this->logger = $logger;
+        $this->doofinderLogger = $doofinderlogger;
+
 
     }
     /**
@@ -133,7 +144,7 @@ class Price extends AbstractPlugin
      */
     public function afterUpdate(BasePriceStorage $basePriceStorage, $result, array $prices)
     {
-        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        if ($this->storeConfig->isDoofinderFeedConfigured())
         {
             $entityIds = array();
             $productModel = $this->productFactory->create();
@@ -151,7 +162,8 @@ class Price extends AbstractPlugin
                             }
                         } catch (\Exception $e) {
                             // TODO: log exception
-                            $this->logger->error($e->getMessage());
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Price'],'Location'=>['function'=>'afterUpdate','product'=>['products'=>  $entityIds,'storecode'=> $store->getCode()],'exception'=>['message'=>$e->getMessage(),'stacktrace'=>$e->getTraceAsString()]]));  
+
                             continue;
                         }
                     }
@@ -168,6 +180,8 @@ class Price extends AbstractPlugin
                             $id, 
                             $store->getCode()
                         );
+
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Price','Mode'=>'onSchedule'],'Location'=>['function'=>'afterUpdate','product'=>['productid'=>  $id,'storecode'=> $store->getCode()]]));  
                     }
                 } else 
                 {
@@ -194,7 +208,11 @@ class Price extends AbstractPlugin
                             $dimensions,
                             $fullAction->rebuildStoreIndex($store->getId(), $productIds)
                         );
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Price','Mode'=>'onSave'],'Location'=>['function'=>'afterUpdate','product'=>['productid'=>  $productIds,'storecode'=> $store->getCode()]]));  
+
                     } catch(\Exception $e) {
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Price'],'Location'=>['function'=>'afterUpdate','product'=>['productid'=>  $productIds,'storecode'=> $store->getCode()],'exception'=>['message'=>$e->getMessage(),'stacktrace'=>$e->getTraceAsString()]]));  
+
                         throw $e;
                     } finally {
                         $this->indexerScope->setIndexerScope(null);

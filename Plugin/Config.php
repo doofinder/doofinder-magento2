@@ -55,66 +55,92 @@ class Config
         {
             //replace the object
             $configdata = $config->getData('groups');
-            //get urls
-            $search_server_url = $configdata['doofinder_account']['fields']['search_server']['value'];
-            $managment_server_url = $configdata['doofinder_account']['fields']['management_server']['value'];
-
-            //get protocols of the url
-            $search_server_protocol = parse_url($search_server_url, PHP_URL_SCHEME);
-            $management_server_protocol = parse_url($managment_server_url, PHP_URL_SCHEME);
-
-            //check if protocol is set
-            if (!isset($search_server_protocol)) 
+            if(isset($configdata['doofinder_account']))
             {
-                $configdata['doofinder_account']['fields']['search_server']['value'] = self::URL_SCHEME.'://'.$search_server_url;
-             
-                $this->messageManager->addSuccessMessage(
-                    __('Search server is set to HTTPS')
-                );
-
-            }
-            else if (strtolower($search_server_protocol) !== self::URL_SCHEME) 
-            {
-                //check if protocols are in http         
-                    //force https 
-                    $newsearchurl =  str_replace(strtolower($search_server_protocol).'://', 'https://', $search_server_url);
-                   
-                    $configdata['doofinder_account']['fields']['search_server']['value'] = $newsearchurl;
-                    
-                    $this->messageManager->addSuccessMessage(
-                        __('Search server protocol was changed from HTTP to HTTPS')
+                //get urls
+                $search_server_url = $configdata['doofinder_account']['fields']['search_server']['value'];
+                $managment_server_url = $configdata['doofinder_account']['fields']['management_server']['value'];
+                //validate the urls
+                if(!filter_var($search_server_url,FILTER_VALIDATE_URL))
+                {
+                    $this->messageManager->addErrorMessage(
+                        __('Search server is invalid URL')
                     );
-            }
+                }
+                else
+                {
+                    //get protocols of the url
+                    $search_server_protocol = parse_url($search_server_url, PHP_URL_SCHEME);
+                    //check if protocol is set
+                    if (!isset($search_server_protocol)) 
+                    {
+                        $configdata['doofinder_account']['fields']['search_server']['value'] = self::URL_SCHEME.'://'.$search_server_url;
+                    
+                        $this->messageManager->addSuccessMessage(
+                            __('Search server is set to HTTPS')
+                        );
 
-            if (!isset($management_server_protocol)) {
-               
-                $configdata['doofinder_account']['fields']['management_server']['value'] = self::URL_SCHEME.'://'.$managment_server_url;
+                    }
+                    else if (strtolower($search_server_protocol) !== self::URL_SCHEME) 
+                    {
+                        //check if protocols are in http         
+                            //force https 
+                            $newsearchurl =  str_replace(strtolower($search_server_protocol).'://', 'https://', $search_server_url);
+                        
+                            $configdata['doofinder_account']['fields']['search_server']['value'] = $newsearchurl;
+                            
+                            $this->messageManager->addSuccessMessage(
+                                __('Search server protocol was changed from HTTP to HTTPS')
+                            );
+                    }
 
-                $this->messageManager->addSuccessMessage(
-                    __('Management server is set to HTTPS')
-                );
-            } 
-            else if (strtolower($management_server_protocol) !== self::URL_SCHEME) 
-            {
-                //force https 
-                $newmanagmenturl =  str_replace(strtolower($management_server_protocol).'://', 'https://', $managment_server_url);
+                }
+
+                //validate management server url
+                if(!filter_var($managment_server_url,FILTER_VALIDATE_URL))
+                {
+                    $this->messageManager->addErrorMessage(
+                        __('Management server is invalid URL')
+                    );
+                }
+                else
+                {
                 
-                $configdata['doofinder_account']['fields']['management_server']['value'] =  $newmanagmenturl;
-                
-                $this->messageManager->addSuccessMessage(
-                    __('Management server protocol was changed from HTTP to HTTPS')
-                );
+                    //check protocol
+                    $management_server_protocol = parse_url($managment_server_url, PHP_URL_SCHEME);            
+                    if (!isset($management_server_protocol)) {
+                    
+                        $configdata['doofinder_account']['fields']['management_server']['value'] = self::URL_SCHEME.'://'.$managment_server_url;
 
-            }
+                        $this->messageManager->addSuccessMessage(
+                            __('Management server is set to HTTPS')
+                        );
 
-            $config->setData('groups', $configdata);
+                    } 
+                    else if (strtolower($management_server_protocol) !== self::URL_SCHEME) 
+                    {
+                        //force https 
+                        $newmanagmenturl =  str_replace(strtolower($management_server_protocol).'://', 'https://', $managment_server_url);
+                        
+                        $configdata['doofinder_account']['fields']['management_server']['value'] =  $newmanagmenturl;
+                        
+                        $this->messageManager->addSuccessMessage(
+                            __('Management server protocol was changed from HTTP to HTTPS')
+                        );
 
-            $indexer = $this->indexer;
-            if ($config->getSection() == $indexer::CONFIG_SECTION_ID) {
-                $this->indexer->storeOldConfig();
-            }
+                    }
+                }
+
+                $config->setData('groups', $configdata); 
+
+                $indexer = $this->indexer;
+                if ($config->getSection() == $indexer::CONFIG_SECTION_ID) {
+                    $this->indexer->storeOldConfig();
+                }
 
             return  $value;
+            }
+           
         }
         catch(\Exception $ex)
         {
@@ -124,5 +150,9 @@ class Config
         {
             return  $value;
         }
+    }
+
+    public function afterSave(\Magento\Config\Model\Config $config)
+    {
     }
 }

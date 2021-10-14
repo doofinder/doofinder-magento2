@@ -17,6 +17,8 @@ use Magento\Framework\App\ObjectManager;
 use Doofinder\Feed\Model\Indexer\IndexStructure;
 use Exception;
 use finfo;
+use Doofinder\Feed\Helper\Logger;
+
 
 // phpcs:disable Squiz.Commenting.FunctionComment.MissingParamTag
 // phpcs:disable Squiz.Commenting.FunctionComment.MissingParamName
@@ -83,8 +85,20 @@ class Fulltext
      * @var FullFactory
      */
     private $fullActionFactory;
-
+    
+    /**
+     * logger
+     *
+     * @var mixed
+     */
     protected $logger;
+    
+    /**
+     * doofinderLogger
+     *
+     * @var mixed
+     */
+    private $doofinderLogger;
 
 
     /**
@@ -114,8 +128,8 @@ class Fulltext
         IndexerHelper $indexerHelper,
         IndexerHandlerFactory $indexerHandlerFactory,
         IndexStructure $indexStructure,
-        \Psr\Log\LoggerInterface $logger
-
+        \Psr\Log\LoggerInterface $logger,
+        Logger $doofinderlogger
     ) {
         $this->fullActionFactory = $fullActionFactory;
         $this->storeConfig = $storeConfig;
@@ -129,7 +143,7 @@ class Fulltext
         $this->indexerHandlerFactory = $indexerHandlerFactory;
         $this->indexStructure = $indexStructure;
         $this->logger = $logger;
-
+        $this->doofinderLogger = $doofinderlogger;
     }
 
     /**
@@ -147,13 +161,16 @@ class Fulltext
 
     public function beforeExecuteByDimensions(FulltextIndexer $indexer, array $dimensions, \Traversable $entityIds = null)
     {       
-
-            if ($this->indexerScope->getIndexerScope() != null) {
+        if ($this->storeConfig->isDoofinderFeedConfigured())
+        {
+            if ($this->indexerScope->getIndexerScope() != null) 
+            {
                 return;
             }
             
             $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-            if ($this->storeConfig->isUpdateByApiEnable($storeId)) {
+            if ($this->storeConfig->isUpdateByApiEnable($storeId)) 
+            {
                 if ($this->indexerHelper->isScheduled()) {
                     $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_DELAYED);
                 } 
@@ -161,6 +178,7 @@ class Fulltext
                 {
                      $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);  
                 }
+            }
         }
     }
 
@@ -173,7 +191,7 @@ class Fulltext
      */
     public function afterExecuteByDimensions(FulltextIndexer $indexer, $result, array $dimensions, \Traversable $entityIds = null)
     {
-        if ($this->storeConfig->getApiKey() && $this->storeConfig->getManagementServer() && $this->storeConfig->getSearchServer()) 
+        if ($this->storeConfig->isDoofinderFeedConfigured())
         {
              $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);      
             if (
@@ -195,10 +213,14 @@ class Fulltext
                         $indexerHandler->saveIndex(
                             $dimensions,
                             $fullAction->rebuildStoreIndex($storeId)
+
                         );
+
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'FullText','Mode'=>$this->indexerScope->getIndexerScope()],'Location'=>['function'=>'afterExecuteByDimensions','calledfunction'=>['name'=>'saveIndex','arguments'=>[$dimensions,$storeId]]]));
+
                     } catch(\Exception $e) {
-                        $this->logger->error('Doofinder : afterExecuteByDimensions '.$e->getMessage());    
-                        return $result;
+                       $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'FullText'],'Location'=>['function'=>'afterExecuteByDimensions'],'exception'=>['message'=>$e->getMessage(),'stacktrace'=>$e->getTraceAsString()]));
+                      return $result;
                     } finally {
                         $this->indexerScope->setIndexerScope(null);
                         return $result;

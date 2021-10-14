@@ -9,3 +9,5 @@
 
 # Dev files
 /node_modules
+#feed zipped
+/doofinder.zip

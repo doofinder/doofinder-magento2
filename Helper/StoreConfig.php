@@ -66,6 +66,8 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     const INDICES_UPDATE_MODE = 'doofinder_config_config/doofinder_search_engine/doofinder_indices_update_mode';
 
+    const DOOFINDER_LOGGING = 'doofinder_config_config/doofinder_logging';
+
     /**
      * Doofinder indices update type api as update type code
      */
@@ -75,6 +77,9 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * Doofinder indices update type feed as update type code
      */
     const DOOFINDER_INDICES_UPDATE_FEED = 'feed';
+
+
+
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
@@ -91,6 +96,8 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $storeWebsiteRelation;
 
+    protected $_authorization;
+
     /**
      * StoreConfig constructor.
      *
@@ -103,11 +110,14 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Doofinder\Feed\Helper\Serializer $serializer,
-        \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation
+        \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation,
+        \Magento\Framework\AuthorizationInterface $authorization
+
     ) {
         $this->storeManager = $storeManager;
         $this->serializer = $serializer;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
+        $this->_authorization = $authorization;
         parent::__construct($context);
     }
 
@@ -544,4 +554,67 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->getUpdateMode($storeCode) == self::DOOFINDER_INDICES_UPDATE_API;
     }
+
+    
+    /**
+     * isDoofinderFeedConfigured
+     *
+     * @return void
+     */
+    public function isDoofinderFeedConfigured()
+    {
+        //check if modules is configured properly
+        // if($this->scopeConfig->getValue(self::DOOFINDER_LOGGING . '/doofinder_enabled'))
+        // {
+            //check if configurations are set
+            if ($this->getApiKey() && $this->getManagementServer() && $this->getSearchServer()) 
+            {
+                //true
+                return true;
+            }
+
+        //}
+        //not enabled and not configured
+       return false;
+    }
+
+  /**
+   * isIndexingLogsAllowed
+   *
+   * @return void
+   */
+  public function isIndexingLogsAllowed()
+  {
+    if($this->scopeConfig->getValue(self::DOOFINDER_LOGGING . '/fullindexing_enabled'))
+    {
+        return true;
+    }
+    return false;
+  }
+
+  public function getAttributesForConversion($storeCode = null) {
+    $list =  $this->scopeConfig->getValue(
+        "doofinder_config_config/doofinder_attributesconversion/searchableproduct_attributes",
+        $this->getScopeStore(),
+        $storeCode
+    );
+    return $list !== null ? explode(',', $list) : [];
+
+}
+
+public function getLogSeverity($storeCode = null) 
+{
+    $var = $this->scopeConfig->getValue(self::DOOFINDER_LOGGING.'/doofinder_loglevel',
+        $this->getScopeStore(),
+        $storeCode
+    );
+    if($var)
+    {
+        return (int)$var;
+
+    }
+
+}
+
+
 }
