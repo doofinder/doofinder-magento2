@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Doofinder\Feed\Helper\Logger;
 use Doofinder\Feed\Helper\Utils;
 
+
 /**
  * Class Indexer
  * The class responsible for communicating between Magento and Doofinder API Library
@@ -56,9 +57,8 @@ class Indexer
      */
     private $doofinderLogger;
 
-  
-  
 
+    
     /**
      * Indexer constructor.
      * @param ManagementClientFactory $managementClientFactory
@@ -131,11 +131,11 @@ class Indexer
                 'name' => $indexName,
                 'preset' => 'product'
             ];
-           $response =  $this->getClient()->createIndex(
-                $hashId,
-                $this->serializer->serialize($options)
-            );
-
+                $response =  $this->getClient()->createIndex(
+                    $hashId,
+                    $this->serializer->serialize($options)
+                );
+            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),"method:createDoofinderIndex ".$options);            
             //loging
           
             if($this->storeConfig->isIndexingLogsAllowed())
@@ -146,8 +146,9 @@ class Indexer
             {
                  $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'createDoofinderIndex'],'response'=>Utils::validateJSON($response)));  
             }
-        } catch (\Exception $exception) {
 
+        }catch (\Exception $exception) 
+        {
             if($this->storeConfig->isIndexingLogsAllowed())
             {
                 $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'createDoofinderIndex','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'options'=>$options],'response'=>Utils::validateJSON($response)],'exception'=>['message'=>$exception->getMessage(),'stacktrace'=>$exception->getTraceAsString()]));  
@@ -172,11 +173,12 @@ class Indexer
         $response = null;
         try 
         {
+
            $response =  $this->getClient()->createTemporaryIndex(
                 $hashId,
                 $indexName
             );
-           
+
             $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'createDoofinderIndexTemp','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId],'response'=>Utils::validateJSON($response)]));  
 
         } catch (\Exception $exception) {
@@ -225,15 +227,16 @@ class Indexer
      */
     public function addItems(array $items, array $dimensions, $indexName)
     { 
+      
         $response = null;
         $hashId = $this->getHashId($dimensions);
             try
-            {              
+            {         
                 $response = $this->getClient()->createTempBulk(
                     $hashId,
                     $indexName,
                     $this->serializer->serialize($items)
-                );
+                );    
 
                 if($this->storeConfig->isIndexingLogsAllowed())
                 {
@@ -243,7 +246,6 @@ class Indexer
                 {
                   $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['name'=>'Indexer','Desc'=>'communicates between magento to doofinder '],'Location'=>['function'=>'addItems','payload'=>['indexname'=>  $indexName,'hashid'=> $hashId,'itemscount'=>count($items)],'response'=>Utils::validateJSON($response)]));  
                 }
-
              }
             catch(\Exception $ex)
             {   
@@ -268,10 +270,9 @@ class Indexer
 
     public function updateItems(array $items, array $dimensions, $indexName)
     {
+
         $hashId = $this->getHashId($dimensions);           
-
         $count = 2;   
-
         $response = null;
         do
         {          
