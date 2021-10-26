@@ -165,7 +165,6 @@ class Product extends AbstractPlugin
 
     public function afterSave(ResourceProduct $productResource, $result, AbstractModel $product)
     {
-       // $product->setData('sed_extra_days',"Delivery estimated by 12 of November");
           if ($this->storeConfig->isDoofinderFeedConfigured())
           {
             $stores = $this->storeConfig->getAllStores();

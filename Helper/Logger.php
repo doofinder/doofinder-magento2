@@ -4,15 +4,12 @@ namespace Doofinder\Feed\Helper;
 use Exception;
 use Magento\Framework\Logger\Handler\Base as BaseHandler;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
-
 /**
  * Helper class for logging or information during events
  * @SuppressWarnings(PHPMD.StaticAccess)
  */
-
 class Logger extends BaseHandler
 {   
-    
    /**
     * logger
     *
@@ -70,9 +67,6 @@ class Logger extends BaseHandler
             //no logging
             return;
         }
-       
-
-
         try
         {            
             $folder = $this->_dir->getPath('log');            
@@ -104,10 +98,8 @@ class Logger extends BaseHandler
                         $this->logger->pushHandler(new \Monolog\Handler\StreamHandler($folder . '/doofinder/info.log'));
                         $this->logger->info(json_encode($msg));
                     }
-                      
-
                 break;
-                
+
                 default:
                     $this->logger->pushHandler(new \Monolog\Handler\StreamHandler($folder . '/doofinder/info.log'));
                     $this->logger->info(json_encode($msg));
@@ -121,5 +113,7 @@ class Logger extends BaseHandler
     }
         
     }
+   
+
     
 }

@@ -58,18 +58,30 @@ class ApiKeyValidation extends \Magento\Framework\App\Config\Value
     {
         $apiKey = $this->getValue();
        
-        if ($apiKey) {
-            try {
+        if ($apiKey) 
+        {
+            try 
+            {
                 $this->searchEngine->getSearchEngines($apiKey);
-            } catch (\Doofinder\Management\Errors\NotAllowed $exception) {
+            } 
+            catch (\Exception $exception) 
+            {
                 throw new \Magento\Framework\Exception\ValidatorException(
-                    __('Provided API key %1 is invalid.', $apiKey)
-                );
+                __("Something went wrong  : ".$exception->getMessage())
+                );    
+                
             }
         } elseif ($this->storeConfig->isInternalSearchEnabled()) {
             throw new \Magento\Framework\Exception\ValidatorException(
                 __('API key cannot be empty when Doofinder engine is enabled.')
             );
+        }
+        else
+        {
+            throw new \Magento\Framework\Exception\ValidatorException(
+                __('API key is invalid.')
+            );
+
         }
 
         return parent::save();
