@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/doofinder/doofinder-magento2.svg?branch=master)](https://travis-ci.org/doofinder/doofinder-magento2)
 
+**IMPORTANT:** If you are in trouble with the module, please contact Doofinder Support from the Doofinder Admin panel.
+
 ## Docker Environment
 
 To use the docker environment clone this repo inside a folder structure like this:

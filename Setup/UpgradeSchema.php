@@ -52,6 +52,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private $storeConfig;
 
     /**
+     * @var boolean
+     */
+    private $serversConfiguredProperly;
+
+    /**
      * UpgradeSchema constructor.
      * @param Serializer $serializer
      * @param WriterInterface $configWriter
@@ -113,6 +118,12 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '0.3.1', '<')) {
             // same reason as above
             $this->configureApiServers();
+            $this->cacheManager->flush([Config::CACHE_TAG]);
+        }
+
+        if (version_compare($context->getVersion(), '0.3.2', '<')) {
+            // same reason as above
+            $this->fixApiConfiguration();
             $this->cacheManager->flush([Config::CACHE_TAG]);
         }
 
@@ -287,8 +298,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
             return;
         }
 
-        $searchServer = $serverPrefix[0] . 'search.doofinder.com';
-        $managementServer = $serverPrefix[0] . 'api.doofinder.com';
+        $searchServer =  'https://' . $serverPrefix[0] . 'search.doofinder.com';
+        $managementServer = 'https://' . $serverPrefix[0] . 'api.doofinder.com';
 
         $searchServerPath = $this->storeConfig::ACCOUNT_CONFIG . '/search_server';
         $managementServerPath = $this->storeConfig::ACCOUNT_CONFIG . '/management_server';
@@ -300,5 +311,50 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $managementServerPath,
             $managementServer
         );
+        $this->serversConfiguredProperly = true;
+    }
+
+    /**
+     * @return void
+     */
+    private function fixApiConfiguration()
+    {
+        // Fix API Key - remove prefix
+        $apiKey = $this->storeConfig->getApiKey();
+        if (!$apiKey) {
+            // api key is not configured
+            return;
+        }
+        preg_match('/^.*?\-/', $apiKey, $serverPrefix);
+        if (isset($serverPrefix[0])) {
+            $apiKeyFixed = substr($apiKey, 4);
+            $this->configWriter->save(
+                $this->storeConfig::ACCOUNT_CONFIG . '/api_key',
+                $apiKeyFixed
+            );
+        }
+
+        if ($this->serversConfiguredProperly) {
+            // servers urls are fine, skip next steps
+            return;
+        }
+
+        // Fix servers - add https protocol
+        $searchServer = $this->storeConfig->getSearchServer();
+        if ($searchServer && strpos($searchServer, 'https://') === false) {
+            $searchServer = 'https://' . $searchServer;
+            $this->configWriter->save(
+                $this->storeConfig::ACCOUNT_CONFIG . '/search_server',
+                $searchServer
+            );
+        }
+        $managementServer = $this->storeConfig->getManagementServer();
+        if ($managementServer && strpos($managementServer, 'https://') === false) {
+            $managementServer = 'https://' . $managementServer;
+            $this->configWriter->save(
+                $this->storeConfig::ACCOUNT_CONFIG . '/management_server',
+                $managementServer
+            );
+        }
     }
 }

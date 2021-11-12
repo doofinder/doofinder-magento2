@@ -2,7 +2,7 @@
 
 namespace Doofinder\Feed\Helper;
 
-use Zend\Serializer\Serializer as ZendSerializer;
+use Magento\Framework\Serialize\SerializerInterface;
 
 /**
  * Helper class for serialization/deserialization
@@ -11,6 +11,20 @@ use Zend\Serializer\Serializer as ZendSerializer;
 class Serializer
 {
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * Serializer constructor.
+     * @param SerializerInterface $serializer
+     */
+    public function __construct(SerializerInterface $serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
+    /**
      * Serialize string
      *
      * @param array|string $data
@@ -18,7 +32,7 @@ class Serializer
      */
     public function serialize($data)
     {
-        return ZendSerializer::serialize($data, 'json');
+        return $this->serializer->serialize($data);
     }
 
     /**
@@ -29,6 +43,6 @@ class Serializer
      */
     public function unserialize($str)
     {
-        return ZendSerializer::unserialize($str, 'json');
+        return $this->serializer->unserialize($str);
     }
 }

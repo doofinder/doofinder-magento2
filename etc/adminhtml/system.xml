@@ -37,7 +37,7 @@
                     <label>API Key</label>
                     <backend_model>Doofinder\Feed\Model\Config\Backend\ApiKeyValidation</backend_model>
                     <comment>
-                        <![CDATA[ You need a Management API Key. Search-only keys won't work. ]]>
+                        <![CDATA[ You need a Management API Key. Search-only keys won't work. <strong>Please, remove server prefix from API Key (eg. eu1-, us1-)</strong> ]]>
                     </comment>
                 </field>
                 <field id="search_server"

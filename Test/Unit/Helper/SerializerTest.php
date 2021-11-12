@@ -19,8 +19,10 @@ class SerializerTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
      */
     protected function setupTests()
     {
+        $serializer = $this->objectManager->getObject(\Magento\Framework\Serialize\Serializer\Json::class);
         $this->helper = $this->objectManager->getObject(
-            \Doofinder\Feed\Helper\Serializer::class
+            \Doofinder\Feed\Helper\Serializer::class,
+            ['serializer' => $serializer]
         );
     }
 
