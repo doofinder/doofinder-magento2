@@ -5,6 +5,12 @@
         <plugin name="doofinderFeedConfig" type="Doofinder\Feed\Plugin\Config" sortOrder="1" />
     </type>
 
+    <type name="Doofinder\Feed\Helper\Serializer">
+        <arguments>
+            <argument name="serializer" xsi:type="object">Magento\Framework\Serialize\Serializer\Json</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
