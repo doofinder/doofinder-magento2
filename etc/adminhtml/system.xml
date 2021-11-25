@@ -123,7 +123,7 @@
                        showInWebsite="0">
                     <label>Choose attributes</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Feed\SearchableAttributes</source_model>
-                <comment>
+                    <comment>
                         <![CDATA[ Selected attributes will be converted to (int) before being sent to Doofinder.]]>
                     </comment>
                 </field>
