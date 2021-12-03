@@ -166,42 +166,42 @@ class Category extends AbstractPlugin
      */
     public function aroundSave(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
     {
+         //get the old category name
+         $origname = $category->getOrigData('name');
+         //get the category new name
+         $newname = $category->getData('name');
+         $result = $proceed($category);
         if ($this->storeConfig->isDoofinderFeedConfigured())
         {
-        //get the old category name
-        $origname = $category->getOrigData('name');
-        //get the category new name
-        $newname = $category->getData('name');
-        $result = $proceed($category);
+                try {
+                //check if there is a change in name then we get all affectec products
+                if ($origname != $newname) {
 
-        try {
-            //check if there is a change in name then we get all affectec products
-            if ($origname != $newname) {
+                    if (is_array($category->getAffectedProductIds())) {
+                        $this->updateDoofinder(array_values($category->getAffectedProductIds()));
+                    } else {
 
-                if (is_array($category->getAffectedProductIds())) {
-                    $this->updateDoofinder(array_values($category->getAffectedProductIds()));
+                        //fetch all products assigned to this category
+                        $allproducts = $this->getIdsOnly($category->getProductCollection());
+                        //if the name has changed then we check for the affected items
+                        $this->updateDoofinder($allproducts);
+                    }
                 } else {
-
-                    //fetch all products assigned to this category
-                    $allproducts = $this->getIdsOnly($category->getProductCollection());
-                    //if the name has changed then we check for the affected items
-                    $this->updateDoofinder($allproducts);
+                    //if the name has not changed then we just get the affected items
+                    $affectedProducts = $category->getAffectedProductIds();
+                    if (is_array($affectedProducts)) {
+                        $this->updateDoofinder(array_values($affectedProducts));
+                    }
                 }
-            } else {
-                //if the name has not changed then we just get the affected items
-                $affectedProducts = $category->getAffectedProductIds();
-                if (is_array($affectedProducts)) {
-                    $this->updateDoofinder(array_values($affectedProducts));
-                }
+            } catch (\Exception $ex) 
+            {
+                //log
+                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category'],'Location'=>['function'=>'aroundSave','category'=>$category],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
+                return $result;
             }
-        } catch (\Exception $ex) 
-        {
-            //log
-            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category'],'Location'=>['function'=>'aroundSave','category'=>$category],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
-            return $result;
         }
-    }
         return $result;
+        
     }
     
     /**
@@ -223,12 +223,6 @@ class Category extends AbstractPlugin
                     foreach ($productarray as $id) {
                         try
                         {
-                            //delete 
-                            $this->registration->registerDelete(
-                                $id,
-                                $store->getCode()
-                                );
-
                             //recreate using update
                             $this->registration->registerUpdate(
                                 $id,
@@ -262,11 +256,6 @@ class Category extends AbstractPlugin
                             array_merge($productarray, $this->fulltextResource->getRelationsByChild($productarray))
                         );
                         
-                        $indexerHandler->deleteIndex(
-                            $dimensions,
-                            new \ArrayIterator($productIds)
-                        );
-
                         $indexerHandler->saveIndex(
                             $dimensions,
                             $fullAction->rebuildStoreIndex($storeId,$productIds)
@@ -303,78 +292,76 @@ class Category extends AbstractPlugin
 
     public function aroundDelete(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
     {
+         //get the products that will be affected
+         $allproducts = $this->getIdsOnly($category->getProductCollection());
+         $result = $proceed($category);
+
         if ($this->storeConfig->isDoofinderFeedConfigured())
         {
-        //get the products that will be affected
-        $allproducts = $this->getIdsOnly($category->getProductCollection());
+           
+            $stores = $this->storeConfig->getAllStores();
+            $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
+        
+            foreach ($stores as $store) {
+                if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
 
-        $result = $proceed($category);
-        $stores = $this->storeConfig->getAllStores();
-        $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-       
-        foreach ($stores as $store) {
-            if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
+                    if ($indexer->isScheduled()) {
+                        foreach ($allproducts  as $productid) {
+                            try
+                            {
+                           
+                                $this->registration->registerUpdate(
+                                    $productid,
+                                    $store->getCode()
+                                );
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=> $productid,'storecode'=>$store->getCode()]));  
 
-                if ($indexer->isScheduled()) {
-                    foreach ($allproducts  as $productid) {
-                        try
+                        }
+                        catch (\Exception $ex) 
                         {
-                            $this->registration->registerDelete(
-                                $productid,
-                                $store->getCode()
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productid,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
+                        }
+                        }
+                    }
+                    else
+                    {
+                        try 
+                        {
+                            $data = $this->config->getIndexers()['catalogsearch_fulltext'];
+                        
+                            $indexerHandler = $this->createDoofinderIndexerHandler($data);                   
+                            $fullAction = $this->createFullAction($data);
+                            $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
+                            //get store id and cast to integer
+                            $storeId = (int)$this->indexerHelper->getStoreIdFromDimensions($dimensions);
+                            //
+                            $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
+                            //
+                            $productIds = array_unique(array_merge($allproducts, $this->fulltextResource->getRelationsByChild($allproducts)));
+
+                            $indexerHandler->saveIndex(
+                                $dimensions,
+                                $fullAction->rebuildStoreIndex($storeId,$productIds)
                             );
 
-                            $this->registration->registerUpdate(
-                                $productid,
-                                $store->getCode()
-                            );
-                           $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=> $productid,'storecode'=>$store->getCode()]));  
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productIds,'storecode'=>$store->getCode()]));  
 
-                    }
-                    catch (\Exception $ex) 
-                    {
-                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productid,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
-                    }
+                        
+                        }
+                        catch (\Exception $ex) 
+                        {
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productIds,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
+                        } 
+                        finally 
+                        {
+                            $this->indexerScope->setIndexerScope(null);
+                            return;
+                        }
                     }
                 }
-                else
-                {
-                    try 
-                    {
-                        $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-                       
-                        $indexerHandler = $this->createDoofinderIndexerHandler($data);                   
-                        $fullAction = $this->createFullAction($data);
-                        $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
-                        //get store id and cast to integer
-                        $storeId = (int)$this->indexerHelper->getStoreIdFromDimensions($dimensions);
-                        //
-                        $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
-                        //
-                        $productIds = array_unique(array_merge($allproducts, $this->fulltextResource->getRelationsByChild($allproducts)));
-
-                        $indexerHandler->saveIndex(
-                            $dimensions,
-                            $fullAction->rebuildStoreIndex($storeId,$productIds)
-                        );
-
-                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productIds,'storecode'=>$store->getCode()]));  
-
-                     
-                    }
-                    catch (\Exception $ex) 
-                    {
-                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productIds,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
-                    } 
-                    finally 
-                    {
-                        $this->indexerScope->setIndexerScope(null);
-                        return;
-                    }
-                }
+                return $result;
             }
         }
-    }
         return $result;
     }
 }

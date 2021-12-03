@@ -18,6 +18,9 @@ use Doofinder\Feed\Model\Indexer\IndexStructure;
 use Exception;
 use finfo;
 use Doofinder\Feed\Helper\Logger;
+use Doofinder\Feed\Model\GetProducts;
+
+
 
 
 // phpcs:disable Squiz.Commenting.FunctionComment.MissingParamTag
@@ -101,6 +104,9 @@ class Fulltext
     private $doofinderLogger;
 
 
+    private $getProducts;
+
+
     /**
      * A constructor.
      *
@@ -129,8 +135,10 @@ class Fulltext
         IndexerHandlerFactory $indexerHandlerFactory,
         IndexStructure $indexStructure,
         \Psr\Log\LoggerInterface $logger,
-        Logger $doofinderlogger
-    ) {
+        Logger $doofinderlogger,
+        GetProducts $getproduct
+        ) 
+        {
         $this->fullActionFactory = $fullActionFactory;
         $this->storeConfig = $storeConfig;
         $this->indexerScope = $indexerScope;
@@ -144,6 +152,10 @@ class Fulltext
         $this->indexStructure = $indexStructure;
         $this->logger = $logger;
         $this->doofinderLogger = $doofinderlogger;
+        $this->getProducts = $getproduct;
+
+        
+
     }
 
     /**
@@ -161,7 +173,7 @@ class Fulltext
 
     public function beforeExecuteByDimensions(FulltextIndexer $indexer, array $dimensions, \Traversable $entityIds = null)
     {       
-        if ($this->storeConfig->isDoofinderFeedConfigured())
+       if ($this->storeConfig->isDoofinderFeedConfigured())
         {
             if ($this->indexerScope->getIndexerScope() != null) 
             {
@@ -201,27 +213,39 @@ class Fulltext
                 $data = $this->config->getIndexers()['catalogsearch_fulltext'];
                 $indexerHandler = $this->createDoofinderIndexerHandler($data);
                 $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
+                //generate ids from magento EAV 
+                $ids = $this->getProducts->getProductCollection($storeId);
+        
                 $fullAction = $this->createFullAction($data);
-
-                if (null === $entityIds) {
-                    try {
+            
+                if (null === $entityIds) 
+                {
+                    try 
+                    {
                         // reindexall
                         $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
                         // create temp index
                         $this->indexStructure->create(null, [], $dimensions);
                         // // add items temp index, switch temporary index to the main one
+                        
+                        //use the generate ids from EAV tables
+                        $documents =  $fullAction->rebuildStoreIndex($storeId,$ids);
+                        
                         $indexerHandler->saveIndex(
-                            $dimensions,
-                            $fullAction->rebuildStoreIndex($storeId)
-
+                            $dimensions, $documents
                         );
 
                         $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'FullText','Mode'=>$this->indexerScope->getIndexerScope()],'Location'=>['function'=>'afterExecuteByDimensions','calledfunction'=>['name'=>'saveIndex','arguments'=>[$dimensions,$storeId]]]));
+                        
+                        return $result;
 
-                    } catch(\Exception $e) {
+                    } catch(\Exception $e) 
+                    {
                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'FullText'],'Location'=>['function'=>'afterExecuteByDimensions'],'exception'=>['message'=>$e->getMessage(),'stacktrace'=>$e->getTraceAsString()]));
                       return $result;
-                    } finally {
+                    }
+                    finally 
+                    {
                         $this->indexerScope->setIndexerScope(null);
                         return $result;
                     }

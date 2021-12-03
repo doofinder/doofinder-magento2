@@ -146,8 +146,9 @@ class MassActions extends AbstractPlugin
     }
 
    
-    public function afterUpdateAttributes(ProductAction $subject,ProductAction $action, $productIds) 
+    public function afterUpdateAttributes(ProductAction $subject,ProductAction $action, $productIds, $attrData) 
     {
+
         try
         {
             if ($this->storeConfig->isDoofinderFeedConfigured())
@@ -169,17 +170,11 @@ class MassActions extends AbstractPlugin
                             {                           
                                 try
                                 {
-                                    //delete first
-                                    $this->registration->registerDelete(
-                                        $id, 
-                                        $store->getCode()
-                                    );
                                     //if true use registerUpdate
                                     $this->registration->registerUpdate(
                                         $id, 
                                         $store->getCode()
                                     );
-                                    $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'MassActions','Mode'=>'onSchedule'],'Location'=>['function'=>'afterUpdateAttributes','product'=>['productid'=> $id,'storecode'=> $store->getCode()]]));  
 
                                 }
                                 catch(\Exception $e) 
@@ -188,6 +183,7 @@ class MassActions extends AbstractPlugin
                                 }
                             
                             }
+
                         }
                         else
                         {
@@ -209,14 +205,7 @@ class MassActions extends AbstractPlugin
                                 $newproductIds = array_unique(
                                     array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds))
                                 );
-                                //delete index first
-                                $indexerHandler->deleteIndex(
-                                    $dimensions,
-                                    new \ArrayIterator($newproductIds)
-                                );
-
-
-
+                    
                                 //save index
                                 $indexerHandler->saveIndex(
                                     $dimensions,
@@ -237,7 +226,10 @@ class MassActions extends AbstractPlugin
                     
                     }
 
-                }   
+                } 
+                  
+                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'MassActions','Mode'=>'onSchedule'],'Location'=>['function'=>'afterUpdateAttributes','product'=>['productids'=> $productIds,'storecode'=> $store->getCode(),'attributedata'=>$attrData]]));  
+
             }   
         }
         catch(Exception $er)

@@ -76,7 +76,7 @@
     </type>
 
     <type name="Magento\Catalog\Model\ResourceModel\Category">
-            <plugin name="doofinder_catalogsearchFulltextCategory" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Category"/>
+            <plugin name="doofinder_catalogsearchFulltextCategory" type="Doofinder\Feed\Plugin\CatalogSearch\Model\Indexer\Fulltext\Category" sortOrder="1000"/>
     </type>
 
     <type name="Magento\Catalog\Model\Product\Action">

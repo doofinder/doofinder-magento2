@@ -368,7 +368,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get product EN ='out of stock' PT ='Sem Stock' label
+     * Get product EN ='out of stock' label
      *
      * @return string
      */
@@ -378,7 +378,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get product EN ='in stock' PT ='Em Stock' label
+     * Get product EN ='in stock' label
      *
      * @return string
      */
