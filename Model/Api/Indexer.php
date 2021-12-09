@@ -135,8 +135,7 @@ class Indexer
                     $hashId,
                     $this->serializer->serialize($options)
                 );
-            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),"method:createDoofinderIndex ".$options);            
-            //loging
+          
           
             if($this->storeConfig->isIndexingLogsAllowed())
             {

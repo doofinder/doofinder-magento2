@@ -172,10 +172,6 @@ class Price extends AbstractPlugin
                 if ($indexer->isScheduled()) {
                     foreach ($entityIds as $id) {
                         
-                        $this->registration->registerDelete(
-                            $id,
-                            $store->getCode()
-                            );
                         $this->registration->registerUpdate(
                             $id, 
                             $store->getCode()
@@ -200,10 +196,7 @@ class Price extends AbstractPlugin
                         $productIds = array_unique(
                             array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds))
                         );
-                        $indexerHandler->deleteIndex(
-                            $dimensions,
-                            new \ArrayIterator($productIds)
-                        );
+                     
                         $indexerHandler->saveIndex(
                             $dimensions,
                             $fullAction->rebuildStoreIndex($store->getId(), $productIds)

@@ -178,18 +178,33 @@ class Product extends AbstractPlugin
                     //check the isScheduled variable if true
                     if($indexer->isScheduled()) 
                     {
-                          //if true use registerdelete to delete the existing index
-                          $this->registration->registerDelete(
-                            $product->getId(), 
-                            $store->getCode()
-                            );
+                            $oldstatus  = $product->getOrigData('status');
+                            $newstatus  = $product->getData('status');
+                            if(!empty($oldstatus) || !empty($newstatus))
+                            {
+                                if($oldstatus!=$newstatus)
+                                {
+                                    $this->registration->registerDelete(
+                                        $product->getId(), 
+                                        $store->getCode()
+                                    );
 
-                            //if true use registerUpdate
+                                }
+                            }
+                                $this->registration->registerUpdate(
+                                    $product->getId(), 
+                                    $store->getCode()
+                                );
+                                return $result;
+
+                            }
+                    
+                          //if true use registerUpdate
                             $this->registration->registerUpdate(
                                 $product->getId(), 
                                 $store->getCode()
                             );
-
+                        
                             $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSchedule'],'Location'=>['function'=>'afterSave','product'=>['productid'=>$product->getId(),'storecode'=> $store->getCode()]]);
                             $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);
 
@@ -227,15 +242,9 @@ class Product extends AbstractPlugin
                             $productIds = array_unique(
                                 array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds))
                             );
-
-                            $indexerHandler->deleteIndex(
-                                $dimensions,
-                                new \ArrayIterator($productIds)
-                            );
         
                             $indexerHandler->saveIndex(
-                                $dimensions,
-                                $fullAction->rebuildStoreIndex($storeId, $productIds)
+                                $dimensions,$fullAction->rebuildStoreIndex($storeId, $productIds)
                             );
 
                             $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterSave','product'=>['productid'=>$product->getId(),'storecode'=> $store->getCode()]]);
@@ -255,10 +264,9 @@ class Product extends AbstractPlugin
                         }
                     }
                    
-                }
-
-            }      
-          }            
+            }
+        }     
+                      
         return $result;
     }
 
@@ -280,69 +288,70 @@ class Product extends AbstractPlugin
         $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
        
 
-        foreach($stores as $store) {
-            //validate 
-            if ($this->storeConfig->isUpdateByApiEnable($store->getCode()))
+            foreach($stores as $store) 
             {
-                //check if its scheduled
-                if($indexer->isScheduled()) 
+                //validate 
+                if ($this->storeConfig->isUpdateByApiEnable($store->getCode()))
                 {
-                    $this->registration->registerDelete(
-                        $product->getId(), 
-                        $store->getCode()
-                    );
+                    //check if its scheduled
+                    if($indexer->isScheduled()) 
+                    {
+                        $this->registration->registerDelete(
+                            $product->getId(), 
+                            $store->getCode()
+                        );
 
-                    $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSchedule'],'Location'=>['function'=>'afterDelete','product'=>$product->getId()]));
-                }
-                else
-                {
-                    $data = $this->config->getIndexers()['catalogsearch_fulltext'];        
-                    $fullAction = $this->createFullAction($data);
-                    try
-                    {
-                       $indexerHandler = $this->createDoofinderIndexerHandler($data);
-                    }catch (\LogicException $e) 
-                    {
-                        $this->logger->error($e->getMessage()); 
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSchedule'],'Location'=>['function'=>'afterDelete','product'=>$product->getId()]));
                     }
-                    //its on save mode
-                    $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
-                    $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-                    
-                    try {
-                        $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
-                        $entityIds = iterator_to_array($product->getId());
-                        $productIds = array_unique(
-                            array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds))
-                        );
-                        //delete
-                        $indexerHandler->deleteIndex(
-                            $dimensions,
-                            new \ArrayIterator($productIds)
-                        );
-
-                        $indexerHandler->saveIndex(
-                            $dimensions,
-                            $fullAction->rebuildStoreIndex($storeId, $productIds)
-                        );
-                        $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterDelete','product'=>$product->getId()]);
-                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);
-    
-                    } catch(\Exception $e) 
+                    else
                     {
-                        //log any cought error here                    
-                        $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterDelete','exception'=>['message'=>$e->getMessage()]]);
-                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);
+                        $data = $this->config->getIndexers()['catalogsearch_fulltext'];        
+                        $fullAction = $this->createFullAction($data);
+                        try
+                        {
+                        $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                        }catch (\LogicException $e) 
+                        {
+                            $this->logger->error($e->getMessage()); 
+                        }
+                        //its on save mode
+                        $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
+                        $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
+                        
+                        try {
+                            $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
+                            $entityIds = iterator_to_array($product->getId());
+                            $productIds = array_unique(
+                                array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds))
+                            );
+                            //delete
+                            $indexerHandler->deleteIndex(
+                                $dimensions,
+                                new \ArrayIterator($productIds)
+                            );
 
-                    } 
-                    finally 
-                    {
-                        $this->indexerScope->setIndexerScope(null);
-                        return $result;
+                            $indexerHandler->saveIndex(
+                                $dimensions,
+                                $fullAction->rebuildStoreIndex($storeId, $productIds)
+                            );
+                            $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterDelete','product'=>$product->getId()]);
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);
+        
+                        } catch(\Exception $e) 
+                        {
+                            //log any cought error here                    
+                            $log = array('File'=>__FILE__,'Type'=>['Plugin'=>'Product','Mode'=>'onSave'],'Location'=>['function'=>'afterDelete','exception'=>['message'=>$e->getMessage()]]);
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),$log);
+
+                        } 
+                        finally 
+                        {
+                            $this->indexerScope->setIndexerScope(null);
+                            return $result;
+                        }
                     }
                 }
             }
-        }
         }
         return $result;
     }

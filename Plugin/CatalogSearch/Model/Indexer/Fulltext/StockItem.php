@@ -98,11 +98,12 @@ class StockItem extends AbstractPlugin
      */
     public function aroundSave(ResourceStockItem $subject, callable $proceed, AbstractModel $stockItem)
     {
+        $result = $proceed($stockItem);
         if ($this->storeConfig->isDoofinderFeedConfigured())
         {
             $origStockItem = $this->getOriginalStockItem($stockItem->getProductId());
                 
-            $result = $proceed($stockItem);
+         
             if ($this->registerUpdate($origStockItem, $stockItem)) 
             {
                 $stores = $this->storeConfig->getAllStores();
@@ -120,7 +121,6 @@ class StockItem extends AbstractPlugin
                 }
             }
         }
-     
         return $result;
     }
     
