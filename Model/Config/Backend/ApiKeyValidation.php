@@ -57,7 +57,6 @@ class ApiKeyValidation extends \Magento\Framework\App\Config\Value
     public function save()
     {
         $apiKey = $this->getValue();
-       
         if ($apiKey) 
         {
             try 
