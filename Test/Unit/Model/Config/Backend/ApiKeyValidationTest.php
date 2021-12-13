@@ -63,9 +63,9 @@ class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
      */
     public function testSaveEmpty()
     {
-        $this->resource->expects($this->once())->method('save');
+        $this->resource->expects($this->never())->method('save');
         $this->storeConfig->method('isInternalSearchEnabled')->willReturn(false);
-
+        $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
         $this->model->setValue(null);
         $this->model->save();
     }
@@ -93,7 +93,6 @@ class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
     public function testSaveValidFormat()
     {
         $this->resource->expects($this->once())->method('save');
-
         $this->model->setValue('eu1-abcdef0123456789abcdef0123456789abcdef01');
         $this->model->save();
     }
@@ -111,8 +110,9 @@ class ApiKeyValidationTest extends \Doofinder\FeedCompatibility\Test\Unit\Base
             $this->throwException(new \Doofinder\Management\Errors\NotAllowed('Error', 0, null, 'Error'))
         );
         $this->expectException(\Magento\Framework\Exception\ValidatorException::class);
-
         $this->model->setValue($apiKey);
         $this->model->save();
     }
+
+    
 }
