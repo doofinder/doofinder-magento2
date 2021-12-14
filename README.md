@@ -52,3 +52,5 @@ root@...:~# cd $MAGENTO_PATH
 root@...:/var/www/magento# gosu application php -d memory_limit=-1 ./bin/magento sampledata:deploy
 root@...:/var/www/magento# gosu application php -d memory_limit=-1 ./bin/magento setup:upgrade
 ```
+
+
