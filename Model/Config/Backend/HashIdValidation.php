@@ -30,17 +30,19 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
      * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
      * @param array $data
      */
+
     public function __construct(
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Model\Api\SearchEngine $searchEngine,
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+        \Doofinder\Feed\Helper\StoreConfig                      $storeConfig,
+        \Doofinder\Feed\Model\Api\SearchEngine                  $searchEngine,
+        \Magento\Framework\Model\Context                        $context,
+        \Magento\Framework\Registry                             $registry,
+        \Magento\Framework\App\Config\ScopeConfigInterface      $config,
+        \Magento\Framework\App\Cache\TypeListInterface          $cacheTypeList,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = []
-    ) {
+        \Magento\Framework\Data\Collection\AbstractDb           $resourceCollection = null,
+        array                                                   $data = []
+    )
+    {
         $this->storeConfig = $storeConfig;
         $this->searchEngine = $searchEngine;
 
@@ -94,7 +96,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
     /**
      * Check if hash id is unique in store.
      *
-     * @param  string $hashId
+     * @param string $hashId
      * @return void
      * @throws \Magento\Framework\Exception\ValidatorException Hash ID already used.
      */
@@ -121,7 +123,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
     /**
      * Check if hash id is available for current api key.
      *
-     * @param  string $hashId
+     * @param string $hashId
      * @return void
      * @throws \Magento\Framework\Exception\ValidatorException Search engine unavailable.
      */
@@ -140,25 +142,24 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
             throw new \Magento\Framework\Exception\ValidatorException(
                 __('Search engine with HashID %1 does not exist in your account.', $hashId)
             );
-            
+
         }
     }
 
     /**
      * Check if, when hash id is null, the indices update mode is not "Doofinder API".
      *
-     * @param  string $hashId
+     * @param string $hashId
      * @return void
      * @throws \Magento\Framework\Exception\ValidatorException Search engine unavailable.
      */
     private function validateIndiceUpdateMode($hashId)
     {
         if ($hashId) {
-            return;
+            return true;
         }
-
-        if ( 
-            $this->getFieldsetDataValue('doofinder_indices_update_mode') == \Doofinder\Feed\Helper\StoreConfig::DOOFINDER_INDICES_UPDATE_API 
+        if (
+            $this->getFieldsetDataValue('doofinder_indices_update_mode') == \Doofinder\Feed\Helper\StoreConfig::DOOFINDER_INDICES_UPDATE_API
             || ($this->getFieldsetDataValue('doofinder_indices_update_mode') == null && $this->storeConfig->isUpdateByApiEnable())
         ) {
             throw new \Magento\Framework\Exception\ValidatorException(
@@ -166,7 +167,6 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
             );
         }
 
-        return;
     }
-        
+
 }

@@ -1,9 +1,7 @@
 <?php
 
 namespace Doofinder\Feed\Model\Config\Backend;
-
 use \Magento\Framework\Exception\ValidatorException;
-
 /**
  * AdditionalAttribute backend model
  * Validate and correct additional attributes before save
@@ -29,15 +27,16 @@ class AdditionalAttributes extends ArraySerialized
      */
     public function __construct(
         \Doofinder\Feed\Model\AdditionalAttributes\DisallowedAttributesProvider $disallowedAttributes,
-        \Doofinder\Feed\Helper\Serializer $serializer,
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = []
-    ) {
+        \Doofinder\Feed\Helper\Serializer                                       $serializer,
+        \Magento\Framework\Model\Context                                        $context,
+        \Magento\Framework\Registry                                             $registry,
+        \Magento\Framework\App\Config\ScopeConfigInterface                      $config,
+        \Magento\Framework\App\Cache\TypeListInterface                          $cacheTypeList,
+        \Magento\Framework\Model\ResourceModel\AbstractResource                 $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb                           $resourceCollection = null,
+        array                                                                   $data = []
+    )
+    {
         $this->disallowedAttributes = $disallowedAttributes;
         parent::__construct(
             $serializer,
@@ -79,19 +78,6 @@ class AdditionalAttributes extends ArraySerialized
     }
 
     /**
-     * Transforms given value in such a way it can be used as Field's value.
-     *
-     * @param string $value
-     * @return string
-     */
-    private function cleanField($value)
-    {
-        $value = trim($value);
-        $value = strtolower($value);
-        return str_replace(' ', '_', $value);
-    }
-
-    /**
      * @param array $item
      * @return void
      * @throws ValidatorException If field data is invalid.
@@ -113,5 +99,18 @@ class AdditionalAttributes extends ArraySerialized
                 $item['field']
             ));
         }
+    }
+
+    /**
+     * Transforms given value in such a way it can be used as Field's value.
+     *
+     * @param string $value
+     * @return string
+     */
+    private function cleanField($value)
+    {
+        $value = trim($value);
+        $value = strtolower($value);
+        return str_replace(' ', '_', $value);
     }
 }

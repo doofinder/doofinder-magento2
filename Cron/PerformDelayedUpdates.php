@@ -2,7 +2,6 @@
 
 namespace Doofinder\Feed\Cron;
 
-use Doofinder\Feed\Helper\Indexer as IndexerHelper;
 use Doofinder\Feed\Model\ChangedProduct\Processor;
 
 /**
@@ -11,10 +10,6 @@ use Doofinder\Feed\Model\ChangedProduct\Processor;
  */
 class PerformDelayedUpdates
 {
-    /**
-     * @var IndexerHelper
-     */
-    private $helper;
 
     /**
      * @var Processor
@@ -23,12 +18,10 @@ class PerformDelayedUpdates
 
     /**
      * PerformDelayedUpdates constructor.
-     * @param IndexerHelper $helper
      * @param Processor $processor
      */
-    public function __construct(IndexerHelper $helper, Processor $processor)
+    public function __construct(Processor $processor)
     {
-        $this->helper = $helper;
         $this->processor = $processor;
     }
 
@@ -38,7 +31,7 @@ class PerformDelayedUpdates
      * @return void
      */
     public function execute()
-    {   
+    {
         $this->processor->execute();
     }
 }

@@ -31,16 +31,17 @@ class IndicesUpdateModeValidation extends \Magento\Framework\App\Config\Value
      * @param array $data
      */
     public function __construct(
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Model\Api\SearchEngine $searchEngine,
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+        \Doofinder\Feed\Helper\StoreConfig                      $storeConfig,
+        \Doofinder\Feed\Model\Api\SearchEngine                  $searchEngine,
+        \Magento\Framework\Model\Context                        $context,
+        \Magento\Framework\Registry                             $registry,
+        \Magento\Framework\App\Config\ScopeConfigInterface      $config,
+        \Magento\Framework\App\Cache\TypeListInterface          $cacheTypeList,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = []
-    ) {
+        \Magento\Framework\Data\Collection\AbstractDb           $resourceCollection = null,
+        array                                                   $data = []
+    )
+    {
         $this->storeConfig = $storeConfig;
         $this->searchEngine = $searchEngine;
 
@@ -57,7 +58,7 @@ class IndicesUpdateModeValidation extends \Magento\Framework\App\Config\Value
         $updateMode = $this->getValue();
         if ($updateMode == \Doofinder\Feed\Helper\StoreConfig::DOOFINDER_INDICES_UPDATE_API) {
             $this->validateHashIdAndApiKey();
-        } 
+        }
 
         if ($this->storeConfig->isSingleStoreMode()) {
             $this->setScope(\Magento\Store\Model\ScopeInterface::SCOPE_STORES);

@@ -65,7 +65,6 @@ class ProductBackendCrudTest extends BaseBackendController
         $this->resetRegisterCollections('default');
         $this->productHelper->deleteAllProducts();
     }
-
     /**
      * Test create product with already existing url key.
      *
@@ -79,7 +78,7 @@ class ProductBackendCrudTest extends BaseBackendController
     {
         $fixtureProductId = 11111;
         $fixtureStoreCode = 'default';
-
+        
         $this->productHelper->deleteAllProducts();
 
         $this->getRequest()->setPostValue($postData);
@@ -95,7 +94,6 @@ class ProductBackendCrudTest extends BaseBackendController
         $item = current($items);
         $this->assertEquals($product->getId(), $item->getProductEntityId());
     }
-
     /**
      * Provide test data for testSaveActionWithAlreadyExistingUrlKey().
      *
@@ -132,7 +130,6 @@ class ProductBackendCrudTest extends BaseBackendController
             ]
         ];
     }
-
     /**
      * Test edit product
      * 
@@ -164,7 +161,6 @@ class ProductBackendCrudTest extends BaseBackendController
         $item = current($items);
         $this->assertEquals($product->getId(), $item->getProductEntityId());
     }
-
     /**
      * Test delete product
      * 

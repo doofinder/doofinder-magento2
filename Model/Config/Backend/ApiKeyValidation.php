@@ -31,58 +31,52 @@ class ApiKeyValidation extends \Magento\Framework\App\Config\Value
      * @param array $data
      */
     public function __construct(
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Model\Api\SearchEngine $searchEngine,
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+        \Doofinder\Feed\Helper\StoreConfig                      $storeConfig,
+        \Doofinder\Feed\Model\Api\SearchEngine                  $searchEngine,
+        \Magento\Framework\Model\Context                        $context,
+        \Magento\Framework\Registry                             $registry,
+        \Magento\Framework\App\Config\ScopeConfigInterface      $config,
+        \Magento\Framework\App\Cache\TypeListInterface          $cacheTypeList,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = []
-    ) {
+        \Magento\Framework\Data\Collection\AbstractDb           $resourceCollection = null,
+        array                                                   $data = []
+    )
+    {
         $this->storeConfig = $storeConfig;
         $this->searchEngine = $searchEngine;
 
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
 
-  
+
     /**
-     * Save configuration.
-     *
-     * @return mixed
-     * @throws \Magento\Framework\Exception\ValidatorException Invalid api key.
+     * @return ApiKeyValidation
+     * @throws \Magento\Framework\Exception\ValidatorException
      */
     public function save()
     {
+        /**
+         * get the API Key
+         */
         $apiKey = $this->getValue();
-        if ($apiKey) 
-        {
-            try 
-            {
+        if ($this->getValue()) {
+            try {
                 $this->searchEngine->getSearchEngines($apiKey);
-            } 
-            catch (\Exception $exception) 
-            {
+            } catch (\Exception $exception) {
                 throw new \Magento\Framework\Exception\ValidatorException(
-                __("Something went wrong  : ".$exception->getMessage())
-                );    
-                
+                    __("Something went wrong  : " . $exception->getMessage())
+                );
             }
         } elseif ($this->storeConfig->isInternalSearchEnabled()) {
             throw new \Magento\Framework\Exception\ValidatorException(
                 __('API key cannot be empty when Doofinder engine is enabled.')
             );
-        }
-        else
-        {
+        } else {
             throw new \Magento\Framework\Exception\ValidatorException(
                 __('API key is invalid.')
             );
 
         }
-
         return parent::save();
     }
 }

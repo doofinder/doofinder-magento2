@@ -1,6 +1,8 @@
 <?php
 
 namespace Doofinder\Feed\Plugin;
+
+use ArrayIterator;
 use Magento\Catalog\Model\Product\Action as ProductAction;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Plugin\AbstractPlugin;
 use Magento\Framework\Indexer\IndexerRegistry;
@@ -20,116 +22,77 @@ use Doofinder\Feed\Helper\Logger;
 
 class MassActions extends AbstractPlugin
 {
-      /**
-     * @var Registration
-     */
-    private $registration;
-
-
-    /**
-     * @var StoreConfig
-     */
-    private $storeConfig;
-
     /**
      * @var IndexerRegistry
      */
     protected $indexerRegistry;
-    
     /**
-     * indexStructure
-     *
-     * @var mixed
-     */
-    private $indexStructure;
-    
-    /**
-     * indexerHelper
-     *
-     * @var mixed
-     */
-    private $indexerHelper;
-    
-    /**
-     * config
-     *
-     * @var mixed
+     * @var ConfigInterface
      */
     protected $config;
-    
     /**
-     * indexerScope
-     *
-     * @var mixed
+     * @var Registration
+     */
+    private $registration;
+    /**
+     * @var StoreConfig
+     */
+    private $storeConfig;
+    /**
+     * @var IndexStructure
+     */
+    private $indexStructure;
+    /**
+     * @var IndexerHelper
+     */
+    private $indexerHelper;
+    /**
+     * @var IndexerScope
      */
     private $indexerScope;
-    
+
     /**
-     * indexerHandlerFactory
-     *
-     * @var mixed
+     * @var IndexerHandlerFactory
      */
     private $indexerHandlerFactory;
-    
+
     /**
-     * fullActionFactory
-     *
-     * @var mixed
+     * @var FullFactory
      */
     private $fullActionFactory;
-    
+
     /**
-     * logger
-     *
-     * @var mixed
+     * @var PsrLoggerInterface
      */
     private $logger;
 
-    
     /**
-     * fulltextResource
-     *
-     * @var mixed
+     * @var FulltextResource
      */
     private $fulltextResource;
-    
     /**
-     * doofinderLogger
-     *
-     * @var mixed
+     * @var Logger
      */
     private $doofinderLogger;
 
-
     /**
      * @param Registration $registration
-     * @param StoreDimensionProvider $storeDimensionProvider
      * @param StoreConfig $storeConfig
      * @param IndexerRegistry $indexerRegistry
+     * @param IndexerHelper $indexerHelper
+     * @param IndexerHandlerFactory $indexerHandlerFactory
+     * @param IndexStructure $indexStructure
+     * @param ConfigInterface $config
+     * @param IndexerScope $indexerScope
+     * @param FullFactory $fullActionFactory
+     * @param PsrLoggerInterface $logger
+     * @param FulltextResource $fulltextResource
+     * @param Logger $doofinderlogger
      */
-    
-    
-    /**
-     * __construct
-     *
-     * @return void
-     */    
- 
-    public function __construct(
-        Registration $registration,
-        StoreConfig $storeConfig,
-        IndexerRegistry $indexerRegistry,
-        IndexerHelper $indexerHelper,
-        IndexerHandlerFactory $indexerHandlerFactory,
-        IndexStructure $indexStructure,
-        ConfigInterface $config,      
-        IndexerScope $indexerScope,
-        FullFactory $fullActionFactory,
-        PsrLoggerInterface $logger,
-        FulltextResource $fulltextResource,
-        Logger $doofinderlogger
+    public function __construct(Registration $registration, StoreConfig $storeConfig, IndexerRegistry $indexerRegistry, IndexerHelper $indexerHelper, IndexerHandlerFactory $indexerHandlerFactory, IndexStructure $indexStructure, ConfigInterface $config, IndexerScope $indexerScope, FullFactory $fullActionFactory, PsrLoggerInterface $logger, FulltextResource $fulltextResource, Logger $doofinderlogger
 
-    ) {
+    )
+    {
         $this->registration = $registration;
         $this->storeConfig = $storeConfig;
         $this->indexerRegistry = $indexerRegistry;
@@ -145,104 +108,72 @@ class MassActions extends AbstractPlugin
 
     }
 
-   
-    public function afterUpdateAttributes(ProductAction $subject,ProductAction $action, $productIds, $attrData) 
+    /**
+     * @param ProductAction $subject
+     * @param ProductAction $action
+     * @param $productIds
+     * @param $attrData
+     * @return ProductAction
+     */
+    public function afterUpdateAttributes(ProductAction $subject, ProductAction $action, $productIds, $attrData)
     {
-
-        try
-        {
-            if ($this->storeConfig->isDoofinderFeedConfigured())
-            {
-                //get the affected ids
+        try {
+            if ($this->storeConfig->isDoofinderFeedConfigured()) {
+                //get all stores
                 $stores = $this->storeConfig->getAllStores();
-                $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID); 
-                
-                foreach($stores as $store) 
-                {
+                $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
+                //loop through each store
+                foreach ($stores as $store) {
                     //check if its update by API set
-                    if ($this->storeConfig->isUpdateByApiEnable($store->getCode()))
-                    {             
+                    if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
                         //check the isScheduled variable if true
-                        if($indexer->isScheduled()) 
-                        {
+                        if ($indexer->isScheduled()) {
                             //loop through all product ids
-                            foreach($productIds as $id)
-                            {                           
-                                try
-                                {
+                            foreach ($productIds as $id) {
+                                try {
                                     //if true use registerUpdate
-                                    $this->registration->registerUpdate(
-                                        $id, 
-                                        $store->getCode()
-                                    );
-
+                                    $this->registration->registerUpdate($id, $store->getCode());
+                                } catch (Exception $e) {
+                                    $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'MassActions', 'Mode' => 'onSchedule'], 'Location' => ['function' => 'afterUpdateAttributes', 'product' => ['productid' => $id, 'storecode' => $store->getCode()], 'stacktrace' => $e->getMessage()]));
                                 }
-                                catch(\Exception $e) 
-                                {
-                                    $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'MassActions','Mode'=>'onSchedule'],'Location'=>['function'=>'afterUpdateAttributes','product'=>['productid'=> $id,'storecode'=> $store->getCode()],'stacktrace'=>$e->getMessage()]));  
-                                }
-                            
                             }
-
-                        }
-                        else
-                        {
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'MassActions', 'Mode' => 'onSchedule'], 'Location' => ['function' => 'afterUpdateAttributes', 'product' => ['productids' => $productIds, 'storecode' => $store->getCode(), 'attributedata' => $attrData]]));
+                        } else {
                             //if it is false  its on save
-                            try 
-                            {
+                            try {
                                 $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-                                $indexerHandler = $this->createDoofinderIndexerHandler($data);
-                                $fullAction = $this->createFullAction($data);
+
+                                //create index handler
+                                $indexerHandler = $this->indexerHandlerFactory->create($data);
+
+                                $fullAction = $this->fullActionFactory->create(['data' => $data]);
                                 //get dimensions
                                 $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
                                 //get storeid
                                 $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-                        
+
                                 $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
-                                //convert the id to array
-                                $entityIds = iterator_to_array( new \ArrayIterator($productIds));
-
-                                $newproductIds = array_unique(
-                                    array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds))
-                                );
-                    
+                                //convert the ids to array
+                                $entityIds = iterator_to_array(new ArrayIterator($productIds));
+                                $newproductIds = array_unique(array_merge($entityIds, $this->fulltextResource->getRelationsByChild($entityIds)));
                                 //save index
-                                $indexerHandler->saveIndex(
-                                    $dimensions,
-                                    $fullAction->rebuildStoreIndex($storeId, $newproductIds)
-                                );
-                                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'MassActions','Mode'=>'onSave'],'Location'=>['function'=>'afterUpdateAttributes','product'=>['productid'=>  $newproductIds,'storecode'=> $store->getCode()]]));  
+                                $indexerHandler->saveIndex($dimensions, $fullAction->rebuildStoreIndex($storeId, $newproductIds));
+                                //write logs
+                                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'MassActions', 'Mode' => 'onSave'], 'Location' => ['function' => 'afterUpdateAttributes', 'product' => ['productid' => $newproductIds, 'storecode' => $store->getCode()]]));
 
-            
-                            } catch(\Exception $e) 
-                            {
-                                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'MassActions','Mode'=>'onSave'],'Location'=>['function'=>'afterUpdateAttributes','product'=>['productid'=> $id,'storecode'=> $store->getCode()],'exception'=>['message'=>$e->getMessage()]]));  
-                          
-
+                            } catch (Exception $e) {
+                                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'MassActions', 'Mode' => 'onSave'], 'Location' => ['function' => 'afterUpdateAttributes', 'product' => ['productid' => $id, 'storecode' => $store->getCode()], 'exception' => ['message' => $e->getMessage()]]));
                             } finally {
-                                $this->indexerScope->setIndexerScope(null);                      
+                                $this->indexerScope->setIndexerScope(null);
                             }
                         }
-                    
                     }
-
-                } 
-                  
-                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'MassActions','Mode'=>'onSchedule'],'Location'=>['function'=>'afterUpdateAttributes','product'=>['productids'=> $productIds,'storecode'=> $store->getCode(),'attributedata'=>$attrData]]));  
-
-            }   
+                }
+            }
+        } catch (Exception $er) {
+            $this->logger->error($er->getMessage());
         }
-        catch(Exception $er)
-        {
-            $this->logger->error($er->getMessage());  
-        }     
         return $action;
     }
-    private function createDoofinderIndexerHandler(array $data = []) {
-        return $this->indexerHandlerFactory->create($data);
-    }
-  
-    private function createFullAction(array $data) {
-        return $this->fullActionFactory->create(['data' => $data]);
-    }
+
 }

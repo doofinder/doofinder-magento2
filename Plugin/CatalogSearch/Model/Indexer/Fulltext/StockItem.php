@@ -22,44 +22,35 @@ use Doofinder\Feed\Helper\Logger;
 class StockItem extends AbstractPlugin
 {
     /**
-     * @var Registration
-     */
-    private $registration;
-
-
-    /**
-     * @var StoreConfig
-     */
-    private $storeConfig;
-
-    /**
      * @var IndexerRegistry
      */
     protected $indexerRegistry;
-
     /**
      * @var StockRegistryInterface
      */
     protected $stockRegistry;
-
     /**
      * @var StockItemRepositoryInterface
      */
     protected $stockItemRepository;
-
     /**
      * @var StockItemCriteriaInterfaceFactory
      */
     protected $stockItemCriteriaFactory;
-
-    
+    /**
+     * @var Registration
+     */
+    private $registration;
+    /**
+     * @var StoreConfig
+     */
+    private $storeConfig;
     /**
      * doofinderLogger
      *
      * @var mixed
      */
     private $doofinderLogger;
-
 
     /**
      * @param Registration $registration
@@ -68,25 +59,27 @@ class StockItem extends AbstractPlugin
      * @param StockRegistryInterface $stockRegistry
      * @param StockItemRepositoryInterface $stockItemRepository
      * @param StockItemCriteriaInterfaceFactory $stockItemCriteriaFactory
+     * @param Logger $doofinderLogger
      */
     public function __construct(
-        Registration $registration,
-        StoreConfig $storeConfig,
-        IndexerRegistry $indexerRegistry,
-        StockRegistryInterface $stockRegistry,
-        StockItemRepositoryInterface $stockItemRepository,
+        Registration                      $registration,
+        StoreConfig                       $storeConfig,
+        IndexerRegistry                   $indexerRegistry,
+        StockRegistryInterface            $stockRegistry,
+        StockItemRepositoryInterface      $stockItemRepository,
         StockItemCriteriaInterfaceFactory $stockItemCriteriaFactory,
-        Logger $doofinderlogger
-    ) {
+        Logger                            $doofinderLogger
+    )
+    {
         $this->registration = $registration;
         $this->storeConfig = $storeConfig;
         $this->indexerRegistry = $indexerRegistry;
         $this->stockRegistry = $stockRegistry;
         $this->stockItemRepository = $stockItemRepository;
         $this->stockItemCriteriaFactory = $stockItemCriteriaFactory;
-        $this->doofinderLogger = $doofinderlogger;
-
+        $this->doofinderLogger = $doofinderLogger;
     }
+
     /**
      * @param ItemResourceModel $subject
      * @param callable $proceed
@@ -99,60 +92,45 @@ class StockItem extends AbstractPlugin
     public function aroundSave(ResourceStockItem $subject, callable $proceed, AbstractModel $stockItem)
     {
         $result = $proceed($stockItem);
-        if ($this->storeConfig->isDoofinderFeedConfigured())
-        {
+        if ($this->storeConfig->isDoofinderFeedConfigured()) {
             $origStockItem = $this->getOriginalStockItem($stockItem->getProductId());
-                
-         
-            if ($this->registerUpdate($origStockItem, $stockItem)) 
-            {
+            if ($this->registerUpdate($origStockItem, $stockItem)) {
                 $stores = $this->storeConfig->getAllStores();
                 $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-                foreach($stores as $store) 
-                {
-                    if ($this->storeConfig->isUpdateByApiEnable($store->getCode()) && $indexer->isScheduled()) 
-                    {
+                foreach ($stores as $store) {
+                    if ($this->storeConfig->isUpdateByApiEnable($store->getCode()) && $indexer->isScheduled()) {
                         $this->registration->registerUpdate(
-                            $stockItem->getProductId(), 
+                            $stockItem->getProductId(),
                             $store->getCode()
                         );
-                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'StockItem','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundSave','product'=>['productid'=> $stockItem->getProductId(),'storecode'=> $store->getCode()]]));  
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'StockItem', 'Mode' => 'onSchedule'], 'Location' => ['function' => 'aroundSave', 'product' => ['productid' => $stockItem->getProductId(), 'storecode' => $store->getCode()]]));
                     }
                 }
             }
         }
         return $result;
     }
-    
+
     /**
-     * getOriginalStockItem
-     *
-     * @param  mixed $productId
-     * @return void
+     * @param $productId
+     * @return false|mixed
      */
-    private function getOriginalStockItem($productId) {
+    private function getOriginalStockItem($productId)
+    {
         $criteria = $this->stockItemCriteriaFactory->create();
         $criteria->setProductsFilter($productId);
         $collection = $this->stockItemRepository->getList($criteria);
         $stockItem = current($collection->getItems());
         return $stockItem;
     }
-    
+
     /**
-     * registerUpdate
-     *
-     * @param  mixed $origStockItem
-     * @param  mixed $stockItem
-     * @return void
+     * @param $origStockItem
+     * @param $stockItem
+     * @return bool
      */
-    private function registerUpdate($origStockItem, $stockItem) {
-        if ($origStockItem && $origStockItem->getIsInStock() != $stockItem->getIsInStock()) {
-            return true;
-        }
-        $trackQtyChanges = false;
-        if ($trackQtyChanges && $origStockItem->getQty() != $stockItem->getQty()) {
-            return true;
-        }
-        return false;
+    private function registerUpdate($origStockItem, $stockItem)
+    {
+        return ($origStockItem && $origStockItem->getIsInStock() != $stockItem->getIsInStock());
     }
 }

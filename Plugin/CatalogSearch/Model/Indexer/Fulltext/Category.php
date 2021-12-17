@@ -25,69 +25,63 @@ use Doofinder\Feed\Helper\Logger;
 class Category extends AbstractPlugin
 {
     /**
-     * @var Registration
-     */
-    private $registration;
-
-    /**
-     * @var StoreConfig
-     */
-    private $storeConfig;
-
-    /**
      * @var IndexerRegistry
      */
     protected $indexerRegistry;
-    
-    /**
-     * indexerScope
-     *
-     * @var mixed
-     */
-    private $indexerScope;
-    
-    /**
-     * indexerHelper
-     *
-     * @var mixed
-     */
-    private $indexerHelper;
-    
     /**
      * config
      *
      * @var mixed
      */
     protected $config;
-    
+    /**
+     * @var Registration
+     */
+    private $registration;
+    /**
+     * @var StoreConfig
+     */
+    private $storeConfig;
+    /**
+     * indexerScope
+     *
+     * @var mixed
+     */
+    private $indexerScope;
+    /**
+     * indexerHelper
+     *
+     * @var mixed
+     */
+    private $indexerHelper;
     /**
      * indexerHandlerFactory
      *
      * @var mixed
      */
     private $indexerHandlerFactory;
-    
+
     /**
      * fullActionFactory
      *
      * @var mixed
      */
     private $fullActionFactory;
-    
-    /** 
+
+    /**
      * fulltextResource
      *
      * @var mixed
      */
     private $fulltextResource;
-    
+
     /**
      * logger
      *
      * @var mixed
      */
     private $logger;
-    
+
     /**
      * doofinderLogger
      *
@@ -96,29 +90,34 @@ class Category extends AbstractPlugin
     private $doofinderLogger;
 
 
-
-
-
     /**
-     * @param Registration $registration=
+     * @param Registration $registration
+     * @param IndexerScope $indexerScope
      * @param StoreConfig $storeConfig
      * @param IndexerRegistry $indexerRegistry
+     * @param IndexerHelper $indexerHelper
+     * @param ConfigInterface $config
+     * @param IndexerHandlerFactory $indexerHandlerFactory
+     * @param FullFactory $fullActionFactory
+     * @param FulltextResource $fulltextResource
+     * @param PsrLoggerInterface $logger
+     * @param Logger $doofinderlogger
      */
     public function __construct(
-        Registration $registration,
-        IndexerScope $indexerScope,
-        StoreConfig $storeConfig,
-        IndexerRegistry $indexerRegistry,
-        IndexerHelper $indexerHelper,
-        ConfigInterface $config,
+        Registration          $registration,
+        IndexerScope          $indexerScope,
+        StoreConfig           $storeConfig,
+        IndexerRegistry       $indexerRegistry,
+        IndexerHelper         $indexerHelper,
+        ConfigInterface       $config,
         IndexerHandlerFactory $indexerHandlerFactory,
-        FullFactory $fullActionFactory,
-        FulltextResource $fulltextResource,
-        PsrLoggerInterface $logger,
-        Logger $doofinderlogger
+        FullFactory           $fullActionFactory,
+        FulltextResource      $fulltextResource,
+        PsrLoggerInterface    $logger,
+        Logger                $doofinderlogger
 
-
-    ) {
+    )
+    {
         $this->registration = $registration;
         $this->storeConfig = $storeConfig;
         $this->indexerRegistry = $indexerRegistry;
@@ -133,18 +132,62 @@ class Category extends AbstractPlugin
 
     }
 
-    
     /**
-     * getIdsOnly
-     *
-     * @param  mixed $allproducts
+     * @param ResourceCategory $resourceCategory
+     * @param callable $proceed
+     * @param AbstractModel $category
+     * @return mixed
+     */
+    public function aroundSave(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
+    {
+        //get the old category name
+        $origname = $category->getOrigData('name');
+        //get the category new name
+        $newname = $category->getData('name');
+        $result = $proceed($category);
+        if ($this->storeConfig->isDoofinderFeedConfigured()) {
+            $entityIds = [];
+            try {
+                //check if there is a change in name then we get all affectec products
+                if ($origname != $newname) {
+                    if (is_array($category->getAffectedProductIds())) {
+                        $entityIds = array_values($category->getAffectedProductIds());
+                    } else {
+                        //fetch all products assigned to this category
+                        //if the name has changed then we check for the affected items
+                        $entityIds = $this->getIdsOnly($category->getProductCollection());
+
+                    }
+                } else {
+                    //if the name has not changed then we just get the affected items
+                    $affectedProducts = $category->getAffectedProductIds();
+                    if (is_array($affectedProducts)) {
+                        $entityIds = array_values($affectedProducts);
+                    }
+                }
+
+                //Send to doofinder after fetching IDS using different criterias
+                $this->updateDoofinder($entityIds);
+
+            } catch (\Exception $ex) {
+                //log
+                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'Category'], 'Location' => ['function' => 'aroundSave', 'category' => $category], 'exception' => ['message' => $ex->getMessage(), 'stacktrace' => $ex->getTraceAsString()]));
+                return $result;
+            }
+        }
+        return $result;
+
+    }
+
+    /**
+     * @param $allproducts
+     * @return array
      */
     public function getIdsOnly($allproducts)
     {
         //set empty array
         $entityIds = [];
-        try 
-        {
+        try {
             foreach ($allproducts as $product) {
                 //just get the id only
                 $entityIds[] = (int)$product->getId();
@@ -155,59 +198,9 @@ class Category extends AbstractPlugin
             return [];
         }
     }
-     
-    /**
-     * aroundSave
-     *
-     * @param  mixed $resourceCategory
-     * @param  mixed $proceed
-     * @param  mixed $category
-     * @return void
-     */
-    public function aroundSave(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
-    {
-         //get the old category name
-         $origname = $category->getOrigData('name');
-         //get the category new name
-         $newname = $category->getData('name');
-         $result = $proceed($category);
-        if ($this->storeConfig->isDoofinderFeedConfigured())
-        {
-                try {
-                //check if there is a change in name then we get all affectec products
-                if ($origname != $newname) {
 
-                    if (is_array($category->getAffectedProductIds())) {
-                        $this->updateDoofinder(array_values($category->getAffectedProductIds()));
-                    } else {
-
-                        //fetch all products assigned to this category
-                        $allproducts = $this->getIdsOnly($category->getProductCollection());
-                        //if the name has changed then we check for the affected items
-                        $this->updateDoofinder($allproducts);
-                    }
-                } else {
-                    //if the name has not changed then we just get the affected items
-                    $affectedProducts = $category->getAffectedProductIds();
-                    if (is_array($affectedProducts)) {
-                        $this->updateDoofinder(array_values($affectedProducts));
-                    }
-                }
-            } catch (\Exception $ex) 
-            {
-                //log
-                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category'],'Location'=>['function'=>'aroundSave','category'=>$category],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
-                return $result;
-            }
-        }
-        return $result;
-        
-    }
-    
     /**
-     * updateDoofinder
-     *
-     * @param  mixed $productarray
+     * @param $productarray
      * @return void
      */
     private function updateDoofinder($productarray)
@@ -218,59 +211,50 @@ class Category extends AbstractPlugin
         //
         foreach ($stores as $store) {
             if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
-                if ($indexer->isScheduled()) 
-                {
+                if ($indexer->isScheduled()) {
                     foreach ($productarray as $id) {
-                        try
-                        {
+                        try {
                             //recreate using update
                             $this->registration->registerUpdate(
                                 $id,
                                 $store->getCode()
                             );
                             //log
-                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundSave','product'=>$id,'storecode'=>$store->getCode()]));  
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'Category', 'Mode' => 'onSchedule'], 'Location' => ['function' => 'aroundSave', 'product' => $id, 'storecode' => $store->getCode()]));
 
-                         }
-                        catch (\Exception $ex) 
-                        {
-                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundSave','product'=>$id,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
+                        } catch (\Exception $ex) {
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'Category', 'Mode' => 'onSchedule'], 'Location' => ['function' => 'aroundSave', 'product' => $id, 'storecode' => $store->getCode()], 'exception' => ['message' => $ex->getMessage(), 'stacktrace' => $ex->getTraceAsString()]));
                         }
                     }
-                } 
-                else 
-                {
-                    try 
-                    {
+                } else {
+                    try {
                         $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-                        $fullAction = $this->createFullAction($data);
-                        $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                        $fullAction = $this->indexerHelper->createFullAction($data, $this->fullActionFactory);
+                        $indexerHandler = $this->indexerHelper->createDoofinderIndexerHandler($data, $this->indexerHandlerFactory);
                         //get dimensions
                         $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
-                       //get store id and cast to integer
+                        //get store id and cast to integer
                         $storeId = (int)$this->indexerHelper->getStoreIdFromDimensions($dimensions);
-
                         $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
-                       //
+                        //
                         $productIds = array_unique(
                             array_merge($productarray, $this->fulltextResource->getRelationsByChild($productarray))
                         );
-                        
+
                         $indexerHandler->saveIndex(
                             $dimensions,
-                            $fullAction->rebuildStoreIndex($storeId,$productIds)
+                            $fullAction->rebuildStoreIndex($storeId, $productIds)
                         );
 
                         //log
-                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSave'],'Location'=>['function'=>'aroundSave','product'=> $productIds,'storecode'=>$store->getCode()]));  
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'Category', 'Mode' => 'onSave'], 'Location' => ['function' => 'aroundSave', 'product' => $productIds, 'storecode' => $store->getCode()]));
 
 
                     } catch (\Exception $ex) {
                         //log the caught error
-                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSave'],'Location'=>['function'=>'aroundSave','product'=>$id,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'Category', 'Mode' => 'onSave'], 'Location' => ['function' => 'aroundSave', 'product' => $id, 'storecode' => $store->getCode()], 'exception' => ['message' => $ex->getMessage(), 'stacktrace' => $ex->getTraceAsString()]));
 
-                    }
-                     finally {
+                    } finally {
                         $this->indexerScope->setIndexerScope(null);
                         return;
                     }
@@ -279,58 +263,40 @@ class Category extends AbstractPlugin
         }
     }
 
-    private function createDoofinderIndexerHandler(array $data = [])
-    {
-        return $this->indexerHandlerFactory->create($data);
-    }
-
-    private function createFullAction(array $data)
-    {
-        return $this->fullActionFactory->create(['data' => $data]);
-    }
-
-
     public function aroundDelete(ResourceCategory $resourceCategory, callable $proceed, AbstractModel $category)
     {
-         //get the products that will be affected
-         $allproducts = $this->getIdsOnly($category->getProductCollection());
-         $result = $proceed($category);
+        //get the products that will be affected
+        $allproducts = $this->getIdsOnly($category->getProductCollection());
+        $result = $proceed($category);
 
-        if ($this->storeConfig->isDoofinderFeedConfigured())
-        {
-           
+        if ($this->storeConfig->isDoofinderFeedConfigured()) {
+
             $stores = $this->storeConfig->getAllStores();
             $indexer = $this->indexerRegistry->get(FulltextIndexer::INDEXER_ID);
-        
+
             foreach ($stores as $store) {
                 if ($this->storeConfig->isUpdateByApiEnable($store->getCode())) {
 
                     if ($indexer->isScheduled()) {
-                        foreach ($allproducts  as $productid) {
-                            try
-                            {
-                           
+                        foreach ($allproducts as $productid) {
+                            try {
+
                                 $this->registration->registerUpdate(
                                     $productid,
                                     $store->getCode()
                                 );
-                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=> $productid,'storecode'=>$store->getCode()]));  
+                                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'Category', 'Mode' => 'onSchedule'], 'Location' => ['function' => 'aroundDelete', 'product' => $productid, 'storecode' => $store->getCode()]));
 
+                            } catch (\Exception $ex) {
+                                $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'Category', 'Mode' => 'onSchedule'], 'Location' => ['function' => 'aroundDelete', 'product' => $productid, 'storecode' => $store->getCode()], 'exception' => ['message' => $ex->getMessage(), 'stacktrace' => $ex->getTraceAsString()]));
+                            }
                         }
-                        catch (\Exception $ex) 
-                        {
-                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productid,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
-                        }
-                        }
-                    }
-                    else
-                    {
-                        try 
-                        {
+                    } else {
+                        try {
                             $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-                        
-                            $indexerHandler = $this->createDoofinderIndexerHandler($data);                   
-                            $fullAction = $this->createFullAction($data);
+                            $fullAction = $this->indexerHelper->createFullAction($data, $this->fullActionFactory);
+                            $indexerHandler = $this->indexerHelper->createDoofinderIndexerHandler($data, $this->indexerHandlerFactory);
+
                             $dimensions = array($this->indexerHelper->getDimensions($store->getId()));
                             //get store id and cast to integer
                             $storeId = (int)$this->indexerHelper->getStoreIdFromDimensions($dimensions);
@@ -341,19 +307,15 @@ class Category extends AbstractPlugin
 
                             $indexerHandler->saveIndex(
                                 $dimensions,
-                                $fullAction->rebuildStoreIndex($storeId,$productIds)
+                                $fullAction->rebuildStoreIndex($storeId, $productIds)
                             );
 
-                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productIds,'storecode'=>$store->getCode()]));  
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'Category', 'Mode' => 'onSchedule'], 'Location' => ['function' => 'aroundDelete', 'product' => $productIds, 'storecode' => $store->getCode()]));
 
-                        
-                        }
-                        catch (\Exception $ex) 
-                        {
-                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'Category','Mode'=>'onSchedule'],'Location'=>['function'=>'aroundDelete','product'=>$productIds,'storecode'=>$store->getCode()],'exception'=>['message'=>$ex->getMessage(),'stacktrace'=>$ex->getTraceAsString()]));  
-                        } 
-                        finally 
-                        {
+
+                        } catch (\Exception $ex) {
+                            $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'Category', 'Mode' => 'onSchedule'], 'Location' => ['function' => 'aroundDelete', 'product' => $productIds, 'storecode' => $store->getCode()], 'exception' => ['message' => $ex->getMessage(), 'stacktrace' => $ex->getTraceAsString()]));
+                        } finally {
                             $this->indexerScope->setIndexerScope(null);
                             return;
                         }

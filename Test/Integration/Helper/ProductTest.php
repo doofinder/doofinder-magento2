@@ -56,7 +56,9 @@ class ProductTest extends Base
      */
     protected function tearDownTests()
     {
+        
     }
+
 
     /**
      * Test getProductId() method
