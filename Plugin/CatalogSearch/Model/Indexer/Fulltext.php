@@ -13,14 +13,9 @@ use Magento\CatalogSearch\Model\ResourceModel\Fulltext as FulltextResource;
 use Doofinder\Feed\Model\ChangedProductFactory;
 use Doofinder\Feed\Model\Indexer\IndexerHandlerFactory;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\FullFactory;
-use Magento\Framework\App\ObjectManager;
 use Doofinder\Feed\Model\Indexer\IndexStructure;
-use Exception;
-use finfo;
 use Doofinder\Feed\Helper\Logger;
 use Doofinder\Feed\Model\GetProducts;
-
-
 
 
 // phpcs:disable Squiz.Commenting.FunctionComment.MissingParamTag
@@ -35,67 +30,55 @@ use Doofinder\Feed\Model\GetProducts;
 class Fulltext
 {
     /**
-     * @var IndexStructure
-     */
-    private $indexStructure;
-
-    /**
-     * @var ChangedProductFactory
-     */
-    private $changedFactory;
-
-    /**
-     * @var IndexerHelper
-     */
-    private $indexerHelper;
-
-    /**
      * @var ConfigInterface
      */
     protected $config;
-
     /**
      * @var Registration
      */
     protected $registration;
-
     /**
      * @var Processor
      */
     protected $processor;
-
-    /**
-     * @var FulltextResource
-     */
-    private $fulltextResource;
-
-    /**
-     * @var StoreConfig
-     */
-    private $storeConfig;
-
-    /**
-     * @var IndexerScope
-     */
-    private $indexerScope;
-
-    /**
-     * @var IndexerHandlerFactory
-     */
-    private $indexerHandlerFactory;
-
-    /**
-     * @var FullFactory
-     */
-    private $fullActionFactory;
-    
     /**
      * logger
      *
      * @var mixed
      */
     protected $logger;
-    
+    /**
+     * @var IndexStructure
+     */
+    private $indexStructure;
+    /**
+     * @var ChangedProductFactory
+     */
+    private $changedFactory;
+    /**
+     * @var IndexerHelper
+     */
+    private $indexerHelper;
+    /**
+     * @var FulltextResource
+     */
+    private $fulltextResource;
+    /**
+     * @var StoreConfig
+     */
+    private $storeConfig;
+    /**
+     * @var IndexerScope
+     */
+    private $indexerScope;
+    /**
+     * @var IndexerHandlerFactory
+     */
+    private $indexerHandlerFactory;
+    /**
+     * @var FullFactory
+     */
+    private $fullActionFactory;
     /**
      * doofinderLogger
      *
@@ -103,13 +86,12 @@ class Fulltext
      */
     private $doofinderLogger;
 
-
+    /**
+     * @var GetProducts
+     */
     private $getProducts;
 
-
     /**
-     * A constructor.
-     *
      * @param FullFactory $fullActionFactory
      * @param StoreConfig $storeConfig
      * @param IndexerScope $indexerScope
@@ -121,24 +103,27 @@ class Fulltext
      * @param IndexerHelper $indexerHelper
      * @param IndexerHandlerFactory $indexerHandlerFactory
      * @param IndexStructure $indexStructure
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param Logger $doofinderlogger
+     * @param GetProducts $getproduct
      */
     public function __construct(
-        FullFactory $fullActionFactory,
-        StoreConfig $storeConfig,
-        IndexerScope $indexerScope,
-        ConfigInterface $config,
-        Registration $registration,
-        Processor $processor,
-        FulltextResource $fulltextResource,
-        ChangedProductFactory $changedFactory,
-        IndexerHelper $indexerHelper,
-        IndexerHandlerFactory $indexerHandlerFactory,
-        IndexStructure $indexStructure,
+        FullFactory              $fullActionFactory,
+        StoreConfig              $storeConfig,
+        IndexerScope             $indexerScope,
+        ConfigInterface          $config,
+        Registration             $registration,
+        Processor                $processor,
+        FulltextResource         $fulltextResource,
+        ChangedProductFactory    $changedFactory,
+        IndexerHelper            $indexerHelper,
+        IndexerHandlerFactory    $indexerHandlerFactory,
+        IndexStructure           $indexStructure,
         \Psr\Log\LoggerInterface $logger,
-        Logger $doofinderlogger,
-        GetProducts $getproduct
-        ) 
-        {
+        Logger                   $doofinderlogger,
+        GetProducts              $getproduct
+    )
+    {
         $this->fullActionFactory = $fullActionFactory;
         $this->storeConfig = $storeConfig;
         $this->indexerScope = $indexerScope;
@@ -154,7 +139,6 @@ class Fulltext
         $this->doofinderLogger = $doofinderlogger;
         $this->getProducts = $getproduct;
 
-        
 
     }
 
@@ -171,24 +155,25 @@ class Fulltext
         $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
     }
 
+    /**
+     * @param FulltextIndexer $indexer
+     * @param array $dimensions
+     * @param \Traversable|null $entityIds
+     * @return void
+     */
     public function beforeExecuteByDimensions(FulltextIndexer $indexer, array $dimensions, \Traversable $entityIds = null)
-    {       
-       if ($this->storeConfig->isDoofinderFeedConfigured())
-        {
-            if ($this->indexerScope->getIndexerScope() != null) 
-            {
+    {
+        if ($this->storeConfig->isDoofinderFeedConfigured()) {
+            if ($this->indexerScope->getIndexerScope() != null) {
                 return;
             }
-            
+
             $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-            if ($this->storeConfig->isUpdateByApiEnable($storeId)) 
-            {
+            if ($this->storeConfig->isUpdateByApiEnable($storeId)) {
                 if ($this->indexerHelper->isScheduled()) {
                     $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_DELAYED);
-                } 
-                else 
-                {
-                     $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);  
+                } else {
+                    $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_ON_SAVE);
                 }
             }
         }
@@ -199,70 +184,54 @@ class Fulltext
      * Execute after plugin (update/delete on doofinder indice) ONLY when theese conditions are met:
      *  - doofinder is not the search engine
      *  - update doofinder indice mode is set by API
-     *  - the catalogsearch index update mode is set to on save 
+     *  - the catalogsearch index update mode is set to on save
      */
     public function afterExecuteByDimensions(FulltextIndexer $indexer, $result, array $dimensions, \Traversable $entityIds = null)
     {
-        if ($this->storeConfig->isDoofinderFeedConfigured())
-        {
-             $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);      
+        if ($this->storeConfig->isDoofinderFeedConfigured()) {
+            $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
             if (
                 $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_ON_SAVE ||
                 $this->indexerScope->getIndexerScope() == $this->indexerScope::SCOPE_FULL
             ) {
                 $data = $this->config->getIndexers()['catalogsearch_fulltext'];
-                $indexerHandler = $this->createDoofinderIndexerHandler($data);
+                $indexerHandler = $this->indexerHelper->createDoofinderIndexerHandler($data, $this->indexerHandlerFactory);
                 $storeId = $this->indexerHelper->getStoreIdFromDimensions($dimensions);
-                //generate ids from magento EAV 
+                //generate ids from magento EAV
                 $ids = $this->getProducts->getProductCollection($storeId);
-        
-                $fullAction = $this->createFullAction($data);
-            
-                if (null === $entityIds) 
-                {
-                    try 
-                    {
+
+                $fullAction = $this->indexerHelper->createFullAction($data, $this->fullActionFactory);
+                if (null === $entityIds) {
+                    try {
                         // reindexall
                         $this->indexerScope->setIndexerScope(IndexerScope::SCOPE_FULL);
                         // create temp index
                         $this->indexStructure->create(null, [], $dimensions);
                         // // add items temp index, switch temporary index to the main one
-                        
+
                         //use the generate ids from EAV tables
-                        $documents =  $fullAction->rebuildStoreIndex($storeId,$ids);
-                        
+                        $documents = $fullAction->rebuildStoreIndex($storeId, $ids);
+
                         $indexerHandler->saveIndex(
                             $dimensions, $documents
                         );
 
-                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'FullText','Mode'=>$this->indexerScope->getIndexerScope()],'Location'=>['function'=>'afterExecuteByDimensions','calledfunction'=>['name'=>'saveIndex','arguments'=>[$dimensions,$storeId]]]));
-                        
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'FullText', 'Mode' => $this->indexerScope->getIndexerScope()], 'Location' => ['function' => 'afterExecuteByDimensions', 'calledfunction' => ['name' => 'saveIndex', 'arguments' => [$dimensions, $storeId]]]));
+
                         return $result;
 
-                    } catch(\Exception $e) 
-                    {
-                       $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(),array('File'=>__FILE__,'Type'=>['Plugin'=>'FullText'],'Location'=>['function'=>'afterExecuteByDimensions'],'exception'=>['message'=>$e->getMessage(),'stacktrace'=>$e->getTraceAsString()]));
-                      return $result;
-                    }
-                    finally 
-                    {
+                    } catch (\Exception $e) {
+                        $this->doofinderLogger->writeLogs($this->storeConfig->getLogSeverity(), array('File' => __FILE__, 'Type' => ['Plugin' => 'FullText'], 'Location' => ['function' => 'afterExecuteByDimensions'], 'exception' => ['message' => $e->getMessage(), 'stacktrace' => $e->getTraceAsString()]));
+                        return $result;
+                    } finally {
                         $this->indexerScope->setIndexerScope(null);
                         return $result;
                     }
-                } 
-            
+                }
+
             }
-        
+
         }
-        
         return $result;
-    }
-
-    private function createDoofinderIndexerHandler(array $data = []) {
-        return $this->indexerHandlerFactory->create($data);
-    }
-
-    private function createFullAction(array $data) {
-        return $this->fullActionFactory->create(['data' => $data]);
     }
 }

@@ -2,7 +2,21 @@
 
 namespace Doofinder\Feed\Helper;
 
+use Magento\Catalog\Helper\Image;
+use Magento\Catalog\Model\Category;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\CatalogInventory\Model\Stock\Item;
+use Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Phrase;
+use Magento\Framework\Url;
 use Magento\Framework\UrlInterface;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Tax\Model\Config;
+use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 
 /**
@@ -12,63 +26,55 @@ use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
  * @SuppressWarnings(PHPMD.ElseExpression)
  * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
  */
-class Product extends \Magento\Framework\App\Helper\AbstractHelper
+class Product extends AbstractHelper
 {
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory
+     * @var CollectionFactory
      */
     private $categoryColFactory = null;
 
     /**
-     * @var \Magento\Catalog\Helper\Image
+     * @var Image
      */
     private $imageHelper = null;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
-     * @var \Magento\CatalogInventory\Api\StockRegistryInterface
+     * @var StockRegistryInterface
      */
     private $stockRegistry;
 
     /**
-     * @var \Magento\Tax\Model\Config
+     * @var Config
      */
     private $taxConfig;
 
     /**
-     * @var \Magento\Framework\Url
+     * @var Url
      */
     private $frontendUrl;
 
     /**
-     * @var \Magento\UrlRewrite\Model\UrlFinderInterface
+     * @var UrlFinderInterface
      */
     private $urlFinder;
 
     /**
-     * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory
-     * @param \Magento\Catalog\Helper\Image $imageHelper
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
-     * @param \Magento\Tax\Model\Config $taxConfig
-     * @param \Magento\Framework\Url $frontendUrl
-     * @param \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
+     * @param CollectionFactory $categoryColFactory
+     * @param Image $imageHelper
+     * @param Context $context
+     * @param StoreManagerInterface $storeManager
+     * @param StockRegistryInterface $stockRegistry
+     * @param Config $taxConfig
+     * @param Url $frontendUrl
+     * @param UrlFinderInterface $urlFinder
      */
-    public function __construct(
-        \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory,
-        \Magento\Catalog\Helper\Image $imageHelper,
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
-        \Magento\Tax\Model\Config $taxConfig,
-        \Magento\Framework\Url $frontendUrl,
-        \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
-    ) {
+    public function __construct(CollectionFactory $categoryColFactory, Image $imageHelper, Context $context, StoreManagerInterface $storeManager, StockRegistryInterface $stockRegistry, Config $taxConfig, Url $frontendUrl, UrlFinderInterface $urlFinder)
+    {
         $this->categoryColFactory = $categoryColFactory;
         $this->imageHelper = $imageHelper;
         $this->storeManager = $storeManager;
@@ -103,11 +109,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $storeId = $product->getStoreId();
         $routePath = '';
         $requestPath = $product->getRequestPath();
-        $filterData = [
-            UrlRewrite::ENTITY_ID => $product->getId(),
-            UrlRewrite::ENTITY_TYPE => \Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator::ENTITY_TYPE,
-            UrlRewrite::STORE_ID => $storeId,
-        ];
+        $filterData = [UrlRewrite::ENTITY_ID => $product->getId(), UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE, UrlRewrite::STORE_ID => $storeId,];
         $rewrite = $this->urlFinder->findOneByData($filterData);
 
         if ($rewrite) {
@@ -128,16 +130,27 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         // Special mark that URL is building by doofinder:
         $routeParams['doofinder_product_url'] = true;
 
-        if ($this->scopeConfig->getValue(\Magento\Store\Model\Store::XML_PATH_STORE_IN_URL) == 1) {
+        if ($this->scopeConfig->getValue(Store::XML_PATH_STORE_IN_URL) == 1) {
             $routeParams['_scope_to_url'] = true;
         }
 
-        $url = $this->frontendUrl->setScope($storeId)->getUrl(
-            $routePath,
-            $routeParams
-        );
+        $url = $this->frontendUrl->setScope($storeId)->getUrl($routePath, $routeParams);
 
         return $url;
+    }
+
+    /**
+     * Get product categories tree
+     *
+     * @param \Magento\Catalog\Model\Product $product
+     * @param boolean $fromNavigation Exclude categories not in menu.
+     * @return Category[]
+     */
+    public function getProductCategoriesWithParents(\Magento\Catalog\Model\Product $product, $fromNavigation = false)
+    {
+        $productCategoryIds = $product->getCategoryIds();
+        $categories = $this->getCategories($productCategoryIds);
+        return $this->getCategoryTree($categories, $productCategoryIds, $fromNavigation);
     }
 
     /**
@@ -145,18 +158,12 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param int[] $ids
      * @param boolean $fromNavigation
-     * @return \Magento\Catalog\Model\Category[]
+     * @return Category[]
      */
     private function getCategories(array $ids, $fromNavigation = false)
     {
         $categoryCollection = $this->categoryColFactory->create();
-        $categoryCollection
-            ->addIdFilter($ids)
-            ->addAttributeToSelect('name')
-            ->addAttributeToSelect('include_in_menu')
-            ->addAttributeToSelect('path')
-            ->addAttributeToFilter('is_active', 1)
-            ->addFieldToFilter('level', ['gt' => 1]);
+        $categoryCollection->addIdFilter($ids)->addAttributeToSelect('name')->addAttributeToSelect('include_in_menu')->addAttributeToSelect('path')->addAttributeToFilter('is_active', 1)->addFieldToFilter('level', ['gt' => 1]);
 
         if ($fromNavigation) {
             $categoryCollection->addFieldToFilter('include_in_menu', $fromNavigation);
@@ -168,10 +175,10 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get category tree
      *
-     * @param \Magento\Catalog\Model\Category[] $categories
+     * @param Category[] $categories
      * @param int[] $productCategoryIds
      * @param boolean $fromNavigation
-     * @return \Magento\Catalog\Model\Category[]
+     * @return Category[]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getCategoryTree(array $categories, array $productCategoryIds, $fromNavigation = false)
@@ -200,9 +207,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         // Get only needed category to build a tree
         $result = [];
         foreach ($categories as $category) {
-            if (!isset($toRemove[$category->getPath()])
-                && in_array($category->getPath(), $catTree)
-            ) {
+            if (!isset($toRemove[$category->getPath()]) && in_array($category->getPath(), $catTree)) {
                 $result[] = $category;
             }
         }
@@ -217,12 +222,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
                 }
             }
 
-            $tree[] = array_values(
-                $this->getCategories(
-                    $ids,
-                    $fromNavigation
-                )
-            );
+            $tree[] = array_values($this->getCategories($ids, $fromNavigation));
         }
 
         return array_filter($tree);
@@ -243,15 +243,11 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             $activeTree = [];
 
             $categoryCollection = $this->categoryColFactory->create();
-            $categoryCollection->addIdFilter($tree)
-                ->addFieldToSelect('is_active')
-                ->addFieldToSelect('include_in_menu')
-                ->addFieldToFilter('level', ['gteq' => 1])
-                ->addAttributeToSort('path');
+            $categoryCollection->addIdFilter($tree)->addFieldToSelect('is_active')->addFieldToSelect('include_in_menu')->addFieldToFilter('level', ['gteq' => 1])->addAttributeToSort('path');
 
             // check all categories in tree
             foreach ($categoryCollection->getItems() as $category) {
-                /** @var \Magento\Catalog\Model\Category $category */
+                /** @var Category $category */
                 if (!$category->getIsActive()) {
                     break;
                 }
@@ -267,22 +263,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get product categories tree
-     *
-     * @param \Magento\Catalog\Model\Product $product
-     * @param boolean $fromNavigation Exclude categories not in menu.
-     * @return \Magento\Catalog\Model\Category[]
-     */
-    public function getProductCategoriesWithParents(
-        \Magento\Catalog\Model\Product $product,
-        $fromNavigation = false
-    ) {
-        $productCategoryIds = $product->getCategoryIds();
-        $categories = $this->getCategories($productCategoryIds);
-        return $this->getCategoryTree($categories, $productCategoryIds, $fromNavigation);
-    }
-
-    /**
      * Get product image url
      *
      * @param \Magento\Catalog\Model\Product $product
@@ -293,10 +273,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     public function getProductImageUrl(\Magento\Catalog\Model\Product $product, $size = null, $field = 'image')
     {
         if ($product->hasData($field)) {
-            return $this->imageHelper
-                ->init($product, 'doofinder_' . $field)
-                ->resize($size)
-                ->getUrl();
+            return $this->imageHelper->init($product, 'doofinder_' . $field)->resize($size)->getUrl();
         }
     }
 
@@ -308,18 +285,14 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @param boolean|null $tax
      * @return float
      */
-    public function getProductPrice(
-        \Magento\Catalog\Model\Product $product,
-        $attribute = 'final_price',
-        $tax = null
-    ) {
+    public function getProductPrice(\Magento\Catalog\Model\Product $product, $attribute = 'final_price', $tax = null)
+    {
         switch ($attribute) {
             case 'special_price':
             case 'tier_price':
             case 'regular_price':
                 $type = $attribute;
                 break;
-
             default:
                 $type = 'final_price';
         }
@@ -346,45 +319,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $value;
-    }
-
-    /**
-     * Get product availability
-     *
-     * @param \Magento\Catalog\Model\Product $product
-     * @return string
-     */
-    public function getProductAvailability(\Magento\Catalog\Model\Product $product)
-    {
-        //In Stock -> Em Stock | Out of Stock -> Sem Stock
-        if ($this->getStockItem($product->getId())->getIsInStock())
-        {            
-         return $this->getInStockLabel();
-        }
-        return  $this->getOutOfStockLabel();
-         
-
-        //translate labels to portuguese
-    }
-
-    /**
-     * Get product EN ='out of stock' label
-     *
-     * @return string
-     */
-    public function getOutOfStockLabel()
-    {
-        return __(__('out of stock'));
-    }
-
-    /**
-     * Get product EN ='in stock' label
-     *
-     * @return string
-     */
-    public function getInStockLabel()
-    {
-        return __(__('in stock'));
     }
 
     /**
@@ -424,7 +358,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             $value = $frontend->getValue($product);
         }
 
-        if (is_a($value, \Magento\Framework\Phrase::class)) {
+        if (is_a($value, Phrase::class)) {
             $value = $value->render();
         }
 
@@ -441,7 +375,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $qty = $this->getStockItem($product->getId())->getQty();
         $availability = $this->getProductAvailability($product);
-
         return implode(' - ', array_filter([$qty, $availability], function ($item) {
             return $item !== null;
         }));
@@ -451,10 +384,46 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get stock item
      *
      * @param integer $productId
-     * @return \Magento\CatalogInventory\Model\Stock\Item
+     * @return Item
      */
     private function getStockItem($productId)
     {
         return $this->stockRegistry->getStockItem($productId);
+    }
+
+    /**
+     * Get product availability
+     *
+     * @param \Magento\Catalog\Model\Product $product
+     * @return string
+     */
+    public function getProductAvailability(\Magento\Catalog\Model\Product $product)
+    {
+        //In Stock -> Em Stock | Out of Stock -> Sem Stock
+        if ($this->getStockItem($product->getId())->getIsInStock()) {
+            return $this->getInStockLabel();
+        }
+        return $this->getOutOfStockLabel();
+
+    }
+
+    /**
+     * Get product EN ='in stock' label
+     *
+     * @return string
+     */
+    public function getInStockLabel()
+    {
+        return __('in stock');
+    }
+
+    /**
+     * Get product EN ='out of stock' label
+     *
+     * @return string
+     */
+    public function getOutOfStockLabel()
+    {
+        return __('out of stock');
     }
 }

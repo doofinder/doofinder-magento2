@@ -141,19 +141,17 @@ class ProductTest extends Base
         
         $product = $this->createProduct($fixtureProductId);
         $product->delete();
-
         $collection = $this->collectionProvider->get(ChangedProductResource::OPERATION_DELETE, $fixtureStoreCode);
-
         $items = $collection->getItems();
         $this->assertEquals(1, count($items));
         $item = current($items);
         $this->assertEquals($fixtureProductId, $item->getProductEntityId());
-
         $this->resetRegisterCollections($fixtureStoreCode);
         $this->configHelper->cleanConfig();
     }
 
-    private function createProduct($identifier) {
+    private function createProduct($identifier) 
+    {
         $adminWebsite = $this->objectManager->get(\Magento\Store\Api\WebsiteRepositoryInterface::class)->get('admin');
         /** @var  $productExtensionAttributes */
         $productExtensionAttributesFactory = $this->objectManager->get(ProductExtensionInterfaceFactory::class);
@@ -180,6 +178,7 @@ class ProductTest extends Base
             ->setMetaDescription('meta description')
             ->setVisibility(\Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH)
             ->setStatus(\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
+          
             ->setStockData(
                 [
                     'use_config_manage_stock'   => 1,
@@ -188,6 +187,7 @@ class ProductTest extends Base
                     'is_in_stock'               => 1,
                 ]
             );
+
         $product->save();
         return $product;
     }

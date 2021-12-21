@@ -5,21 +5,20 @@ use Exception;
 
 class Utils
 {
-  
-    public static function validateJSON($string)
+    /**
+     * @param $jsonValue
+     * @return mixed|string
+     */
+    public static function validateJSON($jsonValue)
     {
-        try
-        {
-            $value  = json_decode($string);
-            
-            if(is_null($value))
-            {
+        try {
+            $value = json_decode($jsonValue);
+
+            if (is_null($value)) {
                 return "";
             }
             return $value;
-        }
-        catch(\Exception $ex)
-        {
+        } catch (\Exception $ex) {
             return "";
         }
     }

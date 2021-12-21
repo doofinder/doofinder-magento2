@@ -41,7 +41,7 @@ class Magento implements FetcherInterface
      * @var array|null
      */
     private $processed;
-    
+
     /**
      * storeConfig
      *
@@ -50,19 +50,19 @@ class Magento implements FetcherInterface
     private $storeConfig;
 
     /**
-     * Magento constructor.
+     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
      * @param DataProvider $dataProvider
      * @param array $excludedAttributes
      */
     public function __construct(
         \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        DataProvider $dataProvider,
-        array $excludedAttributes = []
-    ) {
+        DataProvider                       $dataProvider,
+        array                              $excludedAttributes = []
+    )
+    {
         $this->dataProvider = $dataProvider;
         $this->excludedAttributes = $excludedAttributes;
         $this->storeConfig = $storeConfig;
-
     }
 
     /**
@@ -81,16 +81,6 @@ class Magento implements FetcherInterface
                 $this->processed[$productId][$attributeCode] = $value;
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * @param integer $productId
-     * @return array
-     */
-    public function get($productId)
-    {
-        return $this->processed[$productId] ?? [];
     }
 
     /**
@@ -128,37 +118,9 @@ class Magento implements FetcherInterface
             if (!is_array($attributeValues)) {
                 $attributeValues = [$productId => $attributeValues];
             }
-            $attributeValues = $this->prepareAttributeValues($productId, $attribute, $attributeValues, $storeId);
+            $attributeValues = $this->prepareAttributeValues($productId, $attribute, $attributeValues);
             $productAttributes += $this->convertAttribute($attribute, $attributeValues);
         }
-
-        return $productAttributes;
-    }
-
-    /**
-     * Convert data for attribute, add {attribute_code}_value for searchable attributes, that contain actual value.
-     *
-     * @param Attribute $attribute
-     * @param array $attributeValues
-     * @return array
-     */
-    private function convertAttribute(Attribute $attribute, array $attributeValues)
-    {
-        $productAttributes = [];
-
-        $retrievedValue = $this->retrieveFieldValue($attributeValues);
-        if ($retrievedValue) {
-            $productAttributes[$attribute->getAttributeCode()] = $retrievedValue;
-
-            if ($attribute->getIsSearchable()) {
-                $attributeLabels = $this->getValuesLabels($attribute, $attributeValues);
-                $retrievedLabel = $this->retrieveFieldValue($attributeLabels);
-                if ($retrievedLabel) {
-                    $productAttributes[$attribute->getAttributeCode() . '_value'] = $retrievedLabel;
-                }
-            }
-        }
-        //
 
         return $productAttributes;
     }
@@ -175,15 +137,15 @@ class Magento implements FetcherInterface
         $productId,
         Attribute $attribute,
         array $attributeValues
-    ) {
+    )
+    {
         if (in_array($attribute->getAttributeCode(), $this->attrsExcluded, true)) {
             $attributeValues = [
                 $productId => $attributeValues[$productId] ?? '',
             ];
         }
 
-        if ($attribute->getFrontendInput() === 'multiselect') 
-        {
+        if ($attribute->getFrontendInput() === 'multiselect') {
             $attributeValues = $this->prepareMultiselectValues($attributeValues);
         }
 
@@ -194,67 +156,13 @@ class Magento implements FetcherInterface
             }
         }
 
-        if ($this->convertAttributeType($attribute)) 
-        {
-            // 
-            foreach ($attributeValues as $key => $attributeValue) 
-            {
-                $attributeValues[$key] = $this->changeType('int',$attributeValue);
+        if ($this->checkIfConvertible($attribute)) {
+            foreach ($attributeValues as $key => $attributeValue) {
+                $attributeValues[$key] = $this->changeType('int', $attributeValue);
             }
         }
 
         return $attributeValues;
-    }
-        
-    /**
-     * changeType
-     *
-     * @param  mixed $type
-     * @param  mixed $value
-     * @return void
-     */
-    public function changeType($type,$value)
-    {
-        $converted=null;
-
-        switch($type)
-        {
-            case 'int':
-                try
-                {
-                     $converted = (int)$value;
-                }
-                catch(Exception $ex)
-                {
-                    $converted = $value;
-                }
-            break;
-
-        }
-        return $converted;
-    }
-    /**
-     * convertAttributeType
-     *
-     * @param  mixed $attribute
-     * @return void
-     */
-    private function convertAttributeType($attribute)
-    {
-        try
-        {
-            if (in_array($attribute->getAttributeCode(), $this->storeConfig->getAttributesForConversion(), true)) 
-            {
-                return true;
-            }
-            return false;
-        }
-        catch(Exception $ex)
-        {
-            return false;
-        }
-           
-        
     }
 
     /**
@@ -280,6 +188,90 @@ class Magento implements FetcherInterface
     {
         return $attribute->getFrontendInput() === 'date'
             || in_array($attribute->getBackendType(), ['datetime', 'timestamp'], true);
+    }
+
+    /**
+     * checkIfConvertible
+     *
+     * @param mixed $attribute
+     * @return bool
+     */
+
+    private function checkIfConvertible($attribute)
+    {
+        try {
+            if (in_array($attribute->getAttributeCode(), $this->storeConfig->getAttributesForConversion(), true)) {
+                return true;
+            }
+            return false;
+        } catch (Exception $ex) {
+            return false;
+        }
+    }
+
+    /**
+     * changeType
+     *
+     * @param mixed $type
+     * @param mixed $value
+     * @return void
+     */
+
+    public function changeType($type, $value)
+    {
+        $converted = null;
+        switch ($type) {
+            case 'int':
+                try {
+                    $converted = (int)$value;
+                } catch (Exception $ex) {
+                    $converted = $value;
+                }
+                break;
+
+        }
+        return $converted;
+    }
+
+    /**
+     * Convert data for attribute, add {attribute_code}_value for searchable attributes, that contain actual value.
+     *
+     * @param Attribute $attribute
+     * @param array $attributeValues
+     * @return array
+     */
+    private function convertAttribute(Attribute $attribute, array $attributeValues)
+    {
+        $productAttributes = [];
+
+        $retrievedValue = $this->retrieveFieldValue($attributeValues);
+        if ($retrievedValue) {
+            $productAttributes[$attribute->getAttributeCode()] = $retrievedValue;
+
+            if ($attribute->getIsSearchable()) {
+                $attributeLabels = $this->getValuesLabels($attribute, $attributeValues);
+                $retrievedLabel = $this->retrieveFieldValue($attributeLabels);
+                if ($retrievedLabel) {
+                    $productAttributes[$attribute->getAttributeCode() . '_value'] = $retrievedLabel;
+                }
+            }
+        }
+        return $productAttributes;
+    }
+
+    /**
+     * Retrieve value for field. If field have only one value this method return it.
+     * Otherwise will be returned array of these values.
+     * Note: array of values must have index keys, not as associative array.
+     *
+     * @param array $values
+     * @return array|string
+     */
+    private function retrieveFieldValue(array $values)
+    {
+        $values = array_filter(array_unique($values));
+
+        return count($values) === 1 ? array_shift($values) : array_values($values);
     }
 
     /**
@@ -324,17 +316,12 @@ class Magento implements FetcherInterface
     }
 
     /**
-     * Retrieve value for field. If field have only one value this method return it.
-     * Otherwise will be returned array of these values.
-     * Note: array of values must have index keys, not as associative array.
-     *
-     * @param array $values
-     * @return array|string
+     * {@inheritDoc}
+     * @param integer $productId
+     * @return array
      */
-    private function retrieveFieldValue(array $values)
+    public function get($productId)
     {
-        $values = array_filter(array_unique($values));
-
-        return count($values) === 1 ? array_shift($values) : array_values($values);
+        return $this->processed[$productId] ?? [];
     }
 }

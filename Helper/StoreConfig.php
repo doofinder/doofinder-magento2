@@ -77,26 +77,19 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * Doofinder indices update type feed as update type code
      */
     const DOOFINDER_INDICES_UPDATE_FEED = 'feed';
-
-
-
-
+    protected $_authorization;
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
-
     /**
      * @var \Doofinder\Feed\Helper\Serializer
      */
     private $serializer;
-
     /**
      * @var \Doofinder\Feed\Model\StoreWebsiteRelation
      */
     private $storeWebsiteRelation;
-
-    protected $_authorization;
 
     /**
      * StoreConfig constructor.
@@ -107,13 +100,14 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Framework\App\Helper\Context      $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Doofinder\Feed\Helper\Serializer $serializer,
+        \Doofinder\Feed\Helper\Serializer          $serializer,
         \Doofinder\Feed\Model\StoreWebsiteRelation $storeWebsiteRelation,
-        \Magento\Framework\AuthorizationInterface $authorization
+        \Magento\Framework\AuthorizationInterface  $authorization
 
-    ) {
+    )
+    {
         $this->storeManager = $storeManager;
         $this->serializer = $serializer;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
@@ -141,6 +135,15 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get current store code based on request parameter or store manager
+     * @return string
+     */
+    public function getCurrentStoreCode()
+    {
+        return $this->getCurrentStore()->getCode();
+    }
+
+    /**
      * Get current store based on request parameter or store manager
      * @return \Magento\Store\Api\Data\StoreInterface
      */
@@ -154,21 +157,36 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get current store code based on request parameter or store manager
-     * @return string
-     */
-    public function getCurrentStoreCode()
-    {
-        return $this->getCurrentStore()->getCode();
-    }
-
-    /**
      * Check if current operation is a save action
      * @return boolean
      */
     public function isSaveAction()
     {
         return $this->_request->getActionName() == 'save';
+    }
+
+    /**
+     * Get active/all store codes
+     *
+     * @param boolean $onlyActive
+     * @param boolean $all
+     * @return string[]
+     */
+    public function getStoreCodes($onlyActive = true, $all = false)
+    {
+        $storeId = $this->_request->getParam('store');
+        if (!$all && $storeId) {
+            return [$this->storeManager->getStore($storeId)->getCode()];
+        }
+
+        $storeCodes = [];
+        $stores = $this->getAllStores($onlyActive);
+
+        foreach ($stores as $store) {
+            $storeCodes[] = $store->getCode();
+        }
+
+        return $storeCodes;
     }
 
     /**
@@ -209,30 +227,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get active/all store codes
-     *
-     * @param boolean $onlyActive
-     * @param boolean $all
-     * @return string[]
-     */
-    public function getStoreCodes($onlyActive = true, $all = false)
-    {
-        $storeId = $this->_request->getParam('store');
-        if (!$all && $storeId) {
-            return [$this->storeManager->getStore($storeId)->getCode()];
-        }
-
-        $storeCodes = [];
-        $stores = $this->getAllStores($onlyActive);
-
-        foreach ($stores as $store) {
-            $storeCodes[] = $store->getCode();
-        }
-
-        return $storeCodes;
-    }
-
-    /**
      * Returns the store view ID for a store having given store code.
      *
      * @param string $storeCode Code of the store whose ID should be returned.
@@ -253,31 +247,15 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get Scope store.
-     *
-     * @return string Scope store
-     */
-    public function getScopeStore()
-    {
-        return \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-    }
-
-    /**
-     * Get API key.
-     *
+     * Get value from store config save request. If it's not set, use the default one
      * @return string
      */
-    public function getApiKey()
+    public function getManagementServerFromRequest()
     {
-        return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/api_key');
-    }
+        $params = $this->_request->getParam('groups');
+        return $params['doofinder_account']['fields']['management_server']['value']
+            ?? $this->getManagementServer();
 
-    /**
-     * @return string
-     */
-    public function getSearchServer()
-    {
-        return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/search_server');
     }
 
     /**
@@ -286,18 +264,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function getManagementServer()
     {
         return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/management_server');
-    }
-
-    /**
-     * Get value from store config save request. If it's not set, use the default one
-     * @return string
-     */
-    public function getManagementServerFromRequest()
-    {
-        $params = $this->_request->getParam('groups');
-       return  $params['doofinder_account']['fields']['management_server']['value']
-            ?? $this->getManagementServer();
-         
     }
 
     /**
@@ -329,12 +295,21 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
             $storeId
         );
 
-        $unserialized = $this->serializer->unserialize($attributes['additional_attributes']);
-        foreach ($unserialized as $attr) {
+        foreach ($this->serializer->unserialize($attributes['additional_attributes']) as $attr) {
             $attributes[$attr['field']] = $attr['additional_attribute'];
         }
         unset($attributes['additional_attributes']);
         return $attributes;
+    }
+
+    /**
+     * Get Scope store.
+     *
+     * @return string Scope store
+     */
+    public function getScopeStore()
+    {
+        return \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
     }
 
     /**
@@ -417,7 +392,7 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isExportProductPrices($storeCode = null)
     {
-        return (bool) $this->scopeConfig->getValue(
+        return (bool)$this->scopeConfig->getValue(
             self::FEED_SETTINGS_CONFIG . '/export_product_prices',
             $this->getScopeStore(),
             $storeCode
@@ -527,14 +502,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
-    public function getUpdateMode($storeCode = null) {
-        return $this->scopeConfig->getValue(
-            self::INDICES_UPDATE_MODE,
-            $this->getScopeStore(),
-            $storeCode
-        );
-    }
-
     /**
      * Check if update indices by feed is enabled.
      *
@@ -543,6 +510,15 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
     public function isUpdateByFeedEnable($storeCode = null)
     {
         return $this->getUpdateMode($storeCode) == self::DOOFINDER_INDICES_UPDATE_FEED;
+    }
+
+    public function getUpdateMode($storeCode = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::INDICES_UPDATE_MODE,
+            $this->getScopeStore(),
+            $storeCode
+        );
     }
 
     /**
@@ -555,7 +531,6 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->getUpdateMode($storeCode) == self::DOOFINDER_INDICES_UPDATE_API;
     }
 
-    
     /**
      * isDoofinderFeedConfigured
      *
@@ -563,58 +538,67 @@ class StoreConfig extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function isDoofinderFeedConfigured()
     {
-        //check if modules is configured properly
-        // if($this->scopeConfig->getValue(self::DOOFINDER_LOGGING . '/doofinder_enabled'))
-        // {
-            //check if configurations are set
-            if ($this->getApiKey() && $this->getManagementServer() && $this->getSearchServer()) 
-            {
-                //true
-                return true;
-            }
-
-        //}
-        //not enabled and not configured
-       return false;
+        //check if configurations are set
+        if ($this->getApiKey() && $this->getManagementServer() && $this->getSearchServer()) {
+            //true
+            return true;
+        }
+        return false;
     }
 
-  /**
-   * isIndexingLogsAllowed
-   *
-   * @return void
-   */
-  public function isIndexingLogsAllowed()
-  {
-    if($this->scopeConfig->getValue(self::DOOFINDER_LOGGING . '/fullindexing_enabled'))
+    /**
+     * Get API key.
+     *
+     * @return string
+     */
+    public function getApiKey()
     {
-        return true;
+        return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/api_key');
     }
-    return false;
-  }
 
-  public function getAttributesForConversion($storeCode = null) {
-    $list =  $this->scopeConfig->getValue(
-        "doofinder_config_config/doofinder_attributesconversion/searchableproduct_attributes",
-        $this->getScopeStore(),
-        $storeCode
-    );
-    return $list !== null ? explode(',', $list) : [];
-
-}
-
-public function getLogSeverity($storeCode = null) 
-{
-    $var = $this->scopeConfig->getValue(self::DOOFINDER_LOGGING.'/doofinder_loglevel',
-        $this->getScopeStore(),
-        $storeCode
-    );
-    if($var)
+    /**
+     * @return string
+     */
+    public function getSearchServer()
     {
-        return (int)$var;
+        return $this->scopeConfig->getValue(self::ACCOUNT_CONFIG . '/search_server');
+    }
+
+    /**
+     * isIndexingLogsAllowed
+     *
+     * @return void
+     */
+    public function isIndexingLogsAllowed()
+    {
+        if ($this->scopeConfig->getValue(self::DOOFINDER_LOGGING . '/fullindexing_enabled')) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getAttributesForConversion($storeCode = null)
+    {
+        $list = $this->scopeConfig->getValue(
+            "doofinder_config_config/doofinder_attributesconversion/searchableproduct_attributes",
+            $this->getScopeStore(),
+            $storeCode
+        );
+        return $list !== null ? explode(',', $list) : [];
 
     }
 
-}
+    public function getLogSeverity($storeCode = null)
+    {
+        $var = $this->scopeConfig->getValue(self::DOOFINDER_LOGGING . '/doofinder_loglevel',
+            $this->getScopeStore(),
+            $storeCode
+        );
+        if ($var) {
+            return (int)$var;
 
+        }
+
+    }
 
 }

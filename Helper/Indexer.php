@@ -235,4 +235,23 @@ class Indexer extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->dimensionFactory->create(['name' => 'scope', 'value' => $storeId]);
     }
+
+    /**
+     * @param array $data
+     * @param $indexerHandlerFactory
+     * @return mixed
+     */
+    public function createDoofinderIndexerHandler(array $data = [],$indexerHandlerFactory)
+    {
+        return $indexerHandlerFactory->create($data);
+    }
+
+    /**
+     * @param array $data
+     * @param $fullActionFactory
+     * @return mixed
+     */
+    public function createFullAction(array $data,$fullActionFactory) {
+        return $fullActionFactory->create(['data' => $data]);
+    }
 }

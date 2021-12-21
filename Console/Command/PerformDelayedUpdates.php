@@ -51,6 +51,30 @@ class PerformDelayedUpdates extends Command
     }
 
     /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     * @throws LocalizedException If Delayed updates disabled.
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        $force = (bool)$input->getOption(self::ARG_FORCE);
+        if (!$this->helper->isDelayedUpdatesEnabled() && !$force) {
+            throw new LocalizedException(__('Delayed updates are disabled. Use --force=1 to proceed'));
+        }
+
+        $output->writeln('<info>Started</info>');
+
+        $self = $this;
+        $this->state->emulateAreaCode(Area::AREA_FRONTEND, function () use ($self) {
+            $self->processor->execute();
+        });
+
+        $output->writeln('<info>Finished</info>');
+    }
+
+    /**
      * @return void
      */
     protected function configure()
@@ -64,29 +88,5 @@ class PerformDelayedUpdates extends Command
                 'Force execute even if Delayed Updates are disabled. Usage: --force=1',
                 0
             );
-    }
-
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return void
-     * @throws LocalizedException If Delayed updates disabled.
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function execute(InputInterface $input, OutputInterface $output)
-    {
-        $force = (bool) $input->getOption(self::ARG_FORCE);
-        if (!$this->helper->isDelayedUpdatesEnabled() && !$force) {
-            throw new LocalizedException(__('Delayed updates are disabled. Use --force=1 to proceed'));
-        }
-
-        $output->writeln('<info>Started</info>');
-
-        $self = $this;
-        $this->state->emulateAreaCode(Area::AREA_FRONTEND, function () use ($self) {
-            $self->processor->execute();
-        });
-
-        $output->writeln('<info>Finished</info>');
     }
 }
