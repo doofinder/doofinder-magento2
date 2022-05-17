@@ -1,0 +1,56 @@
+<?php
+/**
+ * @var \Doofinder\Feed\Block\Adminhtml\SearchEngines\ProcessStatus $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$statuses =  $block->getSearchEnginesProcessStatus();
+?>
+<?php if (isset($statuses['error'])): ?>
+    <p><?= __(sprintf('There was an error while requesting search engines process task status: %s', $statuses['error'])) ?></p>
+<?php elseif (isset($statuses['warning'])): ?>
+    <?php if ($statuses['warning'] == 'not_found'): ?>
+        <p><?= __('The search engines process task statuses are not ready yet. Please, try again later.') ?></p>
+    <?php else: ?>
+        <p><?= __(sprintf('There was a warning while requesting search engines process task status: %s', $statuses['warning'])) ?></p>
+    <?php endif; ?>
+<?php else: ?>
+    <div class="admin__data-grid-wrap admin__data-grid-wrap-static">
+        <table class="data-grid" id="gridIndexer_table">
+            <thead>
+            <tr>
+                <th class="data-grid-th  no-link col-indexer_title"><span><?= __('Indexer') ?></span></th>
+                <th class="data-grid-th  no-link col-indexer_status"><span><?= __('Status') ?></span></th>
+                <th class="data-grid-th  no-link col-indexer_status"><span><?= __('Result') ?></span></th>
+                <th class="data-grid-th  no-link col-indexer_error_message"><span><?= __('Error Message') ?></span></th>
+                <th class="data-grid-th  no-link col-indexer_updated col-date last"><span><?= __('Finished At') ?></span></th>
+            </tr>
+            </thead>
+            <tbody>
+                <?php $row = 'even'; foreach ($statuses as $storeCode => $status): ?>
+                    <tr data-role="row" title="#" class="<?= $row ?> _clickable">
+                        <td data-column="indexer_title" class="a-left indexer-title col-indexer_title">
+                            <?= $block->escapeHtml($status['name']) ?> (<?= $block->escapeHtml($storeCode) ?>)
+                        </td>
+                        <td data-column="indexer_status" class="indexer-status col-indexer_status ">
+                            <span class="grid-severity-<?= $block->escapeHtml($status['severity']) ?>">
+                                <span><?= $block->escapeHtml($status['status']) ?></span>
+                            </span>
+                        </td>
+                        <td data-column="indexer_status" class="indexer-status col-indexer_status ">
+                            <span class="grid-severity-<?= $block->escapeHtml($status['severity']) ?>">
+                                <span><?= $block->escapeHtml($status['result']) ?></span>
+                            </span>
+                        </td>
+                        <td data-column="indexer_error_message" class="indexer-error-message col-indexer_error_message">
+                            <?= $block->escapeHtml($status['error_message']) ?>
+                        </td>
+                        <td data-column="indexer_updated" class=" col-date col-indexer_updated last">
+                            <!-- TODO: format date -->
+                            <?= $status['finished_at'] ?>
+                        </td>
+                    </tr>
+                <?php $row = ($row == 'even') ? '' : 'even'; endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php endif; ?>

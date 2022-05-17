@@ -1,11 +1,6 @@
 # Composer lockfile
 /composer.lock
 
-# Travis files
-/*travis.log
-
-# Docker files
-/.env
-
 # Dev files
 /node_modules
+

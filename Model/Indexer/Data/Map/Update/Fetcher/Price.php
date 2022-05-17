@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 
-use Doofinder\Feed\Model\Indexer\Data\Map\Update\FetcherInterface;
-use Doofinder\Feed\Model\ResourceModel\Index;
+use Doofinder\Feed\Api\Data\FetcherInterface;
 use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\Price as PriceNameFieldResolver;
+use Doofinder\Feed\Model\ResourceModel\Index;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Zend_Db_Select_Exception;
 
-/**
- * Class Price
- * The class responsible for providing price data to index
- */
 class Price implements FetcherInterface
 {
     /**
@@ -41,21 +42,19 @@ class Price implements FetcherInterface
     }
 
     /**
-     * {@inheritDoc}
      * @param array $documents
-     * @param integer $storeId
+     * @param int $storeId
      * @return void
+     * @throws NoSuchEntityException
+     * @throws LocalizedException
+     * @throws Zend_Db_Select_Exception
      */
-    public function process(array $documents, $storeId)
+    public function process(array $documents, int $storeId)
     {
-        $priceIndexData = $this->index->getPriceIndexData(
-            array_keys($documents),
-            $storeId
-        );
-
+        $priceIndexData = $this->index->getPriceIndexData(array_keys($documents), $storeId);
         foreach ($priceIndexData as $productId => $customerGroupPrices) {
             foreach ($customerGroupPrices as $customerGroupId => $price) {
-                $fieldName = $this->priceNameResolver->getFiledName(['customer_group_id' => $customerGroupId]);
+                $fieldName = $this->priceNameResolver->getFieldName(['customer_group_id' => $customerGroupId]);
                 $this->processed[$productId][$fieldName] = $price;
             }
         }
@@ -63,17 +62,14 @@ class Price implements FetcherInterface
 
     /**
      * {@inheritDoc}
-     * @param integer $productId
-     * @return array
      */
-    public function get($productId)
+    public function get(int $productId): array
     {
         return $this->processed[$productId] ?? [];
     }
 
     /**
      * {@inheritDoc}
-     * @return void
      */
     public function clear()
     {

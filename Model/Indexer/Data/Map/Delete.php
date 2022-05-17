@@ -1,13 +1,11 @@
 <?php
+declare(strict_types=1);
+
 
 namespace Doofinder\Feed\Model\Indexer\Data\Map;
 
-use Doofinder\Feed\Model\Indexer\Data\MapInterface;
+use Doofinder\Feed\Api\Data\MapInterface;
 
-/**
- * Class Delete
- * The class responsible for providing products that should be deleted in the index
- */
 class Delete implements MapInterface
 {
     /**
@@ -18,7 +16,7 @@ class Delete implements MapInterface
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      * @phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInImplementedInterfaceAfterLastUsed
      */
-    public function map(array $documents, $scopeId)
+    public function map(array $documents, int $scopeId): array
     {
         // phpcs:enable
         return array_map(function ($productId) {

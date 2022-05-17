@@ -1,34 +1,34 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <tab id="doofinder_config"
-            translate="label"
-            sortOrder="1000">
+             translate="label"
+             sortOrder="1000">
             <label>Doofinder</label>
         </tab>
         <section id="doofinder_config_config"
                  translate="label"
                  type="text"
-                 sortOrder="1"
+                 sortOrder="100"
                  showInDefault="1"
-                 showInStore="1"
-                 showInWebsite="1">
+                 showInWebsite="1"
+                 showInStore="1">
             <label>Configuration</label>
             <tab>doofinder_config</tab>
             <resource>Doofinder_Feed::config</resource>
             <group id="doofinder_account"
-                    translate="label"
-                    type="text"
-                    sortOrder="1"
-                    showInDefault="1"
-                    showInWebsite="0"
-                    showInStore="0">
+                   translate="label"
+                   type="text"
+                   sortOrder="100"
+                   showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
                 <label>Account</label>
                 <field id="api_key"
                        translate="label"
                        type="text"
-                       sortOrder="1"
+                       sortOrder="100"
                        showInDefault="1"
                        showInStore="0"
                        showInWebsite="0">
@@ -39,229 +39,236 @@
                     </comment>
                 </field>
             </group>
-            <group id="doofinder_search_engine"
-                    translate="label"
-                    type="text"
-                    sortOrder="1"
-                    showInDefault="1"
-                    showInWebsite="0"
-                    showInStore="1">
-                <label>Search Engine</label>
+            <group id="doofinder_layer"
+                   translate="label"
+                   type="text"
+                   sortOrder="200"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Doofinder Layer</label>
+                <field id="doofinder_layer_enabled"
+                       translate="label"
+                       type="select"
+                       sortOrder="100"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\DisplayLayerState</backend_model>
+                    <comment>
+                        <![CDATA[ Activate/deactivate the search layer. ]]>
+                    </comment>
+                </field>
+                <field id="installation_id"
+                       translate="label"
+                       type="text"
+                       sortOrder="200"
+                       showInDefault="0"
+                       showInWebsite="1"
+                       showInStore="0">
+                    <depends>
+                        <field id="doofinder_layer_enabled">1</field>
+                    </depends>
+                    <label>Installation Id</label>
+                    <comment>
+                        <![CDATA[ You need an installation ID for every website. ]]>
+                    </comment>
+                </field>
+                <field id="script"
+                       translate="label"
+                       type="textarea"
+                       sortOrder="300"
+                       showInDefault="0"
+                       showInWebsite="1"
+                       showInStore="0">
+                    <depends>
+                        <field id="doofinder_layer_enabled">1</field>
+                    </depends>
+                    <label>Script</label>
+                    <comment>
+                        <![CDATA[ Do not modify this unless you are an advanced user. ]]>
+                    </comment>
+                </field>
                 <field id="hash_id"
                        translate="label"
                        type="text"
-                       sortOrder="1"
+                       sortOrder="400"
                        showInDefault="0"
-                       showInStore="1"
-                       showInWebsite="0">
+                       showInWebsite="0"
+                       showInStore="1">
                     <label>Hash Id</label>
                     <backend_model>Doofinder\Feed\Model\Config\Backend\HashIdValidation</backend_model>
                     <comment>
                         <![CDATA[ You must configure a "hashid" for each store view. ]]>
                     </comment>
                 </field>
-                <field id="internal_search_enabled"
-                       translate="label"
-                       type="note"
-                       sortOrder="2"
-                       showInDefault="1"
-                       showInStore="0"
-                       showInWebsite="0">
-                    <label>Use Doofinder for Internal Search</label>
-                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\InternalSearchEnabled</frontend_model>
-                </field>
             </group>
-            <group id="doofinder_layer"
+            <group id="update_on_save"
                    translate="label"
                    type="text"
-                   sortOrder="2"
+                   sortOrder="300"
                    showInDefault="1"
-                   showInWebsite="0"
+                   showInWebsite="1"
                    showInStore="1">
-                <label>Doofinder Layer</label>
+                <label>Update on save</label>
                 <field id="enabled"
                        translate="label"
                        type="select"
-                       sortOrder="1"
+                       sortOrder="100"
                        showInDefault="1"
-                       showInStore="1"
-                       showInWebsite="1">
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\Updateonsave</backend_model>
                     <comment>
-                        <![CDATA[ Activate/deactivate the search layer. IMPORTANT: You must configure a different Layer script for each store view ]]>
+                        <![CDATA[ If "Update on save" is enabled when a product is created / updated / deleted this change is sent to Doofinder ]]>
                     </comment>
                 </field>
-                <field id="script"
-                       translate="label"
-                       type="textarea"
-                       sortOrder="2"
-                       showInDefault="0"
-                       showInStore="1"
-                       showInWebsite="0">
-                    <label>Script</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        <![CDATA[ Paste your integration script here. ]]>
-                    </comment>
-                </field>
-            </group>
-            <group id="doofinder_banners"
-                   translate="label"
-                   type="text"
-                   sortOrder="2"
-                   showInDefault="1"
-                   showInWebsite="0"
-                   showInStore="1">
-                <label>Banners</label>
-                <field id="enabled"
+                <field id="cron_expression"
                        translate="label"
                        type="select"
-                       sortOrder="1"
+                       sortOrder="200"
                        showInDefault="1"
-                       showInStore="1"
-                       showInWebsite="1">
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                       showInWebsite="0"
+                       showInStore="0">
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <label>Process changed products</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Cronexpression</source_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\Cron</backend_model>
                     <comment>
-                        <![CDATA[ Activate/deactivate banners. Banners require proper configuration in Doofinder Management panel. ]]>
+                        <![CDATA[ Configure when registered product changes are sent to Doofinder ]]>
                     </comment>
                 </field>
-                <field id="insertion_point"
-                       translate="label"
-                       type="text"
-                       sortOrder="1"
-                       showInDefault="1"
-                       showInStore="1"
-                       showInWebsite="1">
-                    <label>Insertion point</label>
-                </field>
-                <field id="insertion_method"
-                       translate="label"
-                       type="select"
-                       sortOrder="1"
-                       showInDefault="1"
-                       showInStore="1"
-                       showInWebsite="1">
-                    <label>Insertion method</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Banner\Insertion</source_model>
-                </field>
-            </group>
-        </section>
-        <section id="doofinder_config_index"
-                translate="label"
-                type="text"
-                sortOrder="2"
-                showInDefault="1"
-                showInWebsite="1"
-                showInStore="1">
-            <label>Index Settings</label>
-            <tab>doofinder_config</tab>
-            <resource>Doofinder_Feed::config</resource>
-            <group id="feed_attributes"
-            translate="label"
-            type="text"
-            sortOrder="2"
-            showInDefault="1"
-            showInWebsite="1"
-            showInStore="1">
-                <label>Attributes</label>
-                <field id="brand"
-                    translate="label"
-                    type="select"
-                    sortOrder="4"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Brand</label>
-                    <source_model>doofinderAttributesAll</source_model>
-                </field>
-                <field id="image_link"
-                    translate="label"
-                    type="select"
-                    sortOrder="7"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Image link</label>
-                    <source_model>doofinderAttributesImages</source_model>
-                </field>
-                <field id="mpn"
-                    translate="label"
-                    type="select"
-                    sortOrder="10"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>MPN</label>
-                    <source_model>doofinderAttributesAll</source_model>
-                </field>
-                <field id="additional_attributes"
-                    translate="label comment"
-                    sortOrder="12"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Additional Attributes</label>
-                    <frontend_model>Doofinder\Feed\Block\Adminhtml\Map\Additional</frontend_model>
-                    <backend_model>Doofinder\Feed\Model\Config\Backend\AdditionalAttributes</backend_model>
-                    <comment>Field names must be in lowercase and contain no whitespaces.</comment>
-                </field>
-            </group>
-            <group id="feed_settings"
-                translate="label"
-                type="text"
-                sortOrder="1"
-                showInDefault="1"
-                showInWebsite="1"
-                showInStore="1">
-                <label>Settings</label>
                 <field id="export_product_prices"
-                    translate="label"
-                    type="select"
-                    sortOrder="2"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
+                       translate="label"
+                       type="select"
+                       sortOrder="300"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Export Product Prices</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="price_tax_mode"
-                    translate="label"
-                    type="select"
-                    sortOrder="2"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
-                    <label>Price Export Mode</label>
-                    <source_model>Doofinder\Feed\Model\Config\Source\Feed\PriceTaxMode</source_model>
-                    <comment>
-                        <![CDATA[Export product price tax mode: Auto - use catalog display setting; With tax - export prices with tax; Without tax - export prices without tax.]]>
-                    </comment>
-                </field>
                 <field id="image_size"
-                    translate="label"
-                    type="text"
-                    sortOrder="2"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1">
+                       translate="label"
+                       type="text"
+                       sortOrder="400"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Image size</label>
                     <comment>
                         <![CDATA[Export product image with given width. Leave empty to use original size.]]>
                     </comment>
                 </field>
                 <field id="categories_in_navigation"
-                    translate="label"
-                    type="select"
-                    sortOrder="10"
-                    showInDefault="1"
-                    showInWebsite="0"
-                    showInStore="1">
+                       translate="label"
+                       type="select"
+                       sortOrder="500"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
                     <label>Export only categories present in navigation menus</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>
                         <![CDATA[Whether this option is enabled or not, only active categories will be exported.]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="doofinder_custom_attributes"
+                   translate="label"
+                   type="text"
+                   sortOrder="400"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Custom attributes</label>
+                <field id="custom_attributes"
+                       translate="label"
+                       sortOrder="200"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Custom attributes to be indexed</label>
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\Form\Field\CustomAttributes</frontend_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\CustomAttributes</backend_model>
+                    <comment>
+                        <![CDATA[ Attributes selected as 'Enabled' will be included in the feed indexation. ]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="doofinder_integration"
+                   translate="label"
+                   type="text"
+                   sortOrder="500"
+                   showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Doofinder Integration configuration (advanced)</label>
+                <field id="integration_id"
+                       translate="label"
+                       type="select"
+                       sortOrder="100"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Magento Integration</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\Integration</source_model>
+                    <comment>
+                        <![CDATA[ Select Magento integration for Doofinder. Please, make sure you have completed the setup process.  ]]>
+                    </comment>
+                </field>
+                <field id="login_endpoint"
+                       translate="label"
+                       type="text"
+                       sortOrder="200"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Doofinder Login URL</label>
+                    <comment>
+                        <![CDATA[ Doofinder endpoint URL where the login integration request will be sent. ]]>
+                    </comment>
+                </field>
+                <field id="signup_endpoint"
+                       translate="label"
+                       type="text"
+                       sortOrder="300"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Doofinder Signup URL</label>
+                    <comment>
+                        <![CDATA[ Doofinder endpoint URL where the signup integration request will be sent. ]]>
+                    </comment>
+                </field>
+                <field id="display_layer_create_endpoint"
+                       translate="label"
+                       type="text"
+                       sortOrder="400"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Doofinder Display Layer Create URL</label>
+                    <comment>
+                        <![CDATA[ Doofinder endpoint URL where display layer and installation id are created. ]]>
+                    </comment>
+                </field>
+                <field id="display_layer_state_endpoint"
+                       translate="label"
+                       type="text"
+                       sortOrder="500"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Doofinder Display Layer State URL</label>
+                    <comment>
+                        <![CDATA[ Doofinder endpoint URL where display layer is enabled or disabled. ]]>
                     </comment>
                 </field>
             </group>

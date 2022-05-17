@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 
-use Doofinder\Feed\Model\Generator\MapInterface;
-use Doofinder\Feed\Model\Indexer\Data\Map\Update\FetcherInterface;
+use Doofinder\Feed\Api\Data\FetcherInterface;
+use Doofinder\Feed\Api\Data\Generator\MapInterface;
 use Doofinder\Feed\Model\Config\Indexer\Attributes;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
-use Magento\CatalogInventory\Model\ResourceModel\Stock\Status;
-use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\InventoryCatalog\Model\ResourceModel\AddStockDataToCollection;
+use Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface;
 
-/**
- * Class Doofinder
- * The class responsible for providing custom Doofinder attributes to index
- */
 class Doofinder implements FetcherInterface
 {
     /**
@@ -26,14 +25,19 @@ class Doofinder implements FetcherInterface
     private $generators;
 
     /**
-     * @var CollectionFactory
+     * @var ProductCollectionFactory
      */
     private $productColFactory;
 
     /**
-     * @var Status
+     * @var DefaultStockProviderInterface
      */
-    private $stockStatusResource;
+    private $defaultStockProvider;
+
+    /**
+     * @var AddStockDataToCollection
+     */
+    private $addStockDataToCollection;
 
     /**
      * @var Attributes
@@ -42,43 +46,41 @@ class Doofinder implements FetcherInterface
 
     /**
      * Doofinder constructor.
-     * @param CollectionFactory $collectionFactory
-     * @param Status $stockStatusResource
+     *
+     * @param ProductCollectionFactory $collectionFactory
+     * @param DefaultStockProviderInterface $defaultStockProvider
+     * @param AddStockDataToCollection $addStockDataToCollection
      * @param Attributes $attributes
      * @param array $generators
      */
     public function __construct(
-        CollectionFactory $collectionFactory,
-        Status $stockStatusResource,
+        ProductCollectionFactory $collectionFactory,
+        DefaultStockProviderInterface $defaultStockProvider,
+        AddStockDataToCollection $addStockDataToCollection,
         Attributes $attributes,
         array $generators
     ) {
         $this->productColFactory = $collectionFactory;
-        $this->stockStatusResource = $stockStatusResource;
+        $this->defaultStockProvider = $defaultStockProvider;
+        $this->addStockDataToCollection = $addStockDataToCollection;
         $this->attributes = $attributes;
         $this->generators = $generators;
     }
 
     /**
-     * {@inheritDoc}
-     * @param array $documents
-     * @param integer $storeId
-     * @return void
+     * @inheritDoc
      */
-    public function process(array $documents, $storeId)
+    public function process(array $documents, int $storeId)
     {
         $this->clear();
         $productIds = array_keys($documents);
-
-        $productCol = $this->getProductCollection($productIds, $storeId);
-
+        $productCollection = $this->getProductCollection($productIds, $storeId);
         $fields = $this->getFields($storeId);
-        foreach ($productCol as $product) {
+        foreach ($productCollection as $product) {
             $productId = $product->getId();
             $type = strtolower($product->getTypeId());
             $generator = $this->getGenerator($type);
             $this->processed[$productId] = [];
-
             foreach ($fields as $indexField => $attribute) {
                 $this->processed[$productId][$indexField] = $generator->get($product, $attribute);
             }
@@ -87,18 +89,15 @@ class Doofinder implements FetcherInterface
     }
 
     /**
-     * {@inheritDoc}
-     * @param integer $productId
-     * @return array
+     * @inheritDoc
      */
-    public function get($productId)
+    public function get(int $productId): array
     {
         return $this->processed[$productId] ?? [];
     }
 
     /**
-     * {@inheritDoc}
-     * @return void
+     * @inheritDoc
      */
     public function clear()
     {
@@ -107,13 +106,13 @@ class Doofinder implements FetcherInterface
 
     /**
      * Get product generator
+     *
      * @param string $type
      * @return MapInterface
      */
-    private function getGenerator($type)
+    private function getGenerator(string $type): MapInterface
     {
-        return isset($this->generators[$type]) ?
-            $this->generators[$type] : $this->generators['simple'];
+        return $this->generators[$type] ?? $this->generators['simple'];
     }
 
     /**
@@ -121,7 +120,7 @@ class Doofinder implements FetcherInterface
      * @param integer $storeId
      * @return array
      */
-    private function getFields($storeId)
+    private function getFields(int $storeId): array
     {
         return $this->attributes->get($storeId);
     }
@@ -129,23 +128,26 @@ class Doofinder implements FetcherInterface
     /**
      * @param array $productIds
      * @param integer $storeId
-     * @return Collection
+     * @param int|null $stockId
+     *
+     * @return ProductCollection
      */
-    private function getProductCollection(array $productIds, $storeId)
+    private function getProductCollection(array $productIds, int $storeId, ?int $stockId = null): ProductCollection
     {
-        $collection = $this->productColFactory->create()
+        $collection = $this->productColFactory
+            ->create()
             ->addIdFilter($productIds)
             ->addAttributeToSelect('*')
             ->addStoreFilter($storeId)
             ->addAttributeToSort('id', 'asc');
-
         /**
          * @notice Magento 2.2.x included a default stock filter
          *         so that 'out of stock' products are excluded by default.
          *         We override this behavior here.
          */
         $collection->setFlag('has_stock_status_filter', true);
-        $this->stockStatusResource->addStockDataToCollection($collection, false);
+        $stockId = $stockId ?? $this->defaultStockProvider->getId();
+        $this->addStockDataToCollection->execute($collection, false, $stockId);
 
         return $collection;
     }

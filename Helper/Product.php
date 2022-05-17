@@ -1,91 +1,139 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doofinder\Feed\Helper;
 
+use Magento\Catalog\Helper\Image as ImageHelper;
+use Magento\Catalog\Model\Category as CategoryModel;
+use Magento\Catalog\Model\Product as ProductModel;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator;
+use Magento\Eav\Model\Config as EavConfig;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Phrase;
+use Magento\Framework\Url;
 use Magento\Framework\UrlInterface;
+use Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface;
+use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
+use Magento\Store\Model\Store as StoreModel;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Tax\Model\Config as TaxConfig;
+use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
+use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
+use Magento\Catalog\Model\Product\Type as ProductType;
 
 /**
  * Product helper
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class Product extends \Magento\Framework\App\Helper\AbstractHelper
+class Product extends AbstractHelper
 {
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory
+     * @var CategoryCollectionFactory
      */
-    private $categoryColFactory = null;
+    private $categoryCollectionFactory;
 
     /**
-     * @var \Magento\Catalog\Helper\Image
+     * @var ImageHelper
      */
-    private $imageHelper = null;
+    private $imageHelper;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
-     * @var \Magento\CatalogInventory\Api\StockRegistryInterface
+     * @var GetStockItemDataInterface
      */
-    private $stockRegistry;
+    private $getStockItemData;
 
     /**
-     * @var \Magento\Tax\Model\Config
+     * @var DefaultStockProviderInterface
+     */
+    private $defaultStockProvider;
+
+    /**
+     * @var TaxConfig
      */
     private $taxConfig;
 
     /**
-     * @var \Magento\Framework\Url
+     * @var Url
      */
     private $frontendUrl;
 
     /**
-     * @var \Magento\UrlRewrite\Model\UrlFinderInterface
+     * @var UrlFinderInterface
      */
     private $urlFinder;
 
     /**
-     * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory
-     * @param \Magento\Catalog\Helper\Image $imageHelper
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
-     * @param \Magento\Tax\Model\Config $taxConfig
-     * @param \Magento\Framework\Url $frontendUrl
-     * @param \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
+     * @var EavConfig
+     */
+    protected $eavConfig;
+
+    /**
+     * @var Configurable
+     */
+    protected $configurable;
+
+    /**
+     * @param CategoryCollectionFactory $categoryCollectionFactory
+     * @param ImageHelper $imageHelper
+     * @param Context $context
+     * @param StoreManagerInterface $storeManager
+     * @param GetStockItemDataInterface $getStockItemData
+     * @param DefaultStockProviderInterface $defaultStockProvider
+     * @param TaxConfig $taxConfig
+     * @param Url $frontendUrl
+     * @param UrlFinderInterface $urlFinder
+     * @param EavConfig $eavConfig
+     * @param Configurable $configurable
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
-        \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryColFactory,
-        \Magento\Catalog\Helper\Image $imageHelper,
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
-        \Magento\Tax\Model\Config $taxConfig,
-        \Magento\Framework\Url $frontendUrl,
-        \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
+        CategoryCollectionFactory $categoryCollectionFactory,
+        ImageHelper $imageHelper,
+        Context $context,
+        StoreManagerInterface $storeManager,
+        GetStockItemDataInterface $getStockItemData,
+        DefaultStockProviderInterface $defaultStockProvider,
+        TaxConfig $taxConfig,
+        Url $frontendUrl,
+        UrlFinderInterface $urlFinder,
+        EavConfig $eavConfig,
+        Configurable $configurable
     ) {
-        $this->categoryColFactory = $categoryColFactory;
+        $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->imageHelper = $imageHelper;
         $this->storeManager = $storeManager;
-        $this->stockRegistry = $stockRegistry;
+        $this->getStockItemData = $getStockItemData;
+        $this->defaultStockProvider = $defaultStockProvider;
         $this->taxConfig = $taxConfig;
         $this->frontendUrl = $frontendUrl;
         $this->urlFinder = $urlFinder;
+        $this->eavConfig = $eavConfig;
+        $this->configurable = $configurable;
         parent::__construct($context);
     }
 
     /**
      * Get product id
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param ProductModel $product
+     *
      * @return integer
      */
-    public function getProductId(\Magento\Catalog\Model\Product $product)
+    public function getProductId(ProductModel $product): int
     {
-        return $product->getId();
+        return (int)$product->getId();
     }
 
     /**
@@ -93,49 +141,53 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * This method is based on the \Magento\Catalog\Model\Product\Url::getUrl() method.
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param ProductModel $product
+     *
      * @return string
      */
-    public function getProductUrl(\Magento\Catalog\Model\Product $product)
+    public function getProductUrl(ProductModel $product): string
     {
         $storeId = $product->getStoreId();
         $routePath = '';
         $requestPath = $product->getRequestPath();
         $filterData = [
             UrlRewrite::ENTITY_ID => $product->getId(),
-            UrlRewrite::ENTITY_TYPE => \Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator::ENTITY_TYPE,
+            UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,
             UrlRewrite::STORE_ID => $storeId,
         ];
         $rewrite = $this->urlFinder->findOneByData($filterData);
-
         if ($rewrite) {
             $requestPath = $rewrite->getRequestPath();
         }
-
         if (!empty($requestPath)) {
             $routeParams['_direct'] = $requestPath;
         } else {
             $routePath = 'catalog/product/view';
-            $routeParams['id'] = $product->getId();
-            $routeParams['s'] = $product->getUrlKey();
+            // In case the product is a variant we need the ID of the configurable
+            if (
+                $product->getTypeId() == ProductType::TYPE_SIMPLE
+                && count($parents = $this->configurable->getParentIdsByChild($product->getId())) > 0
+            ) {
+                $routeParams['id'] = $parents[0];
+                $routeParams['s'] = $product->getUrlKey();
+            } else {
+                $routeParams['id'] = $product->getId();
+                $routeParams['s'] = $product->getUrlKey();
+            }
         }
-
         $routeParams['_scope'] = $storeId;
         $routeParams['_nosid'] = true;
         $routeParams['_type'] = UrlInterface::URL_TYPE_LINK;
-        // Special mark that URL is building by doofinder:
+        // Special mark that URL is building by Doofinder:
         $routeParams['doofinder_product_url'] = true;
-
-        if ($this->scopeConfig->getValue(\Magento\Store\Model\Store::XML_PATH_STORE_IN_URL) == 1) {
+        if ($this->scopeConfig->getValue(StoreModel::XML_PATH_STORE_IN_URL) == 1) {
             $routeParams['_scope_to_url'] = true;
         }
 
-        $url = $this->frontendUrl->setScope($storeId)->getUrl(
+        return $this->frontendUrl->setScope($storeId)->getUrl(
             $routePath,
             $routeParams
         );
-
-        return $url;
     }
 
     /**
@@ -143,11 +195,13 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param int[] $ids
      * @param boolean $fromNavigation
-     * @return \Magento\Catalog\Model\Category[]
+     *
+     * @return CategoryModel[]
+     * @throws LocalizedException
      */
-    private function getCategories(array $ids, $fromNavigation = false)
+    private function getCategories(array $ids, ?bool $fromNavigation = false): array
     {
-        $categoryCollection = $this->categoryColFactory->create();
+        $categoryCollection = $this->categoryCollectionFactory->create();
         $categoryCollection
             ->addIdFilter($ids)
             ->addAttributeToSelect('name')
@@ -155,7 +209,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             ->addAttributeToSelect('path')
             ->addAttributeToFilter('is_active', 1)
             ->addFieldToFilter('level', ['gt' => 1]);
-
         if ($fromNavigation) {
             $categoryCollection->addFieldToFilter('include_in_menu', $fromNavigation);
         }
@@ -166,13 +219,15 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get category tree
      *
-     * @param \Magento\Catalog\Model\Category[] $categories
+     * @param CategoryModel[] $categories
      * @param int[] $productCategoryIds
      * @param boolean $fromNavigation
-     * @return \Magento\Catalog\Model\Category[]
+     *
+     * @return CategoryModel[]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @throws LocalizedException
      */
-    private function getCategoryTree(array $categories, array $productCategoryIds, $fromNavigation = false)
+    private function getCategoryTree(array $categories, array $productCategoryIds, ?bool $fromNavigation = false): array
     {
         // Store all category paths
         $catTree = [];
@@ -198,7 +253,8 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         // Get only needed category to build a tree
         $result = [];
         foreach ($categories as $category) {
-            if (!isset($toRemove[$category->getPath()])
+            if (
+                !isset($toRemove[$category->getPath()])
                 && in_array($category->getPath(), $catTree)
             ) {
                 $result[] = $category;
@@ -214,7 +270,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
                     unset($ids[$key]);
                 }
             }
-
             $tree[] = array_values(
                 $this->getCategories(
                     $ids,
@@ -228,20 +283,21 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Remove inactive or excluded from navigation trees
+     *
      * @param array $catTree
      * @param boolean $fromNavigation
+     *
      * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function filterCategories(array $catTree, $fromNavigation = false)
+    private function filterCategories(array $catTree, ?bool $fromNavigation = false): array
     {
         foreach ($catTree as $key => $item) {
             $tree = explode('/', $item);
-
             $activeTree = [];
-
-            $categoryCollection = $this->categoryColFactory->create();
-            $categoryCollection->addIdFilter($tree)
+            $categoryCollection = $this->categoryCollectionFactory->create();
+            $categoryCollection
+                ->addIdFilter($tree)
                 ->addFieldToSelect('is_active')
                 ->addFieldToSelect('include_in_menu')
                 ->addFieldToFilter('level', ['gteq' => 1])
@@ -249,7 +305,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
 
             // check all categories in tree
             foreach ($categoryCollection->getItems() as $category) {
-                /** @var \Magento\Catalog\Model\Category $category */
+                /** @var CategoryModel $category */
                 if (!$category->getIsActive()) {
                     break;
                 }
@@ -261,34 +317,38 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             array_unshift($activeTree, 1); // add id 1 as the main root category
             $catTree[$key] = implode('/', $activeTree);
         }
+
         return $catTree;
     }
 
     /**
      * Get product categories tree
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param ProductModel $product
      * @param boolean $fromNavigation Exclude categories not in menu.
-     * @return \Magento\Catalog\Model\Category[]
+     *
+     * @return CategoryModel[]
+     * @throws LocalizedException
      */
-    public function getProductCategoriesWithParents(
-        \Magento\Catalog\Model\Product $product,
-        $fromNavigation = false
-    ) {
+    public function getProductCategoriesWithParents(ProductModel $product, ?bool $fromNavigation = false): array
+    {
         $productCategoryIds = $product->getCategoryIds();
         $categories = $this->getCategories($productCategoryIds);
+
         return $this->getCategoryTree($categories, $productCategoryIds, $fromNavigation);
     }
 
     /**
      * Get product image url
+     * TODO: return same image as endpoint
      *
-     * @param \Magento\Catalog\Model\Product $product
-     * @param string $size
-     * @param string $field
+     * @param ProductModel $product
+     * @param string|null $size
+     * @param string|null $field
+     *
      * @return string|null
      */
-    public function getProductImageUrl(\Magento\Catalog\Model\Product $product, $size = null, $field = 'image')
+    public function getProductImageUrl(ProductModel $product, ?string $size = null, ?string $field = 'image'): ?string
     {
         if ($product->hasData($field)) {
             return $this->imageHelper
@@ -296,21 +356,21 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
                 ->resize($size)
                 ->getUrl();
         }
+
+        return null;
     }
 
     /**
      * Get product price
      *
-     * @param \Magento\Catalog\Model\Product $product
-     * @param string $attribute
+     * @param ProductModel $product
+     * @param string|null $attribute
      * @param boolean|null $tax
+     *
      * @return float
      */
-    public function getProductPrice(
-        \Magento\Catalog\Model\Product $product,
-        $attribute = 'final_price',
-        $tax = null
-    ) {
+    public function getProductPrice(ProductModel $product, ?string $attribute = 'final_price', ?bool $tax = null): float
+    {
         switch ($attribute) {
             case 'special_price':
             case 'tier_price':
@@ -321,15 +381,11 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             default:
                 $type = 'final_price';
         }
-
         $price = $product->getPriceInfo()->getPrice($type);
         $amount = $price->getAmount();
-
         if ($tax === null) {
-            $taxConfig = $this->taxConfig;
-            $tax = $this->taxConfig->getPriceDisplayType() != $taxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
+            $tax = $this->taxConfig->getPriceDisplayType() != TaxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
         }
-
         if (!$tax) {
             // No tax needed, use base amount
             $value = $amount->getBaseAmount();
@@ -337,7 +393,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             // Tax already included, use value
             $value = $amount->getValue();
         } else {
-            // Tax needed but not included in base price, apply tax
+            // Tax needed but not included in base price
             // Apply tax to base amount to make sure tax is not added twice
             $adjustment = $product->getPriceInfo()->getAdjustment('tax');
             $value = $adjustment->applyAdjustment($amount->getBaseAmount(), $product);
@@ -347,26 +403,11 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get product availability
-     *
-     * @param \Magento\Catalog\Model\Product $product
-     * @return string
-     */
-    public function getProductAvailability(\Magento\Catalog\Model\Product $product)
-    {
-        if ($this->getStockItem($product->getId())->getIsInStock()) {
-            return $this->getInStockLabel();
-        }
-
-        return $this->getOutOfStockLabel();
-    }
-
-    /**
      * Get product 'out of stock' label
      *
      * @return string
      */
-    public function getOutOfStockLabel()
+    public function getOutOfStockLabel(): string
     {
         return 'out of stock';
     }
@@ -376,7 +417,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return string
      */
-    public function getInStockLabel()
+    public function getInStockLabel(): string
     {
         return 'in stock';
     }
@@ -385,40 +426,65 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * Get currency code
      *
      * @return string
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function getCurrencyCode()
+    public function getCurrencyCode(): string
     {
         return $this->storeManager->getStore()->getCurrentCurrency()->getCode();
     }
 
     /**
-     * Get attribute text
+     * Get attribute type
      *
-     * @param \Magento\Catalog\Model\Product $product
-     * @param string $attributeName
-     * @return string
+     * @param ProductModel $product
+     * @param string $attributeCode
+     * @return string|null
      */
-    public function getAttributeText(\Magento\Catalog\Model\Product $product, $attributeName)
+    public function getAttributeType(ProductModel $product, string $attributeCode): ?string
     {
-        $attribute = $product->getResource()->getAttribute($attributeName);
-        $value = $product->getData($attributeName);
-
-        if (!$value) {
+        try {
+            $attribute = $this->eavConfig->getAttribute(ProductModel::ENTITY, $attributeCode);
+        } catch (LocalizedException $e) {
             return null;
         }
-
-        if (!$attribute) {
+        $optionId = $product->getData($attributeCode);
+        if (!$optionId) {
             return null;
         }
-
         $frontend = $attribute->getFrontend();
-        $value = $frontend->getOption($value);
-
+        $value = $frontend->getOption($optionId);
         if (!$value) {
             $value = $frontend->getValue($product);
         }
 
-        if (is_a($value, \Magento\Framework\Phrase::class)) {
+        return gettype($value);
+    }
+
+    /**
+     * Get attribute
+     *
+     * @param ProductModel $product
+     * @param string $attributeCode
+     * @return mixed
+     */
+    public function getAttribute(ProductModel $product, string $attributeCode)
+    {
+        try {
+            $attribute = $this->eavConfig->getAttribute(ProductModel::ENTITY, $attributeCode);
+        } catch (LocalizedException $e) {
+            return null;
+        }
+        $optionId = $product->getData($attributeCode);
+        if (!$optionId) {
+            return null;
+        }
+        $frontend = $attribute->getFrontend();
+        $value = $frontend->getOption($optionId);
+        if (!$value) {
+            $value = $frontend->getValue($product);
+        }
+        if (is_a($value, Phrase::class)) {
             $value = $value->render();
         }
 
@@ -426,15 +492,45 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Get attribute text
+     *
+     * @param ProductModel $product
+     * @param string $attributeCode
+     * @return string|null
+     */
+    public function getAttributeText(ProductModel $product, string $attributeCode): ?string
+    {
+        return $this->getAttribute($product, $attributeCode);
+    }
+
+    /**
+     * Get attribute as array
+     *
+     * @param ProductModel $product
+     * @param string $attributeCode
+     * @return array|null
+     */
+    public function getAttributeArray(ProductModel $product, string $attributeCode): ?array
+    {
+        return $this->getAttribute($product, $attributeCode);
+    }
+
+    /**
      * Get quantity and stock status
      *
-     * @param \Magento\Catalog\Model\Product $product
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
      * @return string
+     * @throws LocalizedException
      */
-    public function getQuantityAndStockStatus(\Magento\Catalog\Model\Product $product)
+    public function getQuantityAndStockStatus(ProductModel $product, ?int $stockId = null): string
     {
-        $qty = $this->getStockItem($product->getId())->getQty();
-        $availability = $this->getProductAvailability($product);
+        $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
+        $qty = $stockItemData[GetStockItemDataInterface::QUANTITY];
+        $availability = $stockItemData[GetStockItemDataInterface::IS_SALABLE]
+            ? $this->getInStockLabel()
+            : $this->getOutOfStockLabel();
 
         return implode(' - ', array_filter([$qty, $availability], function ($item) {
             return $item !== null;
@@ -442,13 +538,38 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * Get stock item
+     * Get product availability
      *
-     * @param integer $productId
-     * @return \Magento\CatalogInventory\Model\Stock\Item
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return string
+     * @throws LocalizedException
      */
-    private function getStockItem($productId)
+    public function getProductAvailability(ProductModel $product, ?int $stockId = null): string
     {
-        return $this->stockRegistry->getStockItem($productId);
+        $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
+
+        return $stockItemData[GetStockItemDataInterface::IS_SALABLE]
+            ? $this->getInStockLabel()
+            : $this->getOutOfStockLabel();
+    }
+
+    /**
+     * @param string $sku
+     * @param int|null $stockId
+     *
+     * @return array
+     * @throws LocalizedException
+     */
+    private function getStockItemData(string $sku, ?int $stockId = null): array
+    {
+        $stockId = $stockId ?? $this->defaultStockProvider->getId();
+        $stockItemData = $this->getStockItemData->execute($sku, $stockId);
+
+        return [
+            GetStockItemDataInterface::QUANTITY => $stockItemData[GetStockItemDataInterface::QUANTITY],
+            GetStockItemDataInterface::IS_SALABLE => (bool)($stockItemData[GetStockItemDataInterface::IS_SALABLE] ?? false)
+        ];
     }
 }

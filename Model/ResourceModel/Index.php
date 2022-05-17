@@ -1,29 +1,21 @@
 <?php
+declare(strict_types=1);
+
 
 namespace Doofinder\Feed\Model\ResourceModel;
 
-use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
-use Magento\Framework\Search\Request\IndexScopeResolverInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Model\ResourceModel\Db\Context;
-use Magento\Framework\EntityManager\MetadataPool;
-use Magento\Catalog\Api\Data\CategoryInterface;
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Search\Request\Dimension;
 use Magento\Catalog\Model\Indexer\Category\Product\AbstractAction;
-use Magento\Framework\Search\Request\IndexScopeResolverInterface as TableResolver;
 use Magento\Catalog\Model\Indexer\Product\Price\DimensionCollectionFactory;
+use Magento\Framework\EntityManager\MetadataPool;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+use Magento\Framework\Model\ResourceModel\Db\Context;
+use Magento\Framework\Search\Request\Dimension;
+use Magento\Framework\Search\Request\IndexScopeResolverInterface as TableResolver;
 use Magento\Store\Model\Indexer\WebsiteDimensionProvider;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
 
-// phpcs:disable
-
-/**
- * Class Index
- * The class used for backward compatibility
- * @SuppressWarnings(PHPMD.LongVariable)
- * @see \Magento\AdvancedSearch\Model\ResourceModel\Index
- * @TODO: consider refactoring
- */
 class Index extends AbstractDb
 {
     /**
@@ -66,7 +58,7 @@ class Index extends AbstractDb
         MetadataPool $metadataPool,
         TableResolver $tableResolver,
         DimensionCollectionFactory $dimensionCollectionFactory,
-        $connectionName = null
+        string $connectionName = null
     ) {
         parent::__construct($context, $connectionName);
         $this->storeManager = $storeManager;
@@ -88,12 +80,12 @@ class Index extends AbstractDb
      *
      * @param array $productIds
      * @return array
+     * @throws \Zend_Db_Select_Exception
      */
-    private function _getCatalogProductPriceData(array $productIds = [])
+    private function _getCatalogProductPriceData(array $productIds = []): array
     {
         $connection = $this->getConnection();
         $catalogProductIndexPriceSelect = [];
-
         foreach ($this->dimensionCollectionFactory->create() as $dimensions) {
             if (!isset($dimensions[WebsiteDimensionProvider::DIMENSION_NAME]) ||
                 $this->websiteId === null ||
@@ -108,9 +100,7 @@ class Index extends AbstractDb
                 $catalogProductIndexPriceSelect[] = $select;
             }
         }
-
         $catalogProductIndexPriceUnionSelect = $connection->select()->union($catalogProductIndexPriceSelect);
-
         $result = [];
         foreach ($connection->fetchAll($catalogProductIndexPriceUnionSelect) as $row) {
             $result[$row['website_id']][$row['entity_id']][$row['customer_group_id']] = round($row['min_price'], 2);
@@ -125,15 +115,15 @@ class Index extends AbstractDb
      * @param array|null $productIds
      * @param integer|null $storeId
      * @return array
+     * @throws NoSuchEntityException
+     * @throws \Zend_Db_Select_Exception
      */
-    public function getPriceIndexData(array $productIds, $storeId = null)
+    public function getPriceIndexData(?array $productIds, ?int $storeId = null): array
     {
         $websiteId = $this->storeManager->getStore($storeId)->getWebsiteId();
-
         $this->websiteId = $websiteId;
         $priceProductsIndexData = $this->_getCatalogProductPriceData($productIds);
         $this->websiteId = null;
-
         if (!isset($priceProductsIndexData[$websiteId])) {
             return [];
         }
@@ -148,19 +138,16 @@ class Index extends AbstractDb
      * @param array $productIds
      * @return array
      */
-    public function getCategoryProductIndexData($storeId = null, array $productIds = [])
+    public function getCategoryProductIndexData(?int $storeId = null, array $productIds = []): array
     {
         $connection = $this->getConnection();
-
-        $catalogCategoryProductDimension = new Dimension(\Magento\Store\Model\Store::ENTITY, $storeId);
-
+        $catalogCategoryProductDimension = new Dimension(Store::ENTITY, $storeId);
         $catalogCategoryProductTableName = $this->tableResolver->resolve(
             AbstractAction::MAIN_INDEX_TABLE,
             [
                 $catalogCategoryProductDimension
             ]
         );
-
         $select = $connection->select()->from(
             [$catalogCategoryProductTableName],
             ['category_id', 'product_id', 'position', 'store_id']
@@ -168,11 +155,9 @@ class Index extends AbstractDb
             'store_id = ?',
             $storeId
         );
-
         if ($productIds) {
             $select->where('product_id IN (?)', $productIds);
         }
-
         $result = [];
         foreach ($connection->fetchAll($select) as $row) {
             $result[$row['product_id']][$row['category_id']] = $row['position'];

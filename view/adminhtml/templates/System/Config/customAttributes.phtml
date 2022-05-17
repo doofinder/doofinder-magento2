@@ -1,0 +1,70 @@
+<?php
+    $_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
+?>
+<div class="design_theme_ua_regexp" id="grid<?php echo $_htmlId ?>">
+    <div class="admin__control-table-wrapper">
+        <table class="admin__control-table">
+            <thead>
+                <tr>
+                    <?php foreach ($block->getColumns() as $columnName => $column): ?>
+                        <th><?php echo $column['label'] ?></th>
+                    <?php endforeach ?>
+                </tr>
+            </thead>
+            <tbody id="addRow<?php echo $_htmlId ?>"></tbody>
+        </table>
+    </div>
+    <input type="hidden" name="<?php echo $block->getElement()->getName() ?>[__empty]" value="" />
+
+    <script>
+        require([
+            'mage/template',
+            'prototype'
+        ], function (mageTemplate) {
+            // create row creator
+            window.arrayAttributes<?php echo $_htmlId ?> = {
+                // define row prototypeJS template
+                template: mageTemplate(
+                    '<tr id="<%- _id %>">'
+                        <?php foreach ($block->getColumns() as $columnName => $column): ?>
+                            + '<td>'
+                            + '<?php echo $block->renderCellTemplate($columnName)?>'
+                            + '<\/td>'
+                        <?php endforeach ?>
+                    +'<\/tr>'
+                ),
+
+                add: function(rowData, insertAfterId) {
+                    // generate default template data
+                    var templateValues = rowData;
+
+                    // Insert new row after specified row or at the bottom
+                    if (insertAfterId) {
+                        Element.insert($(insertAfterId), {after: this.template(templateValues)});
+                    } else {
+                        Element.insert($('addRow<?php echo $_htmlId ?>'), {bottom: this.template(templateValues)});
+                    }
+                },
+            }
+
+            // add existing rows
+            <?php
+                foreach ($block->getArrayRows() as $_rowId => $_row) {
+                    if ($_row->getAttrId()) {
+                        $_row->setAction($this->getUrl('catalog/product_attribute/edit/attribute_id/', ['attribute_id' => $_row->getAttrId()]));
+                        $_row->setActionClass('viewed');
+                    } else {
+                        $_row->setAction('');
+                        $_row->setActionClass('hidden');
+                    }
+                    echo "arrayAttributes{$_htmlId}.add(" . $_row->toJson() . ");\n";
+                }
+            ?>
+
+            // Toggle the grid availability, if element is disabled (depending on scope)
+            <?php if ($block->getElement()->getDisabled()):?>
+                toggleValueElements({checked: true}, $('grid<?php echo $_htmlId ?>').parentNode);
+            <?php endif ?>
+        });
+    </script>
+</div>
