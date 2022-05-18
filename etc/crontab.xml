@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
-    <group id="doofinder">
-        <job name="doofinder_feed_perform_delayed_updates" instance="Doofinder\Feed\Cron\PerformDelayedUpdates" method="execute">
-            <schedule>* * * * *</schedule>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="doofinder_update_on_save" instance="Doofinder\Feed\Cron\Processor" method="execute">
+            <config_path>crontab/default/jobs/doofinder_update_on_save/schedule/cron_expr</config_path>
         </job>
     </group>
 </config>

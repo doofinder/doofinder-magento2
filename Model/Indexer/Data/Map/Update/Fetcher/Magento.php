@@ -1,16 +1,13 @@
 <?php
+declare(strict_types=1);
+
 
 namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 
-use Doofinder\Feed\Model\Indexer\Data\Map\Update\FetcherInterface;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider;
 use Magento\Eav\Model\Entity\Attribute;
 
-/**
- * Class Magento
- * The class responsible for providing Magento attributes to index
- */
-class Magento implements FetcherInterface
+class Magento implements \Doofinder\Feed\Api\Data\FetcherInterface
 {
     /**
      * @var string[]
@@ -56,16 +53,12 @@ class Magento implements FetcherInterface
 
     /**
      * {@inheritDoc}
-     * @param array $documents
-     * @param integer $storeId
-     * @return void
      */
-    public function process(array $documents, $storeId)
+    public function process(array $documents, int $storeId)
     {
         $this->clear();
         foreach ($documents as $productId => $indexData) {
             $productIndexData = $this->convertToProductData($productId, $indexData, $storeId);
-
             foreach ($productIndexData as $attributeCode => $value) {
                 $this->processed[$productId][$attributeCode] = $value;
             }
@@ -74,17 +67,14 @@ class Magento implements FetcherInterface
 
     /**
      * {@inheritDoc}
-     * @param integer $productId
-     * @return array
      */
-    public function get($productId)
+    public function get(int $productId): array
     {
         return $this->processed[$productId] ?? [];
     }
 
     /**
      * {@inheritDoc}
-     * @return void
      */
     public function clear()
     {
@@ -99,26 +89,27 @@ class Magento implements FetcherInterface
      * @param integer $storeId
      * @return array
      */
-    private function convertToProductData($productId, array $indexData, $storeId)
+    private function convertToProductData(int $productId, array $indexData, int $storeId): array
     {
         $productAttributes = [];
-
         if (isset($indexData['options'])) {
             $productAttributes['options'] = $indexData['options'];
             unset($indexData['options']);
         }
-
         foreach ($indexData as $attributeId => $attributeValues) {
             $attribute = $this->dataProvider->getSearchableAttribute($attributeId);
             if (in_array($attribute->getAttributeCode(), $this->excludedAttributes, true)) {
                 continue;
             }
-
+            if (!$attribute->getIsSearchable() || $attribute->getIsUserDefined()) {
+                continue;
+            }
             if (!is_array($attributeValues)) {
                 $attributeValues = [$productId => $attributeValues];
             }
             $attributeValues = $this->prepareAttributeValues($productId, $attribute, $attributeValues, $storeId);
-            $productAttributes += $this->convertAttribute($attribute, $attributeValues);
+            $attributeValue = $this->getAttributeValue($attribute, $attributeValues);
+            $productAttributes[$attribute->getAttributeCode()] = $attributeValue;
         }
 
         return $productAttributes;
@@ -129,26 +120,22 @@ class Magento implements FetcherInterface
      *
      * @param Attribute $attribute
      * @param array $attributeValues
-     * @return array
+     * @return mixed|null
      */
-    private function convertAttribute(Attribute $attribute, array $attributeValues)
+    private function getAttributeValue(Attribute $attribute, array $attributeValues)
     {
-        $productAttributes = [];
-
+        $attributeValue = null;
         $retrievedValue = $this->retrieveFieldValue($attributeValues);
         if ($retrievedValue) {
-            $productAttributes[$attribute->getAttributeCode()] = $retrievedValue;
-
-            if ($attribute->getIsSearchable()) {
-                $attributeLabels = $this->getValuesLabels($attribute, $attributeValues);
-                $retrievedLabel = $this->retrieveFieldValue($attributeLabels);
-                if ($retrievedLabel) {
-                    $productAttributes[$attribute->getAttributeCode() . '_value'] = $retrievedLabel;
-                }
+            $attributeValue = $retrievedValue;
+            $attributeLabels = $this->getValuesLabels($attribute, $attributeValues);
+            $retrievedLabel = $this->retrieveFieldValue($attributeLabels);
+            if ($retrievedLabel) {
+                $attributeValue = $retrievedLabel;
             }
         }
 
-        return $productAttributes;
+        return $attributeValue;
     }
 
     /**
@@ -159,21 +146,16 @@ class Magento implements FetcherInterface
      * @param array $attributeValues
      * @return array
      */
-    private function prepareAttributeValues(
-        $productId,
-        Attribute $attribute,
-        array $attributeValues
-    ) {
+    private function prepareAttributeValues(int $productId, Attribute $attribute, array $attributeValues): array
+    {
         if (in_array($attribute->getAttributeCode(), $this->attrsExcluded, true)) {
             $attributeValues = [
                 $productId => $attributeValues[$productId] ?? '',
             ];
         }
-
         if ($attribute->getFrontendInput() === 'multiselect') {
             $attributeValues = $this->prepareMultiselectValues($attributeValues);
         }
-
         if ($this->isAttributeDate($attribute)) {
             foreach ($attributeValues as $key => $attributeValue) {
                 $attributeValues[$key] = $attributeValue;
@@ -189,7 +171,7 @@ class Magento implements FetcherInterface
      * @param array $values
      * @return array
      */
-    private function prepareMultiselectValues(array $values)
+    private function prepareMultiselectValues(array $values): array
     {
         return array_merge(...array_map(function ($value) {
             return explode(',', $value);
@@ -202,7 +184,7 @@ class Magento implements FetcherInterface
      * @param Attribute $attribute
      * @return boolean
      */
-    private function isAttributeDate(Attribute $attribute)
+    private function isAttributeDate(Attribute $attribute): bool
     {
         return $attribute->getFrontendInput() === 'date'
             || in_array($attribute->getBackendType(), ['datetime', 'timestamp'], true);
@@ -215,15 +197,13 @@ class Magento implements FetcherInterface
      * @param array $attributeValues
      * @return array
      */
-    private function getValuesLabels(Attribute $attribute, array $attributeValues)
-    {
+    private function getValuesLabels(Attribute $attribute, array $attributeValues): array
+    {        
         $attributeLabels = [];
-
         $options = $this->getAttributeOptions($attribute);
         if (empty($options)) {
             return $attributeLabels;
         }
-
         foreach ($options as $option) {
             if (in_array($option->getValue(), $attributeValues)) {
                 $attributeLabels[] = $option->getLabel();
@@ -239,7 +219,7 @@ class Magento implements FetcherInterface
      * @param Attribute $attribute
      * @return array
      */
-    private function getAttributeOptions(Attribute $attribute)
+    private function getAttributeOptions(Attribute $attribute): array
     {
         if (!isset($this->attrOptionsCache[$attribute->getId()])) {
             $options = $attribute->getOptions() ? $attribute->getOptions() : [];
@@ -251,7 +231,7 @@ class Magento implements FetcherInterface
 
     /**
      * Retrieve value for field. If field have only one value this method return it.
-     * Otherwise will be returned array of these values.
+     * Otherwise, will be returned array of these values.
      * Note: array of values must have index keys, not as associative array.
      *
      * @param array $values

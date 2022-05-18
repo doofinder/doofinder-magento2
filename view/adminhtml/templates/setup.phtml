@@ -1,0 +1,117 @@
+<?php
+
+// @codingStandardsIgnoreFile
+
+/** @var $block Doofinder\Feed\Block\Adminhtml\Setup */
+
+?>
+<div data-role="steps-setup-main" class="steps-setup">
+    <div class="steps-col-container">
+        <div class="steps-col">
+            <img alt="<?= $block->escapeHtmlAttr(__('Doofinder Feed Setup')) ?>"
+                 src="<?= /* @noEscape */ $block->getViewFileUrl('Doofinder_Feed::images/doofinder-logo.png') ?>" />
+            <div class="steps-buttons-col">
+                <div class="steps-button-title">
+                    <h2><?= $block->escapeHtmlAttr(__('Step 1:')) ?></h2>
+                    <h4><?= $block->escapeHtmlAttr(__('This integration will give us access to the catalog and products elements')) ?></h4>
+                    <div class="steps-button-container">
+                        <input type="button" id="create-integration-btn" value="<?= $block->escapeHtmlAttr(__('CREATE INTEGRATION')) ?>" />
+                    </div>
+                    <div data-role="messages" class="messages"></div>
+                </div>
+                <div class="steps-button-title">
+                    <h2><?= $block->escapeHtmlAttr(__('Step 2:')) ?></h2>
+                    <h4><?= $block->escapeHtmlAttr(__('We link to our Doofinder account')) ?></h4>
+                    <div class="steps-button-container">
+                        <input class="steps-btn-yellow" id="register-account-btn" disabled type="button" value="<?= $block->escapeHtmlAttr(__('USE YOUR FREE TRIAL NOW!')) ?>" />
+                    </div>
+                    <div class="steps-button-container">
+                        <input disabled type="button" id="login-btn" value="<?= $block->escapeHtmlAttr(__('I HAVE AN ACCOUNT')) ?>" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="steps-col">
+            <div class="steps-description">
+                <h2 class="steps-head">
+                    <?= $block->escapeHtmlAttr(__('Add a smart search engine to your e-commerce in 5 minutes and with no programming')) ?>
+                </h2>
+                <h3 id="steps-about"><?= $block->escapeHtmlAttr(__('ABOUT DOOFINDER:')) ?></h3>
+                <p><?= $block->escapeHtmlAttr(__('Doofinder provides you with an instant search layer to display your products when your visitors use the search bar.')) ?></p>
+                <p><?= $block->escapeHtmlAttr(__('Your customers then have the opportunity to preview your products, filter them and choose the desired product. Upon hitting enter, doofinder will power also the results page.')) ?></p>
+                <p><?= $block->escapeHtmlAttr(__('Among our features are:')) ?></p>
+                <ul>
+                    <li>
+                        <?= $block->escapeHtmlAttr(__('Detailed reports on search behaviour.')) ?>
+                    </li>
+                    <li>
+                        <?= $block->escapeHtmlAttr(__('Faceted search option.')) ?>
+                    </li>
+                    <li>
+                        <?= $block->escapeHtmlAttr(__('Learning behaviour')) ?>
+                    </li>
+                    <li>
+                        <?= $block->escapeHtmlAttr(__('Merchandising power to set a products positioning.')) ?>
+                    </li>
+                    <li>
+                        <?= $block->escapeHtmlAttr(__('Banner feature for advertising and promoting products, brands and events.')) ?>
+                    </li>
+                    <li>
+                        <?= $block->escapeHtmlAttr(__('Options to redirect users to content pages.')) ?>
+                    </li>
+                    <li>
+                        <?= $block->escapeHtmlAttr(__('Held on our servers for a faster page load time.')) ?>
+                    </li>
+                </ul>
+                <p><?= $block->escapeHtmlAttr(__('More than 5000 e-commerces sites over 35 countries are already using it.')) ?></p>
+            </div>
+        </div>
+
+        <div class="ajax-steps-col">
+            <img alt="<?= $block->escapeHtmlAttr(__('Doofinder Feed Setup')) ?>"
+                 src="<?= /* @noEscape */ $block->getViewFileUrl('Doofinder_Feed::images/doofinder.png') ?>" />
+            <h3 id="message-ajax-steps"></h3>
+            <div class="setup-finish-buttons hidden">
+                <a href="<?= $block->getIndexProcessingStatusUrl() ?>" class="doofinder-button"><?= $block->escapeHtml(__('Check index processing status')) ?></a>
+                <a href="<?= $block->getDoofinderConfigurationUrl() ?>" class="doofinder-button"><?= $block->escapeHtml(__('Go to configuration')) ?></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Doofinder_Feed/js/initial": {
+                "component": "Doofinder_Feed/js/initial",
+                "submit_url": "<?= $block->getSaveUrl() ?>",
+                "save_config_url": "<?= $block->getSaveConfigUrl() ?>",
+                "permissionsDialogUrl": "<?= $block->getPermissionsDialogUrl() ?>",
+                "tokensDialogUrl": "<?= $block->getTokensDialogUrl() ?>",
+                "accessTokenUrl": "<?= $block->getAccessTokenUrl() ?>",
+                "buttonId": "#create-integration-btn",
+                "buttonRegister": "#register-account-btn",
+                "buttonLogin": "#login-btn",
+                "email": "<?= $this->helper('Doofinder\Feed\Helper\StoreConfig')->getEmailAdmin() ?>",
+                "name": "<?= $this->helper('Doofinder\Feed\Helper\StoreConfig')->getIntegrationName() ?>",
+                "isIntegrationCreated": "<?= $block->isIntegrationCreated() ?>",
+                "hasApiKey": "<?= $block->hasApiKey() ?>",
+                "installingLoopStatus": "<?= $block->getInstallingLoopStatus() ?>"
+            },
+            "Doofinder_Feed/js/link-account": {
+                "component": "Doofinder_Feed/js/link-account",
+                "buttonRegister": "#register-account-btn",
+                "buttonLogin": "#login-btn",
+                "signupEndpoint": "<?= $this->helper('Doofinder\Feed\Helper\StoreConfig')->getSignupEndpoint() ?>",
+                "loginEndpoint": "<?= $this->helper('Doofinder\Feed\Helper\StoreConfig')->getLoginEndpoint() ?>",
+                "paramsPopup": "<?= $block->getParamsPopup() ?>",
+                "checkAPIKeyUrl": "<?= $block->getCheckAPIKeyUrl() ?>",
+                "createSearchEnginesUrl": "<?= $block->getCreateSearchEnginesUrl() ?>",
+                "createIndicesUrl": "<?= $block->getCreateIndicesUrl() ?>",
+                "processSearchEnginesUrl": "<?= $block->getProcessSearchEnginesUrl() ?>",
+                "createDisplayLayersUrl": "<?= $block->getCreateDisplayLayersUrl() ?>"
+            }
+        }
+    }
+</script>

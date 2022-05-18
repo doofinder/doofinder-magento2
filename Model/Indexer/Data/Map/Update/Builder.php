@@ -1,13 +1,9 @@
 <?php
+declare(strict_types=1);
+
 
 namespace Doofinder\Feed\Model\Indexer\Data\Map\Update;
 
-use Magento\Framework\Phrase;
-
-/**
- * Class Builder
- * The class responsible for building product data for index
- */
 class Builder
 {
     /**
@@ -18,7 +14,7 @@ class Builder
     /**
      * @return array
      */
-    public function build()
+    public function build(): array
     {
         $document = [];
         foreach ($this->fields as $field => $value) {
@@ -30,6 +26,7 @@ class Builder
             // phpcs:enable
         }
         $this->clear();
+
         return $document;
     }
 
@@ -46,43 +43,20 @@ class Builder
      * @param mixed $value
      * @return array
      */
-    private function getField($field, $value)
+    private function getField(string $field, $value): array
     {
         if (is_array($value)) {
             if (count($value) == 0) {
                 return [$field => $value];
             }
-
             $fields = [];
-            foreach ($value as $val) {
-                $val = $this->filterValue($val);
-                if (!$val) {
-                    continue;
-                }
-                $fields[$field][] = $this->filterValue($val);
+            foreach ($value as $key => $val) {
+                $fields[$field][$key] = $val;
             }
             return $fields;
         }
 
-        $value = $this->filterValue($value);
         return [$field => $value];
-    }
-
-    /**
-     * @param mixed $val
-     * @return mixed
-     */
-    private function filterValue($val)
-    {
-        if ($val instanceof Phrase) {
-            // Make sure that Phrase object is converted into string
-            return $val->render();
-        }
-        if (is_array($val) || is_object($val) || is_resource($val)) {
-            // Do not try to index multidimensional arrays/objects/resources
-            return null;
-        }
-        return $val;
     }
 
     /**
@@ -90,7 +64,7 @@ class Builder
      * @param mixed $value
      * @return $this
      */
-    public function addField($field, $value)
+    public function addField(string $field, $value): Builder
     {
         $this->fields[$field] = $value;
         return $this;
@@ -100,7 +74,7 @@ class Builder
      * @param array $fields
      * @return $this
      */
-    public function addFields(array $fields)
+    public function addFields(array $fields): Builder
     {
         $this->fields = array_merge($this->fields, $fields);
         return $this;

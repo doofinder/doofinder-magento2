@@ -1,18 +1,15 @@
 <?php
+declare(strict_types=1);
+
 
 namespace Doofinder\Feed\Model\Indexer\Data;
 
-use DomainException;
-use RuntimeException;
+use Doofinder\Feed\Api\Data\MapInterface;
 
-/**
- * Class Mapper
- * The class responsible for providing specific mapper
- */
 class Mapper
 {
     /**
-     * @var MapInterface[]
+     * @var MapInterface
      */
     private $maps;
 
@@ -28,17 +25,17 @@ class Mapper
     /**
      * @param string $type
      * @return MapInterface
-     * @throws DomainException If map does not exist.
-     * @throws RuntimeException If map does not implement interface.
+     * @throws \DomainException If map does not exist.
+     * @throws \RuntimeException If map does not implement interface.
      */
     public function get($type)
     {
         if (!isset($this->maps[$type])) {
-            throw new DomainException('Map does not exist');
+            throw new \DomainException('Map does not exist');
         }
         $map = $this->maps[$type];
         if (!$map instanceof MapInterface) {
-            throw new RuntimeException(
+            throw new \RuntimeException(
                 sprintf(
                     '%s does not implement %s',
                     $type,
@@ -46,6 +43,7 @@ class Mapper
                 )
             );
         }
+
         return $map;
     }
 }

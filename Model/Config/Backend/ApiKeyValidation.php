@@ -1,80 +1,85 @@
 <?php
+declare(strict_types=1);
 
 namespace Doofinder\Feed\Model\Config\Backend;
+
+use Doofinder\Feed\ApiClient\ManagementClientFactory;
+use Doofinder\Feed\Errors\DoofinderFeedException;
+use Doofinder\Feed\Errors\NotAllowed;
+use Doofinder\Feed\Helper\SearchEngineFactory;
+use GuzzleHttp\Exception\GuzzleException;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Value;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Exception\ValidatorException;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
 
 /**
  * API key validation backend
  */
-class ApiKeyValidation extends \Magento\Framework\App\Config\Value
+class ApiKeyValidation extends Value
 {
     /**
-     * @var \Doofinder\Feed\Helper\StoreConfig
+     * @var SearchEngineFactory
      */
-    private $storeConfig;
-
-    /**
-     * @var \Doofinder\Feed\Helper\Search
-     */
-    private $search;
+    private $searchEngineFactory;
 
     /**
      * ApiKeyValidation constructor.
      *
-     * @param \Doofinder\Feed\Helper\StoreConfig $storeConfig
-     * @param \Doofinder\Feed\Helper\Search $search
-     * @param \Magento\Framework\Model\Context $context
-     * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
-     * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
-     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param SearchEngineFactory $searchEngineFactory
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param TypeListInterface $cacheTypeList
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Doofinder\Feed\Helper\StoreConfig $storeConfig,
-        \Doofinder\Feed\Helper\Search $search,
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
-        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        SearchEngineFactory $searchEngineFactory,
+        Context $context,
+        Registry $registry,
+        ScopeConfigInterface $config,
+        TypeListInterface $cacheTypeList,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        $this->storeConfig = $storeConfig;
-        $this->search = $search;
-
+        $this->searchEngineFactory = $searchEngineFactory;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
 
     /**
-     * Save configuration.
+     * Check API Key is valida before save.
      *
-     * @return mixed
-     * @throws \Magento\Framework\Exception\ValidatorException Invalid api key.
+     * @return ApiKeyValidation
+     * @throws DoofinderFeedException
+     * @throws ValidatorException
      */
-    public function save()
+    public function beforeSave(): ApiKeyValidation
     {
         if ($apiKey = $this->getValue()) {
             if (!preg_match('/^(us1|eu1)-[0-9a-f]{40}$/', $apiKey)) {
-                throw new \Magento\Framework\Exception\ValidatorException(
+                throw new ValidatorException(
                     __('API key %1 is in an invalid format.', $apiKey)
                 );
             }
-
             try {
-                $this->search->getDoofinderSearchEngines($apiKey);
-            } catch (\Doofinder\Api\Management\Errors\NotAllowed $exception) {
-                throw new \Magento\Framework\Exception\ValidatorException(
+                $searchEngine = $this->searchEngineFactory->create(['apiKey' => $apiKey]);
+                $searchEngine->listSearchEngines();
+            } catch (NotAllowed $e) {
+                throw new ValidatorException(
                     __('API key %1 is invalid.', $apiKey)
                 );
+            } catch (\Exception $e) {
+                throw new DoofinderFeedException($e->getMessage());
             }
-        } elseif ($this->storeConfig->isInternalSearchEnabled()) {
-            throw new \Magento\Framework\Exception\ValidatorException(
-                __('API key cannot be empty when Doofinder engine is enabled.')
-            );
         }
 
-        return parent::save();
+        return parent::beforeSave();
     }
 }

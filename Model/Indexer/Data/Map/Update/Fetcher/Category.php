@@ -1,27 +1,19 @@
 <?php
+declare(strict_types=1);
+
 
 namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 
-use Doofinder\Feed\Model\Indexer\Data\Map\Update\FetcherInterface;
-use Doofinder\Feed\Model\ResourceModel\Index;
+use Doofinder\Feed\Api\Data\FetcherInterface;
 use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\Category as CategoryFieldNameResolver;
-use Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver\CategoryPosition as CategoryPositionNameResolver;
+use Doofinder\Feed\Model\ResourceModel\Index;
 
-/**
- * Class Category
- * The class responsible for providing category data for index
- */
 class Category implements FetcherInterface
 {
     /**
      * @var Index
      */
     private $index;
-
-    /**
-     * @var CategoryPositionNameResolver
-     */
-    private $catPosNameResolver;
 
     /**
      * @var array|null
@@ -31,48 +23,36 @@ class Category implements FetcherInterface
     /**
      * Category constructor.
      * @param Index $index
-     * @param CategoryPositionNameResolver $catPosNameResolver
      */
     public function __construct(
-        Index $index,
-        CategoryPositionNameResolver $catPosNameResolver
+        Index $index
     ) {
         $this->index = $index;
-        $this->catPosNameResolver = $catPosNameResolver;
     }
 
     /**
-     * {@inheritDoc}
-     * @param array $documents
-     * @param integer $storeId
-     * @return void
+     * @inheritDoc
      */
-    public function process(array $documents, $storeId)
+    public function process(array $documents, int $storeId)
     {
         $this->processed = $this->index->getCategoryProductIndexData($storeId, array_keys($documents));
 
         foreach ($this->processed as $productId => $categoryIds) {
             unset($this->processed[$productId]);
-            foreach ($categoryIds as $categoryId => $categoryPosition) {
-                $this->processed[$productId][CategoryFieldNameResolver::ATTR_NAME][] = (string) $categoryId;
-                $posName = $this->catPosNameResolver->getFiledName($categoryId);
-                $this->processed[$productId][$posName] = (float) $categoryPosition;
-            }
+            $this->processed[$productId][CategoryFieldNameResolver::ATTR_NAME] = array_keys($categoryIds);
         }
     }
 
     /**
-     * @param integer $productId
-     * @return array
+     * @inheritDoc
      */
-    public function get($productId)
+    public function get(int $productId): array
     {
         return $this->processed[$productId] ?? [];
     }
 
     /**
-     * {@inheritDoc}
-     * @return void
+     * @inheritDoc
      */
     public function clear()
     {

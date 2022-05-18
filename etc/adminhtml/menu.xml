@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add
+            id="Doofinder_Feed::base"
+            title="Doofinder"
+            module="Doofinder_Feed"
+            sortOrder="75"
+            resource="Doofinder_Feed::base"/>
+        <add
+            id="Doofinder_Feed::feed"
+            title="Doofinder"
+            module="Doofinder_Feed"
+            sortOrder="100"
+            resource="Doofinder_Feed::feed"
+            parent="Doofinder_Feed::base"/>
+        <add
+            id="Doofinder_Feed::config"
+            title="Configuration"
+            module="Doofinder_Feed"
+            sortOrder="100"
+            resource="Doofinder_Feed::config"
+            parent="Doofinder_Feed::feed"
+            action="adminhtml/system_config/edit/section/doofinder_config_config"
+        />
+        <add
+            id="Doofinder_Feed::setup"
+            title="Initial Setup"
+            module="Doofinder_Feed"
+            sortOrder="200"
+            resource="Doofinder_Feed::setup"
+            parent="Doofinder_Feed::feed"
+            action="doofinderfeed/setup/index"
+        />
+        <add
+            id="Doofinder_Feed::searchEnginesProcessStatus"
+            title="Indexes Processing Status"
+            module="Doofinder_Feed"
+            sortOrder="300"
+            resource="Doofinder_Feed::searchEnginesProcessStatus"
+            parent="Doofinder_Feed::feed"
+            action="doofinderfeed/searchEngines/processStatus"
+        />
+    </menu>
+</config>

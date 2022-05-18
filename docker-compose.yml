@@ -1,27 +1,106 @@
-version: '2'
+version: "2.1"
 
 services:
+  
+  # Web container
+  web:
+    image: webdevops/php-apache-dev:${PHP_VERSION}
+    container_name: web
+    user: www-data
+    environment:
+      WEB_ALIAS_DOMAIN: ${MAGENTO_BASE_URL}
+      COMPOSER_VERSION: ${COMPOSER_VERSION}
+      WEB_DOCUMENT_ROOT: /app/pub
+      PHP_MAX_EXECUTION_TIME: 300
+      XDEBUG_CONFIG: "remote_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} remote_autostart=1 remote_connect_back=0 remote_enable=1 remote_handler=dbgp remote_mode=req remote_port=9000"
+    volumes:
+      - ./src:/app
+      - ./auth_json:/auth_json
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - db
+      - elasticsearch
+      - setup
+
+  # Setup container
+  setup:
+    image: webdevops/php-apache:${PHP_VERSION}
+    container_name: setup
+    user: root
+    environment:
+      COMPOSER_VERSION: ${COMPOSER_VERSION}
+      PHP_MAX_EXECUTION_TIME: 300
+      MAGENTO_EDITION: ${MAGENTO_EDITION}
+      MAGENTO_VERSION: ${MAGENTO_VERSION}
+      COMPOSER_AUTH_USERNAME: ${COMPOSER_AUTH_USERNAME}
+      COMPOSER_AUTH_PASSWORD: ${COMPOSER_AUTH_PASSWORD}
+      MAGENTO_BASE_URL: ${MAGENTO_BASE_URL}
+      MAGENTO_ADMIN_FRONTNAME: ${MAGENTO_ADMIN_FRONTNAME}
+      MAGENTO_ADMIN_FIRST_NAME: ${MAGENTO_ADMIN_FIRST_NAME}
+      MAGENTO_ADMIN_LAST_NAME: ${MAGENTO_ADMIN_LAST_NAME}
+      MAGENTO_ADMIN_EMAIL: ${MAGENTO_ADMIN_EMAIL}
+      MAGENTO_ADMIN_USER: ${MAGENTO_ADMIN_USER}
+      MAGENTO_ADMIN_PASSWORD: ${MAGENTO_ADMIN_PASSWORD}
+      MAGENTO_LOCALE: ${MAGENTO_LOCALE}
+      MAGENTO_CURRENCY: ${MAGENTO_CURRENCY}
+      MAGENTO_TIMEZONE: ${MAGENTO_TIMEZONE}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./build.sh:/build.sh
+      - ./package:/package
+      - ./src:/app
+    entrypoint: sh -c "chmod +x /build.sh; /build.sh" 
+    links:
+      - db
+      - elasticsearch
+    depends_on:
+      db:
+        condition: service_healthy
+                    
   # MySQL container
   db:
     image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: db
-
-  # App container
-  app:
-    image: magently/magento2:2.3.1
-    links:
-      - db
+    container_name: db
     ports:
-      - 80:80
-    volumes:
-      - ./packages/:/var/www/magento/packages/
-      - ./log/:/var/www/magento/var/log/
+      - 3306:3306
+    healthcheck:
+      test: 'mysqladmin ping -h localhost -p${MYSQL_DATABASE}'
+      interval: 30s
+      timeout: 30s
+      retries: 3
     environment:
-      - PHP_DEBUGGER=none
-      - COMPOSER_AUTH={"http-basic":{"repo.magento.com":{"username":"","password":""}}}
-      - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=secret
-      - MYSQL_DATABASE=db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  
+  # PhpMyAdmin container    
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - 8080:80
+    links:
+      - db     
+  
+  # Elasticsearch container    
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+          
+      

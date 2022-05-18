@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doofinder\Feed\Model\Adapter\FieldMapper\FieldResolver;
 
 use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 
-/**
- * Class Price
- * The class responsible for retrieving price field name based on Customer Group
- */
 class Price
 {
     const ATTR_NAME = 'mage_price_';
@@ -29,12 +29,15 @@ class Price
     /**
      * @param array $context
      * @return string
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function getFiledName(array $context = [])
+    public function getFieldName(array $context = []): string
     {
         $customerGroupId = empty($context['customer_group_id'])
             ? $this->customerSession->getCustomerGroupId()
             : $context['customer_group_id'];
+
         return self::ATTR_NAME  . $customerGroupId;
     }
 }

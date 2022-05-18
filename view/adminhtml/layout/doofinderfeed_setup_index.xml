@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Doofinder_Feed::css/doofinderfeed_setup.css"/>
+    </head>
+    <referenceBlock name="page.title">
+        <action method="setPageTitle">
+            <argument name="title" xsi:type="string">Doofinder Feed Setup</argument>
+        </action>
+    </referenceBlock>
+    <body>
+        <referenceContainer name="content">
+            <block class="Doofinder\Feed\Block\Adminhtml\Setup" name="doofinder-setup" template="Doofinder_Feed::setup.phtml" />
+        </referenceContainer>
+    </body>
+</page>

@@ -1,14 +1,12 @@
 <?php
+declare(strict_types=1);
+
 
 namespace Doofinder\Feed\Model\Indexer\Data\Map;
 
-use Doofinder\Feed\Model\Indexer\Data\MapInterface;
-use Doofinder\Feed\Model\Indexer\Data\Map\Update\FetcherInterface;
+use Doofinder\Feed\Api\Data\MapInterface;
+use Doofinder\Feed\Api\Data\FetcherInterface;
 
-/**
- * Class Update
- * The class responsible for providing products data to index
- */
 class Update implements MapInterface
 {
     /**
@@ -38,41 +36,36 @@ class Update implements MapInterface
      * Notice: add sorting?
      * @return FetcherInterface[]
      */
-    public function getFetchers()
+    public function getFetchers(): array
     {
         return $this->fetchers;
     }
 
     /**
      * {@inheritDoc}
-     * @param array $documentData
-     * @param integer $storeId
+     * @param array $documents
+     * @param integer $scopeId
      * @return array
      */
-    public function map(array $documentData, $storeId)
+    public function map(array $documents, int $scopeId): array
     {
-        $documents = [];
-        $productIds = array_keys($documentData);
-
+        $docs = [];
+        $productIds = array_keys($documents);
         foreach ($this->getFetchers() as $fetcher) {
-            $fetcher->process($documentData, $storeId);
+            $fetcher->process($documents, $scopeId);
             foreach ($productIds as $productId) {
-                if (!isset($documents[$productId])) {
-                    $documents[$productId] = [];
-                    $this->builder->addField('store_id', (string) $storeId);
+                if (!isset($docs[$productId])) {
+                    $docs[$productId] = [];
+                    $this->builder->addField('store_id', (string) $scopeId);
                 }
-
                 $this->builder->addFields(
                     $fetcher->get($productId)
                 );
-                $documents[$productId] = array_merge_recursive($documents[$productId], $this->builder->build());
+                $docs[$productId] = array_merge_recursive($docs[$productId], $this->builder->build());
             }
             $fetcher->clear();
         }
 
-        $documents = array_filter($documents, function ($document) {
-            return isset($document['id']);
-        });
-        return $documents;
+        return array_values($docs);
     }
 }

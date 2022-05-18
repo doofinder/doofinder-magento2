@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Doofinder\Feed\Model\ResourceModel\ChangedProduct;
 
+use Doofinder\Feed\Api\Data\ChangedProductInterface;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 use Doofinder\Feed\Model\ChangedProduct as ChangedProductModel;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResourceModel;
@@ -25,40 +27,59 @@ class Collection extends AbstractCollection
     }
 
     /**
-     * @param string $storeCode
+     * @param int $storeId
      * @return $this
      */
-    public function filterDeleted($storeCode)
+    public function filterDeleted(int $storeId): Collection
     {
-        $this->addFieldToSelect(ChangedProductResourceModel::FIELD_ID)
-            ->addFieldToSelect(ChangedProductResourceModel::FIELD_PRODUCT_ID)
+        $this->addFieldToSelect(ChangedProductInterface::CHANGED_PRODUCT_ID)
+            ->addFieldToSelect(ChangedProductInterface::PRODUCT_ID)
             ->addFieldToFilter(
-                ChangedProductResourceModel::FIELD_OPERATION_TYPE,
-                ChangedProductResourceModel::OPERATION_DELETE
+                ChangedProductInterface::OPERATION_TYPE,
+                ChangedProductInterface::OPERATION_TYPE_DELETE
             )
             ->addFieldToFilter(
-                ChangedProductResourceModel::FIELD_STORE_CODE,
-                $storeCode
+                ChangedProductInterface::STORE_ID,
+                $storeId
             );
 
         return $this;
     }
 
     /**
-     * @param string $storeCode
+     * @param int $storeId
      * @return $this
      */
-    public function filterUpdated($storeCode)
+    public function filterUpdated(int $storeId): Collection
     {
-        $this->addFieldToSelect(ChangedProductResourceModel::FIELD_ID)
-            ->addFieldToSelect(ChangedProductResourceModel::FIELD_PRODUCT_ID)
+        $this->addFieldToSelect(ChangedProductInterface::CHANGED_PRODUCT_ID)
+            ->addFieldToSelect(ChangedProductInterface::PRODUCT_ID)
             ->addFieldToFilter(
-                ChangedProductResourceModel::FIELD_OPERATION_TYPE,
-                ChangedProductResourceModel::OPERATION_UPDATE
+                ChangedProductInterface::OPERATION_TYPE,
+                ChangedProductInterface::OPERATION_TYPE_UPDATE
             )
             ->addFieldToFilter(
-                ChangedProductResourceModel::FIELD_STORE_CODE,
-                $storeCode
+                ChangedProductInterface::STORE_ID,
+                $storeId
+            );
+        return $this;
+    }
+
+    /**
+     * @param int $storeId
+     * @return $this
+     */
+    public function filterCreated(int $storeId): Collection
+    {
+        $this->addFieldToSelect(ChangedProductInterface::CHANGED_PRODUCT_ID)
+            ->addFieldToSelect(ChangedProductInterface::PRODUCT_ID)
+            ->addFieldToFilter(
+                ChangedProductInterface::OPERATION_TYPE,
+                ChangedProductInterface::OPERATION_TYPE_CREATE
+            )
+            ->addFieldToFilter(
+                ChangedProductInterface::STORE_ID,
+                $storeId
             );
         return $this;
     }

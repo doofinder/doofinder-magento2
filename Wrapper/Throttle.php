@@ -1,6 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Doofinder\Feed\Wrapper;
+
+use Doofinder\Feed\Errors\IndexingInProgress;
+use Doofinder\Feed\Errors\NotFound;
+use Doofinder\Feed\Errors\ThrottledResponse;
 
 /**
  * Throttle wrapper
@@ -18,9 +23,9 @@ class Throttle
     private $obj;
 
     /**
-     * @param mixed $obj
+     * @param object $obj
      */
-    public function __construct($obj)
+    public function __construct(object $obj)
     {
         $this->obj = $obj;
     }
@@ -28,12 +33,13 @@ class Throttle
     /**
      * Throttle every method
      *
-     * @param  string $name
-     * @param  array|null $args
+     * @param string $name
+     * @param array|null $args
      * @return mixed
-     * @throws \BadMethodCallException Unknown method.
+     * @throws NotFound
+     * @throws ThrottledResponse
      */
-    public function __call($name, $args)
+    public function __call(string $name, array $args = null)
     {
         if (method_exists($this->obj, $name)) {
             return $this->throttle($name, $args);
@@ -45,10 +51,10 @@ class Throttle
     /**
      * Wait specified amount of time
      *
-     * @param  integer $seconds
+     * @param integer $seconds
      * @return void
      */
-    private function wait($seconds)
+    private function wait(int $seconds)
     {
         // phpcs:disable
         sleep($seconds);
@@ -58,28 +64,27 @@ class Throttle
     /**
      * Throttle requests to search engine in case of ThrottledResponse error
      *
-     * @param  string     $name    Method name.
-     * @param  array|null $args    Method args.
-     * @param  integer    $counter Throttle counter.
+     * @param string $name Method name.
+     * @param array|null $args Method args.
+     * @param integer $counter Throttle counter.
      * @return mixed
-     * @throws \Doofinder\Api\Management\Errors\ThrottledResponse Response throttled.
-     * @throws \Doofinder\Api\Management\Errors\NotFound Not found.
+     * @throws ThrottledResponse Response throttled.
+     * @throws NotFound Not found.
      */
-    private function throttle($name, $args, $counter = 1)
+    private function throttle(string $name, array $args = null, int $counter = 1)
     {
         try {
             // phpcs:disable
             return call_user_func_array([$this->obj, $name], $args);
             // phpcs:enable
-        } catch (\Doofinder\Api\Management\Errors\ThrottledResponse $e) {
+        } catch (ThrottledResponse $e) {
             if ($counter >= self::THROTTLE_RETRIES) {
                 throw $e;
             }
-
             $this->wait(1);
-        } catch (\Doofinder\Api\Management\Errors\IndexingInProgress $e) {
+        } catch (IndexingInProgress $e) {
             $this->wait(3);
-        } catch (\Doofinder\Api\Management\Errors\NotFound $e) {
+        } catch (NotFound $e) {
             if ($name == 'deleteType') {
                 return true;
             }

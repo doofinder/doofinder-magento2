@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="doofinder_feed_changed_product" engine="innodb" resource="default" comment="Doofinder Feed Changed Products Table">
+        <column xsi:type="bigint" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="product_id" nullable="false" comment="Product ID"/>
+        <column xsi:type="int" name="store_id" nullable="false" comment="ID of store the change was issued on"/>
+        <column xsi:type="varchar" name="operation_type" nullable="false" length="255" comment="Operation Type"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="DOOFINDER_FEED_CHANGED_PRODUCT_PRODUCT_ID_STORE_ID_OPERATION_TYPE">
+            <column name="product_id"/>
+            <column name="store_id"/>
+            <column name="operation_type"/>
+        </constraint>
+    </table>
+</schema>
