@@ -214,21 +214,20 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      */
     public function getList(SearchCriteriaInterface $searchCriteria): ProductSearchResultsInterface
     {
-        $websiteId = $this->storeConfig->getCurrentStore()->getWebsiteId();
-        $searchCriteriaFilters = $searchCriteria->getFilterGroups();
-        $searchCriteria = $this->searchCriteriaBuilder->setFilterGroups($searchCriteriaFilters)
-                                                      ->addFilter('website_id', $websiteId)
-                                                      ->create();
-
         $searchResult = parent::getList($searchCriteria);
+        $storeId = null;
+
         foreach ($searchResult->getItems() as $product) {
-            $this->appEmulation->startEnvironmentEmulation($product->getStoreId(), Area::AREA_FRONTEND, true);
+            if ($storeId !== $product->getStoreId()) {
+                $storeId = $product->getStoreId();
+                $this->appEmulation->stopEnvironmentEmulation();
+                $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
+            }
             
             $this->setCustomAttributes($product);
             $this->setExtensionAttributes($product);
-            
-            $this->appEmulation->stopEnvironmentEmulation();
         }
+        $this->appEmulation->stopEnvironmentEmulation();
 
         return $searchResult;
     }

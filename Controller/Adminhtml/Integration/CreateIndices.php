@@ -91,6 +91,7 @@ class CreateIndices extends Action implements HttpGetActionInterface
                                 'options' => [
                                     'url' => $this->urlInterface->getBaseUrl() . 'rest/' . $store->getCode() . '/V1/',
                                     'token' => $integrationToken,
+                                    'website_id' => $store->getWebsiteId(),
                                 ],
                             ],
                         ],
