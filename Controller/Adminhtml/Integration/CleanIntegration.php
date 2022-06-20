@@ -10,11 +10,6 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\ResourceConnection;
 use Psr\Log\LoggerInterface;
 
-/**
- * Create display layers
- *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class CleanIntegration extends Action
 {
 
