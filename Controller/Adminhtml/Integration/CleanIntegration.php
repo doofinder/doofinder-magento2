@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface;
 class CleanIntegration extends Action
 {
 
+    private $integration_table_column = ['integration' => 'name', 'core_config_data' => 'path'];
+
     private $resourceConnection;
 
     public function __construct(
@@ -32,8 +34,9 @@ class CleanIntegration extends Action
     {
         $connection = $this->resourceConnection->getConnection();
         try {
-            $this->delete_integration_table_entries($connection);
-            $this->delete_config_table_entries($connection);
+            foreach ($this->integration_table_column as $table => $column) {
+                $this->delete_integration_entries($connection, $table, $column);
+            } 
         } catch (Exception $e) {
             $this->logger->error('There was a problem cleaning the database from Doofinder entries: ' . $e->getMessage());
         }
@@ -44,19 +47,11 @@ class CleanIntegration extends Action
         return $this->_authorization->isAllowed('Doofinder_Feed::config');
     }
 
-    private function delete_integration_table_entries($connection) {
-        $integrationTable = $this->resourceConnection->getTableName('integration');
+    private function delete_integration_entries($connection, $table, $column) {
+        $integrationTable = $this->resourceConnection->getTableName($table);
         $connection->delete(
             $integrationTable,
-            'name like "%doofinder%"'
-        );
-    }
-
-    private function delete_config_table_entries($connection) {
-        $integrationTable = $this->resourceConnection->getTableName('core_config_data');
-        $connection->delete(
-            $integrationTable,
-            'path like "%doofinder%"'
+            $column.' like "%doofinder%"'
         );
     }
 }
