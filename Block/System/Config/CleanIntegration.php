@@ -25,7 +25,7 @@ class CleanIntegration extends Field
     public function getButtonHtml()
     {
         $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')->setData([
-            'id' => 'clean-integration', 'label' => __('Clean Integration'),
+            'id' => 'clean-integration', 'label' => __('Reset All'),
         ]);
         return $button->toHtml();
     }

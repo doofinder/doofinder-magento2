@@ -272,7 +272,7 @@
                     </comment>
                 </field>
                 <field id="clean_integration" translate="label" type="button" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Clean Integration Data From Database</label>
+                    <label>Unsynchronize your integration with Doofinder (irreversible)</label>
                     <frontend_model>Doofinder\Feed\Block\System\Config\CleanIntegration</frontend_model>
                 </field>
             </group>
