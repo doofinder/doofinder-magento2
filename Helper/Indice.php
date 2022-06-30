@@ -20,7 +20,7 @@ use Magento\Framework\App\Helper\Context;
 
 class Indice extends AbstractHelper
 {
-    const MAGENTO_INDICE_NAME = 'magento2';
+    const MAGENTO_INDICE_NAME = 'product';
 
     /** @var ManagementClientFactory  */
     private $managementClientFactory;
