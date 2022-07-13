@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Controller\Adminhtml\Integration;
 
+use Doofinder\Feed\Helper\Indice as IndiceHelper;
 use Doofinder\Feed\Helper\SearchEngine;
 use Doofinder\Feed\Helper\StoreConfig;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
+use Magento\Framework\App\Cache\Frontend\Pool;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Cache\Type\Config;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Block\Adminhtml\Integration\Tokens;
-use Psr\Log\LoggerInterface;
-use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
-use Magento\Framework\App\Cache\Frontend\Pool;
-use Magento\Framework\App\Cache\Type\Config;
-use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Store\Model\ScopeInterface;
+use Psr\Log\LoggerInterface;
 
 class CreateStore extends Action implements HttpGetActionInterface
 {
-    private const INSTALLING_LOOP_STEP = 2;
-
     /** @var SearchEngine */
     private $searchEngineHelper;
 

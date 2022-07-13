@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
-use Magento\Config\Model\Config\Backend\Admin\Custom;
 use Doofinder\Feed\ApiClient\ManagementClientFactory;
+use Magento\Config\Model\Config\Backend\Admin\Custom;
 use Magento\Catalog\Model\Product;
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigCollectionFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -369,11 +369,6 @@ class StoreConfig extends AbstractHelper
             }
         );
     } 
-
-    public function getWebSiteName()
-    {
-        return $this->getCurrentStore()->getName();
-    }
 
     /**
      * Get API key.
