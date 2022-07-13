@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Helper;
 
 use Magento\Config\Model\Config\Backend\Admin\Custom;
+use Doofinder\Feed\ApiClient\ManagementClientFactory;
 use Magento\Catalog\Model\Product;
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigCollectionFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -134,6 +135,9 @@ class StoreConfig extends AbstractHelper
      */
     public const CUSTOM_ATTRIBUTES = 'doofinder_config_config/doofinder_custom_attributes/custom_attributes';
 
+    /** @var ManagementClientFactory  */
+    private $managementClientFactory;
+
     /**
      * @var StoreManagerInterface
      */
@@ -186,6 +190,7 @@ class StoreConfig extends AbstractHelper
      * @param Config $eavConfig
      */
     public function __construct(
+        ManagementClientFactory $managementClientFactory,
         Context $context,
         StoreManagerInterface $storeManager,
         StoreWebsiteRelationInterface $storeWebsiteRelation,
@@ -195,6 +200,7 @@ class StoreConfig extends AbstractHelper
         Escaper $escaper,
         Config $eavConfig
     ) {
+        $this->managementClientFactory = $managementClientFactory;
         $this->storeManager = $storeManager;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
         $this->configWriter = $configWriter;
@@ -204,6 +210,13 @@ class StoreConfig extends AbstractHelper
         $this->eavConfig = $eavConfig;
 
         parent::__construct($context);
+    }
+
+    public function createStore(array $storeData): array 
+    {
+        $managementClient = $this->managementClientFactory->create(['apiType' => 'doomanager']);
+        
+        return $managementClient->createStore($storeData);
     }
 
     /**
@@ -355,6 +368,11 @@ class StoreConfig extends AbstractHelper
                 return $store->isActive();
             }
         );
+    } 
+
+    public function getWebSiteName()
+    {
+        return $this->getCurrentStore()->getName();
     }
 
     /**

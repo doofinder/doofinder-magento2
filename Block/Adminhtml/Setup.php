@@ -140,6 +140,16 @@ class Setup extends Template
     }
 
     /**
+     * Get create store
+     *
+     * @return string
+     */
+    public function getCreateStoreUrl(): string
+    {
+        return $this->getUrl('*/integration/createStore');
+    }
+
+    /**
      * Get create indices url
      *
      * @return string
