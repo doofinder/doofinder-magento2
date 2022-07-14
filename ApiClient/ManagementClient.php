@@ -22,9 +22,10 @@ class ManagementClient
 
     public function __construct(
         ClientFactory $clientFactory,
-        string $apiKey = null
+        string $apiKey = null,
+        string $apiType = Client::MANAGEMENT_API
     ) {
-        $this->client = $clientFactory->create(['apiKey' => $apiKey, 'apiType' => Client::MANAGEMENT_API]);
+        $this->client = $clientFactory->create(['apiKey' => $apiKey, 'apiType' => $apiType]);
     }
 
     /**
@@ -45,6 +46,13 @@ class ManagementClient
     public function listSearchEngines(): array
     {
         $response = $this->client->get(self::ENDPOINT_SEARCH_ENGINES);
+
+        return \Zend_Json::decode($response);
+    }
+
+    public function createStore(array $storeData): array 
+    {
+        $response = $this->client->post('/plugins/create-store', $storeData);
 
         return \Zend_Json::decode($response);
     }

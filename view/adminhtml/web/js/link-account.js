@@ -19,10 +19,7 @@ define([
                 signupEndpoint: '${ $.signupEndpoint }',
                 loginEndpoint: '${ $.loginEndpoint }',
                 checkAPIKeyUrl: '${ $.checkAPIKeyUrl }',
-                createSearchEnginesUrl: '${ $.createSearchEnginesUrl }',
-                createIndicesUrl: '${ $.createIndicesUrl }',
-                processSearchEnginesUrl: '${ $.processSearchEnginesUrl }',
-                createDisplayLayersUrl: '${ $.createDisplayLayersUrl }'
+                createStoreUrl: '${ $.createStoreUrl }',
             },
             paramsPopup: '${ $.paramsPopup }'
         },
@@ -97,62 +94,23 @@ define([
                     $('.ajax-steps-col').hide();
                     return;
                 }
-                //create search engines
+                // create store
                 $.ajax({
-                    url: self.urls.createSearchEnginesUrl,
+                    url: self.urls.createStoreUrl,
                     method: 'GET',
                     cache: false,
                     data: {
                         'form_key': window.FORM_KEY
                     },
                     beforeSend: function () {
-                        addAjaxMessage($.mage.__('Creating search engines...'));
+                        addAjaxMessage($.mage.__('Creating doofinder stores ...'));
                     }
                 }).done(function () {
-                    //create indices
-                    $.ajax({
-                        url: self.urls.createIndicesUrl,
-                        method: 'GET',
-                        cache: false,
-                        data: {
-                            'form_key': window.FORM_KEY
-                        },
-                        beforeSend: function () {
-                            addAjaxMessage($.mage.__('Creating index to search on your site...'));
-                        }
-                    }).done(function () {
-                        //process search engines
-                        $.ajax({
-                            url: self.urls.processSearchEnginesUrl,
-                            method: 'GET',
-                            cache: false,
-                            data: {
-                                'form_key': window.FORM_KEY
-                            },
-                            beforeSend: function () {
-                                addAjaxMessage($.mage.__('Processing search engines...'));
-                            }
-                        }).done(function () {
-                            //create display layers
-                            $.ajax({
-                                url: self.urls.createDisplayLayersUrl,
-                                method: 'GET',
-                                cache: false,
-                                data: {
-                                    'form_key': window.FORM_KEY
-                                },
-                                beforeSend: function () {
-                                    addAjaxMessage($.mage.__('Creating display layers...'));
-                                }
-                            }).done(function () {
-                               addAjaxMessage($.mage.__(
-                                 'The setup wizard has successfully finished but search engine cannot be used until ' +
-                                 'index processing has completed.<br/>Now, you can check process task status or go ' +
-                                 'to configuration page.'));
-                               $('.setup-finish-buttons').removeClass('hidden');
-                            }).fail(ajaxRequestFail);
-                        }).fail(ajaxRequestFail);
-                    }).fail(ajaxRequestFail);
+                    addAjaxMessage($.mage.__(
+                        'The setup wizard has successfully finished but search engine cannot be used until ' +
+                        'index processing has completed.<br/>Now, you can check process task status or go ' +
+                        'to configuration page.'));
+                      $('.setup-finish-buttons').removeClass('hidden');
                 }).fail(ajaxRequestFail);
             }).fail(ajaxRequestFail);
         }
