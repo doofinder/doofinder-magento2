@@ -10,10 +10,6 @@ require(["jquery", "mage/url", "Magento_Customer/js/customer-data"], function (
     });
   });
 
-  function closeDoofinderLayer() {
-    $('button[dfd-click="close-layer"').click();
-  }
-
   function addProductToCart(item_id, amount) {
     amount = !amount ? 1 : parseInt(amount);
     item_id = parseInt(item_id);
@@ -34,9 +30,6 @@ require(["jquery", "mage/url", "Magento_Customer/js/customer-data"], function (
         if (data.hasOwnProperty("product_url")) {
           window.location = data.product_url;
           return;          
-        } else {
-          console.log(`added ${amount} of item #${item_id}`);
-          closeDoofinderLayer();
         }
       },
       complete: function () {
