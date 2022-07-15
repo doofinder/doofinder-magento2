@@ -96,7 +96,6 @@ class CreateStore extends Action implements HttpGetActionInterface
         $success = true;
         foreach($this->storeConfig->getAllWebsites() as $website) {
             try {
-                $this->logger->error($this->storeConfig->getLanguageFromStore($website->getDefaultStore()));
                 $websiteConfig = [
                     "name" => $website->getName(),
                     "platform" => "magento2",
@@ -104,7 +103,6 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "skip_indexation" => false,
                     "search_engines" => $this->generateSearchEngineData((int)$website->getId())
                 ];
-                $this->logger->error(\Zend_Json::encode($websiteConfig));
                 $response = $this->storeConfig->createStore($websiteConfig);
                 $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
             } catch (Exception $e) {
