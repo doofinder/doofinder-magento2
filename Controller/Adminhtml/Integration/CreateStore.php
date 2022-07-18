@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Controller\Adminhtml\Integration;
 
-use Doofinder\Feed\Helper\Indice as IndiceHelper;
 use Doofinder\Feed\Helper\SearchEngine;
 use Doofinder\Feed\Helper\StoreConfig;
 use Exception;
@@ -16,8 +15,6 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\App\Cache\Frontend\Pool;
-use Magento\Framework\App\Cache\TypeListInterface;
-use Magento\Framework\App\Cache\Type\Config;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Integration\Api\IntegrationServiceInterface;
@@ -27,9 +24,6 @@ use Psr\Log\LoggerInterface;
 
 class CreateStore extends Action implements HttpGetActionInterface
 {
-    /** @var SearchEngine */
-    private $searchEngineHelper;
-
     /** @var AttributeCollectionFactory */
     protected $attributeCollectionFactory;
 
@@ -61,7 +55,6 @@ class CreateStore extends Action implements HttpGetActionInterface
     public function __construct(
         WriterInterface $configWriter,
         StoreConfig $storeConfig,
-        SearchEngine $searchEngineHelper,
         JsonFactory $resultJsonFactory,
         Escaper $escaper,
         UrlInterface $urlInterface,
@@ -72,7 +65,6 @@ class CreateStore extends Action implements HttpGetActionInterface
     ) {
         $this->configWriter = $configWriter;
         $this->storeConfig = $storeConfig;
-        $this->searchEngineHelper = $searchEngineHelper;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->escaper = $escaper;
         $this->urlInterface = $urlInterface;
@@ -90,36 +82,41 @@ class CreateStore extends Action implements HttpGetActionInterface
     public function execute()
     {
         $resultJson = $this->resultJsonFactory->create();
-        try {
-            $this->generateDoofinderStores();
+        if ($this->generateDoofinderStores() == true) {
             $resultJson->setData(true);
-        } catch (Exception $e) {
-            $this->logger->error('Initial Setup error: ' . $e->getMessage());
+        } else {
+            $resultJson->setHttpResponseCode(WebapiException::HTTP_INTERNAL_ERROR);
+            $resultJson->setData(false);
         }
-
         return $resultJson;
     }
 
     public function generateDoofinderStores()
     {
+        $success = true;
         foreach($this->storeConfig->getAllWebsites() as $website) {
-            $websiteConfig = [
-                "name" => $website->getName(),
-                "platform" => "magento2",
-                "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
-                "skip_indexation" => false,
-                "search_engines" => $this->generateSearchEngineData((int)$website->getId())
-            ];
-
-            $response = $this->storeConfig->createStore($websiteConfig);
-            $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
+            try {
+                $websiteConfig = [
+                    "name" => $website->getName(),
+                    "platform" => "magento2",
+                    "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
+                    "skip_indexation" => false,
+                    "search_engines" => $this->generateSearchEngineData((int)$website->getId())
+                ];
+                $response = $this->storeConfig->createStore($websiteConfig);
+                $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
+            } catch (Exception $e) {
+                $success = false;
+                $this->logger->error('Error creating store for website "' . $website->getName() . '". ' . $e->getMessage());
+            }
         }
+        return $success;
     }
 
     public function generateSearchEngineData($websiteID)
     {
         $searchEngineConfig = [];
-        foreach ($this->storeConfig->getAllStores() as $store) {
+        foreach ($this->storeConfig->getWebsiteStores($websiteID) as $store) {
             $integrationToken = $this->integrationService
                 ->get($this->storeConfig->getIntegrationId())
                 ->getData(Tokens::DATA_TOKEN);

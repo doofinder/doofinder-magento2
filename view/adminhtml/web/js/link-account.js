@@ -118,12 +118,10 @@ define([
 
     function ajaxRequestFail(jqXHR, status, error) {
         $('body').trigger('processStop');
-        let failStep = jqXHR.responseText;
         alert({
             content: $.mage.__(
-              'Installation has failed in step "' + failStep + '". ' +
-              'Please, uninstall and install again the extension following documentation instructions. ' +
-              'After installation is complete run again this Initial Setup.'
+              'Installation has failed. Please take a look into the logs for more information.' +
+              'Maybe you need uninstall and install again the extension following documentation instructions. '
             )
         });
         window.console && console.log(status + ': ' + error + '\nResponse text:\n' + jqXHR.responseText);
