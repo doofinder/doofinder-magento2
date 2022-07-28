@@ -120,7 +120,7 @@ define([
         $('body').trigger('processStop');
         alert({
             content: $.mage.__(
-              'Installation has failed. Please take a look into the logs for more information.' +
+              'Installation has failed. Please take a look into the logs for more information. ' +
               'Maybe you need uninstall and install again the extension following documentation instructions. '
             )
         });
