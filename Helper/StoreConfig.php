@@ -413,11 +413,13 @@ class StoreConfig extends AbstractHelper
     public function getDisplayLayer(): ?string
     {
         try {
-            $locale = $this->getLanguageFromStore($this->getCurrentStore());
-            $currency = $this->getCurrentStore()->getCurrentCurrency()->getCode();
             $websiteId = $this->getCurrentStore()->getWebsiteId();
             $displayLayerScript = $this->getValueFromConfig(self::DISPLAY_LAYER_SCRIPT_CONFIG, ScopeInterface::SCOPE_WEBSITES, (int)$websiteId);
-            $displayLayerScript = $this->include_locale_and_currency($displayLayerScript, $locale, $currency);
+            if ($displayLayerScript != null){
+                $locale = $this->getLanguageFromStore($this->getCurrentStore());
+                $currency = $this->getCurrentStore()->getCurrentCurrency()->getCode();
+                $displayLayerScript = $this->include_locale_and_currency($displayLayerScript, $locale, $currency);
+            }
         } catch (\Exception $e) {
             $displayLayerScript = null;
         }
