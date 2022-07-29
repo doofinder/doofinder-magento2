@@ -73,6 +73,11 @@ class StoreConfig extends AbstractHelper
     public const INTEGRATION_ID_CONFIG = 'doofinder_config_config/doofinder_integration/integration_id';
 
     /**
+     * Path to Sector Value
+     */
+    public const SECTOR_VALUE_CONFIG = 'doofinder_config_config/doofinder_integration/sector_value';
+
+    /**
      * Path to the API KEY value
      */
     public const API_KEY = 'doofinder_config_config/doofinder_account/api_key';

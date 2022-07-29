@@ -130,13 +130,13 @@ class Setup extends Template
     }
 
     /**
-     * Get create search engines url
+     *Get Sector Changed url
      *
      * @return string
      */
-    public function getCreateSearchEnginesUrl(): string
+    public function getSaveSectorUrl(): string
     {
-        return $this->getUrl('*/integration/createSearchEngines');
+        return $this->getUrl('*/integration/saveSector');
     }
 
     /**
@@ -150,16 +150,6 @@ class Setup extends Template
     }
 
     /**
-     * Get create indices url
-     *
-     * @return string
-     */
-    public function getCreateIndicesUrl(): string
-    {
-        return $this->getUrl('*/integration/createIndices');
-    }
-
-    /**
      * Get process search engines url
      *
      * @return string
@@ -167,16 +157,6 @@ class Setup extends Template
     public function getProcessSearchEnginesUrl(): string
     {
         return $this->getUrl('*/integration/processSearchEngines');
-    }
-
-    /**
-     * Get create display layers url
-     *
-     * @return string
-     */
-    public function getCreateDisplayLayersUrl(): string
-    {
-        return $this->getUrl('*/integration/createDisplayLayers');
     }
 
     /**

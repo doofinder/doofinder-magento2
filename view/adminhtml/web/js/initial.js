@@ -15,6 +15,7 @@ define([
                 error: null
             },
             elements: {
+                sectorSelector: '${ $.sectorSelector }',
                 buttonId: '${ $.buttonId }',
                 buttonRegister: '${ $.buttonRegister }',
                 buttonLogin: '${ $.buttonLogin }',
@@ -24,6 +25,7 @@ define([
                 save_config: '${ $.save_config_url }',
                 permissions: '${ $.permissionsDialogUrl }',
                 tokens: '${ $.tokensDialogUrl }',
+                saveSector: '${ $.saveSectorUrl }',
                 accessToken: '${ $.accessTokenUrl }'
             },
             resource: [
@@ -47,7 +49,28 @@ define([
             hasApiKey: '${ $.hasApiKey }',
             installingLoopStatus: '${ $.installingLoopStatus }'
         },
-        createIntegration: function () {
+        changeSector: function(value) {
+            if (value) {
+                sessionStorage.setItem('sector', value);
+
+                //   let self = this;
+                //   Spinner.show();
+                //   $.ajax({
+                //       url: this.urls.saveSector,
+                //       method: 'POST',
+                //       data: value
+                //   }).done(function() {
+                //       $(self.elements.buttonRegister).prop("disabled", true);
+                //       $(self.elements.buttonLogin).prop("disabled", true);
+                //       $(self.elements.buttonId).prop("disabled", false);
+                //   }).fail(function(jqXHR, textStatus, errorThrown) {
+                //       console.error('Error (' + textStatus + '): ' + errorThrown);
+                //   }).always(function() {
+                //       Spinner.hide();
+                //   })
+            }
+        },
+        createIntegration: function() {
             let initial = this,
                 integrationId = null;
 
@@ -137,44 +160,44 @@ define([
 
                                         return;
                                     }
-                                  // Replace placeholders in URL
-                                  const ajaxUrl = initial.urls.accessToken.replace(':id', integrationId);
-                                  $.ajax({
-                                    url: ajaxUrl,
-                                    cache: false,
-                                    data: {
-                                      'form_key': window.FORM_KEY
-                                    },
-                                    method: 'GET',
+                                    // Replace placeholders in URL
+                                    const ajaxUrl = initial.urls.accessToken.replace(':id', integrationId);
+                                    $.ajax({
+                                        url: ajaxUrl,
+                                        cache: false,
+                                        data: {
+                                            'form_key': window.FORM_KEY
+                                        },
+                                        method: 'GET',
                                     beforeSend: function () {
-                                      // Show the spinner
-                                      $('body').trigger('processStart');
-                                    }
+                                            // Show the spinner
+                                            $('body').trigger('processStart');
+                                        }
                                   }).done(function (result) {
-                                    let redirect = result._redirect;
-                                    if (redirect) {
-                                      const text = $.mage.__('An error occurred retrieving integration access token. Please, reload the page and continue process.');
-                                      messageBox.append('<div class="message message-error error"><div data-ui-id="messages-message-error">' + text + '</div></div>');
-                                      return;
-                                    }
-                                    // We replace the integration id param in the route path of the linking account process
+                                        let redirect = result._redirect;
+                                        if (redirect) {
+                                            const text = $.mage.__('An error occurred retrieving integration access token. Please, reload the page and continue process.');
+                                            messageBox.append('<div class="message message-error error"><div data-ui-id="messages-message-error">' + text + '</div></div>');
+                                            return;
+                                        }
+                                        // We replace the integration id param in the route path of the linking account process
                                     $(document).trigger('changeOnIntegrationId', {'accessToken': result.accessToken});
-                                    const text = $.mage.__('The integration was created and activated correctly.');
-                                    messageBox.append('<div class="message message-success success"><div data-ui-id="messages-message-success">' + text + '</div></div>');
+                                        const text = $.mage.__('The integration was created and activated correctly.');
+                                        messageBox.append('<div class="message message-success success"><div data-ui-id="messages-message-success">' + text + '</div></div>');
 
-                                    // We activate login/register buttons
-                                    $(initial.elements.buttonRegister).prop("disabled", false);
-                                    $(initial.elements.buttonLogin).prop("disabled", false);
-                                    $(initial.elements.buttonId).prop("disabled", true);
+                                        // We activate login/register buttons
+                                        $(initial.elements.buttonRegister).prop("disabled", false);
+                                        $(initial.elements.buttonLogin).prop("disabled", false);
+                                        $(initial.elements.buttonId).prop("disabled", true);
                                   }).fail(function (jqXHR, status, error) {
-                                    alert({
-                                      content: $.mage.__('An error occurred retrieving integration access token. Please, reload the page and continue process.')
-                                    });
-                                    window.console && console.log(status + ': ' + error + '\nResponse text:\n' + jqXHR.responseText);
+                                        alert({
+                                            content: $.mage.__('An error occurred retrieving integration access token. Please, reload the page and continue process.')
+                                        });
+                                        window.console && console.log(status + ': ' + error + '\nResponse text:\n' + jqXHR.responseText);
                                   }).always(function () {
-                                    // Hide the spinner
-                                    $('body').trigger('processStop');
-                                  });
+                                        // Hide the spinner
+                                        $('body').trigger('processStop');
+                                    });
                                 },
 
                                 /** @inheritdoc */
@@ -220,6 +243,10 @@ define([
 
             let self = this;
 
+            $(this.elements.sectorSelector).change(function() {
+                self.changeSector(this.value);
+            });
+
             // If we finished the linked account step previously we show an informative message,
             // in other case we show the integration and login/register buttons
             let installingLoopStatus = parseInt(this.installingLoopStatus);
@@ -244,16 +271,16 @@ define([
                 $('.ajax-steps-col').show();
                 addAjaxMessage($.mage.__('The setup process was correctly finished.'));
             } else {
-              $('.steps-col').hide();
-              $('.ajax-steps-col').show();
-              let failStep = getFailStep(installingLoopStatus);
-              addAjaxMessage(
-                $.mage.__(
-                  'Installation has failed in step "' + failStep + '". ' +
-                  'Please, uninstall and install again the extension following documentation instructions. ' +
-                  'After installation is complete run again this Initial Setup.'
-                )
-              );
+                $('.steps-col').hide();
+                $('.ajax-steps-col').show();
+                let failStep = getFailStep(installingLoopStatus);
+                addAjaxMessage(
+                    $.mage.__(
+                        'Installation has failed in step "' + failStep + '". ' +
+                        'Please, uninstall and install again the extension following documentation instructions. ' +
+                        'After installation is complete run again this Initial Setup.'
+                    )
+                );
             }
 
             $('.steps-setup').show();
@@ -269,18 +296,18 @@ define([
     }
 
     function getFailStep(installingLoopStatus) {
-      let failStep = 'Initial Step';
-      if (installingLoopStatus === 1) {
-        failStep = 'Checking if API Key is set';
-      } else if (installingLoopStatus === 2) {
-        failStep = 'Create Search Engines';
-      } else if (installingLoopStatus === 3) {
-        failStep = 'Create Indices';
-      } else if (installingLoopStatus === 4) {
-        failStep = 'Process Search Engines';
-      } else if (installingLoopStatus === 5) {
-        failStep = 'Create Display Layers';
-      }
-      return failStep;
+        let failStep = 'Initial Step';
+        if (installingLoopStatus === 1) {
+            failStep = 'Checking if API Key is set';
+        } else if (installingLoopStatus === 2) {
+            failStep = 'Create Search Engines';
+        } else if (installingLoopStatus === 3) {
+            failStep = 'Create Indices';
+        } else if (installingLoopStatus === 4) {
+            failStep = 'Process Search Engines';
+        } else if (installingLoopStatus === 5) {
+            failStep = 'Create Display Layers';
+        }
+        return failStep;
     }
 });

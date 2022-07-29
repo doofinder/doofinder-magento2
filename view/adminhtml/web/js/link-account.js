@@ -26,7 +26,7 @@ define([
 
         popupDoofinder: function (type) {
             let self = this;
-            const params = '?' + this.paramsPopup;
+            const params = '?' + this.paramsPopup + `&sector=${sessionStorage.sector}`;;
             let domain;
             if (type === 'signup') {
                 domain = this.urls.signupEndpoint;
