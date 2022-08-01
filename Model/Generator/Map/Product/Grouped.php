@@ -14,7 +14,7 @@ class Grouped extends ProductMap
      * @param string $field
      * @return float|null
      */
-    public function getProductPrice(Product $product, $field): ?float
+    public function getProductPrice(Product $product, string $field): ?float
     {
         if ($field == 'final_price') {
             // Magento will return final price properly

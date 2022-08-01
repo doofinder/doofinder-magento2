@@ -25,7 +25,7 @@ class Throttle
     /**
      * @param object $obj
      */
-    public function __construct(object $obj)
+    public function __construct($obj)
     {
         $this->obj = $obj;
     }
