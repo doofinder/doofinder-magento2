@@ -5,6 +5,7 @@
 /** @var $block Doofinder\Feed\Block\Adminhtml\Setup */
 
 ?>
+<?php $sector = $block->getSectorValue() ?>
 <div data-role="steps-setup-main" class="steps-setup">
     <div class="steps-col-container">
         <div class="steps-col">
@@ -16,19 +17,19 @@
                     <h4><?= $block->escapeHtmlAttr(__('We select the sector of our platform')) ?></h4>
                     <div class="steps-button-container">
                         <select id="sector-selector">
-                            <option value="" disabled selected><?= $block->escapeHtmlAttr(__('Choose the sector of your ecommerce')) ?></option>
-                            <option value="fashion"><?= $block->escapeHtmlAttr(__('Apparel & Accessories')) ?></option>
-                            <option value="autos"><?= $block->escapeHtmlAttr(__('Auto Parts & Accessories')) ?></option>
-                            <option value="childcare"><?= $block->escapeHtmlAttr(__('Childcare')) ?></option>
-                            <option value="food"><?= $block->escapeHtmlAttr(__('Food & Beverages')) ?></option>
-                            <option value="home"><?= $block->escapeHtmlAttr(__('Home & Garden')) ?></option>
-                            <option value="leisure"><?= $block->escapeHtmlAttr(__('Leisure & Culture')) ?></option>
-                            <option value="others"><?= $block->escapeHtmlAttr(__('Others')) ?></option>
-                            <option value="pets"><?= $block->escapeHtmlAttr(__('Pets')) ?></option>
-                            <option value="parapharmacy"><?= $block->escapeHtmlAttr(__('Pharma & Cosmetics')) ?></option>
-                            <option value="sport"><?= $block->escapeHtmlAttr(__('Sport & Fitness')) ?></option>
-                            <option value="technology"><?= $block->escapeHtmlAttr(__('Tech Products & Electronics')) ?></option>
-                            <option value="toys"><?= $block->escapeHtmlAttr(__('Toys & Hobbies')) ?></option>
+                            <option value="" disabled<?php if(!$sector): ?> selected<?php endif; ?> ><?= $block->escapeHtmlAttr(__('Choose the sector of your ecommerce')) ?></option>
+                            <option value="fashion" <?php if($sector === "fashion"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Apparel & Accessories')) ?></option>
+                            <option value="autos" <?php if($sector === "autos"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Auto Parts & Accessories')) ?></option>
+                            <option value="childcare" <?php if($sector === "childcare"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Childcare')) ?></option>
+                            <option value="food" <?php if($sector === "food"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Food & Beverages')) ?></option>
+                            <option value="home" <?php if($sector === "home"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Home & Garden')) ?></option>
+                            <option value="leisure" <?php if($sector === "leisure"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Leisure & Culture')) ?></option>
+                            <option value="others" <?php if($sector === "others"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Others')) ?></option>
+                            <option value="pets" <?php if($sector === "pets"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Pets')) ?></option>
+                            <option value="parapharmacy" <?php if($sector === "parapharmacy"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Pharma & Cosmetics')) ?></option>
+                            <option value="sport" <?php if($sector === "sport"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Sport & Fitness')) ?></option>
+                            <option value="technology" <?php if($sector === "technology"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Tech Products & Electronics')) ?></option>
+                            <option value="toys" <?php if($sector === "toys"): ?> selected<?php endif; ?>><?= $block->escapeHtmlAttr(__('Toys & Hobbies')) ?></option>
                         </select>
                     </div>
                 </div>
@@ -36,7 +37,7 @@
                     <h2><?= $block->escapeHtmlAttr(__('Step 2:')) ?></h2>
                     <h4><?= $block->escapeHtmlAttr(__('This integration will give us access to the catalog and products elements')) ?></h4>
                     <div class="steps-button-container">
-                        <input type="button" id="create-integration-btn" value="<?= $block->escapeHtmlAttr(__('CREATE INTEGRATION')) ?>" disabled />
+                        <input type="button" id="create-integration-btn" value="<?= $block->escapeHtmlAttr(__('CREATE INTEGRATION')) ?>" <?php if(!$sector): ?>disabled <?php endif; ?>/>
                     </div>
                     <div data-role="messages" class="messages"></div>
                 </div>
@@ -112,6 +113,7 @@
                 "tokensDialogUrl": "<?= $block->getTokensDialogUrl() ?>",
                 "accessTokenUrl": "<?= $block->getAccessTokenUrl() ?>",
                 "saveSectorUrl": "<?= $block->getSaveSectorUrl() ?>",
+                "currentSectorValue": "<?= $block->getSectorValue() ?>",
                 "sectorSelector": "#sector-selector",
                 "buttonId": "#create-integration-btn",
                 "buttonRegister": "#register-account-btn",

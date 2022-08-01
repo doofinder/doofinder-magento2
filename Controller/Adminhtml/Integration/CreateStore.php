@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Controller\Adminhtml\Integration;
 
-use Doofinder\Feed\Helper\SearchEngine;
 use Doofinder\Feed\Helper\StoreConfig;
 use Exception;
 use Magento\Backend\App\Action;
@@ -101,6 +100,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "platform" => "magento2",
                     "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
                     "skip_indexation" => false,
+                    "sector" => $this->scopeConfig->getValue(StoreConfig::SECTOR_VALUE_CONFIG),
                     "search_engines" => $this->generateSearchEngineData((int)$website->getId())
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Block\Adminhtml;
 
 use Doofinder\Feed\Helper\StoreConfig;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Magento\Integration\Api\IntegrationServiceInterface;
-use Magento\Integration\Block\Adminhtml\Integration\Tokens;
 use Magento\Integration\Model\Integration;
 use Magento\Integration\Model\ResourceModel\Integration\Collection as IntegrationCollection;
 use Magento\Integration\Model\ResourceModel\Integration\CollectionFactory as IntegrationCollectionFactory;
@@ -58,12 +58,14 @@ class Setup extends Template
         StoreConfig $storeConfig,
         EncryptorInterface $encryptor,
         StoreManagerInterface $storeManager,
+        ScopeConfigInterface $scopeConfig,
         IntegrationServiceInterface $integrationService
     ) {
         $this->storeConfig = $storeConfig;
         $this->collectionFactory = $collectionFactory;
         $this->encryptor = $encryptor;
         $this->storeManager = $storeManager;
+        $this->scopeConfig = $scopeConfig;
         $this->integrationService = $integrationService;
         parent::__construct($context, []);
     }
@@ -239,24 +241,13 @@ class Setup extends Template
     }
 
     /**
-     * Get access token
+     * Get current sector value
      *
-     * @return string|null
+     * @return int
      */
-    private function getIntegrationToken(): ?string
+    public function getSectorValue(): ?string
     {
-        $collection = $this->getIntegrationCollection();
-        if ($collection->getSize()) {
-            $integrationId = $collection->getFirstItem()->getId();
-            try {
-                $integration = $this->integrationService->get($integrationId);
-                return $integration->getData(Tokens::DATA_TOKEN);
-            } catch (\Exception $e) {
-                //silence is golden
-            }
-        }
-
-        return null;
+        return $this->scopeConfig->getValue(StoreConfig::SECTOR_VALUE_CONFIG);
     }
 
     /**

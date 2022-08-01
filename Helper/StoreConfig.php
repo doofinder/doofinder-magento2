@@ -75,7 +75,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Path to Sector Value
      */
-    public const SECTOR_VALUE_CONFIG = 'doofinder_config_config/doofinder_integration/sector_value';
+    public const SECTOR_VALUE_CONFIG = 'doofinder_config_config/doofinder_integration/sector';
 
     /**
      * Path to the API KEY value

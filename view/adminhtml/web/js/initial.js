@@ -51,23 +51,22 @@ define([
         },
         changeSector: function(value) {
             if (value) {
-                sessionStorage.setItem('sector', value);
+                $(this.elements.sectorSelector).prop("disabled", true);
 
-                //   let self = this;
-                //   Spinner.show();
-                //   $.ajax({
-                //       url: this.urls.saveSector,
-                //       method: 'POST',
-                //       data: value
-                //   }).done(function() {
-                //       $(self.elements.buttonRegister).prop("disabled", true);
-                //       $(self.elements.buttonLogin).prop("disabled", true);
-                //       $(self.elements.buttonId).prop("disabled", false);
-                //   }).fail(function(jqXHR, textStatus, errorThrown) {
-                //       console.error('Error (' + textStatus + '): ' + errorThrown);
-                //   }).always(function() {
-                //       Spinner.hide();
-                //   })
+                let self = this;
+                Spinner.show();
+                $.ajax({
+                    url: this.urls.saveSector,
+                    method: 'POST',
+                    data: value
+                }).done(function() {
+                    $(self.elements.buttonId).prop("disabled", false);
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    $(self.elements.sectorSelector).prop("disabled", false);
+                    console.error('Error (' + textStatus + '): ' + errorThrown);
+                }).always(function() {
+                    Spinner.hide();
+                })
             }
         },
         createIntegration: function() {
