@@ -51,8 +51,6 @@ define([
         },
         changeSector: function(value) {
             if (value) {
-                $(this.elements.sectorSelector).prop("disabled", true);
-
                 let self = this;
                 Spinner.show();
                 $.ajax({
@@ -60,7 +58,8 @@ define([
                     method: 'POST',
                     data: value
                 }).done(function() {
-                    $(self.elements.buttonId).prop("disabled", false);
+                    if($(self.elements.buttonLogin).prop("disabled"))
+                        $(self.elements.buttonId).prop("disabled", false);
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     $(self.elements.sectorSelector).prop("disabled", false);
                     console.error('Error (' + textStatus + '): ' + errorThrown);

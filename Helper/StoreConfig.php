@@ -728,7 +728,7 @@ class StoreConfig extends AbstractHelper
      * @param int|null $scopeId
      * @return string|null
      */
-    private function getValueFromConfig(
+    public function getValueFromConfig(
         string $path,
         ?string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
         ?int $scopeId = null

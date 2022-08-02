@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Block\Adminhtml;
 
 use Doofinder\Feed\Helper\StoreConfig;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
@@ -58,14 +57,12 @@ class Setup extends Template
         StoreConfig $storeConfig,
         EncryptorInterface $encryptor,
         StoreManagerInterface $storeManager,
-        ScopeConfigInterface $scopeConfig,
         IntegrationServiceInterface $integrationService
     ) {
         $this->storeConfig = $storeConfig;
         $this->collectionFactory = $collectionFactory;
         $this->encryptor = $encryptor;
         $this->storeManager = $storeManager;
-        $this->scopeConfig = $scopeConfig;
         $this->integrationService = $integrationService;
         parent::__construct($context, []);
     }
@@ -247,7 +244,7 @@ class Setup extends Template
      */
     public function getSectorValue(): ?string
     {
-        return $this->scopeConfig->getValue(StoreConfig::SECTOR_VALUE_CONFIG);
+        return $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG);
     }
 
     /**

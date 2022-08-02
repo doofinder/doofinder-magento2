@@ -9,7 +9,6 @@ use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
@@ -56,7 +55,6 @@ class CreateStore extends Action implements HttpGetActionInterface
         UrlInterface $urlInterface,
         LoggerInterface $logger,
         IntegrationServiceInterface $integrationService,
-        ScopeConfigInterface $scopeConfig,
         Context $context
     ) {
         $this->configWriter = $configWriter;
@@ -65,7 +63,6 @@ class CreateStore extends Action implements HttpGetActionInterface
         $this->escaper = $escaper;
         $this->urlInterface = $urlInterface;
         $this->logger = $logger;
-        $this->scopeConfig = $scopeConfig;
         $this->integrationService = $integrationService;
         parent::__construct($context);
     }
@@ -97,7 +94,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "platform" => "magento2",
                     "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
                     "skip_indexation" => false,
-                    "sector" => $this->scopeConfig->getValue(StoreConfig::SECTOR_VALUE_CONFIG),
+                    "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
                     "search_engines" => $this->generateSearchEngineData((int)$website->getId())
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);
