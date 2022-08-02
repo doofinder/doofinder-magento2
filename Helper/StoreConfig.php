@@ -219,7 +219,7 @@ class StoreConfig extends AbstractHelper
 
     public function createStore(array $storeData): array 
     {
-        $managementClient = $this->managementClientFactory->create(['apiType' => 'doomanager']);
+        $managementClient = $this->managementClientFactory->create(['apiType' => 'admin']);
         
         return $managementClient->createStore($storeData);
     }

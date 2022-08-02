@@ -8,8 +8,8 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
@@ -23,9 +23,6 @@ use Psr\Log\LoggerInterface;
 
 class CreateStore extends Action implements HttpGetActionInterface
 {
-    /** @var AttributeCollectionFactory */
-    protected $attributeCollectionFactory;
-
     /** @var StoreConfig */
     private $storeConfig;
 
@@ -59,7 +56,7 @@ class CreateStore extends Action implements HttpGetActionInterface
         UrlInterface $urlInterface,
         LoggerInterface $logger,
         IntegrationServiceInterface $integrationService,
-        AttributeCollectionFactory $attributeCollectionFactory,
+        ScopeConfigInterface $scopeConfig,
         Context $context
     ) {
         $this->configWriter = $configWriter;
@@ -68,8 +65,8 @@ class CreateStore extends Action implements HttpGetActionInterface
         $this->escaper = $escaper;
         $this->urlInterface = $urlInterface;
         $this->logger = $logger;
+        $this->scopeConfig = $scopeConfig;
         $this->integrationService = $integrationService;
-        $this->attributeCollectionFactory = $attributeCollectionFactory;
         parent::__construct($context);
     }
 

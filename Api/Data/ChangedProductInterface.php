@@ -58,21 +58,6 @@ interface ChangedProductInterface
     const OPERATION_TYPE_CREATE = 'create';
 
     /**
-     * Appointment id
-     *
-     * @return int|null
-     */
-    public function getId();
-
-    /**
-     * Set trace id
-     *
-     * @param int $id
-     * @return $this
-     */
-    public function setId(int $id);
-
-    /**
      * Get product id
      *
      * @return int|null
