@@ -51,6 +51,7 @@ define([
         },
         changeSector: function(value) {
             if (value) {
+                $(this.elements.sectorSelector).prop("disabled", true);
                 let self = this;
                 Spinner.show();
                 $.ajax({
@@ -64,6 +65,7 @@ define([
                     $(self.elements.sectorSelector).prop("disabled", false);
                     console.error('Error (' + textStatus + '): ' + errorThrown);
                 }).always(function() {
+                    $(self.elements.sectorSelector).prop("disabled", false);
                     Spinner.hide();
                 })
             }

@@ -131,7 +131,7 @@ class Config extends Action implements CsrfAwareActionInterface
     {
         $region = 'eu1';
         if ($apiEndpoint) {
-            $apiEndpointParts = explode('-', $apiEndpoint);
+            $apiEndpointParts = explode('-', str_replace('https://', '', $apiEndpoint));
             $region = $apiEndpointParts[0];
         }
 
