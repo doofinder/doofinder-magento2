@@ -9,7 +9,6 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Magento\Integration\Api\IntegrationServiceInterface;
-use Magento\Integration\Block\Adminhtml\Integration\Tokens;
 use Magento\Integration\Model\Integration;
 use Magento\Integration\Model\ResourceModel\Integration\Collection as IntegrationCollection;
 use Magento\Integration\Model\ResourceModel\Integration\CollectionFactory as IntegrationCollectionFactory;
@@ -130,13 +129,13 @@ class Setup extends Template
     }
 
     /**
-     * Get create search engines url
+     *Get Sector Changed url
      *
      * @return string
      */
-    public function getCreateSearchEnginesUrl(): string
+    public function getSaveSectorUrl(): string
     {
-        return $this->getUrl('*/integration/createSearchEngines');
+        return $this->getUrl('*/integration/saveSector');
     }
 
     /**
@@ -150,16 +149,6 @@ class Setup extends Template
     }
 
     /**
-     * Get create indices url
-     *
-     * @return string
-     */
-    public function getCreateIndicesUrl(): string
-    {
-        return $this->getUrl('*/integration/createIndices');
-    }
-
-    /**
      * Get process search engines url
      *
      * @return string
@@ -167,16 +156,6 @@ class Setup extends Template
     public function getProcessSearchEnginesUrl(): string
     {
         return $this->getUrl('*/integration/processSearchEngines');
-    }
-
-    /**
-     * Get create display layers url
-     *
-     * @return string
-     */
-    public function getCreateDisplayLayersUrl(): string
-    {
-        return $this->getUrl('*/integration/createDisplayLayers');
     }
 
     /**
@@ -259,24 +238,13 @@ class Setup extends Template
     }
 
     /**
-     * Get access token
+     * Get current sector value
      *
-     * @return string|null
+     * @return int
      */
-    private function getIntegrationToken(): ?string
+    public function getSectorValue(): ?string
     {
-        $collection = $this->getIntegrationCollection();
-        if ($collection->getSize()) {
-            $integrationId = $collection->getFirstItem()->getId();
-            try {
-                $integration = $this->integrationService->get($integrationId);
-                return $integration->getData(Tokens::DATA_TOKEN);
-            } catch (\Exception $e) {
-                //silence is golden
-            }
-        }
-
-        return null;
+        return $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG);
     }
 
     /**

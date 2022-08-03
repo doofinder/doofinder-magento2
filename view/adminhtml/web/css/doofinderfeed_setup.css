@@ -45,6 +45,12 @@
     font-weight: bold;
 }
 
+.steps-buttons-col select {
+    padding: 4px;
+    border-radius: 4px;
+    background-color: white;
+}
+
 .steps-buttons-col {
     margin-left: 15%;
 }

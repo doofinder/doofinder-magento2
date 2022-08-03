@@ -73,6 +73,11 @@ class StoreConfig extends AbstractHelper
     public const INTEGRATION_ID_CONFIG = 'doofinder_config_config/doofinder_integration/integration_id';
 
     /**
+     * Path to Sector Value
+     */
+    public const SECTOR_VALUE_CONFIG = 'doofinder_config_config/doofinder_integration/sector';
+
+    /**
      * Path to the API KEY value
      */
     public const API_KEY = 'doofinder_config_config/doofinder_account/api_key';
@@ -723,7 +728,7 @@ class StoreConfig extends AbstractHelper
      * @param int|null $scopeId
      * @return string|null
      */
-    private function getValueFromConfig(
+    public function getValueFromConfig(
         string $path,
         ?string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
         ?int $scopeId = null

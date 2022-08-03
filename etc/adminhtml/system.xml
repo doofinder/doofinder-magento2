@@ -275,6 +275,14 @@
                     <label>Unsynchronize your integration with Doofinder (irreversible)</label>
                     <frontend_model>Doofinder\Feed\Block\System\Config\CleanIntegration</frontend_model>
                 </field>
+                <field id="sector"
+                       translate="label"
+                       type="select"
+                       sortOrder="700"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="0">
+                </field>
             </group>
         </section>
     </system>

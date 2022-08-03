@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Controller\Adminhtml\Integration;
 
-use Doofinder\Feed\Helper\SearchEngine;
 use Doofinder\Feed\Helper\StoreConfig;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
@@ -24,9 +22,6 @@ use Psr\Log\LoggerInterface;
 
 class CreateStore extends Action implements HttpGetActionInterface
 {
-    /** @var AttributeCollectionFactory */
-    protected $attributeCollectionFactory;
-
     /** @var StoreConfig */
     private $storeConfig;
 
@@ -60,7 +55,6 @@ class CreateStore extends Action implements HttpGetActionInterface
         UrlInterface $urlInterface,
         LoggerInterface $logger,
         IntegrationServiceInterface $integrationService,
-        AttributeCollectionFactory $attributeCollectionFactory,
         Context $context
     ) {
         $this->configWriter = $configWriter;
@@ -70,7 +64,6 @@ class CreateStore extends Action implements HttpGetActionInterface
         $this->urlInterface = $urlInterface;
         $this->logger = $logger;
         $this->integrationService = $integrationService;
-        $this->attributeCollectionFactory = $attributeCollectionFactory;
         parent::__construct($context);
     }
 
@@ -101,6 +94,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "platform" => "magento2",
                     "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
                     "skip_indexation" => false,
+                    "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
                     "search_engines" => $this->generateSearchEngineData((int)$website->getId())
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);

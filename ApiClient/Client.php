@@ -247,7 +247,7 @@ class Client
     private function setApiTokenRegion(?string $apiKey)
     {
         $this->apiKey = $apiKey ?? $this->storeConfig->getApiKey() ?? '';
-        $clusterToken = explode('-', $this->apiKey);
+        $clusterToken = explode('-', str_replace('https://', '', $this->apiKey));
         if (count($clusterToken) != 2) {
             throw new InvalidApiKey("Invalid API Key provided");
         }
