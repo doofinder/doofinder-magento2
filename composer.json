@@ -1,10 +1,10 @@
 {
     "name": "doofinder/doofinder-magento2",
-    "version": "0.5.9",
+    "version": "0.6.0",
     "description": "Doofinder module for Magento 2",
     "type": "magento2-module",
     "require": {
-        "magento/framework": ">=101.0.6",
+        "magento/framework": ">=102.0.7",
         "guzzlehttp/guzzle": "*"
     },
     "require-dev": {
