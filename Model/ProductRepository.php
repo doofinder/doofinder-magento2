@@ -6,7 +6,6 @@ namespace Doofinder\Feed\Model;
 
 use Magento\Catalog\Api\Data\ProductExtension;
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Api\Data\ProductSearchResultsInterface;
 use Magento\Catalog\Api\Data\ProductSearchResultsInterfaceFactory;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper;
@@ -212,7 +211,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     /**
      * @inheritDoc
      */
-    public function getList(SearchCriteriaInterface $searchCriteria): ProductSearchResultsInterface
+    public function getList(SearchCriteriaInterface $searchCriteria)
     {
         $searchResult = parent::getList($searchCriteria);
         $storeId = null;
