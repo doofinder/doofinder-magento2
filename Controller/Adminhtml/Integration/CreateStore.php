@@ -22,6 +22,8 @@ use Psr\Log\LoggerInterface;
 
 class CreateStore extends Action implements HttpGetActionInterface
 {
+    private const CUSTOM_ATTRIBUTES_ENABLED_DEFAULT = ['manufacturer'];
+
     /** @var StoreConfig */
     private $storeConfig;
 
@@ -99,6 +101,9 @@ class CreateStore extends Action implements HttpGetActionInterface
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);
                 $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
+                $this->setCustomAttributes();
+                $this->cleanCache();
+        
             } catch (Exception $e) {
                 $success = false;
                 $this->logger->error('Error creating store for website "' . $website->getName() . '". ' . $e->getMessage());
@@ -119,6 +124,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                 "name" => $store->getName(),
                 "language" => $this->storeConfig->getLanguageFromStore($store),
                 "currency" => strtoupper($store->getCurrentCurrency()->getCode()),
+                "query_input" => "#search",
                 "site_url" => $store->getBaseUrl(),
                 "datatypes" => [
                     [
@@ -145,5 +151,35 @@ class CreateStore extends Action implements HttpGetActionInterface
     {
         $this->configWriter->save(StoreConfig::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_WEBSITES, $websiteID);
         $this->configWriter->save(StoreConfig::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_WEBSITES, $websiteID);
+    }
+
+    /**
+     * Function to set some custom attributes to enabled by default
+     */
+    private function setCustomAttributes()
+    {
+        $attributeCollection = $this->attributeCollectionFactory->create();
+        $attributeCollection->addFieldToFilter('is_user_defined',['eq' => 1]);
+        $attributeCollection->addFieldToFilter('attribute_code',['in' => self::CUSTOM_ATTRIBUTES_ENABLED_DEFAULT]);
+        $attributes     = [];
+        foreach ($attributeCollection as $attribute) {
+            $attribute_id = $attribute->getAttributeId();
+            $attributes[$attribute_id] = ['label' => $this->escaper->escapeHtml($attribute->getFrontendLabel()), 
+                                          'code' => $attribute->getAttributeCode(), 
+                                          'enabled' => 'on'];
+        }
+
+        $customAttributes = \Zend_Json::encode($attributes);
+        $this->configWriter->save(StoreConfig::CUSTOM_ATTRIBUTES, $customAttributes);
+    }
+
+    /**
+     * As we are adding some custom attributes we need to clean the cache to see them into the config panel.
+     */
+    private function cleanCache()
+    {
+        foreach ($this->cacheFrontendPool as $cacheFrontend) {
+            $cacheFrontend->getBackend()->clean();
+        }
     }
 }
