@@ -105,7 +105,8 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
                     "skip_indexation" => false,
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
-                    "search_engines" => $this->generateSearchEngineData((int)$website->getId())
+                    "search_engines" => $this->generateSearchEngineData((int)$website->getId()),
+                    "livelayer" => ["query_input" => "#search"]
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);
                 $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
@@ -132,7 +133,6 @@ class CreateStore extends Action implements HttpGetActionInterface
                 "name" => $store->getName(),
                 "language" => $this->storeConfig->getLanguageFromStore($store),
                 "currency" => strtoupper($store->getCurrentCurrency()->getCode()),
-                "query_input" => "#search",
                 "site_url" => $store->getBaseUrl(),
                 "datatypes" => [
                     [
