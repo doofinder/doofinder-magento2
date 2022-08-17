@@ -381,9 +381,8 @@ class Product implements MapInterface
      * @param ProductModel $product
      * @param string $attributeCode
      *
-     * @return string|null
      */
-    public function getAttributeText(ProductModel $product, string $attributeCode): ?string
+    public function getAttributeText(ProductModel $product, string $attributeCode)
     {
         return $this->productHelper->getAttributeText($product, $attributeCode);
     }
