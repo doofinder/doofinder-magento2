@@ -106,7 +106,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "skip_indexation" => false,
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
                     "search_engines" => $this->generateSearchEngineData((int)$website->getId()),
-                    "livelayer" => ["query_input" => "#search"]
+                    "query_input" => "#search"
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);
                 $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
