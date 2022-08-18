@@ -8,6 +8,7 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
@@ -22,6 +23,11 @@ use Psr\Log\LoggerInterface;
 
 class CreateStore extends Action implements HttpGetActionInterface
 {
+    private const CUSTOM_ATTRIBUTES_ENABLED_DEFAULT = ['manufacturer'];
+
+    /** @var AttributeCollectionFactory */
+    protected $attributeCollectionFactory;
+    
     /** @var StoreConfig */
     private $storeConfig;
 
@@ -55,7 +61,9 @@ class CreateStore extends Action implements HttpGetActionInterface
         UrlInterface $urlInterface,
         LoggerInterface $logger,
         IntegrationServiceInterface $integrationService,
-        Context $context
+        Context $context,
+        AttributeCollectionFactory $attributeCollectionFactory,
+        Pool $cacheFrontendPool
     ) {
         $this->configWriter = $configWriter;
         $this->storeConfig = $storeConfig;
@@ -64,6 +72,8 @@ class CreateStore extends Action implements HttpGetActionInterface
         $this->urlInterface = $urlInterface;
         $this->logger = $logger;
         $this->integrationService = $integrationService;
+        $this->attributeCollectionFactory = $attributeCollectionFactory;
+        $this->cacheFrontendPool = $cacheFrontendPool;
         parent::__construct($context);
     }
 
@@ -89,16 +99,22 @@ class CreateStore extends Action implements HttpGetActionInterface
         $success = true;
         foreach($this->storeConfig->getAllWebsites() as $website) {
             try {
+                $searchEngineData = $this->generateSearchEngineData((int)$website->getId());
                 $websiteConfig = [
                     "name" => $website->getName(),
                     "platform" => "magento2",
                     "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
                     "skip_indexation" => false,
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
-                    "search_engines" => $this->generateSearchEngineData((int)$website->getId())
+                    "search_engines" => $searchEngineData["searchEngineConfig"],
+                    "query_input" => "#search"
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);
                 $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
+                $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["search_engines"]);
+                $this->setCustomAttributes();
+                $this->cleanCache();
+        
             } catch (Exception $e) {
                 $success = false;
                 $this->logger->error('Error creating store for website "' . $website->getName() . '". ' . $e->getMessage());
@@ -110,15 +126,17 @@ class CreateStore extends Action implements HttpGetActionInterface
     public function generateSearchEngineData($websiteID)
     {
         $searchEngineConfig = [];
+        $storesConfig = [];
+
         foreach ($this->storeConfig->getWebsiteStores($websiteID) as $store) {
-            $integrationToken = $this->integrationService
-                ->get($this->storeConfig->getIntegrationId())
-                ->getData(Tokens::DATA_TOKEN);
+            $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
+            $language = $this->storeConfig->getLanguageFromStore($store);
+            $currency = strtoupper($store->getCurrentCurrency()->getCode());
 
             $searchEngineConfig[] = [
                 "name" => $store->getName(),
-                "language" => $this->storeConfig->getLanguageFromStore($store),
-                "currency" => strtoupper($store->getCurrentCurrency()->getCode()),
+                "language" => $language,
+                "currency" => $currency,
                 "site_url" => $store->getBaseUrl(),
                 "datatypes" => [
                     [
@@ -137,13 +155,67 @@ class CreateStore extends Action implements HttpGetActionInterface
                     ]
                 ]
             ];
+
+            $storesConfig[$language][$currency] = $store->getId();
         }
-        return $searchEngineConfig;
+        return ["searchEngineConfig" => $searchEngineConfig, "storesConfig" => $storesConfig];
     }
 
+    /**
+     * Function to store into the data base the installation id as well as the layer script
+     */
     private function saveInstallationConfig($websiteID, $installationId, $script) 
     {
         $this->configWriter->save(StoreConfig::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_WEBSITES, $websiteID);
         $this->configWriter->save(StoreConfig::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_WEBSITES, $websiteID);
+    }
+
+    /**
+     * Function to store into data base the relation of each store view his hashid related
+     * The storeConfig variable has the following format:
+     * {"en":{"USD":"1"},"de":{"USD":"2"}}
+     * The searchEngines variable has the following format:
+     * "search_engines":{"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},"en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
+     * We're going to iterate over the search_engines because there is the data created in doofinder. May occour that some
+     * of the data that we've in storeConfig has some invalid parameter and will be bypass during the creation.
+     */
+    private function saveSearchEngineConfig($storesConfig, $searchEngines)
+    {
+        foreach ($searchEngines as $language => $values) {
+            foreach ($values as $currency => $hashid) {
+                $storeId = $storesConfig[$language][$currency];
+                $this->configWriter->save(StoreConfig::HASH_ID_CONFIG, $hashid, ScopeInterface::SCOPE_STORES, $storeId);
+            }
+        }
+    }
+
+    /**
+     * Function to set some custom attributes to enabled by default
+     */
+    private function setCustomAttributes()
+    {
+        $attributeCollection = $this->attributeCollectionFactory->create();
+        $attributeCollection->addFieldToFilter('is_user_defined',['eq' => 1]);
+        $attributeCollection->addFieldToFilter('attribute_code',['in' => self::CUSTOM_ATTRIBUTES_ENABLED_DEFAULT]);
+        $attributes     = [];
+        foreach ($attributeCollection as $attribute) {
+            $attribute_id = $attribute->getAttributeId();
+            $attributes[$attribute_id] = ['label' => $this->escaper->escapeHtml($attribute->getFrontendLabel()), 
+                                          'code' => $attribute->getAttributeCode(), 
+                                          'enabled' => 'on'];
+        }
+
+        $customAttributes = \Zend_Json::encode($attributes);
+        $this->configWriter->save(StoreConfig::CUSTOM_ATTRIBUTES, $customAttributes);
+    }
+
+    /**
+     * As we are adding some custom attributes we need to clean the cache to see them into the config panel.
+     */
+    private function cleanCache()
+    {
+        foreach ($this->cacheFrontendPool as $cacheFrontend) {
+            $cacheFrontend->getBackend()->clean();
+        }
     }
 }
