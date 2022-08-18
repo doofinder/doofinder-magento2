@@ -4,7 +4,7 @@
     "description": "Doofinder module for Magento 2",
     "type": "magento2-module",
     "require": {
-        "magento/framework": ">=102.0.7",
+        "magento/framework": ">=101.0.6",
         "guzzlehttp/guzzle": "*"
     },
     "require-dev": {
