@@ -99,17 +99,19 @@ class CreateStore extends Action implements HttpGetActionInterface
         $success = true;
         foreach($this->storeConfig->getAllWebsites() as $website) {
             try {
+                $searchEngineData = $this->generateSearchEngineData((int)$website->getId());
                 $websiteConfig = [
                     "name" => $website->getName(),
                     "platform" => "magento2",
                     "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
                     "skip_indexation" => false,
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
-                    "search_engines" => $this->generateSearchEngineData((int)$website->getId()),
+                    "search_engines" => $searchEngineData["searchEngineConfig"],
                     "query_input" => "#search"
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);
                 $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
+                $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["search_engines"]);
                 $this->setCustomAttributes();
                 $this->cleanCache();
         
@@ -124,15 +126,17 @@ class CreateStore extends Action implements HttpGetActionInterface
     public function generateSearchEngineData($websiteID)
     {
         $searchEngineConfig = [];
+        $storesConfig = [];
+
         foreach ($this->storeConfig->getWebsiteStores($websiteID) as $store) {
-            $integrationToken = $this->integrationService
-                ->get($this->storeConfig->getIntegrationId())
-                ->getData(Tokens::DATA_TOKEN);
+            $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
+            $language = $this->storeConfig->getLanguageFromStore($store);
+            $currency = strtoupper($store->getCurrentCurrency()->getCode());
 
             $searchEngineConfig[] = [
                 "name" => $store->getName(),
-                "language" => $this->storeConfig->getLanguageFromStore($store),
-                "currency" => strtoupper($store->getCurrentCurrency()->getCode()),
+                "language" => $language,
+                "currency" => $currency,
                 "site_url" => $store->getBaseUrl(),
                 "datatypes" => [
                     [
@@ -151,14 +155,32 @@ class CreateStore extends Action implements HttpGetActionInterface
                     ]
                 ]
             ];
+
+            $storesConfig[$language][$currency] = $store->getId();
         }
-        return $searchEngineConfig;
+        return ["searchEngineConfig" => $searchEngineConfig, "storesConfig" => $storesConfig];
     }
 
+    /**
+     * Function to store into the data base the installation id as well as the layer script
+     */
     private function saveInstallationConfig($websiteID, $installationId, $script) 
     {
         $this->configWriter->save(StoreConfig::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_WEBSITES, $websiteID);
         $this->configWriter->save(StoreConfig::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_WEBSITES, $websiteID);
+    }
+
+    /**
+     * Function to store into data base the relation of each store view his hashid related
+     */
+    private function saveSearchEngineConfig($storesConfig, $searchEngines)
+    {
+        foreach ($searchEngines as $language => $values) {
+            foreach ($values as $currency => $hashid) {
+                $storeId = $storesConfig[$language][$currency];
+                $this->configWriter->save(StoreConfig::HASH_ID_CONFIG, $hashid, ScopeInterface::SCOPE_STORES, $storeId);
+            }
+        }
     }
 
     /**

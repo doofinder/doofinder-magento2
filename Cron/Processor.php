@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Cron;
 
-use Doofinder\Feed\Api\ChangedProductRepositoryInterface;
 use Doofinder\Feed\Api\Data\ChangedProductInterface;
 use Doofinder\Feed\Helper\Indice as IndiceHelper;
 use Doofinder\Feed\Helper\Item as ItemHelper;
