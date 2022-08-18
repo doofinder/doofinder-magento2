@@ -172,6 +172,12 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /**
      * Function to store into data base the relation of each store view his hashid related
+     * The storeConfig variable has the following format:
+     * {"en":{"USD":"1"},"de":{"USD":"2"}}
+     * The searchEngines variable has the following format:
+     * "search_engines":{"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},"en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
+     * We're going to iterate over the search_engines because there is the data created in doofinder. May occour that some
+     * of the data that we've in storeConfig has some invalid parameter and will be bypass during the creation.
      */
     private function saveSearchEngineConfig($storesConfig, $searchEngines)
     {
