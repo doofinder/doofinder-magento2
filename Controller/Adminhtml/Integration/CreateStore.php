@@ -19,6 +19,7 @@ use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Block\Adminhtml\Integration\Tokens;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Api\Data\StoreInterface;
 use Psr\Log\LoggerInterface;
 
 class CreateStore extends Action implements HttpGetActionInterface
@@ -105,6 +106,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "platform" => "magento2",
                     "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
                     "skip_indexation" => false,
+                    "callback_urls" => $searchEngineData["callbackUrls"],
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
                     "search_engines" => $searchEngineData["searchEngineConfig"],
                     "query_input" => "#search"
@@ -127,6 +129,7 @@ class CreateStore extends Action implements HttpGetActionInterface
     {
         $searchEngineConfig = [];
         $storesConfig = [];
+        $callbackUrls = [];
 
         foreach ($this->storeConfig->getWebsiteStores($websiteID) as $store) {
             $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
@@ -155,10 +158,10 @@ class CreateStore extends Action implements HttpGetActionInterface
                     ]
                 ]
             ];
-
             $storesConfig[$language][$currency] = $store->getId();
+            $callbackUrls[$language][$currency] = $this->getProcessCallbackUrl($store);
         }
-        return ["searchEngineConfig" => $searchEngineConfig, "storesConfig" => $storesConfig];
+        return ["searchEngineConfig" => $searchEngineConfig, "storesConfig" => $storesConfig, "callbackUrls" => $callbackUrls];
     }
 
     /**
@@ -217,5 +220,17 @@ class CreateStore extends Action implements HttpGetActionInterface
         foreach ($this->cacheFrontendPool as $cacheFrontend) {
             $cacheFrontend->getBackend()->clean();
         }
+    }
+
+    /**
+     * Get Process Callback URL
+     *
+     * @param StoreInterface $store
+     *
+     * @return string
+     */
+    private function getProcessCallbackUrl(StoreInterface $store): string
+    {
+        return $store->getBaseUrl() . 'doofinderfeed/setup/processCallback';
     }
 }
