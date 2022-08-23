@@ -148,16 +148,34 @@ class Doofinder implements FetcherInterface
         $collection->setFlag('has_stock_status_filter', true);
 
         if ($this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) {
-            $defaultStockProvider = $this->_objectManager->create(\Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface::class);
-            $addStockDataToCollection = $this->_objectManager->create(\Magento\InventoryCatalog\Model\ResourceModel\AddStockDataToCollection::class);
-
-            $stockId = $stockId ?? $defaultStockProvider->getId();
-            $addStockDataToCollection->execute($collection, false, $stockId);
+            $this->updateDataCollectionWithMSI($collection);
         }else {
-            $stockStatusResource = $this->_objectManager->create(\Magento\CatalogInventory\Model\ResourceModel\Stock\Status::class);
-            $stockStatusResource->addStockDataToCollection($collection, false);
+            $this->updateDataCollectionWithoutMSI($collection);
         }
 
         return $collection;
+    }
+
+    /**
+     * Function to update the collection to include out of stock products when the user has MSI enabled
+     * 
+     * @param ProductCollection $collection
+     */
+    private function updateDataCollectionWithMSI(&$collection) {
+        $defaultStockProvider = $this->_objectManager->create(\Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface::class);
+        $addStockDataToCollection = $this->_objectManager->create(\Magento\InventoryCatalog\Model\ResourceModel\AddStockDataToCollection::class);
+
+        $stockId = $stockId ?? $defaultStockProvider->getId();
+        $addStockDataToCollection->execute($collection, false, $stockId);
+    }
+
+    /**
+     * Function to update the collection to include out of stock products when the user has MSI disabled
+     * 
+     * @param ProductCollection $collection
+     */
+    private function updateDataCollectionWithoutMSI(&$collection) {
+        $stockStatusResource = $this->_objectManager->create(\Magento\CatalogInventory\Model\ResourceModel\Stock\Status::class);
+        $stockStatusResource->addStockDataToCollection($collection, false);
     }
 }
