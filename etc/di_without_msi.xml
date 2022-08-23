@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Integration\Controller\Adminhtml\Integration\Save" type="Doofinder\Feed\Controller\Adminhtml\Integration\Save" />
+    <preference for="Doofinder\Feed\Api\ChangedProductRepositoryInterface" type="Doofinder\Feed\Model\ChangedProductRepository"/>
+    <preference for="Doofinder\Feed\Api\Data\ChangedProductInterface" type="Doofinder\Feed\Model\ChangedProduct"/>
+    <preference for="Doofinder\Feed\Api\Data\ChangedProductSearchResultsInterface" type="Doofinder\Feed\Model\ChangedProductSearchResults"/>
+    <preference for="Doofinder\Feed\Api\ProductRepositoryInterface" type="Doofinder\Feed\Model\ProductWithoutMSIRepository" />
+    <type name="Doofinder\Feed\Model\Indexer\Data\Mapper">
+        <arguments>
+            <argument name="maps" xsi:type="array">
+                <item name="update" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Update</item>
+                <item name="delete" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Delete</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Doofinder\Feed\Model\Indexer\Data\Map\Update">
+        <arguments>
+            <argument name="fetchers" xsi:type="array">
+                <item name="magento" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\Magento</item>
+                <item name="doofinder" xsi:type="object">Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\DoofinderWithoutMSI</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\Magento">
+        <arguments>
+            <argument name="excludedAttributes" xsi:type="array">
+                <item name="price" xsi:type="string">price</item>
+                <item name="media_gallery" xsi:type="string">media_gallery</item>
+                <item name="tier_price" xsi:type="string">tier_price</item>
+                <item name="quantity_and_stock_status" xsi:type="string">quantity_and_stock_status</item>
+                <item name="giftcard_amounts" xsi:type="string">giftcard_amounts</item>
+                <item name="name" xsi:type="string">name</item>
+                <item name="url_key" xsi:type="string">url_key</item>
+                <item name="sku" xsi:type="string">sku</item>
+                <item name="status" xsi:type="string">status</item>
+                <item name="tax_class_id" xsi:type="string">tax_class_id</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher\DoofinderWithoutMSI">
+        <arguments>
+            <argument name="generators" xsi:type="array">
+                <item name="simple" xsi:type="object">Doofinder\Feed\Model\Generator\Map\ProductWithoutMSI</item>
+                <item name="grouped" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product\Grouped</item>
+                <item name="configurable" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product\Configurable</item>
+                <item name="bundle" xsi:type="object">Doofinder\Feed\Model\Generator\Map\Product\Bundle</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Doofinder\Feed\Model\Config\Indexer\Attributes">
+        <arguments>
+            <argument name="attributes" xsi:type="array">
+                <item name="id" xsi:type="string">df_id</item>
+                <item name="title" xsi:type="string">name</item>
+                <item name="categories" xsi:type="string">category_ids</item>
+                <item name="link" xsi:type="string">url_key</item>
+                <item name="price" xsi:type="string">df_regular_price</item>
+                <item name="sale_price" xsi:type="string">df_sale_price</item>
+                <item name="best_price" xsi:type="string">minimal_price</item>
+                <item name="availability" xsi:type="string">df_availability</item>
+                <item name="image_link" xsi:type="string">image_link</item>
+                <item name="created_at" xsi:type="string">created_at</item>
+                <item name="group_id" xsi:type="string">df_grouping_id</item>
+                <item name="df_grouping_id" xsi:type="string">df_grouping_id</item>
+                <item name="df_group_leader" xsi:type="string">df_group_leader</item>
+                <item name="gtin" xsi:type="string">sku</item>
+                <item name="weight" xsi:type="string">weight</item>
+                <item name="updated_at" xsi:type="string">updated_at</item>
+                <item name="options" xsi:type="string">options</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
