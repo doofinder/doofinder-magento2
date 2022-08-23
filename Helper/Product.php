@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
+use Doofinder\Feed\Helper\Inventory as InventoryHelper;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Model\Category as CategoryModel;
 use Magento\Catalog\Model\Product as ProductModel;
@@ -17,8 +18,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Phrase;
 use Magento\Framework\Url;
 use Magento\Framework\UrlInterface;
-use Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface;
-use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Model\Store as StoreModel;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Tax\Model\Config as TaxConfig;
@@ -50,14 +49,9 @@ class Product extends AbstractHelper
     private $storeManager;
 
     /**
-     * @var GetStockItemDataInterface
+     * @var InventoryHelper
      */
-    private $getStockItemData;
-
-    /**
-     * @var DefaultStockProviderInterface
-     */
-    private $defaultStockProvider;
+    private $inventoryHelper;
 
     /**
      * @var TaxConfig
@@ -89,8 +83,6 @@ class Product extends AbstractHelper
      * @param ImageHelper $imageHelper
      * @param Context $context
      * @param StoreManagerInterface $storeManager
-     * @param GetStockItemDataInterface $getStockItemData
-     * @param DefaultStockProviderInterface $defaultStockProvider
      * @param TaxConfig $taxConfig
      * @param Url $frontendUrl
      * @param UrlFinderInterface $urlFinder
@@ -103,24 +95,22 @@ class Product extends AbstractHelper
         ImageHelper $imageHelper,
         Context $context,
         StoreManagerInterface $storeManager,
-        GetStockItemDataInterface $getStockItemData,
-        DefaultStockProviderInterface $defaultStockProvider,
         TaxConfig $taxConfig,
         Url $frontendUrl,
         UrlFinderInterface $urlFinder,
         EavConfig $eavConfig,
-        Configurable $configurable
+        Configurable $configurable,
+        InventoryHelper $inventoryHelper
     ) {
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->imageHelper = $imageHelper;
         $this->storeManager = $storeManager;
-        $this->getStockItemData = $getStockItemData;
-        $this->defaultStockProvider = $defaultStockProvider;
         $this->taxConfig = $taxConfig;
         $this->frontendUrl = $frontendUrl;
         $this->urlFinder = $urlFinder;
         $this->eavConfig = $eavConfig;
         $this->configurable = $configurable;
+        $this->inventoryHelper = $inventoryHelper;
         parent::__construct($context);
     }
 
@@ -403,26 +393,6 @@ class Product extends AbstractHelper
     }
 
     /**
-     * Get product 'out of stock' label
-     *
-     * @return string
-     */
-    public function getOutOfStockLabel(): string
-    {
-        return 'out of stock';
-    }
-
-    /**
-     * Get product 'in stock' label
-     *
-     * @return string
-     */
-    public function getInStockLabel(): string
-    {
-        return 'in stock';
-    }
-
-    /**
      * Get currency code
      *
      * @return string
@@ -525,15 +495,7 @@ class Product extends AbstractHelper
      */
     public function getQuantityAndStockStatus(ProductModel $product, ?int $stockId = null): string
     {
-        $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
-        $qty = $stockItemData[GetStockItemDataInterface::QUANTITY];
-        $availability = $stockItemData[GetStockItemDataInterface::IS_SALABLE]
-            ? $this->getInStockLabel()
-            : $this->getOutOfStockLabel();
-
-        return implode(' - ', array_filter([$qty, $availability], function ($item) {
-            return $item !== null;
-        }));
+        return $this->inventoryHelper->getQuantityAndStockStatus($product, $stockId);
     }
 
     /**
@@ -547,28 +509,6 @@ class Product extends AbstractHelper
      */
     public function getProductAvailability(ProductModel $product, ?int $stockId = null): string
     {
-        $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
-
-        return $stockItemData[GetStockItemDataInterface::IS_SALABLE]
-            ? $this->getInStockLabel()
-            : $this->getOutOfStockLabel();
-    }
-
-    /**
-     * @param string $sku
-     * @param int|null $stockId
-     *
-     * @return array
-     * @throws LocalizedException
-     */
-    private function getStockItemData(string $sku, ?int $stockId = null): array
-    {
-        $stockId = $stockId ?? $this->defaultStockProvider->getId();
-        $stockItemData = $this->getStockItemData->execute($sku, $stockId);
-
-        return [
-            GetStockItemDataInterface::QUANTITY => $stockItemData[GetStockItemDataInterface::QUANTITY],
-            GetStockItemDataInterface::IS_SALABLE => (bool)($stockItemData[GetStockItemDataInterface::IS_SALABLE] ?? false)
-        ];
+        return $this->inventoryHelper->getProductAvailability($product, $stockId);
     }
 }
