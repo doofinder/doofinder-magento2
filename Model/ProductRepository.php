@@ -360,7 +360,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $extensionAttributes->setStockItem($this->stockRegistry->getStockItem($product->getId()));
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
         if($product->getTypeId() == Configurable::TYPE_CODE){
-            $extensionAttributes->setFinalPrice($product->getFinalPrice());
+            $extensionAttributes->setFinalPrice($this->productHelperFactory->create()->getProductPrice($product));
         }
         $product->setExtensionAttributes($extensionAttributes);
     }
