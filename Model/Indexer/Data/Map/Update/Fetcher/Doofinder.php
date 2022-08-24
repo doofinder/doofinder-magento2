@@ -9,8 +9,8 @@ use Doofinder\Feed\Api\Data\Generator\MapInterface;
 use Doofinder\Feed\Model\Config\Indexer\Attributes;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
-use Magento\InventoryCatalog\Model\ResourceModel\AddStockDataToCollection;
-use Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\Module\Manager;
 
 class Doofinder implements FetcherInterface
 {
@@ -30,41 +30,41 @@ class Doofinder implements FetcherInterface
     private $productColFactory;
 
     /**
-     * @var DefaultStockProviderInterface
-     */
-    private $defaultStockProvider;
-
-    /**
-     * @var AddStockDataToCollection
-     */
-    private $addStockDataToCollection;
-
-    /**
      * @var Attributes
      */
     private $attributes;
 
     /**
+     * @var ObjectManagerInterface
+     */
+    private $_objectManager;
+
+    /**
+     * @var Manager
+     */
+    protected $moduleManager;
+
+    /**
      * Doofinder constructor.
      *
      * @param ProductCollectionFactory $collectionFactory
-     * @param DefaultStockProviderInterface $defaultStockProvider
-     * @param AddStockDataToCollection $addStockDataToCollection
      * @param Attributes $attributes
-     * @param array $generators
+     * @param ObjectManagerInterface $objectmanager
+     * @param Manager $moduleManager
+     * @param array $generators,
      */
     public function __construct(
         ProductCollectionFactory $collectionFactory,
-        DefaultStockProviderInterface $defaultStockProvider,
-        AddStockDataToCollection $addStockDataToCollection,
         Attributes $attributes,
+        ObjectManagerInterface $objectmanager,
+        Manager $moduleManager,
         array $generators
     ) {
         $this->productColFactory = $collectionFactory;
-        $this->defaultStockProvider = $defaultStockProvider;
-        $this->addStockDataToCollection = $addStockDataToCollection;
         $this->attributes = $attributes;
         $this->generators = $generators;
+        $this->_objectManager = $objectmanager;
+        $this->moduleManager = $moduleManager;
     }
 
     /**
@@ -146,9 +146,36 @@ class Doofinder implements FetcherInterface
          *         We override this behavior here.
          */
         $collection->setFlag('has_stock_status_filter', true);
-        $stockId = $stockId ?? $this->defaultStockProvider->getId();
-        $this->addStockDataToCollection->execute($collection, false, $stockId);
+
+        if ($this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) {
+            $this->updateDataCollectionWithMSI($collection);
+        }else {
+            $this->updateDataCollectionWithoutMSI($collection);
+        }
 
         return $collection;
+    }
+
+    /**
+     * Function to update the collection to include out of stock products when the user has MSI enabled
+     * 
+     * @param ProductCollection $collection
+     */
+    private function updateDataCollectionWithMSI(&$collection) {
+        $defaultStockProvider = $this->_objectManager->create(\Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface::class);
+        $addStockDataToCollection = $this->_objectManager->create(\Magento\InventoryCatalog\Model\ResourceModel\AddStockDataToCollection::class);
+
+        $stockId = $stockId ?? $defaultStockProvider->getId();
+        $addStockDataToCollection->execute($collection, false, $stockId);
+    }
+
+    /**
+     * Function to update the collection to include out of stock products when the user has MSI disabled
+     * 
+     * @param ProductCollection $collection
+     */
+    private function updateDataCollectionWithoutMSI(&$collection) {
+        $stockStatusResource = $this->_objectManager->create(\Magento\CatalogInventory\Model\ResourceModel\Stock\Status::class);
+        $stockStatusResource->addStockDataToCollection($collection, false);
     }
 }
