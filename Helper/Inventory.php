@@ -53,11 +53,24 @@ class Inventory extends AbstractHelper
      */
     public function getQuantityAndStockStatus(ProductModel $product, ?int $stockId = null)
     {
-        if ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) {
-            return $this->getQuantityAndStockStatusWithMSI($product, $stockId);
-        } else {
-            return $this->getQuantityAndStockStatusWithoutMSI($product);
-        }
+        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) ?
+            $this->getQuantityAndStockStatusWithMSIMessage($product, $stockId) :
+            $this->getQuantityAndStockStatusWithoutMSIMessage($product);
+    }
+
+    /**
+     * Get quantity and stock status
+     *
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return string
+     */
+    public function getQuantityAndAvailability(ProductModel $product, ?int $stockId = null)
+    {
+        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) ?
+            $this->getQuantityAndStockStatusWithMSI($product, $stockId) :
+            $this->getQuantityAndStockStatusWithoutMSI($product);
     }
 
     /**
@@ -69,11 +82,26 @@ class Inventory extends AbstractHelper
      */
     public function getProductAvailability(ProductModel $product, ?int $stockId = null)
     {
-        if ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) {
-            return $this->getProductAvailabilityWithMSI($product, $stockId);
-        } else {
-            return $this->getProductAvailabilityWithoutMSI($product);
-        }
+        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) ?
+            $this->getProductAvailabilityWithMSI($product, $stockId) :
+            $this->getProductAvailabilityWithoutMSI($product);
+    }
+
+    /**
+     * Get quantity and stock status for environments with MSI dependency
+     *
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return array
+     */
+    private function getQuantityAndStockStatusWithMSI(ProductModel $product, ?int $stockId = null)
+    {
+        $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
+        $qty = $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::QUANTITY];
+        $availability = $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::IS_SALABLE];
+
+        return [$qty, $availability];
     }
 
     /**
@@ -84,15 +112,12 @@ class Inventory extends AbstractHelper
      *
      * @return string
      */
-    private function getQuantityAndStockStatusWithMSI(ProductModel $product, ?int $stockId = null)
+    private function getQuantityAndStockStatusWithMSIMessage(ProductModel $product, ?int $stockId = null)
     {
-        $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
-        $qty = $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::QUANTITY];
-        $availability = $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::IS_SALABLE]
-            ? $this->getInStockLabel()
-            : $this->getOutOfStockLabel();
+        $qtyAndAvailability = $this->getQuantityAndStockStatusWithMSI($product, $stockId);
+        $qtyAndAvailability[1] = $qtyAndAvailability[1] ? $this->getInStockLabel(): $this->getOutOfStockLabel();
 
-        return implode(' - ', array_filter([$qty, $availability], function ($item) {
+        return implode(' - ', array_filter($qtyAndAvailability, function ($item) {
             return $item !== null;
         }));
     }
@@ -140,14 +165,30 @@ class Inventory extends AbstractHelper
      * @param ProductModel $product
      * @param int|null $stockId
      *
-     * @return string
+     * @return array
      */
     private function getQuantityAndStockStatusWithoutMSI(ProductModel $product)
     {
         $qty = $this->getStockItem($product->getId())->getQty();
-        $availability = $this->getProductAvailabilityWithoutMSI($product);
+        $availability = $this->getStockItem($product->getId())->getIsInStock();
 
-        return implode(' - ', array_filter([$qty, $availability], function ($item) {
+        return [$qty, $availability];
+    }
+
+    /**
+     * Get quantity and stock status for environments without MSI dependency
+     *
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return string
+     */
+    private function getQuantityAndStockStatusWithoutMSIMessage(ProductModel $product)
+    {
+        $qtyAndAvailability = $this->getQuantityAndStockStatusWithoutMSI($product);
+        $qtyAndAvailability[1] = $qtyAndAvailability[1] ? $this->getInStockLabel(): $this->getOutOfStockLabel();
+
+        return implode(' - ', array_filter($qtyAndAvailability, function ($item) {
             return $item !== null;
         }));
     }
