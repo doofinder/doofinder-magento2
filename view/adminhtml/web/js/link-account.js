@@ -20,6 +20,7 @@ define([
                 loginEndpoint: '${ $.loginEndpoint }',
                 checkAPIKeyUrl: '${ $.checkAPIKeyUrl }',
                 createStoreUrl: '${ $.createStoreUrl }',
+                doofinderConnectUrl: '${ $.doofinderConnectUrl}'
             },
             paramsPopup: '${ $.paramsPopup }'
         },
@@ -36,11 +37,10 @@ define([
             const winObj = this.popupCenter(domain + params, 'Doofinder');
             // We check if the windows was correctly opened and not blocked by the Browser
             if(winObj !== null && typeof(winObj) !== 'undefined') {
-              const loop = setInterval(function () {
-                if (winObj.closed) {
-                  clearInterval(loop);
-                  self.installingLoop();
-                }
+                const loop = setInterval(function () {
+                    if (winObj.closed) {
+                        clearInterval(loop);
+                    }
               }, 1000);
             } else {
                 const text = $.mage.__('An error occurred. Probably your browser blocked up the popup window. Please try again after giving us access to show this popup.');
@@ -52,6 +52,8 @@ define([
         initialize: function () {
             this._super();
             let self = this;
+            // Listener for the doofinder response
+            self.listen_doofinder_response();
             // login/register click event
             $(this.elements.buttonRegister).click(function (e) {
                 e.preventDefault();
@@ -112,6 +114,46 @@ define([
                         'to configuration page.'));
                       $('.setup-finish-buttons').removeClass('hidden');
                 }).fail(ajaxRequestFail);
+            }).fail(ajaxRequestFail);
+        },
+
+        listen_doofinder_response: function() {
+            let self = this;
+            window.addEventListener(
+                "message",
+                (event) => {
+                  const doofinder_regex = /.*\.doofinder\.com/gm;
+                  console.log(event.data)
+                  //Check that the sender is doofinder
+                  if (!doofinder_regex.test(event.origin)) return;
+                  if (event.data) {
+                    const data_received = event.data.split("|");
+                    const event_name = data_received[0];
+                    const event_data = JSON.parse(atob(data_received[1]));
+                    if (event_name === "set_doofinder_data") self.send_connect_data(event_data);
+                  }
+                },
+                false
+              );
+        },
+
+        send_connect_data: function(data) {
+            let self = this;
+            data["action"] = "doofinder_set_connection_data";
+            $.ajax({
+              url: self.urls.doofinderConnectUrl,
+              method: "POST",
+              data: data,
+              dataType: "json",
+              cache: false
+            }).done(function (response) {
+                if(response.result == true) {
+                    self.installingLoop();
+                } else {
+                    $('.steps-col').show();
+                    $('.ajax-steps-col').hide();
+                    addMessage($.mage.__(response.error));
+                }
             }).fail(ajaxRequestFail);
         }
     });
