@@ -140,6 +140,11 @@ class StoreConfig extends AbstractHelper
      */
     public const CUSTOM_ATTRIBUTES = 'doofinder_config_config/doofinder_custom_attributes/custom_attributes';
 
+    /**
+     * Path to endpoint to store doofinder connection data (API key, endpoint api, etc.)
+     */
+    public const DOOFINDER_CONNECTION = 'doofinderfeed/setup/config';
+
     /** @var ManagementClientFactory  */
     private $managementClientFactory;
 
@@ -579,6 +584,15 @@ class StoreConfig extends AbstractHelper
         return self::DOOFINDER_INTEGRATION_NAME;
     }
 
+    /**
+     * Get Doofinder config (API Token, endpoint, etc.)
+     *
+     * @return string
+     */
+    public function getDoofinderConnectUrl(): string
+    {
+        return $this->storeManager->getStore()->getBaseUrl() . self::DOOFINDER_CONNECTION;
+    }
     /**
      * Get update on save configuration value
      *

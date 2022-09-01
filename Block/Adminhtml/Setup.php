@@ -75,15 +75,12 @@ class Setup extends Template
      */
     public function getParamsPopup(): string
     {
-        $redirect = $this->storeManager->getStore()->getBaseUrl() .
-            'doofinderfeed/setup/config';
-
+        $redirect = $this->getDoofinderConnectUrl();
         $token = $this->encryptor->hash($redirect);
 
         return 'email=' . $this->storeConfig->getEmailAdmin()
             . '&token=' . $token
-            . '&shop_url=' . urlencode($this->storeManager->getStore()->getBaseUrl())
-            . '&return_path=' . urlencode($redirect);
+            . '&shop_url=' . urlencode($this->storeManager->getStore()->getBaseUrl());
     }
 
     /**
@@ -146,6 +143,17 @@ class Setup extends Template
     public function getCreateStoreUrl(): string
     {
         return $this->getUrl('*/integration/createStore');
+    }
+
+
+    /**
+     * Get doofinder connection data endpoint
+     *
+     * @return string
+     */
+    public function getDoofinderConnectUrl(): string
+    {
+        return $this->storeConfig->getDoofinderConnectUrl();
     }
 
     /**
