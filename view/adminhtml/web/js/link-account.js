@@ -139,7 +139,6 @@ define([
 
         send_connect_data: function(data) {
             let self = this;
-            data["action"] = "doofinder_set_connection_data";
             $.ajax({
               url: self.urls.doofinderConnectUrl,
               method: "POST",
