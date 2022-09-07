@@ -61,24 +61,14 @@ class Indexation extends AbstractHelper
      */
     public function getSeverity(string $status): string
     {
-        switch ($status) {
-            case self::DOOFINDER_INDEX_PROCESS_STATUS_STARTED:
-                $severity = self::DOOFINDER_GRID_SEVERITY_MINOR;
-                break;
+        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->debug($status);
+        $severity = [
+            self::DOOFINDER_INDEX_PROCESS_STATUS_STARTED => self::DOOFINDER_GRID_SEVERITY_MINOR,
+            self::DOOFINDER_INDEX_PROCESS_STATUS_SUCCESS => self::DOOFINDER_GRID_SEVERITY_NOTICE,
+            self::DOOFINDER_INDEX_PROCESS_STATUS_FAILURE => self::DOOFINDER_GRID_SEVERITY_MAJOR,
 
-            case self::DOOFINDER_INDEX_PROCESS_STATUS_SUCCESS:
-                $severity = self::DOOFINDER_GRID_SEVERITY_NOTICE;
-                break;
+        ];
 
-            case self::DOOFINDER_INDEX_PROCESS_STATUS_FAILURE:
-                $severity = self::DOOFINDER_GRID_SEVERITY_MAJOR;
-                break;
-
-            default:
-                $severity = self::DOOFINDER_GRID_SEVERITY_CRITICAL;
-                break;
-        }
-
-        return $severity;
+        return $severity[$status];
     }
 }
