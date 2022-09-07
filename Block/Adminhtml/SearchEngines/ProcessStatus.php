@@ -4,30 +4,20 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Block\Adminhtml\SearchEngines;
 
-use Doofinder\Feed\Helper\SearchEngine;
-use Doofinder\Feed\Helper\SearchEngineFactory;
 use Doofinder\Feed\Helper\StoreConfig;
 use Exception;
 use Magento\Framework\View\Element\Template;
 
 class ProcessStatus extends Template
 {
-    /** @var SearchEngineFactory  */
-    private $searchEngineHelperFactory;
-
-    /** @var SearchEngine  */
-    private $searchEngineHelper;
-
     /** @var StoreConfig */
     private $storeConfig;
 
     public function __construct(
-        SearchEngineFactory $searchEngineHelperFactory,
         StoreConfig $storeConfig,
         Template\Context $context,
         array $data = []
     ) {
-        $this->searchEngineHelperFactory = $searchEngineHelperFactory;
         $this->storeConfig = $storeConfig;
         parent::__construct($context, $data);
     }
@@ -41,16 +31,11 @@ class ProcessStatus extends Template
     {
         $statuses = [];
         try {
-            foreach ($this->storeConfig->getAllStores() as $store) {
-                $hashId = $this->storeConfig->getHashId((int)$store->getId());
-                if ($hashId) {
-                    $status = $this->getSearchEngineHelper()->sanitizeProcessTaskStatus(
-                        $this->getSearchEngineHelper()->getProcessTaskStatus($hashId)
-                    );
-                    $statuses[$store->getCode()] = $status;
-                    $statuses[$store->getCode()]['name'] = $store->getName();
-                    $statuses[$store->getCode()]['severity'] = $this->getSearchEngineHelper()->getSeverity($status);
-                }
+            $stores = $this->storeConfig->getAllStores();
+            foreach ($stores as $store) {
+                $status = $this->storeConfig->getIndexationStatus((int)$store->getId());
+                $statuses[$store->getCode()] = $status;
+                $statuses[$store->getCode()]['name'] = $store->getName();
             }
         } catch (Exception $e) {
             if (strpos($e->getMessage(), 'not_found') !== false) {
@@ -61,17 +46,5 @@ class ProcessStatus extends Template
         }
 
         return $statuses;
-    }
-
-    /**
-     * @return SearchEngine
-     */
-    private function getSearchEngineHelper(): SearchEngine
-    {
-        if (!$this->searchEngineHelper) {
-            $this->searchEngineHelper = $this->searchEngineHelperFactory->create();
-        }
-
-        return $this->searchEngineHelper;
     }
 }

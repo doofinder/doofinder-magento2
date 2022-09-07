@@ -278,7 +278,7 @@ class Item extends AbstractHelper
      */
     private function getSearchEngineFromStore(StoreInterface $store): array
     {
-        $searchEngine = $this->searchEngine->getSearchEngine($store->getCode());
+        $searchEngine = $this->searchEngine->getSearchEngineByStore($store->getCode());
         if ($searchEngine === null) {
             throw new NotFound('There is not a valid Hash ID configured for the current store.');
         }

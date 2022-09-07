@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Model\Config\Backend;
 
-use Doofinder\Feed\ApiClient\ManagementClientFactory;
 use Doofinder\Feed\Errors\DoofinderFeedException;
 use Doofinder\Feed\Errors\NotAllowed;
 use Doofinder\Feed\Helper\SearchEngineFactory;
-use GuzzleHttp\Exception\GuzzleException;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Value;

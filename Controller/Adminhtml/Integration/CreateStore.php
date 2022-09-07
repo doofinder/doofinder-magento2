@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Controller\Adminhtml\Integration;
 
 use Doofinder\Feed\Helper\StoreConfig;
+use Doofinder\Feed\Helper\Indexation;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -14,11 +15,9 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\App\Cache\Frontend\Pool;
-use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Block\Adminhtml\Integration\Tokens;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use Psr\Log\LoggerInterface;
 
@@ -55,7 +54,6 @@ class CreateStore extends Action implements HttpGetActionInterface
     protected $cacheFrontendPool;
 
     public function __construct(
-        WriterInterface $configWriter,
         StoreConfig $storeConfig,
         JsonFactory $resultJsonFactory,
         Escaper $escaper,
@@ -66,7 +64,6 @@ class CreateStore extends Action implements HttpGetActionInterface
         AttributeCollectionFactory $attributeCollectionFactory,
         Pool $cacheFrontendPool
     ) {
-        $this->configWriter = $configWriter;
         $this->storeConfig = $storeConfig;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->escaper = $escaper;
@@ -114,14 +111,14 @@ class CreateStore extends Action implements HttpGetActionInterface
                 $response = $this->storeConfig->createStore($websiteConfig);
                 $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
                 $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["search_engines"]);
-                $this->setCustomAttributes();
-                $this->cleanCache();
-        
             } catch (Exception $e) {
                 $success = false;
                 $this->logger->error('Error creating store for website "' . $website->getName() . '". ' . $e->getMessage());
             }
         }
+        $this->setCustomAttributes();
+        $this->cleanCache();
+
         return $success;
     }
 
@@ -158,7 +155,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                     ]
                 ]
             ];
-            $storesConfig[$language][$currency] = $store->getId();
+            $storesConfig[$language][$currency] = (int)$store->getId();
             $callbackUrls[$language][$currency] = $this->getProcessCallbackUrl($store);
         }
         return ["searchEngineConfig" => $searchEngineConfig, "storesConfig" => $storesConfig, "callbackUrls" => $callbackUrls];
@@ -169,8 +166,8 @@ class CreateStore extends Action implements HttpGetActionInterface
      */
     private function saveInstallationConfig($websiteID, $installationId, $script) 
     {
-        $this->configWriter->save(StoreConfig::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_WEBSITES, $websiteID);
-        $this->configWriter->save(StoreConfig::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_WEBSITES, $websiteID);
+        $this->storeConfig->setInstallation($installationId, $websiteID);
+        $this->storeConfig->setDisplayLayer($script, $websiteID);
     }
 
     /**
@@ -187,9 +184,19 @@ class CreateStore extends Action implements HttpGetActionInterface
         foreach ($searchEngines as $language => $values) {
             foreach ($values as $currency => $hashid) {
                 $storeId = $storesConfig[$language][$currency];
-                $this->configWriter->save(StoreConfig::HASH_ID_CONFIG, $hashid, ScopeInterface::SCOPE_STORES, $storeId);
+                $this->storeConfig->setHashId($hashid, $storeId);
+                $this->setIndexationStatus($storeId);
             }
         }
+    }
+
+    /**
+     * Function to store the status of the SE indexation.
+     * By default we set this value to "STARTED" and will be updated when we receive the callback from doofinder
+     */
+    private function setIndexationStatus($storeId) {
+        $status = ["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED];
+        $this->storeConfig->setIndexationStatus($status, $storeId);
     }
 
     /**
@@ -209,7 +216,7 @@ class CreateStore extends Action implements HttpGetActionInterface
         }
 
         $customAttributes = \Zend_Json::encode($attributes);
-        $this->configWriter->save(StoreConfig::CUSTOM_ATTRIBUTES, $customAttributes);
+        $this->storeConfig->setCustomAttributes($customAttributes);
     }
 
     /**
@@ -231,6 +238,6 @@ class CreateStore extends Action implements HttpGetActionInterface
      */
     private function getProcessCallbackUrl(StoreInterface $store): string
     {
-        return $store->getBaseUrl() . 'doofinderfeed/setup/processCallback';
+        return $store->getBaseUrl() . 'doofinderfeed/setup/processCallback?storeId='.$store->getId();
     }
 }

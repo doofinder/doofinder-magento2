@@ -36,7 +36,6 @@ use Magento\Framework\Filesystem;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\InventorySales\Model\ResourceModel\GetAssignedStockIdForWebsite;
-use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;

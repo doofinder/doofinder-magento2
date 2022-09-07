@@ -106,10 +106,8 @@ class ManagementClient
     }
 
     /**
-     * Gets the status of the last process task. Status persists for 72 hours.
-     * If there is no recent task, it will return an error.
-     * @see https://docs.doofinder.com/api/management/v2/#operation/process_status
-     *
+     * Request a search engine details
+     * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_show
      * @param string $hashId
      * @return array
      * @throws BadRequest
@@ -122,11 +120,10 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function getProcessTaskStatus(string $hashId): array
+    public function getSearchEngine(string $hashid): array 
     {
-        $path = $this->getProcessSearchEnginePath($hashId);
-        $response = $this->client->get($path);
-
+        $url = $this->getSearchEnginePath($hashid);
+        $response = $this->client->get($url);
         return \Zend_Json::decode($response);
     }
 
