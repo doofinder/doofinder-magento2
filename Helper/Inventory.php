@@ -9,6 +9,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Module\Manager;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Inventory helper
@@ -28,18 +29,26 @@ class Inventory extends AbstractHelper
     protected $moduleManager;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * @param Context $context
      * @param ObjectManagerInterface $objectmanager
      * @param Manager $moduleManager
+     * @param StoreManagerInterface $storeManager
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         Context $context,
         ObjectManagerInterface $objectmanager,
-        Manager $moduleManager
+        Manager $moduleManager,
+        StoreManagerInterface $storeManager
     ) {
         $this->_objectManager = $objectmanager;
         $this->moduleManager = $moduleManager;
+        $this->storeManager = $storeManager;
         parent::__construct($context);
     }
 
@@ -53,13 +62,13 @@ class Inventory extends AbstractHelper
      */
     public function getQuantityAndStockStatus(ProductModel $product, ?int $stockId = null)
     {
-        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) ?
+        return $this->isMsiActive() ?
             $this->getQuantityAndStockStatusWithMSIMessage($product, $stockId) :
             $this->getQuantityAndStockStatusWithoutMSIMessage($product);
     }
 
     /**
-     * Get quantity and stock status
+     * Get quantity and product availability
      *
      * @param ProductModel $product
      * @param int|null $stockId
@@ -68,7 +77,7 @@ class Inventory extends AbstractHelper
      */
     public function getQuantityAndAvailability(ProductModel $product, ?int $stockId = null)
     {
-        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) ?
+        return $this->isMsiActive() ?
             $this->getQuantityAndStockStatusWithMSI($product, $stockId) :
             $this->getQuantityAndStockStatusWithoutMSI($product);
     }
@@ -82,9 +91,24 @@ class Inventory extends AbstractHelper
      */
     public function getProductAvailability(ProductModel $product, ?int $stockId = null)
     {
-        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) ?
+        return $this->isMsiActive() ?
             $this->getProductAvailabilityWithMSI($product, $stockId) :
             $this->getProductAvailabilityWithoutMSI($product);
+    }
+
+    /**
+     * Get stockId related with the given store.
+     * Note: Each website is related only with one stock but one stock can be used by several websites.
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getStockIdByStore(int $storeId): ?int 
+    {
+        return $this->isMsiActive() ?
+            $this->getStockIdByStoreWithMSI($storeId) :
+            null;
+        
     }
 
     /**
@@ -238,5 +262,29 @@ class Inventory extends AbstractHelper
     private function getInStockLabel(): string
     {
         return 'in stock';
+    }
+
+    /**
+     * Function to get the stockId related with the given store / website
+     * 
+     * @return int
+     */
+    private function getStockIdByStoreWithMSI(int $storeId): ?int
+    {
+        $getAssignedStockIdForWebsite = $this->_objectManager->create(\Magento\InventorySales\Model\ResourceModel\GetAssignedStockIdForWebsite::class);
+        $websiteId = (int)$this->storeManager->getStore($storeId)->getWebsiteId();
+        $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
+        return $getAssignedStockIdForWebsite->execute($websiteCode);
+    }
+
+    /**
+     * Function to detect if MSI module is active or not.
+     * For the moment is enugh checking those two dependencies because we're working only with those.
+     * 
+     * @return bool
+     */
+    private function isMsiActive(): bool
+    {
+        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) ? true : false;
     }
 }
