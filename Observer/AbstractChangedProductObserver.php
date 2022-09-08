@@ -103,18 +103,6 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         if (!$this->checkChangedProductExists($changedProduct)) {
             $this->changedProductRepository->save($changedProduct);
         }
-        try {
-            $this->changedProductRepository->save($changedProduct);
-        } catch (AlreadyExistsException $e) {
-            $this->logger->debug(
-                sprintf(
-                    'Product %s (ID: %s) %s change has been already registered.',
-                    $product->getSku(),
-                    $product->getId(),
-                    $this->getOperationType()
-                )
-            );
-        }
     }
 
     /**
