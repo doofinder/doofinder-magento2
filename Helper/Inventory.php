@@ -285,6 +285,6 @@ class Inventory extends AbstractHelper
      */
     private function isMsiActive(): bool
     {
-        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) ? true : false;
+        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi'));
     }
 }
