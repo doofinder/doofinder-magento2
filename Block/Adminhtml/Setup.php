@@ -156,15 +156,6 @@ class Setup extends Template
         return $this->storeConfig->getDoofinderConnectUrl();
     }
 
-    /**
-     * Get process search engines url
-     *
-     * @return string
-     */
-    public function getProcessSearchEnginesUrl(): string
-    {
-        return $this->getUrl('*/integration/processSearchEngines');
-    }
 
     /**
      * Get Permissions dialog url

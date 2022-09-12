@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Helper;
 
 use Doofinder\Feed\ApiClient\ManagementClientFactory;
+use Doofinder\Feed\Helper\Indexation;
 use Magento\Config\Model\Config\Backend\Admin\Custom;
 use Magento\Catalog\Model\Product;
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigCollectionFactory;
@@ -22,6 +23,7 @@ use Magento\Tax\Model\Config as TaxConfig;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Framework\Escaper;
 use Magento\Eav\Model\Config;
+use Doofinder\Feed\Errors\NotFound;
 
 /**
  * Store config helper
@@ -141,6 +143,11 @@ class StoreConfig extends AbstractHelper
     public const CUSTOM_ATTRIBUTES = 'doofinder_config_config/doofinder_custom_attributes/custom_attributes';
 
     /**
+     * Path to search engine indexation status
+     */
+    public const INDEXATION_STATUS = 'doofinder_config_config/doofinder_search_engines/indexation_status';
+
+    /**
      * Path to endpoint to store doofinder connection data (API key, endpoint api, etc.)
      */
     public const DOOFINDER_CONNECTION = 'doofinderfeed/setup/config';
@@ -173,6 +180,9 @@ class StoreConfig extends AbstractHelper
      */
     protected $attributeCollectionFactory;
 
+    /** @var Indexation  */
+    protected $indexationHelper;
+
     /**
      * Escaper
      *
@@ -196,6 +206,7 @@ class StoreConfig extends AbstractHelper
      * @param WriterInterface $configWriter
      * @param ConfigCollectionFactory $configCollectionFactory
      * @param AttributeCollectionFactory $attributeCollectionFactory
+     * @param Indexation $indexationHelper
      * @param Escaper $escaper
      * @param Config $eavConfig
      */
@@ -207,6 +218,7 @@ class StoreConfig extends AbstractHelper
         WriterInterface $configWriter,
         ConfigCollectionFactory $configCollectionFactory,
         AttributeCollectionFactory $attributeCollectionFactory,
+        Indexation $indexationHelper,
         Escaper $escaper,
         Config $eavConfig
     ) {
@@ -216,6 +228,7 @@ class StoreConfig extends AbstractHelper
         $this->configWriter = $configWriter;
         $this->configCollectionFactory = $configCollectionFactory;
         $this->attributeCollectionFactory = $attributeCollectionFactory;
+        $this->indexationHelper = $indexationHelper;
         $this->escaper = $escaper;
         $this->eavConfig = $eavConfig;
 
@@ -243,6 +256,13 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
+     * Function to get a store by id
+     */
+    public function getStoreById($storeId) {
+        return $this->storeManager->getStore($storeId);
+    }
+
+    /**
      * @return boolean
      */
     public function isSingleStoreMode(): bool
@@ -261,6 +281,26 @@ class StoreConfig extends AbstractHelper
             return $this->storeManager->getStore($storeId);
         }
         return $this->storeManager->getStore();
+    }
+
+    /**
+     * Function to get the actual scope based on the request parameter
+     */
+    public function getCurrentScope(): array
+    {
+        $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+        $value = null;
+
+        $websiteId = (int) $this->_request->getParam('website', 0);
+        $storeId = (int) $this->_request->getParam('store', 0);
+        if ($websiteId !== 0){
+            $scope = ScopeInterface::SCOPE_WEBSITES;
+            $value = $websiteId;
+        } else if ($storeId !== 0) {
+            $scope = ScopeInterface::SCOPE_STORES;
+            $value = $storeId;
+        }
+        return array($scope, $value);
     }
 
     /**
@@ -416,6 +456,20 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
+     * Set Hashid related with the given store
+     */
+    public function setHashId(string $hashid, int $storeId) {
+        $this->configWriter->save(self::HASH_ID_CONFIG, $hashid, ScopeInterface::SCOPE_STORES, $storeId);
+    }
+
+    /**
+     * Set the installation ID
+     */
+    public function setInstallation(string $installationId, int $websiteId) {
+        $this->configWriter->save(self::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+    }
+
+    /**
      * Get display layer.
      *
      * @return string|null
@@ -435,6 +489,13 @@ class StoreConfig extends AbstractHelper
         }
 
         return $displayLayerScript;
+    }
+
+    /**
+     * Set display layer
+     */
+    public function setDisplayLayer(string $script, int $websiteId) {
+        $this->configWriter->save(self::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_WEBSITES, $websiteId);
     }
 
     /**
@@ -767,9 +828,13 @@ class StoreConfig extends AbstractHelper
      *
      * @return Array
      */
-    public function getCustomAttributes(?int $storeId = null): array
+    public function getCustomAttributes(?int $id = null, ?string $scope = ScopeInterface::SCOPE_STORES): array
     {
-        $custom_attributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $storeId);
+        if ($id === null) {
+            list($scope, $id) = $this->getCurrentScope();
+        }
+        
+        $custom_attributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, $scope, $id);
         $custom_attributes = ($custom_attributes) ? \Zend_Json::decode($custom_attributes) : null;
         $saved = [];
         if ($custom_attributes && is_array($custom_attributes)) {
@@ -797,6 +862,34 @@ class StoreConfig extends AbstractHelper
             $attributes[$attribute_id]['enabled'] = isset($saved[$attribute_id]['enabled']) && $saved[$attribute_id]['enabled'];
         }
         return $attributes;
+    }
+
+    /**
+     * Function to set custom attributes
+     */
+    public function setCustomAttributes(string $customAttributes) {
+        $this->configWriter->save(self::CUSTOM_ATTRIBUTES, $customAttributes);
+    }
+
+    /**
+     * Function to get the indexation status of a given search engine
+     */
+    public function getIndexationStatus(int $storeId): array {
+        try {
+            $status = $this->scopeConfig->getValue(self::INDEXATION_STATUS, ScopeInterface::SCOPE_STORES, $storeId);
+            return \Zend_Json::decode($status);
+        } catch (\Exception $e){
+            throw new NotFound('There is not a valid indexation status for the current store.');
+        }
+    }
+
+    /**
+     * Function to update the indexation status of a given search engine
+     */
+    public function setIndexationStatus(array $status, int $storeId){
+        $status = $this->indexationHelper->sanitizeProcessTaskStatus($status);
+        $status = \Zend_Json::encode($status);
+        $this->configWriter->save(self::INDEXATION_STATUS, $status, ScopeInterface::SCOPE_STORES, $storeId);
     }
 
     /**
