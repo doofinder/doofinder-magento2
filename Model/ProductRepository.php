@@ -33,12 +33,9 @@ use Magento\Framework\App\Area;
 use Magento\Framework\EntityManager\Operation\Read\ReadExtensions;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
-use Magento\Framework\Module\Manager;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
-use Magento\InventorySales\Model\ResourceModel\GetAssignedStockIdForWebsite;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
@@ -122,9 +119,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         StockRegistryInterface $stockRegistry,
         ProductHelperFactory $productHelperFactory,
         InventoryHelperFactory $inventoryHelperFactory,
-        Manager $moduleManager,
         StoreConfig $storeConfig,
-        GetAssignedStockIdForWebsite $getAssignedStockIdForWebsite,
         ProductFactory $productFactory,
         Helper $initializationHelper,
         ProductSearchResultsInterfaceFactory $searchResultsFactory,
@@ -155,9 +150,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $this->stockRegistry = $stockRegistry;
         $this->productHelperFactory = $productHelperFactory;
         $this->inventoryHelperFactory = $inventoryHelperFactory;
-        $this->moduleManager = $moduleManager;
         $this->storeConfig = $storeConfig;
-        $this->getAssignedStockIdForWebsite = $getAssignedStockIdForWebsite;
         parent::__construct(
             $productFactory,
             $initializationHelper,
@@ -369,20 +362,20 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      */
     private function setExtensionAttributes($product, $storeId): void
     {
+        $inventoryHelper = $this->inventoryHelperFactory->create();
+
         /** @var ProductExtension $extensionAttributes */
         $extensionAttributes = $product->getExtensionAttributes();
-        $stockItem = $this->stockRegistry->getStockItem($product->getId());
-        $stockId = null;
 
-        if ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi')) {
-            $websiteId = (int)$this->storeManager->getStore($storeId)->getWebsiteId();
-            $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
-            $stockId = $this->getAssignedStockIdForWebsite->execute($websiteCode);
-        }
-        $stockAndStatus = $this->inventoryHelperFactory->create()->getQuantityAndAvailability($product, $stockId);
+        $stockItem = $this->stockRegistry->getStockItem($product->getId());
+        $stockId = $inventoryHelper->getStockIdByStore((int)$storeId);
+        
+        $stockAndStatus = $inventoryHelper->getQuantityAndAvailability($product, $stockId);
         $stockItem->setQty($stockAndStatus[0]);
         $stockItem->setIsInStock($stockAndStatus[1]);
+        
         $extensionAttributes->setStockItem($stockItem);
+
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
         $extensionAttributes->setFinalPrice(round($this->productHelperFactory->create()->getProductPrice($product), 2));
         $product->setExtensionAttributes($extensionAttributes);
