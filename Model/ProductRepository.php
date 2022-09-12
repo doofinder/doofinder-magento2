@@ -36,7 +36,6 @@ use Magento\Framework\Filesystem;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
@@ -337,12 +336,11 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         
         foreach ($customAttributes as $customAttribute){
             $code = $customAttribute['code'];
-            if($customAttribute['enabled'] && isset($product[$code])){
-                if ("array" === $productHelperFactory->getAttributeType($product, $code)) {
-                    $value = $productHelperFactory->getAttributeArray($product, $code);
-                } else {
+            if($customAttribute['enabled'] && isset($product[$code])) {
+                ("array" === $productHelperFactory->getAttributeType($product, $code))?
+                    $value = $productHelperFactory->getAttributeArray($product, $code):
                     $value = $productHelperFactory->getAttributeText($product, $code);
-                }
+
                 $product->setCustomAttribute($code, $value);
             } else {
                 unset($product[$code]);
@@ -379,10 +377,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $extensionAttributes->setStockItem($stockItem);
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
-
-        if($product->getTypeId() == Configurable::TYPE_CODE){
-            $extensionAttributes->setFinalPrice($this->productHelperFactory->create()->getProductPrice($product));
-        }
+        $extensionAttributes->setFinalPrice(round($this->productHelperFactory->create()->getProductPrice($product), 2));
         $product->setExtensionAttributes($extensionAttributes);
     }
 }

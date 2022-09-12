@@ -7,13 +7,20 @@ namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 use Doofinder\Feed\Api\Data\FetcherInterface;
 use Doofinder\Feed\Api\Data\Generator\MapInterface;
 use Doofinder\Feed\Model\Config\Indexer\Attributes;
+use Magento\Store\Model\App\Emulation;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Module\Manager;
+use Magento\Framework\App\Area;
 
 class Doofinder implements FetcherInterface
 {
+        /**
+     * @var Emulation
+     */
+    protected $appEmulation;
+
     /**
      * @var array|null
      */
@@ -52,19 +59,22 @@ class Doofinder implements FetcherInterface
      * @param ObjectManagerInterface $objectmanager
      * @param Manager $moduleManager
      * @param array $generators,
+     * @param Emulation $appEmulation
      */
     public function __construct(
         ProductCollectionFactory $collectionFactory,
         Attributes $attributes,
         ObjectManagerInterface $objectmanager,
         Manager $moduleManager,
-        array $generators
+        array $generators,
+        Emulation $appEmulation
     ) {
         $this->productColFactory = $collectionFactory;
         $this->attributes = $attributes;
         $this->generators = $generators;
         $this->_objectManager = $objectmanager;
         $this->moduleManager = $moduleManager;
+        $this->appEmulation = $appEmulation;
     }
 
     /**
@@ -73,6 +83,7 @@ class Doofinder implements FetcherInterface
     public function process(array $documents, int $storeId)
     {
         $this->clear();
+        $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
         $productIds = array_keys($documents);
         $productCollection = $this->getProductCollection($productIds, $storeId);
         $fields = $this->getFields($storeId);
@@ -86,6 +97,7 @@ class Doofinder implements FetcherInterface
             }
             $this->processed[$productId] = array_filter($this->processed[$productId]);
         }
+        $this->appEmulation->stopEnvironmentEmulation();
     }
 
     /**

@@ -135,13 +135,13 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
                 __('Provide API key in the Default Config store view before setting HashID.')
             );
         }
-        $searchEngines = [];
+        $searchEngine = [];
         try {
-            $searchEngines = $this->searchEngine->getSearchEngines();
+            $searchEngine = $this->searchEngine->getSearchEngine($hashId);
         } catch (\Exception $e) {
             $this->_logger->error('There was an error while getting search engines: ' . $e->getMessage());
         }
-        if (!isset($searchEngines[$hashId])) {
+        if (!key_exists("hashid", $searchEngine) || $searchEngine["hashid"] != $hashId) {
             throw new \Magento\Framework\Exception\ValidatorException(
                 __('Search engine with HashID %1 does not exist in your account.', $hashId)
             );

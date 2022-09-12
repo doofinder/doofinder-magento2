@@ -193,7 +193,7 @@
                        sortOrder="200"
                        showInDefault="1"
                        showInWebsite="1"
-                       showInStore="1">
+                       showInStore="0">
                     <label>Custom attributes to be indexed</label>
                     <frontend_model>Doofinder\Feed\Block\Adminhtml\Form\Field\CustomAttributes</frontend_model>
                     <backend_model>Doofinder\Feed\Model\Config\Backend\CustomAttributes</backend_model>
