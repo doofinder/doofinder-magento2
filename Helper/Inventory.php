@@ -178,7 +178,7 @@ class Inventory extends AbstractHelper
         $stockItemData = $getStockItemData->execute($sku, $stockId);
 
         return [
-            \Magento\InventorySalesApi\Model\GetStockItemDataInterface::QUANTITY => $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::QUANTITY],
+            \Magento\InventorySalesApi\Model\GetStockItemDataInterface::QUANTITY => $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::QUANTITY] ?? 0,
             \Magento\InventorySalesApi\Model\GetStockItemDataInterface::IS_SALABLE => (bool)($stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::IS_SALABLE] ?? false)
         ];
     }
