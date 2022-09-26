@@ -12,4 +12,10 @@
             <resource ref="Magento_Catalog::products"/>
         </resources>
     </route>
+    <route url="/V1/custom/module/version" method="GET">
+        <service class="Doofinder\Feed\Api\ModuleDataInterface" method="getVersion"/>
+        <resources>
+			<resource ref="anonymous"/>
+		</resources>
+    </route>
 </routes>

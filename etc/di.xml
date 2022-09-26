@@ -5,6 +5,7 @@
     <preference for="Doofinder\Feed\Api\Data\ChangedProductInterface" type="Doofinder\Feed\Model\ChangedProduct"/>
     <preference for="Doofinder\Feed\Api\Data\ChangedProductSearchResultsInterface" type="Doofinder\Feed\Model\ChangedProductSearchResults"/>
     <preference for="Doofinder\Feed\Api\ProductRepositoryInterface" type="Doofinder\Feed\Model\ProductRepository" />
+    <preference for="Doofinder\Feed\Api\ModuleDataInterface" type="Doofinder\Feed\Model\ModuleData" />
     <type name="Doofinder\Feed\Model\Indexer\Data\Mapper">
         <arguments>
             <argument name="maps" xsi:type="array">
