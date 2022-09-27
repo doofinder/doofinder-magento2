@@ -388,8 +388,7 @@ class Product extends AbstractHelper
             $adjustment = $product->getPriceInfo()->getAdjustment('tax');
             $value = $adjustment->applyAdjustment($amount->getBaseAmount(), $product);
         }
-
-        return $value;
+        return (float)$value;
     }
 
     /**
