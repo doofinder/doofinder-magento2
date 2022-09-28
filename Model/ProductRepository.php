@@ -359,6 +359,8 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $price = round($productHelperFactory->getProductPrice($product, "regular_price"), 2);
         $specialPrice = round($productHelperFactory->getProductPrice($product, $typePrice), 2);
         ($price == $specialPrice || $specialPrice == 0) ?: $product->setCustomAttribute('special_price', $specialPrice);
+        // It is needed to avoid issues with the end day of the special price
+        $product->setCustomAttribute('special_to_date', $productHelperFactory->getSpecialToDate($product));
     }
 
     /**
