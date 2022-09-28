@@ -12,7 +12,7 @@ class WebsiteStruct implements JsonSerializable {
     private $installationId;
     private $storeStructs;
 
-    public function __construct(int $id, string $code, string $name, string $installationId = null, array $storeStructs)
+    public function __construct(int $id, string $name, string $code, string $installationId = null, array $storeStructs)
     {
         $this->id = $id;
         $this->name = $name;
