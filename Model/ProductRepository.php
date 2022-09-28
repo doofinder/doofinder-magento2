@@ -355,10 +355,10 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $product->setCustomAttribute('small_image', $smallImageUrl);
         
         // Management of special price to include the taxes in case the customer has the prices with taxes
-        $type_price = $product->getTypeId() == Configurable::TYPE_CODE ? "final_price" : "special_price";
-        $price = round($this->productHelperFactory->create()->getProductPrice($product, "regular_price"), 2);
-        $special_price = round($this->productHelperFactory->create()->getProductPrice($product, $type_price), 2);
-        ($price == $special_price || $special_price == 0) ?: $product->setCustomAttribute('special_price', $special_price);
+        $typePrice = $product->getTypeId() == Configurable::TYPE_CODE ? "final_price" : "special_price";
+        $price = round($productHelperFactory->getProductPrice($product, "regular_price"), 2);
+        $specialPrice = round($productHelperFactory->getProductPrice($product, $typePrice), 2);
+        ($price == $specialPrice || $specialPrice == 0) ?: $product->setCustomAttribute('special_price', $specialPrice);
     }
 
     /**
