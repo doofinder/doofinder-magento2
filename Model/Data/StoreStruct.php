@@ -19,7 +19,7 @@ class StoreStruct implements JsonSerializable {
         $this->currency = $currency;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return Array(
             'id'    => $this->id,
