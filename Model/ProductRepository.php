@@ -39,6 +39,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -352,6 +353,14 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $product->setCustomAttribute('thumbnail', $thumbnailImageUrl);
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
+        
+        // Management of special price to include the taxes in case the customer has the prices with taxes
+        $typePrice = $product->getTypeId() == Configurable::TYPE_CODE ? "final_price" : "special_price";
+        $price = round($productHelperFactory->getProductPrice($product, "regular_price"), 2);
+        $specialPrice = round($productHelperFactory->getProductPrice($product, $typePrice), 2);
+        ($price == $specialPrice || $specialPrice == 0) ?: $product->setCustomAttribute('special_price', $specialPrice);
+        // It is needed to avoid issues with the end day of the special price
+        $product->setCustomAttribute('special_to_date', $productHelperFactory->getSpecialToDate($product));
     }
 
     /**
@@ -377,7 +386,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $extensionAttributes->setStockItem($stockItem);
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
-        $extensionAttributes->setFinalPrice(round($this->productHelperFactory->create()->getProductPrice($product), 2));
+        $extensionAttributes->setPrice(round($this->productHelperFactory->create()->getProductPrice($product, "regular_price"), 2));
         $product->setExtensionAttributes($extensionAttributes);
     }
 }

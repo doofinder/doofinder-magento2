@@ -388,8 +388,18 @@ class Product extends AbstractHelper
             $adjustment = $product->getPriceInfo()->getAdjustment('tax');
             $value = $adjustment->applyAdjustment($amount->getBaseAmount(), $product);
         }
+        return (float)$value;
+    }
 
-        return $value;
+
+    /**
+     * Function to get the end date of the special price for the given product
+     */
+    public function getSpecialToDate(ProductModel $product): ?string
+    {
+        $date = $product->getSpecialToDate();
+
+        return ($date != null) ? $this->normalizeSpecialDate($date) : $date;
     }
 
     /**
@@ -510,5 +520,20 @@ class Product extends AbstractHelper
     public function getProductAvailability(ProductModel $product, ?int $stockId = null): string
     {
         return $this->inventoryHelper->getProductAvailability($product, $stockId);
+    }
+
+    /**
+     * Magento store the special time range in days not in datatime. In doofeeds we check if the special price is valid
+     * taking the actual datatime, so the day that the offers end we will have that the offer is not valid even if it is
+     * valid for the whole day. So to avoid issues with the duration of the special price in case the date has the
+     * following format: Y-m-d 00:00:00 we change it to: Y-m-d 23:59:59.
+     */
+    private function normalizeSpecialDate($date): string
+    {
+        $dateToCheck = $date = \DateTime::createFromFormat('Y-m-d H:i:s', $date);
+        if ($dateToCheck->format('H') == '00' && $dateToCheck->format('i') == '00' && $dateToCheck->format('s') == '00') {
+            return $dateToCheck->format('Y-m-d 23:59:59');
+        }
+        return $date->format('Y-m-d H:i:s');
     }
 }
