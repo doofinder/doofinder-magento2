@@ -111,7 +111,7 @@ class ModuleData {
                     $store->getId(),
                     $store->getCode(),
                     $this->storeConfig->getLanguageFromStore($store),
-                    $store->getCurrentCurrency()->getCode()
+                    $store->getCurrentCurrencyCode()
                 );
             }
             $websiteStructs[] = new WebsiteStruct(
