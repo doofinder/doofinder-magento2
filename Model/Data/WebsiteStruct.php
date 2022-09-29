@@ -21,7 +21,7 @@ class WebsiteStruct implements JsonSerializable {
         $this->storeStructs = $storeStructs;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return Array(
             'id'    => $this->id,

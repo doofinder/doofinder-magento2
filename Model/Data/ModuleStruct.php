@@ -17,7 +17,7 @@ class ModuleStruct implements JsonSerializable{
         $this->websiteStructs = $websiteStructs;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return Array(
             'version'    => $this->version,
