@@ -353,14 +353,6 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $product->setCustomAttribute('thumbnail', $thumbnailImageUrl);
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
-        
-        // Management of special price to include the taxes in case the customer has the prices with taxes
-        $typePrice = $product->getTypeId() == Configurable::TYPE_CODE ? "final_price" : "special_price";
-        $price = round($productHelperFactory->getProductPrice($product, "regular_price"), 2);
-        $specialPrice = round($productHelperFactory->getProductPrice($product, $typePrice), 2);
-        ($price == $specialPrice || $specialPrice == 0) ?: $product->setCustomAttribute('special_price', $specialPrice);
-        // It is needed to avoid issues with the end day of the special price
-        $product->setCustomAttribute('special_to_date', $productHelperFactory->getSpecialToDate($product));
     }
 
     /**
@@ -371,22 +363,26 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      */
     private function setExtensionAttributes($product, $storeId): void
     {
+        $productHelperFactory = $this->productHelperFactory->create();
         $inventoryHelper = $this->inventoryHelperFactory->create();
 
         /** @var ProductExtension $extensionAttributes */
         $extensionAttributes = $product->getExtensionAttributes();
 
         $stockItem = $this->stockRegistry->getStockItem($product->getId());
-        $stockId = $inventoryHelper->getStockIdByStore((int)$storeId);
-        
+        $stockId = (int)$inventoryHelper->getStockIdByStore((int)$storeId);
         $stockAndStatus = $inventoryHelper->getQuantityAndAvailability($product, $stockId);
         $stockItem->setQty($stockAndStatus[0]);
         $stockItem->setIsInStock($stockAndStatus[1]);
-        
         $extensionAttributes->setStockItem($stockItem);
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
-        $extensionAttributes->setPrice(round($this->productHelperFactory->create()->getProductPrice($product, "regular_price"), 2));
+
+        $price = round($productHelperFactory->getProductPrice($product, "regular_price"), 2);
+        $specialPrice = round($productHelperFactory->getProductPrice($product, "final_price"), 2);
+        $extensionAttributes->setPrice($price);
+        ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
+
         $product->setExtensionAttributes($extensionAttributes);
     }
 }
