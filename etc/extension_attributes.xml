@@ -3,5 +3,6 @@
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
         <attribute code="url_full" type="string"/>
         <attribute code="price" type="float"/>
+        <attribute code="special_price" type="float"/>
     </extension_attributes>
 </config>
