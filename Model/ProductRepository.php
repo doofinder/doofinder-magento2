@@ -39,7 +39,6 @@ use Magento\Store\Model\StoreManagerInterface;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)

@@ -24,6 +24,7 @@ use Magento\Tax\Model\Config as TaxConfig;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Catalog\Model\Product\Type as ProductType;
 
 /**
@@ -371,7 +372,14 @@ class Product extends AbstractHelper
             default:
                 $type = 'final_price';
         }
-        $price = $product->getPriceInfo()->getPrice($type);
+
+        // To solve bug with regular_price in grouped products (Magento2 return price 0€), special_price is correctly calculated
+        if ($type == 'regular_price' && $product->getTypeId() == Grouped::TYPE_CODE) {
+            $price = $this->calculateGroupedPrice($product, $type);
+        } else {
+            $price = $product->getPriceInfo()->getPrice($type);
+        }
+
         $amount = $price->getAmount();
         if ($tax === null) {
             $tax = $this->taxConfig->getPriceDisplayType() != TaxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
@@ -509,5 +517,21 @@ class Product extends AbstractHelper
     public function getProductAvailability(ProductModel $product, ?int $stockId = null): string
     {
         return $this->inventoryHelper->getProductAvailability($product, $stockId);
+    }
+
+    /**
+     * Function to get the minimum price of the simple products in a grouped product
+     */
+    private function calculateGroupedPrice(ProductModel $product, string $type) {
+                
+        $usedProds = $product->getTypeInstance()->getAssociatedProducts($product);
+        foreach ($usedProds as $child) {
+            
+            if ($child->getId() != $product->getId()) {
+                $prices[] = $child->getPriceInfo()->getPrice($type);
+            }
+        }
+
+        return !empty($prices) ? min($prices) : null;
     }
 }
