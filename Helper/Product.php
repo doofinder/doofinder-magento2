@@ -380,6 +380,10 @@ class Product extends AbstractHelper
             $price = $product->getPriceInfo()->getPrice($type);
         }
 
+        if(!$price){
+            return 0;
+        }
+
         $amount = $price->getAmount();
         if ($tax === null) {
             $tax = $this->taxConfig->getPriceDisplayType() != TaxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
