@@ -206,6 +206,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
             $product->load($productId);
             $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             $this->setCustomAttributes($product);
+            $this->removeSpecialPriceCustomAttributes($product);
             $this->setExtensionAttributes($product, $storeId);
             $this->appEmulation->stopEnvironmentEmulation();
             // End Custom code here
@@ -230,8 +231,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
                 $this->appEmulation->stopEnvironmentEmulation();
                 $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             }
-            
+
             $this->setCustomAttributes($product);
+            $this->removeSpecialPriceCustomAttributes($product);
             $this->setExtensionAttributes($product, $storeId);
         }
         $this->appEmulation->stopEnvironmentEmulation();
@@ -254,7 +256,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
     /**
      * Retrieve the product URL
-     * 
+     *
      * @param Product $product
      * @return String
      */
@@ -323,9 +325,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
     /**
      * Function to update the custom attributes of a product depending on the custom attributes selection stored
-     * in the config table. 
+     * in the config table.
      * Here we will update also the value of the custom attribute (id of the option selected) by the option text.
-     * 
+     *
      * @param ProductInterface $product
      * @return void
      */
@@ -333,7 +335,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     {
         $productHelperFactory = $this->productHelperFactory->create();
         $customAttributes = $this->storeConfig->getCustomAttributes($product->getStoreId());
-        
+
         foreach ($customAttributes as $customAttribute){
             $code = $customAttribute['code'];
             if($customAttribute['enabled'] && isset($product[$code])) {
@@ -356,7 +358,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
     /**
      * Function to add the extension attributes to the product
-     * 
+     *
      * @param ProductInterface $product
      * @return void
      */
@@ -383,5 +385,26 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
 
         $product->setExtensionAttributes($extensionAttributes);
+    }
+
+    /**
+     * Function to remove the special_price and its related fields from the
+     * custom_attributes.
+     * If we don't remove them, these attributes may cause some errors when a
+     * special_price is set but it is equal to the retail_price.
+     *
+     * @param ProductInterface $product
+     * @return void
+     */
+    public function removeSpecialPriceCustomAttributes($product)
+    {
+        //Remove special_price attributes
+        $attributes = ['special_price', 'special_from_date', 'special_to_date'];
+        foreach ($attributes as $attribute) {
+            if (!isset($product[$attribute])) {
+                continue;
+            }
+            unset($product[$attribute]);
+        }
     }
 }
