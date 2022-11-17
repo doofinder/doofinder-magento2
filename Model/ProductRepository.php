@@ -81,6 +81,11 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     private $storeConfig;
 
     /**
+     * @var array
+     */
+    private $excludedCustomAttributes;
+
+    /**
      * @param ImageFactory $helperFactory
      * @param Emulation $appEmulation
      * @param StockRegistryInterface $stockRegistry
@@ -151,6 +156,8 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $this->productHelperFactory = $productHelperFactory;
         $this->inventoryHelperFactory = $inventoryHelperFactory;
         $this->storeConfig = $storeConfig;
+        //Add here any custom attributes we want to exclude from indexation
+        $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
         parent::__construct(
             $productFactory,
             $initializationHelper,
@@ -230,7 +237,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
                 $this->appEmulation->stopEnvironmentEmulation();
                 $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             }
-            
+
             $this->setCustomAttributes($product);
             $this->setExtensionAttributes($product, $storeId);
         }
@@ -254,7 +261,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
     /**
      * Retrieve the product URL
-     * 
+     *
      * @param Product $product
      * @return String
      */
@@ -323,9 +330,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
     /**
      * Function to update the custom attributes of a product depending on the custom attributes selection stored
-     * in the config table. 
+     * in the config table.
      * Here we will update also the value of the custom attribute (id of the option selected) by the option text.
-     * 
+     *
      * @param ProductInterface $product
      * @return void
      */
@@ -333,7 +340,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     {
         $productHelperFactory = $this->productHelperFactory->create();
         $customAttributes = $this->storeConfig->getCustomAttributes($product->getStoreId());
-        
+
         foreach ($customAttributes as $customAttribute){
             $code = $customAttribute['code'];
             if($customAttribute['enabled'] && isset($product[$code])) {
@@ -352,11 +359,12 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $product->setCustomAttribute('thumbnail', $thumbnailImageUrl);
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
+        $this->removeExcludedCustomAttributes($product);
     }
 
     /**
      * Function to add the extension attributes to the product
-     * 
+     *
      * @param ProductInterface $product
      * @return void
      */
@@ -383,5 +391,19 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
 
         $product->setExtensionAttributes($extensionAttributes);
+    }
+
+    /**
+     * Function to remove the excluded custom_attributes.
+     *
+     * @param ProductInterface $product
+     * @return void
+     */
+    public function removeExcludedCustomAttributes($product)
+    {
+        foreach ($this->excludedCustomAttributes as $attribute) {
+            if (isset($product[$attribute]))
+                unset($product[$attribute]);
+        }
     }
 }
