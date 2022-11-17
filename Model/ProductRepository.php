@@ -81,6 +81,11 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     private $storeConfig;
 
     /**
+     * @var array
+     */
+    private $excludedCustomAttributes;
+
+    /**
      * @param ImageFactory $helperFactory
      * @param Emulation $appEmulation
      * @param StockRegistryInterface $stockRegistry
@@ -151,6 +156,8 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $this->productHelperFactory = $productHelperFactory;
         $this->inventoryHelperFactory = $inventoryHelperFactory;
         $this->storeConfig = $storeConfig;
+        //Add here any custom attributes we want to exclude from indexation
+        $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
         parent::__construct(
             $productFactory,
             $initializationHelper,
@@ -206,7 +213,6 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
             $product->load($productId);
             $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             $this->setCustomAttributes($product);
-            $this->removeSpecialPriceCustomAttributes($product);
             $this->setExtensionAttributes($product, $storeId);
             $this->appEmulation->stopEnvironmentEmulation();
             // End Custom code here
@@ -233,7 +239,6 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
             }
 
             $this->setCustomAttributes($product);
-            $this->removeSpecialPriceCustomAttributes($product);
             $this->setExtensionAttributes($product, $storeId);
         }
         $this->appEmulation->stopEnvironmentEmulation();
@@ -354,6 +359,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $product->setCustomAttribute('thumbnail', $thumbnailImageUrl);
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
+        $this->removeExcludedCustomAttributes($product);
     }
 
     /**
@@ -388,23 +394,16 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     }
 
     /**
-     * Function to remove the special_price and its related fields from the
-     * custom_attributes.
-     * If we don't remove them, these attributes may cause some errors when a
-     * special_price is set but it is equal to the retail_price.
+     * Function to remove the excluded custom_attributes.
      *
      * @param ProductInterface $product
      * @return void
      */
-    public function removeSpecialPriceCustomAttributes($product)
+    public function removeExcludedCustomAttributes($product)
     {
-        //Remove special_price attributes
-        $attributes = ['special_price', 'special_from_date', 'special_to_date'];
-        foreach ($attributes as $attribute) {
-            if (!isset($product[$attribute])) {
-                continue;
-            }
-            unset($product[$attribute]);
+        foreach ($this->excludedCustomAttributes as $attribute) {
+            if (isset($product[$attribute]))
+                unset($product[$attribute]);
         }
     }
 }
