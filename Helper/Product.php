@@ -380,7 +380,7 @@ class Product extends AbstractHelper
             $price = $product->getPriceInfo()->getPrice($type);
         }
 
-        if(!$price){
+        if (!$price) {
             return 0;
         }
 
@@ -526,16 +526,17 @@ class Product extends AbstractHelper
     /**
      * Function to get the minimum price of the simple products in a grouped product
      */
-    private function calculateGroupedPrice(ProductModel $product, string $type) {
-                
+    private function calculateGroupedPrice(ProductModel $product, string $type)
+    {
         $usedProds = $product->getTypeInstance()->getAssociatedProducts($product);
         foreach ($usedProds as $child) {
-            
             if ($child->getId() != $product->getId()) {
-                $prices[] = $child->getPriceInfo()->getPrice($type);
+                $price = $child->getPriceInfo()->getPrice($type);
+                $prices['prices'][] =  $price;
+                $prices['values'][] =  $price->getAmount()->getValue();
             }
         }
-
-        return !empty($prices) ? min($prices) : null;
+        $index = array_search(min($prices['values']), $prices['values']);
+        return ($index < 0) ? null : $prices['prices'][$index];
     }
 }
