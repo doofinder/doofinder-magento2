@@ -529,6 +529,7 @@ class Product extends AbstractHelper
     private function calculateGroupedPrice(ProductModel $product, string $type)
     {
         $usedProds = $product->getTypeInstance()->getAssociatedProducts($product);
+        $prices = [];
         foreach ($usedProds as $child) {
             if ($child->getId() != $product->getId()) {
                 $price = $child->getPriceInfo()->getPrice($type);
@@ -536,6 +537,10 @@ class Product extends AbstractHelper
                 $prices['values'][] =  $price->getAmount()->getValue();
             }
         }
+
+        if (empty($prices))
+            return null;
+
         $index = array_search(min($prices['values']), $prices['values']);
         return ($index < 0) ? null : $prices['prices'][$index];
     }
