@@ -24,6 +24,7 @@ use Magento\Tax\Model\Config as TaxConfig;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Catalog\Model\Product\Type as ProductType;
 
 /**
@@ -371,7 +372,18 @@ class Product extends AbstractHelper
             default:
                 $type = 'final_price';
         }
-        $price = $product->getPriceInfo()->getPrice($type);
+
+        // To solve bug with regular_price in grouped products (Magento2 return price 0€), special_price is correctly calculated
+        if ($type == 'regular_price' && $product->getTypeId() == Grouped::TYPE_CODE) {
+            $price = $this->calculateGroupedPrice($product, $type);
+        } else {
+            $price = $product->getPriceInfo()->getPrice($type);
+        }
+
+        if (!$price) {
+            return 0;
+        }
+
         $amount = $price->getAmount();
         if ($tax === null) {
             $tax = $this->taxConfig->getPriceDisplayType() != TaxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
@@ -389,17 +401,6 @@ class Product extends AbstractHelper
             $value = $adjustment->applyAdjustment($amount->getBaseAmount(), $product);
         }
         return (float)$value;
-    }
-
-
-    /**
-     * Function to get the end date of the special price for the given product
-     */
-    public function getSpecialToDate(ProductModel $product): ?string
-    {
-        $date = $product->getSpecialToDate();
-
-        return ($date != null) ? $this->normalizeSpecialDate($date) : $date;
     }
 
     /**
@@ -523,17 +524,24 @@ class Product extends AbstractHelper
     }
 
     /**
-     * Magento store the special time range in days not in datatime. In doofeeds we check if the special price is valid
-     * taking the actual datatime, so the day that the offers end we will have that the offer is not valid even if it is
-     * valid for the whole day. So to avoid issues with the duration of the special price in case the date has the
-     * following format: Y-m-d 00:00:00 we change it to: Y-m-d 23:59:59.
+     * Function to get the minimum price of the simple products in a grouped product
      */
-    private function normalizeSpecialDate($date): string
+    private function calculateGroupedPrice(ProductModel $product, string $type)
     {
-        $dateToCheck = $date = \DateTime::createFromFormat('Y-m-d H:i:s', $date);
-        if ($dateToCheck->format('H') == '00' && $dateToCheck->format('i') == '00' && $dateToCheck->format('s') == '00') {
-            return $dateToCheck->format('Y-m-d 23:59:59');
+        $usedProds = $product->getTypeInstance()->getAssociatedProducts($product);
+        $prices = [];
+        foreach ($usedProds as $child) {
+            if ($child->getId() != $product->getId()) {
+                $price = $child->getPriceInfo()->getPrice($type);
+                $prices['prices'][] =  $price;
+                $prices['values'][] =  $price->getAmount()->getValue();
+            }
         }
-        return $date->format('Y-m-d H:i:s');
+
+        if (empty($prices))
+            return null;
+
+        $index = array_search(min($prices['values']), $prices['values']);
+        return ($index < 0) ? null : $prices['prices'][$index];
     }
 }

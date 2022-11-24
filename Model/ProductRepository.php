@@ -39,7 +39,6 @@ use Magento\Store\Model\StoreManagerInterface;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -80,6 +79,11 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      * @var StoreConfig
      */
     private $storeConfig;
+
+    /**
+     * @var array
+     */
+    private $excludedCustomAttributes;
 
     /**
      * @param ImageFactory $helperFactory
@@ -152,6 +156,8 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $this->productHelperFactory = $productHelperFactory;
         $this->inventoryHelperFactory = $inventoryHelperFactory;
         $this->storeConfig = $storeConfig;
+        //Add here any custom attributes we want to exclude from indexation
+        $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
         parent::__construct(
             $productFactory,
             $initializationHelper,
@@ -231,7 +237,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
                 $this->appEmulation->stopEnvironmentEmulation();
                 $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             }
-            
+
             $this->setCustomAttributes($product);
             $this->setExtensionAttributes($product, $storeId);
         }
@@ -255,7 +261,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
     /**
      * Retrieve the product URL
-     * 
+     *
      * @param Product $product
      * @return String
      */
@@ -324,9 +330,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
     /**
      * Function to update the custom attributes of a product depending on the custom attributes selection stored
-     * in the config table. 
+     * in the config table.
      * Here we will update also the value of the custom attribute (id of the option selected) by the option text.
-     * 
+     *
      * @param ProductInterface $product
      * @return void
      */
@@ -334,7 +340,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     {
         $productHelperFactory = $this->productHelperFactory->create();
         $customAttributes = $this->storeConfig->getCustomAttributes($product->getStoreId());
-        
+
         foreach ($customAttributes as $customAttribute){
             $code = $customAttribute['code'];
             if($customAttribute['enabled'] && isset($product[$code])) {
@@ -353,40 +359,51 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $product->setCustomAttribute('thumbnail', $thumbnailImageUrl);
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
-        
-        // Management of special price to include the taxes in case the customer has the prices with taxes
-        $typePrice = $product->getTypeId() == Configurable::TYPE_CODE ? "final_price" : "special_price";
-        $price = round($productHelperFactory->getProductPrice($product, "regular_price"), 2);
-        $specialPrice = round($productHelperFactory->getProductPrice($product, $typePrice), 2);
-        ($price == $specialPrice || $specialPrice == 0) ?: $product->setCustomAttribute('special_price', $specialPrice);
-        // It is needed to avoid issues with the end day of the special price
-        $product->setCustomAttribute('special_to_date', $productHelperFactory->getSpecialToDate($product));
+        $this->removeExcludedCustomAttributes($product);
     }
 
     /**
      * Function to add the extension attributes to the product
-     * 
+     *
      * @param ProductInterface $product
      * @return void
      */
     private function setExtensionAttributes($product, $storeId): void
     {
+        $productHelperFactory = $this->productHelperFactory->create();
         $inventoryHelper = $this->inventoryHelperFactory->create();
 
         /** @var ProductExtension $extensionAttributes */
         $extensionAttributes = $product->getExtensionAttributes();
 
         $stockItem = $this->stockRegistry->getStockItem($product->getId());
-        $stockId = $inventoryHelper->getStockIdByStore((int)$storeId);
-        
+        $stockId = (int)$inventoryHelper->getStockIdByStore((int)$storeId);
         $stockAndStatus = $inventoryHelper->getQuantityAndAvailability($product, $stockId);
         $stockItem->setQty($stockAndStatus[0]);
         $stockItem->setIsInStock($stockAndStatus[1]);
-        
         $extensionAttributes->setStockItem($stockItem);
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
-        $extensionAttributes->setPrice(round($this->productHelperFactory->create()->getProductPrice($product, "regular_price"), 2));
+
+        $price = round($productHelperFactory->getProductPrice($product, "regular_price"), 2);
+        $specialPrice = round($productHelperFactory->getProductPrice($product, "final_price"), 2);
+        $extensionAttributes->setPrice($price);
+        ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
+
         $product->setExtensionAttributes($extensionAttributes);
+    }
+
+    /**
+     * Function to remove the excluded custom_attributes.
+     *
+     * @param ProductInterface $product
+     * @return void
+     */
+    public function removeExcludedCustomAttributes($product)
+    {
+        foreach ($this->excludedCustomAttributes as $attribute) {
+            if (isset($product[$attribute]))
+                unset($product[$attribute]);
+        }
     }
 }
