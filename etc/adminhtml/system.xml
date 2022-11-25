@@ -214,7 +214,7 @@
                        translate="label"
                        type="select"
                        sortOrder="100"
-                       showInDefault="1"
+                       showInDefault="0"
                        showInWebsite="0"
                        showInStore="0">
                     <label>Magento Integration</label>
@@ -227,7 +227,7 @@
                        translate="label"
                        type="text"
                        sortOrder="200"
-                       showInDefault="1"
+                       showInDefault="0"
                        showInWebsite="0"
                        showInStore="0">
                     <label>Doofinder Login URL</label>
@@ -239,7 +239,7 @@
                        translate="label"
                        type="text"
                        sortOrder="300"
-                       showInDefault="1"
+                       showInDefault="0"
                        showInWebsite="0"
                        showInStore="0">
                     <label>Doofinder Signup URL</label>
@@ -251,7 +251,7 @@
                        translate="label"
                        type="text"
                        sortOrder="400"
-                       showInDefault="1"
+                       showInDefault="0"
                        showInWebsite="0"
                        showInStore="0">
                     <label>Doofinder Display Layer Create URL</label>
@@ -263,7 +263,7 @@
                        translate="label"
                        type="text"
                        sortOrder="500"
-                       showInDefault="1"
+                       showInDefault="0"
                        showInWebsite="0"
                        showInStore="0">
                     <label>Doofinder Display Layer State URL</label>

@@ -35,14 +35,6 @@
                 </div>
                 <div class="steps-button-title">
                     <h2><?= $block->escapeHtmlAttr(__('Step 2:')) ?></h2>
-                    <h4><?= $block->escapeHtmlAttr(__('This integration will give us access to the catalog and products elements')) ?></h4>
-                    <div class="steps-button-container">
-                        <input type="button" id="create-integration-btn" value="<?= $block->escapeHtmlAttr(__('CREATE INTEGRATION')) ?>" <?php if(!$sector): ?>disabled <?php endif; ?>/>
-                    </div>
-                    <div data-role="messages" class="messages"></div>
-                </div>
-                <div class="steps-button-title">
-                    <h2><?= $block->escapeHtmlAttr(__('Step 3:')) ?></h2>
                     <h4><?= $block->escapeHtmlAttr(__('We link to our Doofinder account')) ?></h4>
                     <div class="steps-button-container">
                         <input class="steps-btn-yellow" id="register-account-btn" disabled type="button" value="<?= $block->escapeHtmlAttr(__('USE YOUR FREE TRIAL NOW!')) ?>" />
@@ -115,7 +107,6 @@
                 "saveSectorUrl": "<?= $block->getSaveSectorUrl() ?>",
                 "currentSectorValue": "<?= $block->getSectorValue() ?>",
                 "sectorSelector": "#sector-selector",
-                "buttonId": "#create-integration-btn",
                 "buttonRegister": "#register-account-btn",
                 "buttonLogin": "#login-btn",
                 "email": "<?= $this->helper('Doofinder\Feed\Helper\StoreConfig')->getEmailAdmin() ?>",

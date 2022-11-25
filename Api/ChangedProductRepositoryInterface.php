@@ -63,15 +63,4 @@ interface ChangedProductRepositoryInterface
      * @return ChangedProductSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $searchCriteria): ChangedProductSearchResultsInterface;
-
-    /**
-     * @return ChangedProductInterface[]
-     */
-    public function getAll(): array;
-
-    /**
-     * @param SearchCriteriaInterface $searchCriteria
-     * @return ChangedProductInterface|null
-     */
-    public function getSingle(SearchCriteriaInterface $searchCriteria): ?ChangedProductInterface;
 }

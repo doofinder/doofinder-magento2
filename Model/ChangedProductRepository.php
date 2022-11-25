@@ -129,28 +129,4 @@ class ChangedProductRepository implements ChangedProductRepositoryInterface
 
         return $searchResults;
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAll(): array
-    {
-        $collection = $this->collectionFactory->create();
-        $results = [];
-        foreach ($collection as $model) {
-            $results[$model->getId()] = $model;
-        }
-
-        return $results;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getSingle(SearchCriteriaInterface $searchCriteria): ?ChangedProductInterface
-    {
-        $collection = $this->getList($searchCriteria)->getItems();
-
-        return count($collection) ? $collection[0] : null;
-    }
 }
