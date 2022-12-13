@@ -238,8 +238,8 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
                 $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             }
 
-            $this->setCustomAttributes($product);
             $this->setExtensionAttributes($product, $storeId);
+            $this->setCustomAttributes($product);
         }
         $this->appEmulation->stopEnvironmentEmulation();
 
