@@ -24,6 +24,7 @@ use Magento\Tax\Model\Config as TaxConfig;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable  as ConfigurableType;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Catalog\Model\Product\Type as ProductType;
 
@@ -372,11 +373,15 @@ class Product extends AbstractHelper
             default:
                 $type = 'final_price';
         }
-
+        
         // To solve bug with regular_price in grouped products (Magento2 return price 0€), special_price is correctly calculated
         if ($type == 'regular_price' && $product->getTypeId() == Grouped::TYPE_CODE) {
             $price = $this->calculateGroupedPrice($product, $type);
-        } else {
+
+        }else if ($product->getTypeId() == ConfigurableType::TYPE_CODE) {
+            $price = $this->calculateConfigurablePrice($product, $type);
+        
+        }else {
             $price = $product->getPriceInfo()->getPrice($type);
         }
 
@@ -400,6 +405,7 @@ class Product extends AbstractHelper
             $adjustment = $product->getPriceInfo()->getAdjustment('tax');
             $value = $adjustment->applyAdjustment($amount->getBaseAmount(), $product);
         }
+
         return (float)$value;
     }
 
@@ -529,6 +535,15 @@ class Product extends AbstractHelper
     private function calculateGroupedPrice(ProductModel $product, string $type)
     {
         $usedProds = $product->getTypeInstance()->getAssociatedProducts($product);
+        return $this->getMinimumPrice($product, $usedProds, $type);
+    }
+
+    private function calculateConfigurablePrice(ProductModel $product, string $type) {
+        $usedProds = $product->getTypeInstance()->getUsedProducts($product);
+        return $this->getMinimumPrice($product, $usedProds, $type);
+    }
+
+    private function getMinimumPrice($product, $usedProds, $type) {
         $prices = [];
         foreach ($usedProds as $child) {
             if ($child->getId() != $product->getId()) {
