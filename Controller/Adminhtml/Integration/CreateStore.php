@@ -27,7 +27,7 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /** @var AttributeCollectionFactory */
     protected $attributeCollectionFactory;
-    
+
     /** @var StoreConfig */
     private $storeConfig;
 
@@ -138,18 +138,18 @@ class CreateStore extends Action implements HttpGetActionInterface
                 "language" => $language,
                 "currency" => $currency,
                 "site_url" => $store->getBaseUrl(),
+                "options" => [
+                    'url' => $this->urlInterface->getBaseUrl() . 'rest/' . $store->getCode() . '/V1/',
+                    'token' => $integrationToken,
+                    'website_id' => $store->getWebsiteId(),
+                ],
                 "datatypes" => [
                     [
                         "name" => "product",
                         "preset" => "product",
                         'datasources' => [
                             [
-                                'type' => 'magento2',
-                                'options' => [
-                                    'url' => $this->urlInterface->getBaseUrl() . 'rest/' . $store->getCode() . '/V1/',
-                                    'token' => $integrationToken,
-                                    'website_id' => $store->getWebsiteId(),
-                                ]
+                                'type' => 'magento2'
                             ]
                         ]
                     ]
@@ -164,7 +164,7 @@ class CreateStore extends Action implements HttpGetActionInterface
     /**
      * Function to store into the data base the installation id as well as the layer script
      */
-    private function saveInstallationConfig($websiteID, $installationId, $script) 
+    private function saveInstallationConfig($websiteID, $installationId, $script)
     {
         $this->storeConfig->setInstallation($installationId, $websiteID);
         $this->storeConfig->setDisplayLayer($script, $websiteID);
@@ -210,8 +210,8 @@ class CreateStore extends Action implements HttpGetActionInterface
         $attributes     = [];
         foreach ($attributeCollection as $attribute) {
             $attribute_id = $attribute->getAttributeId();
-            $attributes[$attribute_id] = ['label' => $this->escaper->escapeHtml($attribute->getFrontendLabel()), 
-                                          'code' => $attribute->getAttributeCode(), 
+            $attributes[$attribute_id] = ['label' => $this->escaper->escapeHtml($attribute->getFrontendLabel()),
+                                          'code' => $attribute->getAttributeCode(),
                                           'enabled' => 'on'];
         }
 
