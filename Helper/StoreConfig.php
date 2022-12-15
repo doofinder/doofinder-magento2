@@ -235,10 +235,10 @@ class StoreConfig extends AbstractHelper
         parent::__construct($context);
     }
 
-    public function createStore(array $storeData): array 
+    public function createStore(array $storeData): array
     {
         $managementClient = $this->managementClientFactory->create(['apiType' => 'admin']);
-        
+
         return $managementClient->createStore($storeData);
     }
 
@@ -418,7 +418,7 @@ class StoreConfig extends AbstractHelper
                 return $store->isActive();
             }
         );
-    } 
+    }
 
     /**
      * Get API key.
@@ -531,9 +531,7 @@ class StoreConfig extends AbstractHelper
      */
     public function getLanguageFromStore(StoreInterface $store): string
     {
-        $localeCode = explode('_', $this->getStoreLocaleCode($store));
-
-        return $localeCode[0];
+        return str_replace("_", "-", $this->getStoreLocaleCode($store));
     }
 
     /**
@@ -833,7 +831,7 @@ class StoreConfig extends AbstractHelper
         if ($id === null) {
             list($scope, $id) = $this->getCurrentScope();
         }
-        
+
         $custom_attributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, $scope, $id);
         $custom_attributes = ($custom_attributes) ? \Zend_Json::decode($custom_attributes) : null;
         $saved = [];
@@ -893,36 +891,36 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
-     * Function to include the locale and the currency into the script. 
+     * Function to include the locale and the currency into the script.
      * The following entries are covered:
      *    const dfLayerOptions = {
      *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
      *      zone: 'eu1',
      *      currency: 'USD',
-     *      language: 'fr'
+     *      language: 'fr-FR'
      *    };
-     * 
+     *
      *    const dfLayerOptions = {
      *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
      *      zone: 'eu1',
      *      //currency: 'USD',
-     *      //language: 'fr'
+     *      //language: 'fr-FR'
      *    };
-     * 
+     *
      *    const dfLayerOptions = {
      *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
      *      zone: 'eu1'
      *    };
-     * 
+     *
      * @return string
      *    const dfLayerOptions = {
      *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
      *      zone: 'eu1',
      *      currency: 'USD',
-     *      language: 'fr'
+     *      language: 'fr-FR'
      *    };
      */
-    public function include_locale_and_currency($liveLayerScript, $locale, $currency): string 
+    public function include_locale_and_currency($liveLayerScript, $locale, $currency): string
     {
         if (strpos($liveLayerScript, 'language:') !== false){
             $liveLayerScript = preg_replace("/(\/\/\s*)?(language:)(.*?)(\n|,)/m", "$2 '$locale'$4", $liveLayerScript);
