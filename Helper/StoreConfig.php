@@ -24,6 +24,7 @@ use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as Attrib
 use Magento\Framework\Escaper;
 use Magento\Eav\Model\Config;
 use Doofinder\Feed\Errors\NotFound;
+use Magento\Backend\Helper\Data;
 
 /**
  * Store config helper
@@ -198,6 +199,11 @@ class StoreConfig extends AbstractHelper
     private $eavConfig;
 
     /**
+     * @var Data
+     */
+    private $backendHelper;
+
+    /**
      * StoreConfig constructor.
      *
      * @param Context $context
@@ -209,6 +215,7 @@ class StoreConfig extends AbstractHelper
      * @param Indexation $indexationHelper
      * @param Escaper $escaper
      * @param Config $eavConfig
+     * @param Data $backendHelper
      */
     public function __construct(
         ManagementClientFactory $managementClientFactory,
@@ -220,7 +227,8 @@ class StoreConfig extends AbstractHelper
         AttributeCollectionFactory $attributeCollectionFactory,
         Indexation $indexationHelper,
         Escaper $escaper,
-        Config $eavConfig
+        Config $eavConfig,
+        Data $backendHelper
     ) {
         $this->managementClientFactory = $managementClientFactory;
         $this->storeManager = $storeManager;
@@ -231,6 +239,7 @@ class StoreConfig extends AbstractHelper
         $this->indexationHelper = $indexationHelper;
         $this->escaper = $escaper;
         $this->eavConfig = $eavConfig;
+        $this->backendHelper = $backendHelper;
 
         parent::__construct($context);
     }
@@ -650,7 +659,9 @@ class StoreConfig extends AbstractHelper
      */
     public function getDoofinderConnectUrl(): string
     {
-        return $this->storeManager->getStore()->getBaseUrl() . self::DOOFINDER_CONNECTION;
+        $host = parse_url($this->backendHelper->getUrl(), PHP_URL_HOST);
+        $schema = parse_url($this->backendHelper->getUrl(), PHP_URL_SCHEME);
+        return $schema . "://" . $host . "/" . self::DOOFINDER_CONNECTION;
     }
     /**
      * Get update on save configuration value
