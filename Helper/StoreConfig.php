@@ -659,7 +659,7 @@ class StoreConfig extends AbstractHelper
      */
     public function getDoofinderConnectUrl(): string
     {
-        return $this->backendHelper->getUrl() . self::DOOFINDER_CONNECTION;
+        return "https://" . parse_url($this->backendHelper->getUrl(), PHP_URL_HOST) . "/" . self::DOOFINDER_CONNECTION;
     }
     /**
      * Get update on save configuration value
