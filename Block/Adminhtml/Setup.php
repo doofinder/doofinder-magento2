@@ -12,7 +12,7 @@ use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Model\Integration;
 use Magento\Integration\Model\ResourceModel\Integration\Collection as IntegrationCollection;
 use Magento\Integration\Model\ResourceModel\Integration\CollectionFactory as IntegrationCollectionFactory;
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Backend\Helper\Data;
 
 class Setup extends Template
 {
@@ -32,9 +32,9 @@ class Setup extends Template
     private $encryptor;
 
     /**
-     * @var StoreManagerInterface
+     * @var Data
      */
-    private $storeManager;
+    private $backendHelper;
 
     /**
      * @var IntegrationServiceInterface
@@ -48,7 +48,7 @@ class Setup extends Template
      * @param IntegrationCollectionFactory $collectionFactory
      * @param StoreConfig $storeConfig
      * @param EncryptorInterface $encryptor
-     * @param StoreManagerInterface $storeManager
+     * @param Data $backendHelper
      * @param IntegrationServiceInterface $integrationService
      */
     public function __construct(
@@ -56,13 +56,13 @@ class Setup extends Template
         IntegrationCollectionFactory $collectionFactory,
         StoreConfig $storeConfig,
         EncryptorInterface $encryptor,
-        StoreManagerInterface $storeManager,
+        Data $backendHelper,
         IntegrationServiceInterface $integrationService
     ) {
         $this->storeConfig = $storeConfig;
         $this->collectionFactory = $collectionFactory;
         $this->encryptor = $encryptor;
-        $this->storeManager = $storeManager;
+        $this->backendHelper = $backendHelper;
         $this->integrationService = $integrationService;
         parent::__construct($context, []);
     }
@@ -80,7 +80,7 @@ class Setup extends Template
 
         return 'email=' . $this->storeConfig->getEmailAdmin()
             . '&token=' . $token
-            . '&shop_url=' . urlencode($this->storeManager->getStore()->getBaseUrl());
+            . '&shop_url=' . urlencode($this->backendHelper->getUrl());
     }
 
     /**
