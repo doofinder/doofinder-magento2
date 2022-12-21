@@ -71,30 +71,31 @@ define([
             return await this.createIntegrationTokens(data);
         },
         createIntegrationTokens: async function(data) {
-          const self = this;
-          if (data._redirect) {
-              throw $.mage.__('The integration was not created due to some error. It may be that the Doofinder integration already exists.');
-          } else if (data.integrationId) {
-              // Replace placeholders in URL
-              const manageTokensCallback = async(result, callbackFunction) => {
-                  if (result && result._redirect)
-                      throw $.mage.__('An error occurred during the activation process. Please try to activate the integration manually in the integrations section.');
-                  else
-                      await callbackFunction();
-              };
+            const self = this;
+            if (data._redirect) {
+                throw $.mage.__('The integration was not created due to some error. It may be that the Doofinder integration already exists.');
+            } else if (data.integrationId) {
+                // Replace placeholders in URL
+                const manageTokensCallback = async(result, callbackFunction) => {
+                    if (result && result._redirect)
+                        throw $.mage.__('An error occurred during the activation process. Please try to activate the integration manually in the integrations section.');
+                    else
+                        await callbackFunction();
+                };
 
-              // Activating and giving permissions
-              let dataResult = await ajax_post(this.urls.saveConfig, { 'id': data.integrationId });
-              let result = await ajax_get(this.urls.permissions.replace(':id', data.integrationId));
+                // Activating and giving permissions
+                let dataResult = await ajax_post(this.urls.saveConfig, { 'id': data.integrationId });
+                let result = await ajax_get(this.urls.permissions.replace(':id', data.integrationId));
 
-              if (dataResult.result === false) addMessage(dataResult.error);
+                if (dataResult.result === false) addMessage(dataResult.error);
 
-              manageTokensCallback(result, _ => { ajax_get(self.urls.tokens.replace(':id', data.integrationId)) });
-              manageTokensCallback(result, _ => { ajax_get(self.urls.accessToken.replace(':id', data.integrationId)) });
+                manageTokensCallback(result, _ => { ajax_get(self.urls.tokens.replace(':id', data.integrationId)) });
+                manageTokensCallback(result, _ => { ajax_get(self.urls.accessToken.replace(':id', data.integrationId)) });
 
-              $(this.elements.buttonRegister).prop("disabled", false);
-              $(this.elements.buttonLogin).prop("disabled", false);
-          }
+                this.isIntegrationCreated = true;
+                $(this.elements.buttonRegister).prop("disabled", false);
+                $(this.elements.buttonLogin).prop("disabled", false);
+            }
         },
         initialize: function() {
             this._super();
@@ -120,8 +121,8 @@ define([
         }
     });
 
-    async function ajax_get(url) {
-        return await $.ajax({
+    function ajax_get(url) {
+        return $.ajax({
             url: url,
             method: 'GET',
             cache: false,
@@ -131,8 +132,8 @@ define([
         });
     }
 
-    async function ajax_post(url, data) {
-        return await $.ajax({
+    function ajax_post(url, data) {
+        return $.ajax({
             url: url,
             method: 'POST',
             cache: false,
@@ -145,6 +146,6 @@ define([
     }
 
     function toggleSpinner(enable) {
-      enable ? $('body').trigger('processStart'): $('body').trigger('processStop');
+        enable ? $('body').trigger('processStart') : $('body').trigger('processStop');
     }
 });
