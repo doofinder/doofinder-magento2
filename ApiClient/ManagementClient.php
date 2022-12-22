@@ -152,86 +152,6 @@ class ManagementClient
     }
 
     /**
-     * Gets an item from the index by its id
-     * @see https://docs.doofinder.com/api/management/v2/#operation/item_show
-     *
-     * @param array $item
-     * @param int $itemId
-     * @param string $hashId
-     * @param string $indice
-     * @return array
-     * @throws BadRequest
-     * @throws IndexingInProgress
-     * @throws NotAllowed
-     * @throws NotFound
-     * @throws QuotaExhausted
-     * @throws ThrottledResponse
-     * @throws TypeAlreadyExists
-     * @throws WrongResponse
-     * @throws \Zend_Json_Exception
-     */
-    public function getItem(int $itemId, string $hashId, string $indice): array
-    {
-        $path = $this->getItemPath($hashId, $itemId, $indice);
-        $response = $this->client->get($path);
-
-        return \Zend_Json::decode($response);
-    }
-
-    /**
-     * Creates an item in the index with the data provided
-     * @see https://docs.doofinder.com/api/management/v2/#operation/item_create
-     *
-     * @param array $item
-     * @param string $hashId
-     * @param string $indice
-     * @return array
-     * @throws BadRequest
-     * @throws IndexingInProgress
-     * @throws NotAllowed
-     * @throws NotFound
-     * @throws QuotaExhausted
-     * @throws ThrottledResponse
-     * @throws TypeAlreadyExists
-     * @throws WrongResponse
-     * @throws \Zend_Json_Exception
-     */
-    public function createItem(array $item, string $hashId, string $indice): array
-    {
-        $path = $this->getItemsPath($hashId, $indice);
-        $response = $this->client->post($path, $item);
-
-        return \Zend_Json::decode($response);
-    }
-
-    /**
-     * Partially updates item from index by its id. The operation returns the updated item.
-     * @see https://docs.doofinder.com/api/management/v2/#operation/item_update
-     *
-     * @param array $item
-     * @param int $itemId
-     * @param string $hashId
-     * @param string $indice
-     * @return array
-     * @throws BadRequest
-     * @throws IndexingInProgress
-     * @throws NotAllowed
-     * @throws NotFound
-     * @throws QuotaExhausted
-     * @throws ThrottledResponse
-     * @throws TypeAlreadyExists
-     * @throws WrongResponse
-     * @throws \Zend_Json_Exception
-     */
-    public function updateItem(array $item, int $itemId, string $hashId, string $indice): array
-    {
-        $path = $this->getItemPath($hashId, $itemId, $indice);
-        $response = $this->client->patch($path, $item);
-
-        return \Zend_Json::decode($response);
-    }
-
-    /**
      * Creates a list of items from the index in a single bulk operation.
      * @see https://docs.doofinder.com/api/management/v2/#operation/items_bulk_update
      *
@@ -343,30 +263,6 @@ class ManagementClient
     }
 
     /**
-     * Returns the indice endpoint
-     *
-     * @param string $hashId
-     * @param string $indice
-     * @return string
-     */
-    private function getIndicePath(string $hashId, string $indice): string
-    {
-        return self::ENDPOINT_SEARCH_ENGINES . "/{$hashId}/indices/{$indice}";
-    }
-
-    /**
-     * Returns items endpoint
-     *
-     * @param string $hashId
-     * @param string $indice
-     * @return string
-     */
-    private function getItemsPath(string $hashId, string $indice): string
-    {
-        return self::ENDPOINT_SEARCH_ENGINES . "/{$hashId}/indices/{$indice}/items";
-    }
-
-    /**
      * Returns items endpoint
      *
      * @param string $hashId
@@ -376,18 +272,5 @@ class ManagementClient
     private function getItemsBulkPath(string $hashId, string $indice): string
     {
         return self::ENDPOINT_SEARCH_ENGINES . "/{$hashId}/indices/{$indice}/items/_bulk";
-    }
-
-    /**
-     * Returns items endpoint
-     *
-     * @param string $hashId
-     * @param int $itemId
-     * @param string $indice
-     * @return string
-     */
-    private function getItemPath(string $hashId, int $itemId, string $indice): string
-    {
-        return self::ENDPOINT_SEARCH_ENGINES . "/{$hashId}/indices/{$indice}/items/{$itemId}";
     }
 }

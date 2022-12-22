@@ -8,7 +8,6 @@ use Doofinder\Feed\Api\Data\ChangedProductInterface;
 use Doofinder\Feed\Api\Data\ChangedProductSearchResultsInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
-use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 interface ChangedProductRepositoryInterface
@@ -23,15 +22,6 @@ interface ChangedProductRepositoryInterface
     public function save(ChangedProductInterface $entity): ChangedProductInterface;
 
     /**
-     * Retrieve entity by id
-     *
-     * @param int $entityId
-     * @return ChangedProductInterface
-     * @throws NoSuchEntityException
-     */
-    public function getById(int $entityId): ChangedProductInterface;
-
-    /**
      * Retrieve entity by attribute
      *
      * @param $value
@@ -40,23 +30,6 @@ interface ChangedProductRepositoryInterface
      * @throws NoSuchEntityException
      */
     public function get($value, ?string $field): ChangedProductInterface;
-
-    /**
-     * @param ChangedProductInterface $entity
-     * @return bool
-     * @throws CouldNotDeleteException
-     */
-    public function delete(ChangedProductInterface $entity): bool;
-
-    /**
-     * Delete entity by ID.
-     *
-     * @param int $entityId
-     * @return boolean
-     * @throws NoSuchEntityException
-     * @throws CouldNotDeleteException
-     */
-    public function deleteById(int $entityId): bool;
 
     /**
      * @param SearchCriteriaInterface $searchCriteria

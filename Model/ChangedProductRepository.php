@@ -11,7 +11,6 @@ use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResourceM
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 class ChangedProductRepository implements ChangedProductRepositoryInterface
@@ -68,14 +67,6 @@ class ChangedProductRepository implements ChangedProductRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function getById(int $entityId): ChangedProductInterface
-    {
-        return $this->get($entityId);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function get($value, ?string $field = null): ChangedProductInterface
     {
         $entity = $this->entityFactory->create();
@@ -86,33 +77,6 @@ class ChangedProductRepository implements ChangedProductRepositoryInterface
         }
 
         return $entity;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function delete(ChangedProductInterface $entity): bool
-    {
-        $entityId = $entity->getId();
-        try {
-            $this->resourceModel->delete($entity);
-        } catch (\Exception $e) {
-            throw new CouldNotDeleteException(
-                __('Unable to remove entity %1', $entityId)
-            );
-        }
-
-        return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteById(int $entityId): bool
-    {
-        $entity = $this->getById($entityId);
-
-        return $this->delete($entity);
     }
 
     /**

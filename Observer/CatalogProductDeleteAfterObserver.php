@@ -8,10 +8,12 @@ use Doofinder\Feed\Api\Data\ChangedProductInterface;
 
 class CatalogProductDeleteAfterObserver extends AbstractChangedProductObserver
 {
-    
+    private $operationType = ChangedProductInterface::OPERATION_TYPE_DELETE;
+
     protected function getOperationType(): string
     {
-        return ChangedProductInterface::OPERATION_TYPE_DELETE;
+        return $this->operationType;
     }
+
     protected function setOperationType(string $operationType) {}
 }

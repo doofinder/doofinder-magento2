@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Cron;
 
-use Doofinder\Feed\Api\Data\ChangedProductInterface;
 use Doofinder\Feed\Helper\Indice as IndiceHelper;
 use Doofinder\Feed\Helper\Item as ItemHelper;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedProduct\DocumentsProvider;
 use Doofinder\Feed\Model\Indexer\Data\Mapper;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory as ChangedProductCollectionFactory;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Psr\Log\LoggerInterface;
 
@@ -27,11 +24,6 @@ class Processor
      * @var ChangedProductCollectionFactory
      */
     private $changedProductCollectionFactory;
-
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
 
     /**
      * @var DocumentsProvider
@@ -66,7 +58,6 @@ class Processor
     public function __construct(
         StoreConfig $storeConfig,
         ChangedProductCollectionFactory $changedProductCollectionFactory,
-        ProductRepositoryInterface $productRepository,
         DocumentsProvider $documentsProvider,
         ItemHelper $itemHelper,
         Mapper $mapper,
@@ -76,7 +67,6 @@ class Processor
     ) {
         $this->storeConfig = $storeConfig;
         $this->changedProductCollectionFactory = $changedProductCollectionFactory;
-        $this->productRepository = $productRepository;
         $this->documentsProvider = $documentsProvider;
         $this->itemHelper = $itemHelper;
         $this->mapper = $mapper;
@@ -92,14 +82,10 @@ class Processor
     {
         if ($this->storeConfig->isUpdateOnSave()) {
             try {
-                //TODO: process when removing from Website
                 foreach ($this->storeConfig->getAllStores() as $store) {
                     $indice = IndiceHelper::MAGENTO_INDICE_NAME;
-                    /* Created Products */
                     $this->createProducts($store, $indice);
-                    /* Updated Products */
                     $this->updateProducts($store, $indice);
-                    /* Deleted Products */
                     $this->deleteProducts($store, $indice);
                 }
             } catch (\Exception $e) {
@@ -111,10 +97,10 @@ class Processor
     /**
      * Function to delete the products that have been stored into the data base as "to be created"
      */
-    private function createProducts($store, $indice){
+    private function createProducts($store, $indice)
+    {
         $collection = $this->changedProductCollectionFactory->create()->filterCreated((int)$store->getId());
         if ($collection->getSize()) {
-            # We reuse the getUpdated & update mapper because the indexed fields are equal
             $created = $this->documentsProvider->getUpdated($collection, (int)$store->getId());
             foreach ($this->batch->getItems($created, $this->batchSize) as $batchDocuments) {
                 $items = $this->mapper->get('update')->map($batchDocuments, (int)$store->getId());
@@ -140,7 +126,8 @@ class Processor
     /**
      * Function to update the products that have been stored into the data base as "to be updated"
      */
-    private function updateProducts($store, $indice){
+    private function updateProducts($store, $indice)
+    {
         $collection = $this->changedProductCollectionFactory->create()->filterUpdated((int)$store->getId());
         if ($collection->getSize()) {
             $updated = $this->documentsProvider->getUpdated($collection, (int)$store->getId());
@@ -167,7 +154,8 @@ class Processor
     /**
      * Function to delete the products that have been stored into the data base as "to be deleted"
      */
-    private function deleteProducts($store, $indice){
+    private function deleteProducts($store, $indice)
+    {
         $collection = $this->changedProductCollectionFactory->create()->filterDeleted((int)$store->getId());
         if ($collection->getSize()) {
             $deleted = $this->documentsProvider->getDeleted($collection);
@@ -190,35 +178,5 @@ class Processor
             }
             $collection->walk('delete');
         }
-    }
-
-    /**
-     * Prepare items to be sent to Management API
-     * @see https://docs.doofinder.com/api/management/v2/#operation/items_bulk_update
-     *
-     * @param array $changedProducts
-     * @param bool $update
-     * @return array
-     */
-    private function prepareItems(array $changedProducts, ?bool $update = true): array
-    {
-        $items = [];
-        foreach ($changedProducts as $changedProduct) {
-            /** @var ChangedProductInterface $changedProduct */
-            $item['id'] = $changedProduct->getProductId();
-            if ($update) {
-                try {
-                    $product = $this->productRepository->getById($changedProduct->getProductId());
-                    $item['title'] = $product->getName();
-                    $item['link'] = $product->getProductUrl();
-                    $item['df_manual_boost'] = 1;
-                } catch (NoSuchEntityException $e) {
-                    $this->logger->error('Product with ID ' . $changedProduct->getProductId() . ' not found.');
-                }
-            }
-            $items[] = $item;
-        }
-
-        return $items;
     }
 }

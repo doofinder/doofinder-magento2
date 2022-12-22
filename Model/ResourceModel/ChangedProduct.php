@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Model\ResourceModel;
 
-use Doofinder\Feed\Api\Data\ChangedProductInterface;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDB;
-use Magento\Framework\Model\AbstractModel;
 
 /**
  * The resource model of product change trace.
