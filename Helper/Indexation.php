@@ -65,7 +65,6 @@ class Indexation extends AbstractHelper
             self::DOOFINDER_INDEX_PROCESS_STATUS_STARTED => self::DOOFINDER_GRID_SEVERITY_MINOR,
             self::DOOFINDER_INDEX_PROCESS_STATUS_SUCCESS => self::DOOFINDER_GRID_SEVERITY_NOTICE,
             self::DOOFINDER_INDEX_PROCESS_STATUS_FAILURE => self::DOOFINDER_GRID_SEVERITY_MAJOR,
-
         ];
 
         return $severity[$status];
