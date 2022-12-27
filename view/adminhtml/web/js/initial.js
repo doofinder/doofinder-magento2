@@ -2,10 +2,9 @@
 define([
     'uiComponent',
     'jquery',
-    'Magento_Ui/js/lib/spinner',
     'underscore',
     'mage/translate'
-], function (Component, $, Spinner, _) {
+], function(Component, $, _) {
     'use strict';
 
     return Component.extend({
@@ -16,13 +15,12 @@ define([
             },
             elements: {
                 sectorSelector: '${ $.sectorSelector }',
-                buttonId: '${ $.buttonId }',
                 buttonRegister: '${ $.buttonRegister }',
                 buttonLogin: '${ $.buttonLogin }',
             },
             urls: {
                 save: '${ $.submit_url }',
-                save_config: '${ $.save_config_url }',
+                saveConfig: '${ $.save_config_url }',
                 permissions: '${ $.permissionsDialogUrl }',
                 tokens: '${ $.tokensDialogUrl }',
                 saveSector: '${ $.saveSectorUrl }',
@@ -46,268 +44,108 @@ define([
                 name: '${ $.name }'
             },
             isIntegrationCreated: '${ $.isIntegrationCreated }',
-            hasApiKey: '${ $.hasApiKey }',
-            installingLoopStatus: '${ $.installingLoopStatus }'
+            hasApiKey: '${ $.hasApiKey }'
         },
-        changeSector: function(value) {
-            if (value) {
-                $(this.elements.sectorSelector).prop("disabled", true);
-                let self = this;
-                Spinner.show();
-                $.ajax({
-                    url: this.urls.saveSector,
-                    method: 'POST',
-                    data: value
-                }).done(function() {
-                    if($(self.elements.buttonLogin).prop("disabled"))
-                        $(self.elements.buttonId).prop("disabled", false);
-                }).fail(function(jqXHR, textStatus, errorThrown) {
-                    $(self.elements.sectorSelector).prop("disabled", false);
-                    console.error('Error (' + textStatus + '): ' + errorThrown);
-                }).always(function() {
-                    $(self.elements.sectorSelector).prop("disabled", false);
-                    Spinner.hide();
-                })
+        changeSector: async function(value) {
+            $(this.elements.sectorSelector).prop("disabled", true);
+            toggleSpinner(true);
+
+            try {
+                await ajax_post(this.urls.saveSector, value);
+                if (!Boolean(this.isIntegrationCreated)) await this.createIntegration();
+            } catch (error) {
+                addMessage(error);
+                alert(error);
             }
+
+            toggleSpinner(false);
+            $(this.elements.sectorSelector).prop("disabled", false);
         },
-        createIntegration: function() {
-            let initial = this,
-                integrationId = null;
-
-            Spinner.show();
-
+        createIntegration: async function() {
             let integrationData = this.formData;
-
             integrationData.current_password = "";
             integrationData.all_resources = 0;
             integrationData.resource = this.resource;
-            $.ajax({
-                url: this.urls.save,
-                method: 'POST',
-                data: integrationData
-            }).done(function (data) {
-                //view: module-integration/view/adminhtml/web/js/integration.js
-                const messageBox = $('.messages');
 
-                if (data._redirect) {
-                    const text = $.mage.__('The integration was not created due to some error. It may be that the Doofinder integration already exists.');
-                    addMessage(text);
-                } else if (data.integrationId) {
-                    $.ajax({
-                        url: initial.urls.save_config,
-                        method: 'POST',
-                        data: { 'id': data.integrationId }
-                    }).done(function (data) {
-                        if (data.result === false) {
-                            addMessage(data.error);
-                        }
-                    }).fail(function (jqXHR, textStatus, errorThrown) {
-                        console.error('Error (' + textStatus + '): ' + errorThrown);
-                    });
-
-                    // Activating and giving permissions
-
-                    // Replace placeholders in URL
-                    integrationId = data.integrationId;
-                    const ajaxUrl = initial.urls.permissions.replace(':id', integrationId);
-
-                    $.ajax({
-                        url: ajaxUrl,
-                        cache: false,
-                        data: {
-                            'form_key': window.FORM_KEY
-                        },
-                        method: 'GET',
-
-                        /** @inheritdoc */
-                        beforeSend: function () {
-                            // Show the spinner
-                            $('body').trigger('processStart');
-                        },
-                        /** @inheritdoc */
-                        success: function (result) {
-                            var redirect = result._redirect;
-
-                            if (redirect) {
-                                const text = $.mage.__('An error occurred during the activation process. Please try to activate the integration manually in the integrations section.');
-                                messageBox.append('<div class="message message-error error"><div data-ui-id="messages-message-error">' + text + '</div></div>');
-
-                                return;
-                            }
-
-                            // Replace placeholders in URL
-                            const ajaxUrl = initial.urls.tokens.replace(':id', integrationId);
-                            $.ajax({
-                                url: ajaxUrl,
-                                cache: false,
-                                data: {
-                                    'form_key': window.FORM_KEY
-                                },
-                                method: 'GET',
-
-                                /** @inheritdoc */
-                                beforeSend: function () {
-                                    // Show the spinner
-                                    $('body').trigger('processStart');
-                                },
-                                /** @inheritdoc */
-                                success: function (result) {
-                                    var redirect = result._redirect;
-
-                                    if (redirect) {
-                                        const text = $.mage.__('An error occurred during the activation process. Please try to activate the integration manually in the integrations section.');
-                                        messageBox.append('<div class="message message-error error"><div data-ui-id="messages-message-error">' + text + '</div></div>');
-
-                                        return;
-                                    }
-                                    // Replace placeholders in URL
-                                    const ajaxUrl = initial.urls.accessToken.replace(':id', integrationId);
-                                    $.ajax({
-                                        url: ajaxUrl,
-                                        cache: false,
-                                        data: {
-                                            'form_key': window.FORM_KEY
-                                        },
-                                        method: 'GET',
-                                    beforeSend: function () {
-                                            // Show the spinner
-                                            $('body').trigger('processStart');
-                                        }
-                                  }).done(function (result) {
-                                        let redirect = result._redirect;
-                                        if (redirect) {
-                                            const text = $.mage.__('An error occurred retrieving integration access token. Please, reload the page and continue process.');
-                                            messageBox.append('<div class="message message-error error"><div data-ui-id="messages-message-error">' + text + '</div></div>');
-                                            return;
-                                        }
-                                        // We replace the integration id param in the route path of the linking account process
-                                    $(document).trigger('changeOnIntegrationId', {'accessToken': result.accessToken});
-                                        const text = $.mage.__('The integration was created and activated correctly.');
-                                        messageBox.append('<div class="message message-success success"><div data-ui-id="messages-message-success">' + text + '</div></div>');
-
-                                        // We activate login/register buttons
-                                        $(initial.elements.buttonRegister).prop("disabled", false);
-                                        $(initial.elements.buttonLogin).prop("disabled", false);
-                                        $(initial.elements.buttonId).prop("disabled", true);
-                                  }).fail(function (jqXHR, status, error) {
-                                        alert({
-                                            content: $.mage.__('An error occurred retrieving integration access token. Please, reload the page and continue process.')
-                                        });
-                                        window.console && console.log(status + ': ' + error + '\nResponse text:\n' + jqXHR.responseText);
-                                  }).always(function () {
-                                        // Hide the spinner
-                                        $('body').trigger('processStop');
-                                    });
-                                },
-
-                                /** @inheritdoc */
-                                error: function (jqXHR, status, error) {
-                                    alert({
-                                        content: $.mage.__('Sorry, something went wrong. Please try again later.')
-                                    });
-                                    window.console && console.log(status + ': ' + error + '\nResponse text:\n' + jqXHR.responseText);
-                                },
-
-                                /** @inheritdoc */
-                                complete: function () {
-                                    // Hide the spinner
-                                    $('body').trigger('processStop');
-                                }
-                            });
-                        },
-
-                        /** @inheritdoc */
-                        error: function (jqXHR, status, error) {
-                            alert({
-                                content: $.mage.__('Sorry, something went wrong. Please try again later.')
-                            });
-                            window.console && console.log(status + ': ' + error + '\nResponse text:\n' + jqXHR.responseText);
-                        },
-
-                        /** @inheritdoc */
-                        complete: function () {
-                            // Hide the spinner
-                            $('body').trigger('processStop');
-                        }
-                    });
-                }
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                console.error('Error (' + textStatus + '): ' + errorThrown);
-            }).always(function () {
-                Spinner.hide();
-            });
-            return this;
+            let data = await ajax_post(this.urls.save, integrationData);
+            return await this.createIntegrationTokens(data);
         },
-        initialize: function () {
+        createIntegrationTokens: async function(data) {
+            const self = this;
+            if (data._redirect) {
+                throw $.mage.__('The integration was not created due to some error. It may be that the Doofinder integration already exists.');
+            } else if (data.integrationId) {
+                // Replace placeholders in URL
+                const manageTokensCallback = async(result, callbackFunction) => {
+                    if (result && result._redirect)
+                        throw $.mage.__('An error occurred during the activation process. Please try to activate the integration manually in the integrations section.');
+                    else
+                        await callbackFunction();
+                };
+
+                // Activating and giving permissions
+                let dataResult = await ajax_post(this.urls.saveConfig, { 'id': data.integrationId });
+                let result = await ajax_get(this.urls.permissions.replace(':id', data.integrationId));
+
+                if (dataResult.result === false) addMessage(dataResult.error);
+
+                manageTokensCallback(result, _ => { ajax_get(self.urls.tokens.replace(':id', data.integrationId)) });
+                manageTokensCallback(result, _ => { ajax_get(self.urls.accessToken.replace(':id', data.integrationId)) });
+
+                this.isIntegrationCreated = true;
+                $(this.elements.buttonRegister).prop("disabled", false);
+                $(this.elements.buttonLogin).prop("disabled", false);
+            }
+        },
+        initialize: function() {
             this._super();
 
-            let self = this;
+            const self = this;
+            $(this.elements.sectorSelector).change(function() { if (this.value) self.changeSector(this.value) });
 
-            $(this.elements.sectorSelector).change(function() {
-                self.changeSector(this.value);
-            });
-
-            // If we finished the linked account step previously we show an informative message,
-            // in other case we show the integration and login/register buttons
-            let installingLoopStatus = parseInt(this.installingLoopStatus);
-            if(installingLoopStatus === 0 && !Boolean(this.hasApiKey)) {
-                // Create integration click event
-                $(this.elements.buttonId).click(function (e) {
-                    e.preventDefault();
-                    self.createIntegration();
-                });
-
+            if (!Boolean(this.hasApiKey)) {
                 // If the integration already exists we activate login/register buttons and disable the create integration one
                 if (Boolean(this.isIntegrationCreated)) {
                     const text = $.mage.__('The integration was already created and activated.');
-                    $('.messages').append('<div class="message message-success success"><div data-ui-id="messages-message-success">' + text + '</div></div>');
-
+                    addMessage(text, 'success');
                     $(this.elements.buttonRegister).prop("disabled", false);
                     $(this.elements.buttonLogin).prop("disabled", false);
-                    $(this.elements.buttonId).prop("disabled", true);
                 }
-            } else if (installingLoopStatus === 0 || installingLoopStatus === 100) {
-                $('.steps-col').hide();
-                $('.ajax-steps-col').show();
-                addAjaxMessage($.mage.__('The setup process was correctly finished.'));
             } else {
                 $('.steps-col').hide();
                 $('.ajax-steps-col').show();
-                let failStep = getFailStep(installingLoopStatus);
-                addAjaxMessage(
-                    $.mage.__(
-                        'Installation has failed in step "' + failStep + '". ' +
-                        'Please, uninstall and install again the extension following documentation instructions. ' +
-                        'After installation is complete run again this Initial Setup.'
-                    )
-                );
+                $('#message-ajax-steps').text($.mage.__('The setup process was correctly finished.'));
             }
 
             $('.steps-setup').show();
         }
     });
 
-    function addAjaxMessage(text) {
-        $('#message-ajax-steps').text(text);
+    function ajax_get(url) {
+        return $.ajax({
+            url: url,
+            method: 'GET',
+            cache: false,
+            data: {
+                'form_key': window.FORM_KEY
+            }
+        });
+    }
+
+    function ajax_post(url, data) {
+        return $.ajax({
+            url: url,
+            method: 'POST',
+            cache: false,
+            data: data
+        });
     }
 
     function addMessage(text, type = 'error') {
         $('.messages').append('<div class="message message-' + type + ' ' + type + '"><div data-ui-id="messages-message-' + type + '">' + text + '</div></div>');
     }
 
-    function getFailStep(installingLoopStatus) {
-        let failStep = 'Initial Step';
-        if (installingLoopStatus === 1) {
-            failStep = 'Checking if API Key is set';
-        } else if (installingLoopStatus === 2) {
-            failStep = 'Create Search Engines';
-        } else if (installingLoopStatus === 3) {
-            failStep = 'Create Indices';
-        } else if (installingLoopStatus === 4) {
-            failStep = 'Process Search Engines';
-        } else if (installingLoopStatus === 5) {
-            failStep = 'Create Display Layers';
-        }
-        return failStep;
+    function toggleSpinner(enable) {
+        enable ? $('body').trigger('processStart') : $('body').trigger('processStop');
     }
 });

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Model\ChangedProduct;
 
 use Doofinder\Feed\Api\Data\ChangedProductInterface;
-use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResource;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection as ChangedProductCollection;
 use Generator;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\Full;

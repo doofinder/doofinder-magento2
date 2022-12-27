@@ -74,23 +74,18 @@ class Indice extends AbstractHelper
      *
      * @param array $searchEngine
      * @param string $name
-     * @return array
+     * @return $indiceExists
      * @throws NotFound
      */
-    public function getIndiceFromSearchEngine(array $searchEngine, string $name): array
+    public function checkIndiceExistsInSearchEngine(array $searchEngine, string $name): bool
     {
-        $indice = null;
+        $indiceExists = false;
         foreach ($searchEngine['indices'] as $i) {
             if ($i['name'] == $name) {
-                $indice = $i;
+                $indiceExists = true;
+                break;
             }
         }
-        if ($indice === null) {
-            throw new NotFound(
-                sprintf("Indice '%s' doesn't exist in search engine '%s'", $name, $searchEngine['name'])
-            );
-        }
-
-        return $indice;
+        return $indiceExists;
     }
 }

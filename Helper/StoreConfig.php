@@ -36,7 +36,7 @@ class StoreConfig extends AbstractHelper
     /**
      * URL to make the doofinder requests
      */
-    public const URL = 'https://app.doofinder.com';
+    public const URL = 'https://admin.doofinder.com';
 
     /**
      * Path to account settings in config.xml/core_config_data
@@ -787,6 +787,7 @@ class StoreConfig extends AbstractHelper
         foreach ($this->getAllStores() as $store) {
             if ($this->getValueFromConfig(self::INDICE_CALLBACK, ScopeInterface::SCOPE_STORES, (int)$store->getId()) == 0) {
                 $enabled = 0;
+                break;
             }
         }
         $this->setDisplayLayerEnabled($enabled);
