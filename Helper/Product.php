@@ -24,8 +24,6 @@ use Magento\Tax\Model\Config as TaxConfig;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable  as ConfigurableType;
-use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Catalog\Model\Product\Type as ProductType;
 
 /**
@@ -353,63 +351,6 @@ class Product extends AbstractHelper
     }
 
     /**
-     * Get product price
-     *
-     * @param ProductModel $product
-     * @param string|null $attribute
-     * @param boolean|null $tax
-     *
-     * @return float
-     */
-    public function getProductPrice(ProductModel $product, ?string $attribute = 'final_price', ?bool $tax = null): float
-    {
-        switch ($attribute) {
-            case 'special_price':
-            case 'tier_price':
-            case 'regular_price':
-                $type = $attribute;
-                break;
-
-            default:
-                $type = 'final_price';
-        }
-        
-        // To solve bug with regular_price in grouped products (Magento2 return price 0€), special_price is correctly calculated
-        if ($type == 'regular_price' && $product->getTypeId() == Grouped::TYPE_CODE) {
-            $price = $this->calculateGroupedPrice($product, $type);
-
-        } else if ($product->getTypeId() == ConfigurableType::TYPE_CODE) {
-            $price = $this->calculateConfigurablePrice($product, $type);
-        
-        } else {
-            $price = $product->getPriceInfo()->getPrice($type);
-        }
-
-        if (!$price) {
-            return 0;
-        }
-
-        $amount = $price->getAmount();
-        if ($tax === null) {
-            $tax = $this->taxConfig->getPriceDisplayType() != TaxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
-        }
-        if (!$tax) {
-            // No tax needed, use base amount
-            $value = $amount->getBaseAmount();
-        } elseif ($this->taxConfig->priceIncludesTax()) {
-            // Tax already included, use value
-            $value = $amount->getValue();
-        } else {
-            // Tax needed but not included in base price
-            // Apply tax to base amount to make sure tax is not added twice
-            $adjustment = $product->getPriceInfo()->getAdjustment('tax');
-            $value = $adjustment->applyAdjustment($amount->getBaseAmount(), $product);
-        }
-
-        return (float)$value;
-    }
-
-    /**
      * Get currency code
      *
      * @return string
@@ -527,36 +468,5 @@ class Product extends AbstractHelper
     public function getProductAvailability(ProductModel $product, ?int $stockId = null): string
     {
         return $this->inventoryHelper->getProductAvailability($product, $stockId);
-    }
-
-    /**
-     * Function to get the minimum price of the simple products in a grouped product
-     */
-    private function calculateGroupedPrice(ProductModel $product, string $type)
-    {
-        $usedProds = $product->getTypeInstance()->getAssociatedProducts($product);
-        return $this->getMinimumPrice($product, $usedProds, $type);
-    }
-
-    private function calculateConfigurablePrice(ProductModel $product, string $type) {
-        $usedProds = $product->getTypeInstance()->getUsedProducts($product);
-        return $this->getMinimumPrice($product, $usedProds, $type);
-    }
-
-    private function getMinimumPrice($product, $usedProds, $type) {
-        $prices = [];
-        foreach ($usedProds as $child) {
-            if ($child->getId() != $product->getId()) {
-                $price = $child->getPriceInfo()->getPrice($type);
-                $prices['prices'][] =  $price;
-                $prices['values'][] =  $price->getAmount()->getValue();
-            }
-        }
-
-        if (empty($prices))
-            return null;
-
-        $index = array_search(min($prices['values']), $prices['values']);
-        return ($index < 0) ? null : $prices['prices'][$index];
     }
 }
