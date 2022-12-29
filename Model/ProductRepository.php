@@ -310,7 +310,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      */
     private function setExtensionAttributes($product, $storeId): void
     {
-        $priceHelperFactory = $this->priceHelperFactory->create();
+        $priceHelper = $this->priceHelperFactory->create();
         $inventoryHelper = $this->inventoryHelperFactory->create();
 
         /** @var ProductExtension $extensionAttributes */
@@ -325,8 +325,8 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
 
-        $price = round($priceHelperFactory->getProductPrice($product, 'regular_price'), 2);
-        $specialPrice = round($priceHelperFactory->getProductPrice($product, 'final_price'), 2);
+        $price = round($priceHelper->getProductPrice($product, 'regular_price'), 2);
+        $specialPrice = round($priceHelper->getProductPrice($product, 'final_price'), 2);
         $extensionAttributes->setPrice($price);
         ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
 

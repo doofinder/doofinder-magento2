@@ -120,9 +120,6 @@
                        showInDefault="1"
                        showInWebsite="0"
                        showInStore="0">
-                    <depends>
-                        <field id="enabled">1</field>
-                    </depends>
                     <label>Index my data every</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Cronexpression</source_model>
                     <backend_model>Doofinder\Feed\Model\Config\Backend\Cron</backend_model>

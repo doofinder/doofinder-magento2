@@ -9,20 +9,16 @@ use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 use Magento\Downloadable\Model\Product\Type as DownloadableType;
 use Magento\GroupedProduct\Model\Product\Type\Grouped as GroupedType;
-use Magento\Catalog\Model\ProductFactory;
 use Magento\Tax\Model\Config as TaxConfig;
 
 class Price extends AbstractHelper
 {
-    private $productFactory;
     private $taxConfig;
 
     public function __construct(
         Context $context,
-        ProductFactory $productFactory,
         TaxConfig $taxConfig
     ) {
-        $this->productFactory = $productFactory;
         $this->taxConfig = $taxConfig;
         parent::__construct($context);
     }
@@ -30,9 +26,8 @@ class Price extends AbstractHelper
     /**
      * Gets product price by product's id
      */
-    public function getProductPrice($productId, $type = 'final_price')
+    public function getProductPrice($product, $type = 'final_price')
     {
-        $product = $this->productFactory->create()->load($productId);
         $price_type = $this->getPriceType($type);
         $flat_price = $this->getProductFlatPrice($product, $price_type);
         $price = $this->getPriceApplyingCorrespondingTaxes($product, $flat_price);
@@ -120,6 +115,9 @@ class Price extends AbstractHelper
         return $this->taxConfig->getPriceDisplayType() != TaxConfig::DISPLAY_TYPE_EXCLUDING_TAX;
     }
 
+    /**
+     * Applies the pricing strategy for bundle-type products and returns the corresponding value
+     */
     private function getBundleProductPrice($product, $type)
     {
         if ($type === 'special_price') {
@@ -128,6 +126,9 @@ class Price extends AbstractHelper
         return $product->getPriceInfo()->getPrice($type);
     }
 
+    /**
+     * Applies the pricing strategy for grouped-type products and returns the corresponding value
+     */
     private function getGroupedProductPrice($product, $type)
     {
         if($type !== 'regular_price') {
@@ -138,6 +139,9 @@ class Price extends AbstractHelper
         return $this->getMinimumComplexProductPrice($product, $usedProds, $type);
     }
 
+    /**
+     * Applies the pricing strategy for configurable-type products and returns the corresponding value
+     */
     private function getConfigurableProductPrice($product, $type)
     {
         $usedProds = $product->getTypeInstance()->getUsedProducts($product);
