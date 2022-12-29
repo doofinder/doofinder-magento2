@@ -378,10 +378,10 @@ class Product extends AbstractHelper
         if ($type == 'regular_price' && $product->getTypeId() == Grouped::TYPE_CODE) {
             $price = $this->calculateGroupedPrice($product, $type);
 
-        }else if ($product->getTypeId() == ConfigurableType::TYPE_CODE) {
+        } else if ($product->getTypeId() == ConfigurableType::TYPE_CODE) {
             $price = $this->calculateConfigurablePrice($product, $type);
         
-        }else {
+        } else {
             $price = $product->getPriceInfo()->getPrice($type);
         }
 

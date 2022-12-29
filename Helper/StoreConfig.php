@@ -33,6 +33,7 @@ use Magento\Backend\Helper\Data;
  */
 class StoreConfig extends AbstractHelper
 {
+    public const CRON_DISABLED_VALUE = 'everyday';
     /**
      * URL to make the doofinder requests
      */
@@ -101,12 +102,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Path to integration ID
      */
-    public const UPDATE_ON_SAVE = 'doofinder_config_config/update_on_save/enabled';
-
-    /**
-     * Export product prices config path
-     */
-    public const UPDATE_ON_SAVE_EXPORT_PRODUCT_PRICES = 'doofinder_config_config/update_on_save/export_product_prices';
+    public const UPDATE_ON_SAVE_CRON_EXPRESSION = 'doofinder_config_config/update_on_save/cron_expression';
 
     /**
      * Export product image with given width. Leave empty to use original size
@@ -663,42 +659,19 @@ class StoreConfig extends AbstractHelper
         $schema = parse_url($this->backendHelper->getUrl(), PHP_URL_SCHEME);
         return $schema . "://" . $host . "/" . self::DOOFINDER_CONNECTION;
     }
+
     /**
-     * Get update on save configuration value
+     * Get update on schedule configuration value
      *
      * @return bool
      */
     public function isUpdateOnSave(): bool
     {
-        return (bool)$this->getValueFromConfig(self::UPDATE_ON_SAVE);
-    }
-
-    /**
-     * @param integer|null $storeId
-     * @return string
-     */
-    public function getPriceTaxMode(?int $storeId): ?string
-    {
-        return $this->scopeConfig->getValue(
-            TaxConfig::CONFIG_XML_PATH_PRICE_DISPLAY_TYPE,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
+        $updateOnSchedule = $this->scopeConfig->getValue(
+            self::UPDATE_ON_SAVE_CRON_EXPRESSION,   
+            ScopeInterface::SCOPE_STORE
         );
-    }
-
-    /**
-     * Check if it should export product prices.
-     *
-     * @param int|null $storeId
-     * @return boolean
-     */
-    public function isExportProductPrices(?int $storeId = null): bool
-    {
-        return $this->scopeConfig->isSetFlag(
-            self::UPDATE_ON_SAVE_EXPORT_PRODUCT_PRICES,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
+        return $updateOnSchedule !== self::CRON_DISABLED_VALUE;
     }
 
     /**
@@ -932,7 +905,7 @@ class StoreConfig extends AbstractHelper
      *      language: 'fr-FR'
      *    };
      */
-    public function include_locale_and_currency($liveLayerScript, $locale, $currency): string
+    private function include_locale_and_currency($liveLayerScript, $locale, $currency): string
     {
         if (strpos($liveLayerScript, 'language:') !== false){
             $liveLayerScript = preg_replace("/(\/\/\s*)?(language:)(.*?)(\n|,)/m", "$2 '$locale'$4", $liveLayerScript);

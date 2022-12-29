@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Doofinder\Feed\Model\Generator\Map;
+namespace Doofinder\Feed\Model\Generator;
 
 use Doofinder\Feed\Api\Data\Generator\MapInterface;
 use Doofinder\Feed\Helper\Product as ProductHelper;
+use Doofinder\Feed\Helper\PriceFactory as PriceHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
 use Magento\Catalog\Model\Product as ProductModel;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable as ProductTypeConfigurable;
 use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Catalog\Model\Product\Option as ProductOption;
@@ -47,6 +49,7 @@ class Product implements MapInterface
      * Product constructor.
      *
      * @param ProductHelper $helper
+     * @param PriceHelperFactory $priceHelperFactory
      * @param StoreConfig $storeConfig
      * @param TaxConfig $taxConfig
      * @param ProductTypeConfigurable $productTypeConfigurable
@@ -54,12 +57,14 @@ class Product implements MapInterface
      */
     public function __construct(
         ProductHelper $helper,
+        PriceHelperFactory $priceHelperFactory,
         StoreConfig $storeConfig,
         TaxConfig $taxConfig,
         ProductTypeConfigurable $productTypeConfigurable,
         ProductOption $productOption
     ) {
         $this->productHelper = $helper;
+        $this->priceHelperFactory = $priceHelperFactory;
         $this->storeConfig = $storeConfig;
         $this->taxConfig = $taxConfig;
         $this->productTypeConfigurable = $productTypeConfigurable;
@@ -90,7 +95,7 @@ class Product implements MapInterface
             case 'category_ids':
                 return $this->getProductCategories(
                     $product,
-                    $this->isExportCategoriesInNavigation($product->getStoreId())
+                    $this->storeConfig->isExportCategoriesInNavigation($product->getStoreId())
                 );
 
             case 'image':
@@ -98,7 +103,7 @@ class Product implements MapInterface
             case 'thumbnail':
                 return $this->getProductImage(
                     $product,
-                    $this->getImageSize($product->getStoreId()),
+                    $this->storeConfig->getImageSize($product->getStoreId()),
                     $field
                 );
 
@@ -275,9 +280,13 @@ class Product implements MapInterface
      */
     public function getGroupingId(ProductModel $product): ?string
     {
-        $parentIds = $this->productTypeConfigurable->getParentIdsByChild($product->getId());
-
-        return count($parentIds) ? $parentIds[0] : $product->getId();
+        if ($product->getTypeId() == ConfigurableType::TYPE_CODE) {
+            return $product->getId();
+        }
+        else {
+            $parentIds = $this->productTypeConfigurable->getParentIdsByChild($product->getId());
+            return count($parentIds) ? $parentIds[0] : $product->getId();
+        }
     }
 
     /**
@@ -302,24 +311,7 @@ class Product implements MapInterface
      */
     public function getProductPrice(ProductModel $product, string $field): ?float
     {
-        if (!$this->isExportProductPrices((int)$product->getStoreId())) {
-            return null;
-        }
-        $tax = null;
-        if ($this->taxConfig->needPriceConversion()) {
-            switch ($this->getPriceTaxMode((int)$product->getStoreId())) {
-                case TaxConfig::DISPLAY_TYPE_INCLUDING_TAX:
-                    $tax = true;
-                    break;
-
-                case TaxConfig::DISPLAY_TYPE_EXCLUDING_TAX:
-                    $tax = false;
-                    break;
-            }
-        }
-
-        // Return price converted to store currency
-        return $this->productHelper->getProductPrice($product, $field, $tax);
+        return $this->priceHelperFactory->create()->getProductPrice($product, $field);
     }
 
     /**
@@ -398,42 +390,5 @@ class Product implements MapInterface
     public function getAttributeArray(ProductModel $product, string $attributeCode): ?array
     {
         return $this->productHelper->getAttributeArray($product, $attributeCode);
-    }
-
-
-    /**
-     * @param integer|null $storeId
-     * @return boolean
-     */
-    public function isExportCategoriesInNavigation(?int $storeId = null): bool
-    {
-        return $this->storeConfig->isExportCategoriesInNavigation($storeId);
-    }
-
-    /**
-     * @param integer|null $storeId
-     * @return string|null
-     */
-    public function getImageSize(?int $storeId = null): ?string
-    {
-        return $this->storeConfig->getImageSize($storeId);
-    }
-
-    /**
-     * @param integer|null $storeId
-     * @return boolean
-     */
-    public function isExportProductPrices(?int $storeId = null): bool
-    {
-        return $this->storeConfig->isExportProductPrices($storeId);
-    }
-
-    /**
-     * @param integer|null $storeId
-     * @return string
-     */
-    public function getPriceTaxMode(?int $storeId = null): string
-    {
-        return $this->storeConfig->getPriceTaxMode($storeId);
     }
 }

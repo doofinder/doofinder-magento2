@@ -15,11 +15,12 @@ class Cronexpression implements OptionSourceInterface
     public function toOptionArray(): array
     {
         return [
-            ['value' => '*/5 * * * *', 'label' => 'Every 5 Minutes'],
-            ['value' => '*/10 * * * *', 'label' => 'Every 10 Minutes'],
-            ['value' => '*/15 * * * *', 'label' => 'Every 15 Minutes'],
-            ['value' => '*/30 * * * *', 'label' => 'Every 30 Minutes'],
-            ['value' => '0 * * * *', 'label' => 'Every 60 Minutes'],
+            ['value' => '', 'label' => 'Everyday'],
+            ['value' => '*/5 * * * *', 'label' => '5 Minutes'],
+            ['value' => '*/10 * * * *', 'label' => '10 Minutes'],
+            ['value' => '*/15 * * * *', 'label' => '15 Minutes'],
+            ['value' => '*/30 * * * *', 'label' => '30 Minutes'],
+            ['value' => '0 * * * *', 'label' => '60 Minutes'],
         ];
     }
 }

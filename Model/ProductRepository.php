@@ -37,6 +37,7 @@ use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
+use Doofinder\Feed\Helper\PriceFactory as PriceHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
 
@@ -45,84 +46,22 @@ use Doofinder\Feed\Helper\StoreConfig;
  */
 class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 {
-    /**
-     * @var ImageFactory
-     */
-    protected $helperFactory;
-
-    /**
-     * @var Emulation
-     */
+    protected $imageHelperFactory;
     protected $appEmulation;
-
-    /**
-     * @var StockRegistryInterface
-     */
     private $stockRegistry;
-
-    /**
-     * @var int
-     */
     private $cacheLimit = 0;
-
-    /**
-     * @var ProductHelperFactory
-     */
     private $productHelperFactory;
-
-    /**
-     * @var InventoryHelperFactory
-     */
+    private $priceHelperFactory;
     private $inventoryHelperFactory;
-
-    /**
-     * @var StoreConfig
-     */
     private $storeConfig;
-
-    /**
-     * @var array
-     */
     private $excludedCustomAttributes;
 
-    /**
-     * @param ImageFactory $helperFactory
-     * @param Emulation $appEmulation
-     * @param StockRegistryInterface $stockRegistry
-     * @param ProductHelperFactory $productHelperFactory
-     * @param InventoryHelperFactory $inventoryHelperFactory
-     * @param StoreConfig $storeConfig
-     * @param ProductFactory $productFactory
-     * @param Helper $initializationHelper
-     * @param ProductSearchResultsInterfaceFactory $searchResultsFactory
-     * @param ProductCollectionFactory $collectionFactory
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param ProductAttributeRepositoryInterface $attributeRepository
-     * @param ProductResourceModel $resourceModel
-     * @param ProductLinks $linkInitializer
-     * @param ProductLinkTypeProvider $linkTypeProvider
-     * @param StoreManagerInterface $storeManager
-     * @param ApiFilterBuilder $filterBuilder
-     * @param ProductAttributeRepositoryInterface $metadataServiceInterface
-     * @param ExtensibleDataObjectConverter $extensibleDataObjectConverter
-     * @param ProductOptionConverter $optionConverter
-     * @param Filesystem $fileSystem
-     * @param ImageContentValidatorInterface $contentValidator
-     * @param ImageContentInterfaceFactory $contentFactory
-     * @param MimeTypeExtensionMap $mimeTypeExtensionMap
-     * @param ImageProcessorInterface $imageProcessor
-     * @param JoinProcessorInterface $extensionAttributesJoinProcessor
-     * @param CollectionProcessorInterface|null $collectionProcessor
-     * @param JsonSerializer|null $serializer
-     * @param int $cacheLimit
-     * @param ReadExtensions|null $readExtensions
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
-     */
     public function __construct(
-        ImageFactory $helperFactory,
+        ImageFactory $imageHelperFactory,
         Emulation $appEmulation,
         StockRegistryInterface $stockRegistry,
         ProductHelperFactory $productHelperFactory,
+        PriceHelperFactory $priceHelperFactory,
         InventoryHelperFactory $inventoryHelperFactory,
         StoreConfig $storeConfig,
         ProductFactory $productFactory,
@@ -150,10 +89,11 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $cacheLimit = 1000,
         ReadExtensions $readExtensions = null
     ) {
-        $this->helperFactory = $helperFactory;
+        $this->imageHelperFactory = $imageHelperFactory;
         $this->appEmulation = $appEmulation;
         $this->stockRegistry = $stockRegistry;
         $this->productHelperFactory = $productHelperFactory;
+        $this->priceHelperFactory = $priceHelperFactory;
         $this->inventoryHelperFactory = $inventoryHelperFactory;
         $this->storeConfig = $storeConfig;
         //Add here any custom attributes we want to exclude from indexation
@@ -256,7 +196,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      */
     private function getImage(Product $product, string $imageId, ?array $attributes = []): ImageHelper
     {
-        return $this->helperFactory->create()->init($product, $imageId, $attributes);
+        return $this->imageHelperFactory->create()->init($product, $imageId, $attributes);
     }
 
     /**
@@ -338,15 +278,15 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      */
     private function setCustomAttributes($product): void
     {
-        $productHelperFactory = $this->productHelperFactory->create();
+        $productHelper = $this->productHelperFactory->create();
         $customAttributes = $this->storeConfig->getCustomAttributes($product->getStoreId());
 
         foreach ($customAttributes as $customAttribute){
             $code = $customAttribute['code'];
             if($customAttribute['enabled'] && isset($product[$code])) {
-                ("array" === $productHelperFactory->getAttributeType($product, $code))?
-                    $value = $productHelperFactory->getAttributeArray($product, $code):
-                    $value = $productHelperFactory->getAttributeText($product, $code);
+                ("array" === $productHelper->getAttributeType($product, $code)) ?
+                    $value = $productHelper->getAttributeArray($product, $code) :
+                    $value = $productHelper->getAttributeText($product, $code)  ;
 
                 $product->setCustomAttribute($code, $value);
             } else {
@@ -370,7 +310,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      */
     private function setExtensionAttributes($product, $storeId): void
     {
-        $productHelperFactory = $this->productHelperFactory->create();
+        $priceHelperFactory = $this->priceHelperFactory->create();
         $inventoryHelper = $this->inventoryHelperFactory->create();
 
         /** @var ProductExtension $extensionAttributes */
@@ -385,8 +325,8 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
 
-        $price = round($productHelperFactory->getProductPrice($product, "regular_price"), 2);
-        $specialPrice = round($productHelperFactory->getProductPrice($product, "final_price"), 2);
+        $price = round($priceHelperFactory->getProductPrice($product, 'regular_price'), 2);
+        $specialPrice = round($priceHelperFactory->getProductPrice($product, 'final_price'), 2);
         $extensionAttributes->setPrice($price);
         ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
 

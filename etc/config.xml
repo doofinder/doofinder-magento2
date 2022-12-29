@@ -8,9 +8,7 @@
                 <indice_callback>0</indice_callback>
             </doofinder_layer>
             <update_on_save>
-                <enabled>0</enabled>
-                <cron_expression>0 * * * *</cron_expression>
-                <export_product_prices>1</export_product_prices>
+                <cron_expression>everyday</cron_expression>
                 <image_size>&#x200B;</image_size>
                 <categories_in_navigation>0</categories_in_navigation>
             </update_on_save>
