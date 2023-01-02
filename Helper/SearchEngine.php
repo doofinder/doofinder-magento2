@@ -17,6 +17,7 @@ use Doofinder\Feed\Errors\WrongResponse;
 use Doofinder\Feed\Wrapper\ThrottleFactory;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 class SearchEngine extends AbstractHelper
@@ -153,7 +154,7 @@ class SearchEngine extends AbstractHelper
     /**
      * Get search engine by hashid
      *
-     * @param string|null $storeCode
+     * @param string|null $hashId
      * @return array|null
      * @throws NoSuchEntityException
      */
@@ -169,15 +170,13 @@ class SearchEngine extends AbstractHelper
     /**
      * Get search engine by store code
      *
-     * @param string|null $storeCode
+     * @param StoreInterface $store
      * @return array|null
      * @throws NoSuchEntityException
      */
-    public function getSearchEngineByStore(string $storeCode = null): ?array
+    public function getSearchEngineByStore(StoreInterface $store): ?array
     {
-        $store = $this->storeManager->getStore($storeCode);
         $hashId = $this->storeConfig->getHashId((int)$store->getId());
-
         return $this->getSearchEngine($hashId);
     }
 

@@ -7,15 +7,19 @@ use Doofinder\Feed\Helper\SearchEngine;
 use Doofinder\Feed\Helper\StoreConfig;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Value;
 use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\ValidatorException;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Hash ID validation backend
  */
-class HashIdValidation extends \Magento\Framework\App\Config\Value
+class HashIdValidation extends Value
 {
     /**
      * @var StoreConfig
@@ -60,8 +64,8 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
      * Save configuration.
      *
      * @return HashIdValidation
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\ValidatorException
+     * @throws NoSuchEntityException
+     * @throws ValidatorException
      */
     public function beforeSave(): HashIdValidation
     {
@@ -70,7 +74,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
             $this->validateSearchEngine($hashId);
         }
         if ($this->storeConfig->isSingleStoreMode()) {
-            $this->setScope(\Magento\Store\Model\ScopeInterface::SCOPE_STORES);
+            $this->setScope(ScopeInterface::SCOPE_STORES);
             $this->setScopeId($this->storeConfig->getCurrentStore()->getId());
         }
 
@@ -79,7 +83,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
 
     /**
      * @return string|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getValue(): ?string
     {
@@ -101,8 +105,8 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
      * @param string $hashId
      *
      * @return void
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\ValidatorException Hash ID already used.
+     * @throws NoSuchEntityException
+     * @throws ValidatorException Hash ID already used.
      */
     private function validateUnique(string $hashId)
     {
@@ -114,7 +118,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
             }
             $scopeHashId = $this->storeConfig->getHashId((int)$store->getId());
             if ($hashId == $scopeHashId) {
-                throw new \Magento\Framework\Exception\ValidatorException(
+                throw new ValidatorException(
                     __('HashID %1 is already used in %2 store. It must be unique.', $hashId, $store->getCode())
                 );
             }
@@ -126,12 +130,12 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
      *
      * @param string $hashId
      * @return void
-     * @throws \Magento\Framework\Exception\ValidatorException Search engine unavailable.
+     * @throws ValidatorException Search engine unavailable.
      */
     private function validateSearchEngine(string $hashId)
     {
         if (!$this->storeConfig->getApiKey()) {
-            throw new \Magento\Framework\Exception\ValidatorException(
+            throw new ValidatorException(
                 __('Provide API key in the Default Config store view before setting HashID.')
             );
         }
@@ -142,7 +146,7 @@ class HashIdValidation extends \Magento\Framework\App\Config\Value
             $this->_logger->error('There was an error while getting search engines: ' . $e->getMessage());
         }
         if (!key_exists("hashid", $searchEngine) || $searchEngine["hashid"] != $hashId) {
-            throw new \Magento\Framework\Exception\ValidatorException(
+            throw new ValidatorException(
                 __('Search engine with HashID %1 does not exist in your account.', $hashId)
             );
         }

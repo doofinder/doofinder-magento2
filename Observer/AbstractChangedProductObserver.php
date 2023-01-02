@@ -13,7 +13,6 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Exception\AlreadyExistsException;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractChangedProductObserver implements ObserverInterface

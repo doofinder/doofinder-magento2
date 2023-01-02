@@ -9,6 +9,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Module\Manager;
+use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 /**
@@ -122,8 +123,8 @@ class Inventory extends AbstractHelper
     private function getQuantityAndStockStatusWithMSI(ProductModel $product, ?int $stockId = null)
     {
         $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
-        $qty = $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::QUANTITY];
-        $availability = $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::IS_SALABLE];
+        $qty = $stockItemData[GetStockItemDataInterface::QUANTITY];
+        $availability = $stockItemData[GetStockItemDataInterface::IS_SALABLE];
 
         return [$qty, $availability];
     }
@@ -158,7 +159,7 @@ class Inventory extends AbstractHelper
     {
         $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
 
-        return $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::IS_SALABLE]
+        return $stockItemData[GetStockItemDataInterface::IS_SALABLE]
             ? $this->getInStockLabel()
             : $this->getOutOfStockLabel();
     }
@@ -172,14 +173,13 @@ class Inventory extends AbstractHelper
     private function getStockItemData(string $sku, ?int $stockId = null)
     {
         $defaultStockProvider = $this->_objectManager->create(\Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface::class);
-        $getStockItemData = $this->_objectManager->create(\Magento\InventorySalesApi\Model\GetStockItemDataInterface::class);
-        
+        $getStockItemData = $this->_objectManager->create(GetStockItemDataInterface::class);
         $stockId = $stockId ?? $defaultStockProvider->getId();
         $stockItemData = $getStockItemData->execute($sku, $stockId);
 
         return [
-            \Magento\InventorySalesApi\Model\GetStockItemDataInterface::QUANTITY => $stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::QUANTITY] ?? 0,
-            \Magento\InventorySalesApi\Model\GetStockItemDataInterface::IS_SALABLE => (bool)($stockItemData[\Magento\InventorySalesApi\Model\GetStockItemDataInterface::IS_SALABLE] ?? false)
+            GetStockItemDataInterface::QUANTITY => $stockItemData[GetStockItemDataInterface::QUANTITY] ?? 0,
+            GetStockItemDataInterface::IS_SALABLE => (bool)($stockItemData[GetStockItemDataInterface::IS_SALABLE] ?? false)
         ];
     }
 
