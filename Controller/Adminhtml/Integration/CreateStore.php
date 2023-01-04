@@ -97,7 +97,10 @@ class CreateStore extends Action implements HttpGetActionInterface
         $success = true;
         foreach ($this->storeConfig->getAllWebsites() as $website) {
             try {
-                $searchEngineData = $this->generateSearchEngineData((int)$website->getId());
+                $website_id = (int)$website->getId();
+                $searchEngineData = $this->generateSearchEngineData($website_id);
+                $storeOptions = $this->generateStoreOptions($website_id);
+
                 $websiteConfig = [
                     "name" => $website->getName(),
                     "platform" => "magento2",
@@ -106,6 +109,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "callback_urls" => $searchEngineData["callbackUrls"],
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
                     "search_engines" => $searchEngineData["searchEngineConfig"],
+                    "options" => $storeOptions,
                     "query_input" => "#search"
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);
@@ -129,7 +133,6 @@ class CreateStore extends Action implements HttpGetActionInterface
         $callbackUrls = [];
 
         foreach ($this->storeConfig->getWebsiteStores($websiteID) as $store) {
-            $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
             $language = $this->storeConfig->getLanguageFromStore($store);
             $currency = strtoupper($store->getCurrentCurrency()->getCode());
 
@@ -138,10 +141,6 @@ class CreateStore extends Action implements HttpGetActionInterface
                 "language" => $language,
                 "currency" => $currency,
                 "site_url" => $store->getBaseUrl(),
-                "options" => [
-                    'token' => $integrationToken,
-                    'website_id' => $store->getWebsiteId(),
-                ],
                 "datatypes" => [
                     [
                         "name" => "product",
@@ -161,6 +160,17 @@ class CreateStore extends Action implements HttpGetActionInterface
             $callbackUrls[$language][$currency] = $this->getProcessCallbackUrl($store);
         }
         return ["searchEngineConfig" => $searchEngineConfig, "storesConfig" => $storesConfig, "callbackUrls" => $callbackUrls];
+    }
+
+
+    public function generateStoreOptions($websiteID)
+    {
+        $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
+
+        return [
+            'token' => $integrationToken,
+            'website_id' => $websiteID,
+        ];
     }
 
     /**
