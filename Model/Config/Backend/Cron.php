@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Model\Config\Backend;
 
 use Doofinder\Feed\Errors\DoofinderFeedException;
+use Doofinder\Feed\Helper\StoreConfigFactory;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Value as ConfigValue;
-use Magento\Framework\App\Config\ValueFactory;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
@@ -18,22 +18,19 @@ class Cron extends ConfigValue
 {
     const CRON_STRING_PATH = 'crontab/default/jobs/doofinder_update_on_save/schedule/cron_expr';
 
-    /**
-     * @var ValueFactory
-     */
-    protected $configValueFactory;
+    protected $storeConfigFactory;
 
     public function __construct(
         Context $context,
         Registry $registry,
         ScopeConfigInterface $config,
+        StoreConfigFactory $storeConfigFactory,
         TypeListInterface $cacheTypeList,
-        ValueFactory $configValueFactory,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        $this->configValueFactory = $configValueFactory;
+        $this->storeConfigFactory = $storeConfigFactory;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
 
@@ -43,11 +40,10 @@ class Cron extends ConfigValue
      */
     public function afterSave(): Cron
     {
-        $updateOnSave = $this->getData('groups/update_on_save/fields/enabled/value');
-        if ($updateOnSave) {
+        if ($this->storeConfigFactory->create()->isUpdateOnSave()) {
             $cronExpression = $this->getData('groups/update_on_save/fields/cron_expression/value');
             try {
-                $this->configValueFactory->create()->load(
+                $this->load(
                     self::CRON_STRING_PATH,
                     'path'
                 )->setValue(

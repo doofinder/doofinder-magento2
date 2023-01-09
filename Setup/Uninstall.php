@@ -8,8 +8,9 @@ use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigCo
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
+use Magento\Framework\Setup\UninstallInterface;
 
-class Uninstall implements \Magento\Framework\Setup\UninstallInterface
+class Uninstall implements UninstallInterface
 {
     /**
      * @var ConfigCollectionFactory

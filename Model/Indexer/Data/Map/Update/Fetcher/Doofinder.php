@@ -7,6 +7,7 @@ namespace Doofinder\Feed\Model\Indexer\Data\Map\Update\Fetcher;
 use Doofinder\Feed\Api\Data\FetcherInterface;
 use Doofinder\Feed\Api\Data\Generator\MapInterface;
 use Doofinder\Feed\Model\Config\Indexer\Attributes;
+use Doofinder\Feed\Model\Generator\Product as ProductGenerator;
 use Magento\Store\Model\App\Emulation;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
@@ -27,9 +28,9 @@ class Doofinder implements FetcherInterface
     private $processed;
 
     /**
-     * @var array
+     * @var ProductGenerator
      */
-    private $generators;
+    private $productGenerator;
 
     /**
      * @var ProductCollectionFactory
@@ -58,7 +59,7 @@ class Doofinder implements FetcherInterface
      * @param Attributes $attributes
      * @param ObjectManagerInterface $objectmanager
      * @param Manager $moduleManager
-     * @param array $generators,
+     * @param ProductGenerator $productGenerator,
      * @param Emulation $appEmulation
      */
     public function __construct(
@@ -66,12 +67,12 @@ class Doofinder implements FetcherInterface
         Attributes $attributes,
         ObjectManagerInterface $objectmanager,
         Manager $moduleManager,
-        array $generators,
+        ProductGenerator $productGenerator,
         Emulation $appEmulation
     ) {
         $this->productColFactory = $collectionFactory;
         $this->attributes = $attributes;
-        $this->generators = $generators;
+        $this->productGenerator = $productGenerator;
         $this->_objectManager = $objectmanager;
         $this->moduleManager = $moduleManager;
         $this->appEmulation = $appEmulation;
@@ -90,10 +91,9 @@ class Doofinder implements FetcherInterface
         foreach ($productCollection as $product) {
             $productId = $product->getId();
             $type = strtolower($product->getTypeId());
-            $generator = $this->getGenerator($type);
             $this->processed[$productId] = [];
             foreach ($fields as $indexField => $attribute) {
-                $this->processed[$productId][$indexField] = $generator->get($product, $attribute);
+                $this->processed[$productId][$indexField] = $this->productGenerator->get($product, $attribute);
             }
             $this->processed[$productId] = array_filter($this->processed[$productId]);
         }
@@ -144,7 +144,7 @@ class Doofinder implements FetcherInterface
      *
      * @return ProductCollection
      */
-    private function getProductCollection(array $productIds, int $storeId, ?int $stockId = null): ProductCollection
+    private function getProductCollection(array $productIds, int $storeId): ProductCollection
     {
         $collection = $this->productColFactory
             ->create()

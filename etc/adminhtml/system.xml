@@ -112,21 +112,7 @@
                    showInDefault="1"
                    showInWebsite="1"
                    showInStore="1">
-                <label>Update on save</label>
-                <field id="enabled"
-                       translate="label"
-                       type="select"
-                       sortOrder="100"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Doofinder\Feed\Model\Config\Backend\Updateonsave</backend_model>
-                    <comment>
-                        <![CDATA[ If "Update on save" is enabled when a product is created / updated / deleted this change is sent to Doofinder ]]>
-                    </comment>
-                </field>
+                <label>Automatic Indexing</label>
                 <field id="cron_expression"
                        translate="label"
                        type="select"
@@ -134,25 +120,12 @@
                        showInDefault="1"
                        showInWebsite="0"
                        showInStore="0">
-                    <depends>
-                        <field id="enabled">1</field>
-                    </depends>
-                    <label>Process changed products</label>
+                    <label>Index my data every</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Cronexpression</source_model>
                     <backend_model>Doofinder\Feed\Model\Config\Backend\Cron</backend_model>
                     <comment>
                         <![CDATA[ Configure when registered product changes are sent to Doofinder ]]>
                     </comment>
-                </field>
-                <field id="export_product_prices"
-                       translate="label"
-                       type="select"
-                       sortOrder="300"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
-                    <label>Export Product Prices</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="image_size"
                        translate="label"
