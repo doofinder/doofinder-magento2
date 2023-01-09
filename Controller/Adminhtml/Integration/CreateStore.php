@@ -27,7 +27,7 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /** @var AttributeCollectionFactory */
     protected $attributeCollectionFactory;
-    
+
     /** @var StoreConfig */
     private $storeConfig;
 
@@ -95,9 +95,12 @@ class CreateStore extends Action implements HttpGetActionInterface
     public function generateDoofinderStores()
     {
         $success = true;
-        foreach($this->storeConfig->getAllWebsites() as $website) {
+        foreach ($this->storeConfig->getAllWebsites() as $website) {
             try {
-                $searchEngineData = $this->generateSearchEngineData((int)$website->getId());
+                $website_id = (int)$website->getId();
+                $searchEngineData = $this->generateSearchEngineData($website_id);
+                $storeOptions = $this->generateStoreOptions($website_id);
+
                 $websiteConfig = [
                     "name" => $website->getName(),
                     "platform" => "magento2",
@@ -106,6 +109,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "callback_urls" => $searchEngineData["callbackUrls"],
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
                     "search_engines" => $searchEngineData["searchEngineConfig"],
+                    "options" => $storeOptions,
                     "query_input" => "#search"
                 ];
                 $response = $this->storeConfig->createStore($websiteConfig);
@@ -129,7 +133,6 @@ class CreateStore extends Action implements HttpGetActionInterface
         $callbackUrls = [];
 
         foreach ($this->storeConfig->getWebsiteStores($websiteID) as $store) {
-            $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
             $language = $this->storeConfig->getLanguageFromStore($store);
             $currency = strtoupper($store->getCurrentCurrency()->getCode());
 
@@ -146,9 +149,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                             [
                                 'type' => 'magento2',
                                 'options' => [
-                                    'url' => $this->urlInterface->getBaseUrl() . 'rest/' . $store->getCode() . '/V1/',
-                                    'token' => $integrationToken,
-                                    'website_id' => $store->getWebsiteId(),
+                                    'url' => $this->urlInterface->getBaseUrl() . 'rest/' . $store->getCode() . '/V1/'
                                 ]
                             ]
                         ]
@@ -161,10 +162,21 @@ class CreateStore extends Action implements HttpGetActionInterface
         return ["searchEngineConfig" => $searchEngineConfig, "storesConfig" => $storesConfig, "callbackUrls" => $callbackUrls];
     }
 
+
+    public function generateStoreOptions($websiteID)
+    {
+        $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
+
+        return [
+            'token' => $integrationToken,
+            'website_id' => $websiteID,
+        ];
+    }
+
     /**
      * Function to store into the data base the installation id as well as the layer script
      */
-    private function saveInstallationConfig($websiteID, $installationId, $script) 
+    private function saveInstallationConfig($websiteID, $installationId, $script)
     {
         $this->storeConfig->setInstallation($installationId, $websiteID);
         $this->storeConfig->setDisplayLayer($script, $websiteID);
@@ -194,7 +206,8 @@ class CreateStore extends Action implements HttpGetActionInterface
      * Function to store the status of the SE indexation.
      * By default we set this value to "STARTED" and will be updated when we receive the callback from doofinder
      */
-    private function setIndexationStatus($storeId) {
+    private function setIndexationStatus($storeId)
+    {
         $status = ["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED];
         $this->storeConfig->setIndexationStatus($status, $storeId);
     }
@@ -205,14 +218,16 @@ class CreateStore extends Action implements HttpGetActionInterface
     private function setCustomAttributes()
     {
         $attributeCollection = $this->attributeCollectionFactory->create();
-        $attributeCollection->addFieldToFilter('is_user_defined',['eq' => 1]);
-        $attributeCollection->addFieldToFilter('attribute_code',['in' => self::CUSTOM_ATTRIBUTES_ENABLED_DEFAULT]);
+        $attributeCollection->addFieldToFilter('is_user_defined', ['eq' => 1]);
+        $attributeCollection->addFieldToFilter('attribute_code', ['in' => self::CUSTOM_ATTRIBUTES_ENABLED_DEFAULT]);
         $attributes     = [];
         foreach ($attributeCollection as $attribute) {
             $attribute_id = $attribute->getAttributeId();
-            $attributes[$attribute_id] = ['label' => $this->escaper->escapeHtml($attribute->getFrontendLabel()), 
-                                          'code' => $attribute->getAttributeCode(), 
-                                          'enabled' => 'on'];
+            $attributes[$attribute_id] = [
+                'label' => $this->escaper->escapeHtml($attribute->getFrontendLabel()),
+                'code' => $attribute->getAttributeCode(),
+                'enabled' => 'on'
+            ];
         }
 
         $customAttributes = \Zend_Json::encode($attributes);
@@ -238,6 +253,6 @@ class CreateStore extends Action implements HttpGetActionInterface
      */
     private function getProcessCallbackUrl(StoreInterface $store): string
     {
-        return $store->getBaseUrl() . 'doofinderfeed/setup/processCallback?storeId='.$store->getId();
+        return $store->getBaseUrl() . 'doofinderfeed/setup/processCallback?storeId=' . $store->getId();
     }
 }
