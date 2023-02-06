@@ -18,11 +18,11 @@ sequenceDiagram
   Client ->> Magento: bin/magento setup:upgrade (refreshes setup_module table)
   Magento ->> Client: truthy response
   Client ->> Magento: select platform's sector
-  Magento ->> Database: save sector
-  Database ->> Magento: truthy response
+  Magento ->> Magento_database: save sector
+  Magento_database ->> Magento: truthy response
   Magento ->> Magento: create integration token
-  Magento ->> Database: save integration token
-  Database ->> Magento: truthy response
+  Magento ->> Magento_database: save integration token
+  Magento_database ->> Magento: truthy response
   Magento ->> Client: truthy response
   Client ->> Magento: login/sign up
   Magento ->> Doomanager: login/sign up
