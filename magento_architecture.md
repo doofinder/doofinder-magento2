@@ -27,22 +27,10 @@ sequenceDiagram
   Client ->> Magento: login/sign up
   Magento ->> Doomanager: login/sign up
   Doomanager ->> Magento: ok postMessage
-  Note left of Magento: postMessage: 
-    %{
-        admin_endpoint: "admin_endpoint",
-        api_endpoint: "api_endpoint",
-        api_token: "api_token",
-        search_endpoint: "search_endpoint",
-        token: "token"
-    }
+  Note left of Magento: {<br/>"admin_endpoint": admin_endpoint,<br/>"api_endpoint": api_endpoint,<br/>"api_token": "api_token",<br/>"search_endpoint": search_endpoint,<br/>"token": token<br/>}
   Magento ->> Magento: create store structure
   Magento ->> DoofAPI: send store structure
   DoofAPI ->> Magento: ok response
-  Note left of Magento: response: 
-    %{
-        installation_id: "installation_id",
-        script: "script",
-        search_endpoints: "search_endpoints",
-    }
+  Note left of Magento: {<br/>"installation_id": installation_id,<br/>"script": script,<br/>"search_endpoints": "search_endpoints",<br/>}
   Magento ->> Client: Enjoy Doofinder :)
 ```
