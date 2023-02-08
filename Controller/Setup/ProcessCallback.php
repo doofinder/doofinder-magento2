@@ -120,7 +120,7 @@ class ProcessCallback extends Action implements CsrfAwareActionInterface, HttpPo
      */
     private function validateProcessMessage(string $message): bool
     {
-        return $message == 'sources were processed successfully' || $message == 'No changes in feeds.';
+        return $message == 'Sources were processed successfully.' || $message == 'No changes in feeds.';
     }
 
     /**
