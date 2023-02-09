@@ -148,8 +148,7 @@ class MagentoReleaseClient
         $payload = [
             [
                 "sku" => "doofinder/doofinder-magento2",
-                #"action" => ["technical" => "submit"],
-                "action" => ["technical" => "draft"],
+                "action" => ["technical" => "submit"],
                 "type" => "extension",
                 "platform" => "M2",
                 "version_compatibility" => [
@@ -177,13 +176,7 @@ class MagentoReleaseClient
         ];
 
         echo "Create Release\n";
-        echo "Release data:\n";
-        var_dump($payload);
-        echo "\n";
-
         $result = $this->post("/products/packages", json_encode($payload), $headers);
-        echo "Result:\n";
-        var_dump($result);
         if (!empty($result)) {
             $result = reset($result);
         }
