@@ -32,6 +32,41 @@ class MagentoReleaseClient
     }
 
     /**
+     * Makes a POST curl Request
+     *
+     * @param string $url
+     * @param mixed $post_data String or Array with curl files
+     * @param array $headers
+     * @return mixed The response
+     */
+    private function post($url, $post_data, $headers = [])
+    {
+        $ch = curl_init();
+        curl_setopt_array(
+            $ch,
+            [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER     => $headers,
+                CURLOPT_URL            => self::API_PATH . $url,
+                CURLOPT_POSTFIELDS     => $post_data,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_CUSTOMREQUEST => 'POST'
+            ]
+        );
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        $decoded_result = json_decode($result);
+        if (!is_null($decoded_result)) {
+            return $decoded_result;
+        } else {
+            echo "An error ocurred while making a POST request:\n";
+            print_r($result);
+            return $result;
+        }
+    }
+
+    /**
      * Executes a POST curl request to obtain the User Session Token and stores
      * the received value into the ust property
      *
@@ -50,27 +85,8 @@ class MagentoReleaseClient
             "grant_type" => "session"
         ];
 
-        $curl = curl_init();
+        $response = $this->post('/app/session/token', json_encode($payload), $headers);
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => self::API_PATH . '/app/session/token',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 100,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode($payload),
-            CURLOPT_HTTPHEADER => $headers,
-            CURLINFO_HEADER_OUT => true,
-        ));
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-
-
-        $response = json_decode($response);
         if (property_exists($response, 'ust')) {
             $this->ust = $response->ust;
             echo " --- Obatined UST: $this->ust\n";
@@ -93,11 +109,10 @@ class MagentoReleaseClient
      */
     private function upload_files()
     {
-
-        $url = "/files/uploads/";
-        $ch = curl_init();
-        $headers   = array();
-        $headers[] = "Authorization: Bearer " . $this->ust;
+        $result_files = [];
+        $headers   = [
+            "Authorization: Bearer " . $this->ust
+        ];
         $path = realpath(dirname(__FILE__) . "/../../../");
         $post = [
             'file[0]' => new \CURLFile("$path/doofinder-magento2.zip", 'application/zip', 'doofinder-magento2.zip'),
@@ -109,23 +124,7 @@ class MagentoReleaseClient
             echo " --- Upload " . $file->postname . "\n";
         }
 
-        curl_setopt_array(
-            $ch,
-            [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HTTPHEADER     => $headers,
-                CURLOPT_URL            => self::API_PATH . $url,
-                CURLOPT_POSTFIELDS     => $post,
-                CURLINFO_HEADER_OUT     => true
-            ]
-        );
-
-        $result = curl_exec($ch);
-        curl_close($ch);
-
-        $uploaded_files = json_decode($result);
-        $result_files = [];
-
+        $uploaded_files = $this->post('/files/uploads/', $post, $headers);
         foreach ($uploaded_files as $file) {
             $result_files[] = $file->file_upload_id;
         }
@@ -141,15 +140,11 @@ class MagentoReleaseClient
     public function create_release()
     {
         $result = [];
-        $url = "/products/packages";
-        $ch = curl_init();
         $headers   = [
             "Authorization: Bearer " . $this->ust,
             "Content-Type: application/json"
         ];
-
         $files = $this->upload_files();
-
         $payload = [
             [
                 "sku" => "doofinder/doofinder-magento2",
@@ -181,26 +176,13 @@ class MagentoReleaseClient
             ]
         ];
 
-
         echo "Create Release\n";
         echo "Release data:\n";
         var_dump($payload);
         echo "\n";
 
-        curl_setopt_array(
-            $ch,
-            [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HTTPHEADER     => $headers,
-                CURLOPT_URL            => self::API_PATH . $url,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => json_encode($payload)
-            ]
-        );
-
-        $result   = curl_exec($ch);
-        curl_close($ch);
-        $result = json_decode($result);
+        $result = $this->post("/products/packages", json_encode($payload), $headers);
+        echo "Result:\n";
         var_dump($result);
         if (!empty($result)) {
             $result = reset($result);
