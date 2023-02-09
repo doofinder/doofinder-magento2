@@ -1,0 +1,12 @@
+/docker-compose\.yml      export-ignore
+/\.gitattributes          export-ignore
+/\.gitignore              export-ignore
+/\.stylelintrc            export-ignore
+/\.eslintrc               export-ignore
+/\.editorconfig           export-ignore
+/magento_architecture\.md export-ignore
+/manual\.doc              export-ignore
+/build\.sh                export-ignore
+/\.github		              export-ignore
+/\.env		                export-ignore
+/README.md		            export-ignore
