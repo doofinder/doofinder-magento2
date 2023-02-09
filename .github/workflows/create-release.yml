@@ -18,11 +18,12 @@ jobs:
           echo "tag=$tag" >> $GITHUB_ENV
           zip_path="doofinder-magento2.zip"
           echo "zip_path=$zip_path" >> $GITHUB_ENV
-          git archive --format=zip -o $zip_path $tag
           tag_message=$(git tag -l --format='%(contents)' ${GITHUB_REF#refs/*/})
           echo "tag_message<<EOF" >> $GITHUB_ENV
           echo "$tag_message" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+      - name: Build
+        run: git archive --format=zip -o $zip_path ${{ env.tag }}
       - name: Setup PHP with PECL extension
         uses: shivammathur/setup-php@v2
         with:
