@@ -26,7 +26,7 @@ class MagentoReleaseClient
         $this->app_id = $app_id;
         $this->app_secret = $app_secret;
         $this->version = $version;
-        $this->release_notes = $release_notes;
+        $this->release_notes = $this->process_release_notes($release_notes);
 
         $this->obtain_ust();
     }
@@ -199,6 +199,15 @@ class MagentoReleaseClient
                 echo "---------------------------------------------\n";
             }
         }
+    }
+
+    private function process_release_notes($release_notes)
+    {
+        $notes = explode(PHP_EOL, $release_notes);
+        if (isset($notes[2]))
+            return trim($notes[2]);
+        else
+            return $release_notes;
     }
 }
 
