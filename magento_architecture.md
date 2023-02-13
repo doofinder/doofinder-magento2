@@ -29,8 +29,11 @@ sequenceDiagram
   Doomanager ->> Magento: ok postMessage
   Note left of Magento: {<br/>"admin_endpoint": admin_endpoint,<br/>"api_endpoint": api_endpoint,<br/>"api_token": "api_token",<br/>"search_endpoint": search_endpoint,<br/>"token": token<br/>}
   Magento ->> Magento: create store structure
-  Magento ->> DoofAPI: send store structure
-  DoofAPI ->> Magento: ok response
+  Magento ->> Doomanager: send store structure
+  Note over Magento,Doomanager: includes callback_url to be called after it
+  Doomanager ->> Magento: ok response
+  Doomanager --) Magento: calls callback_url
+  Magento --) Magento: enables doofinder layer
   Note left of Magento: {<br/>"installation_id": installation_id,<br/>"script": script,<br/>"search_endpoints": "search_endpoints",<br/>}
   Magento ->> Client: Enjoy Doofinder :)
 ```
