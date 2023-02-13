@@ -145,6 +145,8 @@ class MagentoReleaseClient
             "Content-Type: application/json"
         ];
         $files = $this->upload_files();
+        //Sleep 20S to allow time for files to be verified by malware scanner
+        sleep(20);
         $payload = [
             [
                 "sku" => "doofinder/doofinder-magento2",
