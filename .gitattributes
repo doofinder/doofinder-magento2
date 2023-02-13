@@ -5,7 +5,7 @@
 /\.eslintrc                 export-ignore
 /\.editorconfig             export-ignore
 /magento_architecture\.md   export-ignore
-/manual\.doc                export-ignore
+/Manual\.doc                export-ignore
 /build\.sh                  export-ignore
 /\.github                   export-ignore
 /\.env                      export-ignore
