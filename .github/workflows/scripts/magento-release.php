@@ -150,7 +150,10 @@ class MagentoReleaseClient
         $payload = [
             [
                 "sku" => "doofinder/doofinder-magento2",
-                "action" => ["technical" => "submit"],
+                "action" => [
+                    "technical" => "submit",
+                    "marketing" => "submit"
+                ],
                 "type" => "extension",
                 "platform" => "M2",
                 "version_compatibility" => [
