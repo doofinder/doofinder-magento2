@@ -201,6 +201,21 @@ class MagentoReleaseClient
         }
     }
 
+    /**
+     * Process the Merge commit message to get only the real commit message
+     * without the merge info.
+     * Example, receiving:
+     * "Merge pull request #123 from doofinder/merged-pr-branch-name
+     *
+     *  The actual commit message here"
+     *
+     * Will return:
+     * "The actual commit message here""
+     *
+     *
+     * @param string $release_notes Merge commit message
+     * @return string Commit message
+     */
     private function process_release_notes($release_notes)
     {
         $notes = explode(PHP_EOL, $release_notes);
