@@ -114,20 +114,24 @@ class MagentoReleaseClient
             "Authorization: Bearer " . $this->ust
         ];
         $path = realpath(dirname(__FILE__) . "/../../../");
-        $post = [
-            'file[0]' => new \CURLFile("$path/doofinder-magento2.zip", 'application/zip', 'doofinder-magento2.zip'),
-            'file[1]' => new \CURLFile("$path/Manual.pdf", 'application/pdf', 'Manual.pdf')
+        $files = [
+            ["$path/doofinder-magento2.zip", 'application/zip', 'doofinder-magento2.zip'],
+            //["$path/Manual.pdf", 'application/pdf', 'Manual.pdf']
         ];
 
         echo "Uploading files: \n";
-        foreach ($post as $file) {
-            echo " --- Upload " . $file->postname . "\n";
+        foreach ($files as $file) {
+            echo " --- Upload " . $file[2] . "\n";
+            $post = [
+                'file' => new \CURLFile($file[0], $file[1], $file[2])
+            ];
+            $uploaded_files = $this->post('/files/uploads/', $post, $headers);
+            foreach ($uploaded_files as $file) {
+                $result_files[] = $file->file_upload_id;
+            }
         }
 
-        $uploaded_files = $this->post('/files/uploads/', $post, $headers);
-        foreach ($uploaded_files as $file) {
-            $result_files[] = $file->file_upload_id;
-        }
+        $result_files[] = '6284d77e0119b1.76552022.0'; //Add manual.pdf file id
         return $result_files;
     }
 
