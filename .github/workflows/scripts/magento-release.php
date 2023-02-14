@@ -89,7 +89,7 @@ class MagentoReleaseClient
 
         if (property_exists($response, 'ust')) {
             $this->ust = $response->ust;
-            echo " --- Obatined UST: $this->ust\n";
+            echo " --- Obtained UST: $this->ust\n";
         } else {
             die("Error obtaining the User Session Token. Check credentials");
         }
