@@ -123,7 +123,7 @@ class MagentoReleaseClient
         foreach ($files as $file) {
             echo " --- Upload " . $file[2] . "\n";
             $post = [
-                'file' => new \CURLFile($file[0], $file[1], $file[2])
+                'file[]' => new \CURLFile($file[0], $file[1], $file[2])
             ];
             $uploaded_files = $this->post('/files/uploads/', $post, $headers);
             foreach ($uploaded_files as $file) {
