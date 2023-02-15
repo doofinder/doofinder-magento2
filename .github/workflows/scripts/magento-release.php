@@ -102,7 +102,7 @@ class MagentoReleaseClient
      * The create release endpoint needs two files, the '.zip' file containing
      * the code and a documentation file, that in our case is a '.pdf' file
      *
-     * We return the list of file identifiers returned by the API. he first
+     * We return the list of file identifiers returned by the API. The first
      * value is the zip file id, and the second value is the PDF document ID
      *
      * @return array The list of file identifiers.
@@ -119,6 +119,19 @@ class MagentoReleaseClient
             //["$path/Manual.pdf", 'application/pdf', 'Manual.pdf']
         ];
 
+        /**
+         * We have had some problems while uploading the manual.pdf file, so, as
+         * this document is not updated frequently, we decided to specify the
+         * current manual.pdf file id in the code.
+         *
+         * Notice that if we want to update the user manual, we should upload it
+         * manually (Making a request to the '/files/uploads/' endpoint) and
+         * then update the $manual_file_upload_id variable below with the
+         * returned file_upload_id.
+         */
+
+        $manual_file_upload_id = '6284d77e0119b1.76552022.0';
+
         echo "Uploading files: \n";
         foreach ($files as $file) {
             echo " --- Upload " . $file[2] . "\n";
@@ -131,7 +144,7 @@ class MagentoReleaseClient
             }
         }
 
-        $result_files[] = '6284d77e0119b1.76552022.0'; //Add manual.pdf file id
+        $result_files[] = $manual_file_upload_id;
         return $result_files;
     }
 
