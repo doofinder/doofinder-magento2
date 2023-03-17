@@ -511,7 +511,7 @@ class StoreConfig extends AbstractHelper
      * Set the installation ID
      */
     public function setInstallation(string $installationId, int $storeGroupId) {
-        $this->configWriter->save(self::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_GROUPS, $storeGroupId);
+        $this->configWriter->save(self::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_GROUP, $storeGroupId);
     }
 
     /**
@@ -522,8 +522,8 @@ class StoreConfig extends AbstractHelper
     public function getDisplayLayer(): ?string
     {
         try {
-            $websiteId = $this->getCurrentStore()->getWebsiteId();
-            $displayLayerScript = $this->getValueFromConfig(self::DISPLAY_LAYER_SCRIPT_CONFIG, ScopeInterface::SCOPE_GROUPS, (int)$websiteId);
+            $storeGroupId = $this->getCurrentStore()->getStoreGroupId();
+            $displayLayerScript = $this->getValueFromConfig(self::DISPLAY_LAYER_SCRIPT_CONFIG, ScopeInterface::SCOPE_GROUP, (int)$storeGroupId);
             if ($displayLayerScript != null){
                 $locale = $this->getLanguageFromStore($this->getCurrentStore());
                 $currency = $this->getCurrentStore()->getCurrentCurrency()->getCode();
@@ -539,8 +539,8 @@ class StoreConfig extends AbstractHelper
     /**
      * Set display layer
      */
-    public function setDisplayLayer(string $script, int $websiteId) {
-        $this->configWriter->save(self::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+    public function setDisplayLayer(string $script, int $storeGroupId) {
+        $this->configWriter->save(self::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_GROUP, $storeGroupId);
     }
 
     /**
