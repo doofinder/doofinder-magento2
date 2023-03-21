@@ -98,8 +98,9 @@ class CreateStore extends Action implements HttpGetActionInterface
         foreach ($this->storeConfig->getAllGroups() as $storeGroup) {
             try {
                 $storeGroupId = (int)$storeGroup->getId();
+                $websiteId = (int)$storeGroup->getWebsiteId();
                 $searchEngineData = $this->generateSearchEngineData($storeGroupId);
-                $storeOptions = $this->generateStoreOptions();
+                $storeOptions = $this->generateStoreOptions($websiteId);
 
                 $storeGroupConfig = [
                     "name" => $storeGroup->getName(),
@@ -164,11 +165,14 @@ class CreateStore extends Action implements HttpGetActionInterface
     }
 
 
-    public function generateStoreOptions()
+    public function generateStoreOptions($websiteId)
     {
         $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
 
-        return ['token' => $integrationToken];
+        return [
+            'token' => $integrationToken,
+            'website_id' => $websiteId,
+        ];
     }
 
     /**
