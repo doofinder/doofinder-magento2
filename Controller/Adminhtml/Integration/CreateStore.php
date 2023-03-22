@@ -137,6 +137,7 @@ class CreateStore extends Action implements HttpGetActionInterface
             $language = $this->storeConfig->getLanguageFromStore($store);
             $currency = strtoupper($store->getCurrentCurrency()->getCode());
 
+            // store_id field refers to store_view's id.
             $searchEngineConfig[] = [
                 "name" => $store->getName(),
                 "language" => $language,
