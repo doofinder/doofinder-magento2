@@ -12,14 +12,15 @@ use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigCo
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Api\Data\GroupInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Api\StoreWebsiteRelationInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
-use Magento\Tax\Model\Config as TaxConfig;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Framework\Escaper;
 use Magento\Eav\Model\Config;
@@ -200,6 +201,11 @@ class StoreConfig extends AbstractHelper
     private $backendHelper;
 
     /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
+    private $resource;
+
+    /**
      * StoreConfig constructor.
      *
      * @param Context $context
@@ -212,6 +218,7 @@ class StoreConfig extends AbstractHelper
      * @param Escaper $escaper
      * @param Config $eavConfig
      * @param Data $backendHelper
+     * @param ResourceConnection $resource
      */
     public function __construct(
         ManagementClientFactory $managementClientFactory,
@@ -224,7 +231,8 @@ class StoreConfig extends AbstractHelper
         Indexation $indexationHelper,
         Escaper $escaper,
         Config $eavConfig,
-        Data $backendHelper
+        Data $backendHelper,
+        ResourceConnection $resource
     ) {
         $this->managementClientFactory = $managementClientFactory;
         $this->storeManager = $storeManager;
@@ -236,6 +244,7 @@ class StoreConfig extends AbstractHelper
         $this->escaper = $escaper;
         $this->eavConfig = $eavConfig;
         $this->backendHelper = $backendHelper;
+        $this->resource = $resource;
 
         parent::__construct($context);
     }
@@ -372,6 +381,16 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
+     * Get all websites excluding 'default'
+     *
+     * @return GroupInterface[]
+     */
+    public function getAllGroups(): array
+    {
+        return $this->storeManager->getGroups();
+    }
+
+    /**
      * Get website stores by website id
      *
      * @param int $websiteId
@@ -381,6 +400,27 @@ class StoreConfig extends AbstractHelper
     {
         $stores = [];
         $storeIds = $this->storeWebsiteRelation->getStoreByWebsiteId($websiteId);
+        foreach ($storeIds as $storeId) {
+            try {
+                $stores[] = $this->storeManager->getStore($storeId);
+            } catch (NoSuchEntityException $e) {
+                $this->_logger->error($e->getMessage());
+            }
+        }
+
+        return $stores;
+    }
+
+    /**
+     * Get stores by store group id
+     *
+     * @param int $storeId
+     * @return StoreInterface[]
+     */
+    public function getStoreGroupStores(int $storeId): array
+    {
+        $stores = [];
+        $storeIds = $this->getStoreByGroupId($storeId);
         foreach ($storeIds as $storeId) {
             try {
                 $stores[] = $this->storeManager->getStore($storeId);
@@ -470,8 +510,8 @@ class StoreConfig extends AbstractHelper
     /**
      * Set the installation ID
      */
-    public function setInstallation(string $installationId, int $websiteId) {
-        $this->configWriter->save(self::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+    public function setInstallation(string $installationId, int $storeGroupId) {
+        $this->configWriter->save(self::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_GROUP, $storeGroupId);
     }
 
     /**
@@ -482,8 +522,8 @@ class StoreConfig extends AbstractHelper
     public function getDisplayLayer(): ?string
     {
         try {
-            $websiteId = $this->getCurrentStore()->getWebsiteId();
-            $displayLayerScript = $this->getValueFromConfig(self::DISPLAY_LAYER_SCRIPT_CONFIG, ScopeInterface::SCOPE_WEBSITES, (int)$websiteId);
+            $storeGroupId = $this->getCurrentStore()->getStoreGroupId();
+            $displayLayerScript = $this->getValueFromConfig(self::DISPLAY_LAYER_SCRIPT_CONFIG, ScopeInterface::SCOPE_GROUP, (int)$storeGroupId);
             if ($displayLayerScript != null){
                 $locale = $this->getLanguageFromStore($this->getCurrentStore());
                 $currency = $this->getCurrentStore()->getCurrentCurrency()->getCode();
@@ -499,8 +539,8 @@ class StoreConfig extends AbstractHelper
     /**
      * Set display layer
      */
-    public function setDisplayLayer(string $script, int $websiteId) {
-        $this->configWriter->save(self::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+    public function setDisplayLayer(string $script, int $storeGroupId) {
+        $this->configWriter->save(self::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_GROUP, $storeGroupId);
     }
 
     /**
@@ -922,5 +962,22 @@ class StoreConfig extends AbstractHelper
         }
 
         return $liveLayerScript;
+    }
+
+    /**
+     * Get stores by store_group id
+     *
+     * @param int $storeGroupId
+     * @return array
+     */
+    private function getStoreByGroupId($storeGroupId)
+    {
+        $connection = $this->resource->getConnection();
+        $storeTable = $this->resource->getTableName('store');
+        $storeSelect = $connection->select()->from($storeTable, ['store_id'])->where(
+            'group_id = ?',
+            $storeGroupId
+        );
+        return $connection->fetchCol($storeSelect);
     }
 }

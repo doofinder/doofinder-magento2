@@ -37,3 +37,18 @@ sequenceDiagram
   Note left of Magento: {<br/>"installation_id": installation_id,<br/>"script": script,<br/>"search_endpoints": "search_endpoints",<br/>}
   Magento ->> Client: Enjoy Doofinder :)
 ```
+
+### Index Magento feed 
+
+```mermaid
+sequenceDiagram
+  Doomanager ->> Dftasks: send payload to dftasks
+  loop Pagination
+    Dftasks ->> Magento: ask for product's feed to our custom endpoint (paginated)
+    Magento ->> Magento: ask for product's feed to Magento's default API and wraps it's response appending some necessary information for us
+    Magento ->> Dftasks: Products' feed
+  end
+  Dftasks ->> DoofAPI: Index products' feed
+  DoofAPI ->> Dftasks: ok
+  Dftasks ->> Doomanager: ok
+```

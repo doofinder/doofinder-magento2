@@ -95,16 +95,17 @@ class CreateStore extends Action implements HttpGetActionInterface
     public function generateDoofinderStores()
     {
         $success = true;
-        foreach ($this->storeConfig->getAllWebsites() as $website) {
+        foreach ($this->storeConfig->getAllGroups() as $storeGroup) {
             try {
-                $website_id = (int)$website->getId();
-                $searchEngineData = $this->generateSearchEngineData($website_id);
-                $storeOptions = $this->generateStoreOptions($website_id);
+                $storeGroupId = (int)$storeGroup->getId();
+                $websiteId = (int)$storeGroup->getWebsiteId();
+                $searchEngineData = $this->generateSearchEngineData($storeGroupId);
+                $storeOptions = $this->generateStoreOptions($websiteId);
 
-                $websiteConfig = [
-                    "name" => $website->getName(),
+                $storeGroupConfig = [
+                    "name" => $storeGroup->getName(),
                     "platform" => "magento2",
-                    "primary_language" => $this->storeConfig->getLanguageFromStore($website->getDefaultStore()),
+                    "primary_language" => $this->storeConfig->getLanguageFromStore($storeGroup->getDefaultStore()),
                     "skip_indexation" => false,
                     "callback_urls" => $searchEngineData["callbackUrls"],
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
@@ -112,12 +113,12 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "options" => $storeOptions,
                     "query_input" => "#search"
                 ];
-                $response = $this->storeConfig->createStore($websiteConfig);
-                $this->saveInstallationConfig((int)$website->getId(), $response["installation_id"], $response["script"]);
+                $response = $this->storeConfig->createStore($storeGroupConfig);
+                $this->saveInstallationConfig((int)$storeGroupId, $response["installation_id"], $response["script"]);
                 $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["search_engines"]);
             } catch (Exception $e) {
                 $success = false;
-                $this->logger->error('Error creating store for website "' . $website->getName() . '". ' . $e->getMessage());
+                $this->logger->error('Error creating store for store group "' . $storeGroup->getName() . '". ' . $e->getMessage());
             }
         }
         $this->setCustomAttributes();
@@ -126,16 +127,17 @@ class CreateStore extends Action implements HttpGetActionInterface
         return $success;
     }
 
-    public function generateSearchEngineData($websiteID)
+    public function generateSearchEngineData($storeGroupId)
     {
         $searchEngineConfig = [];
         $storesConfig = [];
         $callbackUrls = [];
 
-        foreach ($this->storeConfig->getWebsiteStores($websiteID) as $store) {
+        foreach ($this->storeConfig->getStoreGroupStores($storeGroupId) as $store) {
             $language = $this->storeConfig->getLanguageFromStore($store);
             $currency = strtoupper($store->getCurrentCurrency()->getCode());
 
+            // store_id field refers to store_view's id.
             $searchEngineConfig[] = [
                 "name" => $store->getName(),
                 "language" => $language,
@@ -149,7 +151,8 @@ class CreateStore extends Action implements HttpGetActionInterface
                             [
                                 'type' => 'magento2',
                                 'options' => [
-                                    'url' => $this->urlInterface->getBaseUrl() . 'rest/' . $store->getCode() . '/V1/'
+                                    'url' => $this->urlInterface->getBaseUrl() . 'rest/' . $store->getCode() . '/V1/',
+                                    'store_id' => $store->getId()
                                 ]
                             ]
                         ]
@@ -163,23 +166,23 @@ class CreateStore extends Action implements HttpGetActionInterface
     }
 
 
-    public function generateStoreOptions($websiteID)
+    public function generateStoreOptions($websiteId)
     {
         $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
 
         return [
             'token' => $integrationToken,
-            'website_id' => $websiteID,
+            'website_id' => $websiteId,
         ];
     }
 
     /**
      * Function to store into the data base the installation id as well as the layer script
      */
-    private function saveInstallationConfig($websiteID, $installationId, $script)
+    private function saveInstallationConfig($storeGroupId, $installationId, $script)
     {
-        $this->storeConfig->setInstallation($installationId, $websiteID);
-        $this->storeConfig->setDisplayLayer($script, $websiteID);
+        $this->storeConfig->setInstallation($installationId, $storeGroupId);
+        $this->storeConfig->setDisplayLayer($script, $storeGroupId);
     }
 
     /**
