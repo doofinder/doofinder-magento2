@@ -194,7 +194,7 @@ class Client
                 [
                     RequestOptions::VERIFY  => false,
                     RequestOptions::HEADERS => $this->getHeaders(),
-                    RequestOptions::JSON    => $body,
+                    RequestOptions::JSON    => $this->flatten_array($body),
                     RequestOptions::EXPECT  => '',
                 ]
             );
@@ -272,5 +272,17 @@ class Client
         $arr = preg_split('/\r\n|\r|\n/', $message);
 
         return $arr[1] ?? $message;
+    }
+
+    /**
+     * @param array $ids
+     * @return array
+     */
+    private function flatten_array(array $ids) {
+        $flattened_ids = array();
+        array_walk_recursive($ids, function($a) use (&$flattened_ids) {
+             $flattened_ids[] = $a; 
+        });
+        return $flattened_ids;
     }
 }
