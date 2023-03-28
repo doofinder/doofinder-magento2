@@ -47,14 +47,14 @@ class ManagementClient
     {
         $response = $this->client->get(self::ENDPOINT_SEARCH_ENGINES);
 
-        return \Zend_Json::decode($response);
+        return json_decode($response, true);
     }
 
     public function createStore(array $storeData): array 
     {
         $response = $this->client->post('/plugins/create-store', $storeData);
 
-        return \Zend_Json::decode($response);
+        return json_decode($response, true);
     }
 
     /**
@@ -77,7 +77,7 @@ class ManagementClient
     {
         $response = $this->client->post(self::ENDPOINT_SEARCH_ENGINES, $searchEngine);
 
-        return \Zend_Json::decode($response);
+        return json_decode($response, true);
     }
 
     /**
@@ -102,7 +102,7 @@ class ManagementClient
         $path = $this->getProcessSearchEnginePath($hashId);
         $response = $this->client->post($path, ['callback_url' => $callbackUrl]);
 
-        return \Zend_Json::decode($response);
+        return json_decode($response, true);
     }
 
     /**
@@ -124,7 +124,7 @@ class ManagementClient
     {
         $url = $this->getSearchEnginePath($hashid);
         $response = $this->client->get($url);
-        return \Zend_Json::decode($response);
+        return json_decode($response, true);
     }
 
     /**
@@ -148,7 +148,7 @@ class ManagementClient
     {
         $response = $this->client->post($this->getIndicesPath($hashId), $indice);
 
-        return \Zend_Json::decode($response);
+        return json_decode($response, true);
     }
 
     /**
@@ -174,7 +174,7 @@ class ManagementClient
         $path = $this->getItemsBulkPath($hashId, $indice);
         $response = $this->client->post($path, $items);
 
-        return \Zend_Json::decode($response);
+        return json_decode($response, true);
     }
 
     /**
@@ -200,7 +200,7 @@ class ManagementClient
         $path = $this->getItemsBulkPath($hashId, $indice);
         $response = $this->client->post($path, $items);
 
-        return \Zend_Json::decode($response);
+        return json_decode($response, true);
     }
 
     /**
@@ -226,7 +226,7 @@ class ManagementClient
         $path = $this->getItemsBulkPath($hashId, $indice);
         $response = $this->client->delete($path, $items);
 
-        return \Zend_Json::decode($response);
+        return json_decode($response, true);
     }
 
     /**
