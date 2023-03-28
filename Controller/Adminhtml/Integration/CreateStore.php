@@ -233,7 +233,7 @@ class CreateStore extends Action implements HttpGetActionInterface
             ];
         }
 
-        $customAttributes = \Zend_Json::encode($attributes);
+        $customAttributes = \Laminas\Json\Json::encode($attributes);
         $this->storeConfig->setCustomAttributes($customAttributes);
     }
 

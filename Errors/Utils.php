@@ -61,7 +61,7 @@ class Utils
 
     private static function readError($response): string
     {
-        $error = \Zend_Json::decode($response);
+        $error = json_decode($response, true);
         if ($error === null || !isset($error['error']['message'])) {
             $error = $response;
         } else {

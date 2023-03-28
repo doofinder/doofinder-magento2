@@ -858,7 +858,7 @@ class StoreConfig extends AbstractHelper
         }
 
         $custom_attributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, $scope, $id);
-        $custom_attributes = ($custom_attributes) ? \Zend_Json::decode($custom_attributes) : null;
+        $custom_attributes = ($custom_attributes) ? json_decode($custom_attributes, true) : null;
         $saved = [];
         if ($custom_attributes && is_array($custom_attributes)) {
             foreach ($custom_attributes as $rowId => $row) {
@@ -900,7 +900,7 @@ class StoreConfig extends AbstractHelper
     public function getIndexationStatus(int $storeId): array {
         try {
             $status = $this->scopeConfig->getValue(self::INDEXATION_STATUS, ScopeInterface::SCOPE_STORES, $storeId);
-            return \Zend_Json::decode($status);
+            return json_decode($status, true);
         } catch (\Exception $e){
             throw new NotFound('There is not a valid indexation status for the current store.');
         }
@@ -911,7 +911,7 @@ class StoreConfig extends AbstractHelper
      */
     public function setIndexationStatus(array $status, int $storeId){
         $status = $this->indexationHelper->sanitizeProcessTaskStatus($status);
-        $status = \Zend_Json::encode($status);
+        $status = \Laminas\Json\Json::encode($status);
         $this->configWriter->save(self::INDEXATION_STATUS, $status, ScopeInterface::SCOPE_STORES, $storeId);
     }
 
