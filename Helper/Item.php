@@ -149,16 +149,16 @@ class Item extends AbstractHelper
         $hashId = $searchEngine['hashid'];
         $this->validateIndice($searchEngine, $indice);
         $managementClient = $this->throttleFactory->create([
-            'obj' => $this->managementClientFactory->create(),
+            'obj' => $this->managementClientFactory->create(['apiType' => 'admin']),
         ]);
 
         switch ($type) {
             case ChangedProductInterface::OPERATION_TYPE_CREATE:
-                return $managementClient->createItemsInBulk($items, $hashId, $indice);
+                return $managementClient->createItemsInBulk($items, $hashId);
             case ChangedProductInterface::OPERATION_TYPE_UPDATE:
-                return $managementClient->updateItemsInBulk($items, $hashId, $indice);
+                return $managementClient->updateItemsInBulk($items, $hashId);
             case ChangedProductInterface::OPERATION_TYPE_DELETE:
-                return $managementClient->deleteItemsInBulk($items, $hashId, $indice);
+                return $managementClient->deleteItemsInBulk($items, $hashId);
         }
     }
 

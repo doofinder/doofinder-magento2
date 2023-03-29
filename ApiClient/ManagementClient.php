@@ -16,6 +16,7 @@ use Doofinder\Feed\Errors\WrongResponse;
 class ManagementClient
 {
     const ENDPOINT_SEARCH_ENGINES = '/api/v2/search_engines';
+    const ENDPOINT_UPDATE_ON_SAVE = '/plugins/magento2';
 
     /** @var Client */
     private $client;
@@ -157,7 +158,6 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
-     * @param string $indice
      * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
@@ -169,9 +169,9 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function createItemsInBulk(array $items, string $hashId, string $indice): array
+    public function createItemsInBulk(array $items, string $hashId): array
     {
-        $path = $this->getItemsBulkPath($hashId, $indice);
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -183,7 +183,6 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
-     * @param string $indice
      * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
@@ -195,9 +194,9 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function updateItemsInBulk(array $items, string $hashId, string $indice): array
+    public function updateItemsInBulk(array $items, string $hashId): array
     {
-        $path = $this->getItemsBulkPath($hashId, $indice);
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -209,7 +208,6 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
-     * @param string $indice
      * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
@@ -221,9 +219,9 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function deleteItemsInBulk(array $items, string $hashId, string $indice): array
+    public function deleteItemsInBulk(array $items, string $hashId): array
     {
-        $path = $this->getItemsBulkPath($hashId, $indice);
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_delete";
         $response = $this->client->delete($path, $items);
 
         return json_decode($response, true);
@@ -260,17 +258,5 @@ class ManagementClient
     private function getIndicesPath(string $hashId): string
     {
         return self::ENDPOINT_SEARCH_ENGINES . "/{$hashId}/indices";
-    }
-
-    /**
-     * Returns items endpoint
-     *
-     * @param string $hashId
-     * @param string $indice
-     * @return string
-     */
-    private function getItemsBulkPath(string $hashId, string $indice): string
-    {
-        return self::ENDPOINT_SEARCH_ENGINES . "/{$hashId}/indices/{$indice}/items/_bulk";
     }
 }
