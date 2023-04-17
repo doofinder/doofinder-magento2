@@ -158,7 +158,6 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
-     * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -169,7 +168,7 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function createItemsInBulk(array $items, string $hashId): array
+    public function createItemsInBulk(array $items, string $hashId)
     {
         $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update";
         $response = $this->client->post($path, $items);
@@ -183,7 +182,6 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
-     * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -194,7 +192,7 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function updateItemsInBulk(array $items, string $hashId): array
+    public function updateItemsInBulk(array $items, string $hashId)
     {
         $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update";
         $response = $this->client->post($path, $items);
@@ -208,7 +206,6 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
-     * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -219,7 +216,7 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function deleteItemsInBulk(array $items, string $hashId): array
+    public function deleteItemsInBulk(array $items, string $hashId)
     {
         $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_delete";
         $response = $this->client->delete($path, $items);
