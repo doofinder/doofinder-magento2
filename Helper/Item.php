@@ -54,7 +54,6 @@ class Item extends AbstractHelper
      * @param array $items
      * @param StoreInterface $store
      * @param string $indice
-     * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -66,7 +65,7 @@ class Item extends AbstractHelper
      * @throws \Zend_Json_Exception
      * @throws NoSuchEntityException
      */
-    public function createItemsInBulk(array $items, StoreInterface $store, string $indice): array
+    public function createItemsInBulk(array $items, StoreInterface $store, string $indice)
     {
         return $this->processItemsInBulk($items, $store, $indice, ChangedProductInterface::OPERATION_TYPE_CREATE);
     }
@@ -77,7 +76,6 @@ class Item extends AbstractHelper
      * @param array $items
      * @param StoreInterface $store
      * @param string $indice
-     * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -89,7 +87,7 @@ class Item extends AbstractHelper
      * @throws \Zend_Json_Exception
      * @throws NoSuchEntityException
      */
-    public function updateItemsInBulk(array $items, StoreInterface $store, string $indice): array
+    public function updateItemsInBulk(array $items, StoreInterface $store, string $indice)
     {
         return $this->processItemsInBulk($items, $store, $indice, ChangedProductInterface::OPERATION_TYPE_UPDATE);
     }
@@ -100,7 +98,6 @@ class Item extends AbstractHelper
      * @param array $items
      * @param StoreInterface $store
      * @param string $indice
-     * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -112,7 +109,7 @@ class Item extends AbstractHelper
      * @throws \Zend_Json_Exception
      * @throws NoSuchEntityException
      */
-    public function deleteItemsInBulk(array $items, StoreInterface $store, string $indice): array
+    public function deleteItemsInBulk(array $items, StoreInterface $store, string $indice)
     {
         return $this->processItemsInBulk($items, $store, $indice, ChangedProductInterface::OPERATION_TYPE_DELETE);
     }
@@ -141,9 +138,8 @@ class Item extends AbstractHelper
      * @param StoreInterface $store
      * @param string $indice
      * @param string $type
-     * @return array
      */
-    private function processItemsInBulk(array $items, StoreInterface $store, string $indice, string $type): array
+    private function processItemsInBulk(array $items, StoreInterface $store, string $indice, string $type)
     {
         $searchEngine = $this->getSearchEngineFromStore($store);
         $hashId = $searchEngine['hashid'];
