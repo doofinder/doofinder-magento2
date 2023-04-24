@@ -18,7 +18,7 @@ interface ProductRepositoryInterface
      * @param bool $editMode
      * @param int|null $storeId
      * @param bool $forceReload
-     * @return ProductInterface
+     * @return \Magento\Catalog\Api\Data\ProductInterface
      * @throws NoSuchEntityException
      */
     public function get(
@@ -32,7 +32,7 @@ interface ProductRepositoryInterface
      * Get product list
      *
      * @param SearchCriteriaInterface $searchCriteria
-     * @return ProductSearchResultsInterface
+     * @return \Magento\Catalog\Api\Data\ProductSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $searchCriteria): ProductSearchResultsInterface;
 }
