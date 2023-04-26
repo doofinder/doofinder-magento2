@@ -131,9 +131,9 @@
                        translate="label"
                        type="text"
                        sortOrder="400"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="1">
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="0">
                     <label>Image size</label>
                     <comment>
                         <![CDATA[Export product image with given width. Leave empty to use original size.]]>
