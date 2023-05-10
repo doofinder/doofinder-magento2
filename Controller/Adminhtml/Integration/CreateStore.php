@@ -233,7 +233,7 @@ class CreateStore extends Action implements HttpGetActionInterface
             ];
         }
 
-        $customAttributes = \Laminas\Json\Json::encode($attributes);
+        $customAttributes = json_encode($attributes);
         $this->storeConfig->setCustomAttributes($customAttributes);
     }
 
