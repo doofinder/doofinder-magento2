@@ -107,7 +107,7 @@ class Processor
                 if (count($items)) {
                     try {
                         $this->logger->debug('[CreateInBulk]');
-                        $this->logger->debug(\Laminas\Json\Json::encode($items));
+                        $this->logger->debug(json_encode($items));
                         $this->itemHelper->createItemsInBulk($items, $store, $indice);
                     } catch (\Exception $e) {
                         $this->logger->error(
@@ -136,7 +136,7 @@ class Processor
                 if (count($items)) {
                     try {
                         $this->logger->debug('[UpdateInBulk]');
-                        $this->logger->debug(\Laminas\Json\Json::encode($items));
+                        $this->logger->debug(json_encode($items));
                         $this->itemHelper->updateItemsInBulk($items, $store, $indice);
                     } catch (\Exception $e) {
                         $this->logger->error(
@@ -164,7 +164,7 @@ class Processor
                 if (count($items)) {
                     try {
                         $this->logger->debug('[DeleteInBulk]');
-                        $this->logger->debug(\Laminas\Json\Json::encode($items));
+                        $this->logger->debug(json_encode($items));
                         $this->itemHelper->deleteItemsInBulk($items, $store, $indice);
                     } catch (\Exception $e) {
                         $this->logger->error(

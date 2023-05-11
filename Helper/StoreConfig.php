@@ -911,7 +911,7 @@ class StoreConfig extends AbstractHelper
      */
     public function setIndexationStatus(array $status, int $storeId){
         $status = $this->indexationHelper->sanitizeProcessTaskStatus($status);
-        $status = \Laminas\Json\Json::encode($status);
+        $status = json_encode($status);
         $this->configWriter->save(self::INDEXATION_STATUS, $status, ScopeInterface::SCOPE_STORES, $storeId);
     }
 
