@@ -79,6 +79,7 @@ www-data@...:/app# bin/magento setup:static-content:deploy -f
 ```
 COMPOSER_AUTH_USERNAME & COMPOSER_AUTH_PASSWORD
 ```
+These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and creating an access key. The public key will be COMPOSER_AUTH_USERNAME and the private key will be COMPOSER_AUTH_PASSWORD.
 
 ## Using the module
 
