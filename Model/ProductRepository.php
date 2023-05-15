@@ -7,6 +7,7 @@ namespace Doofinder\Feed\Model;
 use Magento\Catalog\Api\Data\ProductExtension;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\Data\ProductSearchResultsInterfaceFactory;
+use Magento\Catalog\Api\CategoryListInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper;
 use Magento\Catalog\Helper\Image as ImageHelper;
@@ -35,6 +36,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\Store\Model\App\Emulation;
+use Magento\Store\Api\StoreConfigManagerInterface as MagentoStoreConfig;
 use Magento\Store\Model\StoreManagerInterface;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\PriceFactory as PriceHelperFactory;
@@ -54,16 +56,20 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     private $priceHelperFactory;
     private $inventoryHelperFactory;
     private $storeConfig;
+    private $magentoStoreConfig;
     private $excludedCustomAttributes;
+    private $categoryListInterface;
 
     public function __construct(
         ImageFactory $imageHelperFactory,
         Emulation $appEmulation,
         StockRegistryInterface $stockRegistry,
+        CategoryListInterface $categoryListInterface,
         ProductHelperFactory $productHelperFactory,
         PriceHelperFactory $priceHelperFactory,
         InventoryHelperFactory $inventoryHelperFactory,
         StoreConfig $storeConfig,
+        MagentoStoreConfig $magentoStoreConfig,
         ProductFactory $productFactory,
         Helper $initializationHelper,
         ProductSearchResultsInterfaceFactory $searchResultsFactory,
@@ -92,10 +98,12 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $this->imageHelperFactory = $imageHelperFactory;
         $this->appEmulation = $appEmulation;
         $this->stockRegistry = $stockRegistry;
+        $this->categoryListInterface = $categoryListInterface;
         $this->productHelperFactory = $productHelperFactory;
         $this->priceHelperFactory = $priceHelperFactory;
         $this->inventoryHelperFactory = $inventoryHelperFactory;
         $this->storeConfig = $storeConfig;
+        $this->magentoStoreConfig = $magentoStoreConfig;
         //Add here any custom attributes we want to exclude from indexation
         $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
         parent::__construct(
@@ -312,18 +320,23 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     {
         $priceHelper = $this->priceHelperFactory->create();
         $inventoryHelper = $this->inventoryHelperFactory->create();
+        $storeCode = $this->storeManager->getStore($storeId)->getCode();
 
         /** @var ProductExtension $extensionAttributes */
         $extensionAttributes = $product->getExtensionAttributes();
 
-        $stockItem = $this->stockRegistry->getStockItem($product->getId());
         $stockId = (int)$inventoryHelper->getStockIdByStore((int)$storeId);
         $stockAndStatus = $inventoryHelper->getQuantityAndAvailability($product, $stockId);
-        $stockItem->setQty($stockAndStatus[0]);
-        $stockItem->setIsInStock($stockAndStatus[1]);
-        $extensionAttributes->setStockItem($stockItem);
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
+        $extensionAttributes->setIsInStock($stockAndStatus[1]);
+        $extensionAttributes->setBaseUrl($this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseUrl());
+        $extensionAttributes->setBaseMediaUrl($this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseMediaUrl());
+
+        $categories =  $extensionAttributes->getCategoryLinks();
+        if (is_array($categories)) {
+            $extensionAttributes->setCategoryLinks($this->categoriesInformation($categories));
+        }
 
         $price = round($priceHelper->getProductPrice($product, 'regular_price'), 2);
         $specialPrice = round($priceHelper->getProductPrice($product, 'final_price'), 2);
@@ -345,5 +358,47 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
             if (isset($product[$attribute]))
                 unset($product[$attribute]);
         }
+    }
+
+    private function categoriesInformation($categories)
+    {
+        $categoryIds = [];
+        foreach ($categories as $category) {
+            $categoryIds[$category['category_id']] = true;
+        }
+
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter('entity_id', '1', 'gt')
+            ->addFilter('parent_id', '1', 'gt')
+            ->addFilter('is_active', '1')
+            ->create();
+
+        $categories = $this->categoryListInterface->getList($searchCriteria)->__toArray();
+
+        // obtain categories with valid ids (with an associative array to avoid duplicates)
+        $items = $categories["items"];
+        $items_number = count($items);
+        for($i = 0; $i < $items_number; $i++) {
+            if(array_key_exists($items[$i]["entity_id"], $categoryIds)) {
+                $categoryIds[$items[$i]["parent_id"]] = true;
+                array_splice($items, $i, 1);
+                $items_number = count($items);
+                $i = 0;
+            }
+        }
+
+        foreach($categories["items"] as $categoryKey => $categoryValue) {
+            if(!array_key_exists($categoryValue["entity_id"], $categoryIds)) {
+                unset($categories["items"][$categoryKey]);
+            }
+        }
+        
+        foreach($categories["items"] as &$category) {
+            $category["category_id"] = $category["entity_id"];
+        }
+
+        // It returns different elements that we don't need, so we are just taking "items"
+        return $categories["items"];
+        
     }
 }
