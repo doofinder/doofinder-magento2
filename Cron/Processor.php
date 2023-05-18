@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Cron;
 
-use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Doofinder\Feed\Helper\Indice as IndiceHelper;
 use Doofinder\Feed\Helper\Item as ItemHelper;
@@ -125,11 +124,11 @@ class Processor
         if ($collection->getSize()) {
             $searchCriteria = $this->createSearchCriteria($collection, $storeId);
             $items = $this->productRepository->getList($searchCriteria)->__toArray();
-            if (count($items)) {
+            if (array_key_exists("items", $items) && count($items["items"])) {
                 try {
-                    $this->logger->debug('[UpdateInBulk]');
+                    $this->logger->debug('[CreateInBulk]');
                     $this->logger->debug(json_encode($items));
-                    $this->itemHelper->updateItemsInBulk(
+                    $this->itemHelper->createItemsInBulk(
                         $items,
                         $store,
                         $indice
@@ -137,7 +136,7 @@ class Processor
                 } catch (\Exception $e) {
                     $this->logger->error(
                         sprintf(
-                            '[Doofinder] There was an error while updating items in bulk: %s',
+                            '[Doofinder] There was an error while creating items in bulk: %s',
                             $e->getMessage()
                         )
                     );
@@ -158,7 +157,7 @@ class Processor
         if ($collection->getSize()) {
             $searchCriteria = $this->createSearchCriteria($collection, $storeId);
             $items = $this->productRepository->getList($searchCriteria)->__toArray();
-            if (count($items)) {
+            if (array_key_exists("items", $items) && count($items["items"])) {
                 try {
                     $this->logger->debug('[UpdateInBulk]');
                     $this->logger->debug(json_encode($items));

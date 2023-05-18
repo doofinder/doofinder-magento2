@@ -39,16 +39,4 @@ class DocumentsProvider
             yield $item[ChangedProductInterface::PRODUCT_ID];
         }
     }
-
-    /**
-     * @param ChangedProductCollection $collection
-     * @param integer $storeId
-     * @return Generator
-     */
-    public function getUpdated(ChangedProductCollection $collection, int $storeId): Generator
-    {
-        $productIds = $collection->getColumnValues(ChangedProductInterface::PRODUCT_ID);
-
-        return $this->fullAction->rebuildStoreIndex($storeId, $productIds);
-    }
 }
