@@ -109,6 +109,28 @@ $ docker exec -it web bash
 www-data@...:~# cd /app
 www-data@...:/app# bin/magento module:uninstall Doofinder_Feed --remove-data
 ```
+Manual Uninstall
+```
+php bin/magento module:disable Doofinder_Feed --clear-static-content
+php bin/magento setup:upgrade
+php bin/magento cache:flush
+remove directory inside src/app/code
+```
+
+## Test another versions
+Change your branch to the tag that you want inside package directory
+
+Go inside the magento container 
+```
+cd app
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
+php bin/magento setup:static-content:deploy -f
+php bin/magento module:enable Doofinder_Feed  --clear-static-content
+php bin/magento cache:clean
+php bin/magento cache:flush
+```
+
 
 ## Last notes
 
