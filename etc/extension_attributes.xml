@@ -5,6 +5,7 @@
         <attribute code="is_in_stock" type="boolean"/>
         <attribute code="base_url" type="string"/>
         <attribute code="base_media_url" type="string"/>
+        <attribute code="image" type="string"/>
         <attribute code="price" type="float"/>
         <attribute code="special_price" type="float"/>
     </extension_attributes>
