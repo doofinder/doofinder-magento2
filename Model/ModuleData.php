@@ -107,30 +107,32 @@ class ModuleData {
             $storeStructs = [];
             $websiteId = $website->getId();
             foreach ($this->storeConfig->getWebsiteStores($websiteId) as $store) {
+                $storeCode = $store->getCode();
                 $storeStructs[] = new StoreStruct(
                     $store->getId(),
-                    $store->getCode(),
+                    $storeCode,
                     $this->storeConfig->getLanguageFromStore($store),
-                    $store->getCurrentCurrencyCode()
+                    $store->getCurrentCurrencyCode(),
+                    $this->getInstallationId($storeCode),
+
                 );
             }
             $websiteStructs[] = new WebsiteStruct(
                 $websiteId,
                 $website->getName(),
                 $website->getCode(),
-                $this->getInstallationId($websiteId),
                 $storeStructs
             );
         }
         return $websiteStructs;
     }
 
-    private function getInstallationId($websiteId)
+    private function getInstallationId($storeCode)
     {
         return $this->scopeConfig->getValue(
             'doofinder_config_config/doofinder_layer/installation_id',
-            ScopeInterface::SCOPE_WEBSITE,
-            $websiteId
+            ScopeInterface::SCOPE_STORE,
+            $storeCode
         );
     }
 }

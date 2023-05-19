@@ -9,15 +9,13 @@ class WebsiteStruct implements JsonSerializable {
     private $id;
     private $name;
     private $code;
-    private $installationId;
     private $storeStructs;
 
-    public function __construct(int $id, string $name, string $code, string $installationId = null, array $storeStructs)
+    public function __construct(int $id, string $name, string $code, array $storeStructs)
     {
         $this->id = $id;
         $this->name = $name;
         $this->code = $code;
-        $this->installationId = $installationId;
         $this->storeStructs = $storeStructs;
     }
 
@@ -27,7 +25,6 @@ class WebsiteStruct implements JsonSerializable {
             'id'    => $this->id,
             'name'   => $this->name,
             'code'   => $this->code,
-            'installation_id'    => $this->installationId,
             'stores'    => $this->storeStructs
          );
     }
