@@ -26,6 +26,7 @@ use Magento\Framework\Escaper;
 use Magento\Eav\Model\Config;
 use Doofinder\Feed\Errors\NotFound;
 use Magento\Backend\Helper\Data;
+use Doofinder\Feed\Helper\JsonSerialization;
 
 /**
  * Store config helper
@@ -911,7 +912,7 @@ class StoreConfig extends AbstractHelper
      */
     public function setIndexationStatus(array $status, int $storeId){
         $status = $this->indexationHelper->sanitizeProcessTaskStatus($status);
-        $status = json_encode($status);
+        $status = JsonSerialization::encode($status);
         $this->configWriter->save(self::INDEXATION_STATUS, $status, ScopeInterface::SCOPE_STORES, $storeId);
     }
 
