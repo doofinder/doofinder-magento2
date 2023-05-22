@@ -38,13 +38,13 @@ class UpgradeData implements UpgradeDataInterface
                 foreach ($groupCollection as $group) {
                     $websiteId = $group->getWebsiteId();
                     $script = $this->scopeConfig->getValue($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
-                    if(isset($script)){
+                    if(!empty($script)){
                         $this->configWriter->save($scriptIdPath, $script, ScopeInterface::SCOPE_GROUP, $group->getId());
                         $this->configWriter->delete($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
                     }
     
                     $installationId = $this->scopeConfig->getValue($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
-                    if(isset($installationId)){
+                    if(!empty($installationId)){
                         $this->configWriter->save($installationIdPath, $installationId, ScopeInterface::SCOPE_GROUP, $group->getId());
                         $this->configWriter->delete($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
                     }
