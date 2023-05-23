@@ -146,7 +146,7 @@ class ManagementClient
      */
     public function createItemsInBulk(array $items, string $hashId)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_create";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_create_v2";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -170,7 +170,7 @@ class ManagementClient
      */
     public function updateItemsInBulk(array $items, string $hashId)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update_v2";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);

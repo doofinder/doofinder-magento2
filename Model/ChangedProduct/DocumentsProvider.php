@@ -7,29 +7,15 @@ namespace Doofinder\Feed\Model\ChangedProduct;
 use Doofinder\Feed\Api\Data\ChangedProductInterface;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct\Collection as ChangedProductCollection;
 use Generator;
-use Magento\CatalogSearch\Model\Indexer\Fulltext\Action\Full;
 
 class DocumentsProvider
 {
-    /**
-     * @var Full
-     */
-    private $fullAction;
-
-    /**
-     * DocumentsProvider constructor.
-     * @param Full $fullAction
-     */
-    public function __construct(Full $fullAction)
-    {
-        $this->fullAction = $fullAction;
-    }
 
     /**
      * @param ChangedProductCollection $collection
      * @return Generator
      */
-    public function getDeleted(ChangedProductCollection $collection): Generator
+    public function getBatched(ChangedProductCollection $collection): Generator
     {
         if ($collection->getSize() === 0) {
             yield [];

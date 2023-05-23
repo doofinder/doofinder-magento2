@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Cron;
 
-use Magento\Backend\App\Action\Context;
 use Doofinder\Feed\Helper\Indice as IndiceHelper;
 use Doofinder\Feed\Helper\Item as ItemHelper;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedProduct\DocumentsProvider;
-use Doofinder\Feed\Model\Indexer\Data\Mapper;
-use Doofinder\Feed\Model\ProductRepository;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory as ChangedProductCollectionFactory;
-use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Psr\Log\LoggerInterface;
 
@@ -39,11 +35,6 @@ class Processor
     private $itemHelper;
 
     /**
-     * @var Mapper
-     */
-    private $mapper;
-
-    /**
      * @var Batch
      */
     private $batch;
@@ -58,40 +49,22 @@ class Processor
      */
     private $logger;
 
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $searchCriteriaBuilderFactory;
-
-    /**
-     * @var ProductRepository
-     */
-    private $productRepository;
-
     public function __construct(
-        Context $context,
         StoreConfig $storeConfig,
         ChangedProductCollectionFactory $changedProductCollectionFactory,
         DocumentsProvider $documentsProvider,
         ItemHelper $itemHelper,
-        Mapper $mapper,
         Batch $batch,
         LoggerInterface $logger,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        ProductRepository $productRepository,
         $batchSize = 100
     ) {
         $this->storeConfig = $storeConfig;
         $this->changedProductCollectionFactory = $changedProductCollectionFactory;
         $this->documentsProvider = $documentsProvider;
         $this->itemHelper = $itemHelper;
-        $this->mapper = $mapper;
         $this->batch = $batch;
         $this->batchSize = $batchSize;
         $this->logger = $logger;
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
-        $this->productRepository = $productRepository;
-        parent::__construct($context);
     }
 
     /**
@@ -115,34 +88,29 @@ class Processor
 
     /**
      * Function to delete the products that have been stored into the data base as "to be created"
-     * Batches have been removed because it is very very unlikely to have a lot of products related with the update on save process
      */
     private function createProducts($store, $indice)
     {
-        $storeId = (int)$store->getId();
-        $collection = $this->changedProductCollectionFactory->create()->filterCreated($storeId);
+        $collection = $this->changedProductCollectionFactory->create()->filterCreated((int)$store->getId());
         if ($collection->getSize()) {
-            $searchCriteria = $this->createSearchCriteria($collection, $storeId);
-            $items = $this->productRepository->getList($searchCriteria)->__toArray();
-            if (array_key_exists("items", $items) && count($items["items"])) {
-                try {
-                    $this->logger->debug('[CreateInBulk]');
-                    $this->logger->debug(json_encode($items));
-                    $this->itemHelper->createItemsInBulk(
-                        $items,
-                        $store,
-                        $indice
-                    );
-                } catch (\Exception $e) {
-                    $this->logger->error(
-                        sprintf(
-                            '[Doofinder] There was an error while creating items in bulk: %s',
-                            $e->getMessage()
-                        )
-                    );
+            $created = $this->documentsProvider->getBatched($collection, (int)$store->getId());
+            foreach ($this->batch->getItems($created, $this->batchSize) as $batchDocuments) {
+                $items = $this->mapProducts($batchDocuments);
+                if (count($items)) {
+                    try {
+                        $this->logger->debug('[CreateInBulk]');
+                        $this->logger->debug(json_encode($items));
+                        $this->itemHelper->createItemsInBulk($items, $store, $indice);
+                    } catch (\Exception $e) {
+                        $this->logger->error(
+                            sprintf(
+                                '[Doofinder] There was an error while creating items in bulk: %s',
+                                $e->getMessage()
+                            )
+                        );
+                    }
                 }
             }
-
             $collection->walk('delete');
         }
     }
@@ -152,30 +120,26 @@ class Processor
      */
     private function updateProducts($store, $indice)
     {
-        $storeId = (int)$store->getId();
-        $collection = $this->changedProductCollectionFactory->create()->filterUpdated($storeId);
+        $collection = $this->changedProductCollectionFactory->create()->filterUpdated((int)$store->getId());
         if ($collection->getSize()) {
-            $searchCriteria = $this->createSearchCriteria($collection, $storeId);
-            $items = $this->productRepository->getList($searchCriteria)->__toArray();
-            if (array_key_exists("items", $items) && count($items["items"])) {
-                try {
-                    $this->logger->debug('[UpdateInBulk]');
-                    $this->logger->debug(json_encode($items));
-                    $this->itemHelper->updateItemsInBulk(
-                        $items,
-                        $store,
-                        $indice
-                    );
-                } catch (\Exception $e) {
-                    $this->logger->error(
-                        sprintf(
-                            '[Doofinder] There was an error while updating items in bulk: %s',
-                            $e->getMessage()
-                        )
-                    );
+            $updated = $this->documentsProvider->getBatched($collection, (int)$store->getId());
+            foreach ($this->batch->getItems($updated, $this->batchSize) as $batchDocuments) {
+                $items = $this->mapProducts($batchDocuments);
+                if (count($items)) {
+                    try {
+                        $this->logger->debug('[UpdateInBulk]');
+                        $this->logger->debug(json_encode($items));
+                        $this->itemHelper->updateItemsInBulk($items, $store, $indice);
+                    } catch (\Exception $e) {
+                        $this->logger->error(
+                            sprintf(
+                                '[Doofinder] There was an error while updating items in bulk: %s',
+                                $e->getMessage()
+                            )
+                        );
+                    }
                 }
             }
-
             $collection->walk('delete');
         }
     }
@@ -186,9 +150,9 @@ class Processor
     {
         $collection = $this->changedProductCollectionFactory->create()->filterDeleted((int)$store->getId());
         if ($collection->getSize()) {
-            $deleted = $this->documentsProvider->getDeleted($collection);
+            $deleted = $this->documentsProvider->getBatched($collection);
             foreach ($this->batch->getItems($deleted, $this->batchSize) as $batchDeleted) {
-                $items = $this->mapper->get('delete')->map($batchDeleted, (int)$store->getId());
+                $items = $this->mapProducts($batchDeleted);
                 if (count($items)) {
                     try {
                         $this->logger->debug('[DeleteInBulk]');
@@ -208,17 +172,9 @@ class Processor
         }
     }
 
-    private function createSearchCriteria($collection, $storeId)
-    {
-        $productIds = [];
-        foreach ($collection as $item) {
-            $productIds[] = $item['product_id'];
-        }
-            
-        return $this->searchCriteriaBuilderFactory
-            ->create()
-            ->addFilter('entity_id', implode(',', $productIds), 'in')
-            ->addFilter('store_id', $storeId)
-            ->create();
+    private function mapProducts($documents) {
+        return array_map(function ($productId) {
+            return ['id' => $productId];
+        }, $documents);
     }
 }
