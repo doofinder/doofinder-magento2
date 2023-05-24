@@ -79,6 +79,7 @@ www-data@...:/app# bin/magento setup:static-content:deploy -f
 ```
 COMPOSER_AUTH_USERNAME & COMPOSER_AUTH_PASSWORD
 ```
+These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and creating an access key. The public key will be COMPOSER_AUTH_USERNAME and the private key will be COMPOSER_AUTH_PASSWORD.
 
 ## Using the module
 
@@ -108,6 +109,28 @@ $ docker exec -it web bash
 www-data@...:~# cd /app
 www-data@...:/app# bin/magento module:uninstall Doofinder_Feed --remove-data
 ```
+Manual Uninstall
+```
+php bin/magento module:disable Doofinder_Feed --clear-static-content
+php bin/magento setup:upgrade
+php bin/magento cache:flush
+remove directory inside src/app/code
+```
+
+## Test another versions
+Change your branch to the tag that you want inside package directory
+
+Go inside the magento container 
+```
+cd app
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
+php bin/magento setup:static-content:deploy -f
+php bin/magento module:enable Doofinder_Feed  --clear-static-content
+php bin/magento cache:clean
+php bin/magento cache:flush
+```
+
 
 ## Last notes
 
