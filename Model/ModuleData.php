@@ -130,7 +130,6 @@ class ModuleData {
     private function getInstallationId($store)
     {
         $storeGroupId = $store->getStoreGroupId();
-        //return $storeGroupId;
         return $this->storeConfig->getValueFromConfig(
             'doofinder_config_config/doofinder_layer/installation_id',
             ScopeInterface::SCOPE_GROUP,
