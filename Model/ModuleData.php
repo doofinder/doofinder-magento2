@@ -113,7 +113,7 @@ class ModuleData {
                     $storeCode,
                     $this->storeConfig->getLanguageFromStore($store),
                     $store->getCurrentCurrencyCode(),
-                    $this->getInstallationId($storeCode),
+                    $this->getInstallationId($store),
 
                 );
             }
@@ -127,12 +127,14 @@ class ModuleData {
         return $websiteStructs;
     }
 
-    private function getInstallationId($storeCode)
+    private function getInstallationId($store)
     {
-        return $this->scopeConfig->getValue(
+        $storeGroupId = $store->getStoreGroupId();
+        //return $storeGroupId;
+        return $this->storeConfig->getValueFromConfig(
             'doofinder_config_config/doofinder_layer/installation_id',
-            ScopeInterface::SCOPE_STORE,
-            $storeCode
+            ScopeInterface::SCOPE_GROUP,
+            $storeGroupId
         );
     }
 }
