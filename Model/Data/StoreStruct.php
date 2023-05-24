@@ -10,13 +10,15 @@ class StoreStruct implements JsonSerializable {
     private $code;
     private $language;
     private $currency;
+    private $installationId;
 
-    public function __construct(int $id, string $code, string $language, string $currency)
+    public function __construct(int $id, string $code, string $language, string $currency, string $installationId)
     {
         $this->id = $id;
         $this->code = $code;
         $this->language = $language;
         $this->currency = $currency;
+        $this->installationId = $installationId;
     }
 
     public function jsonSerialize(): array
@@ -25,7 +27,8 @@ class StoreStruct implements JsonSerializable {
             'id'    => $this->id,
             'code'   => $this->code,
             'language'    => $this->language,
-            'currency'    => $this->currency
+            'currency'    => $this->currency,
+            'installationId'    => $this->installationId
          );
     }
 }

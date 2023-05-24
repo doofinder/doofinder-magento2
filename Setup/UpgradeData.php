@@ -29,25 +29,29 @@ class UpgradeData implements UpgradeDataInterface
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
-
-        if (version_compare($context->getVersion(), '0.10.7', '<')) {
-            $groupCollection = $this->groupCollectionFactory->create();
-            $scriptIdPath = 'doofinder_config_config/doofinder_layer/script';
-            $installationIdPath = 'doofinder_config_config/doofinder_layer/installation_id';
-
-            foreach ($groupCollection as $group) {
-                $websiteId = $group->getWebsiteId();
-                $script = $this->scopeConfig->getValue($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
-                $this->configWriter->save($scriptIdPath, $script, ScopeInterface::SCOPE_GROUP, $group->getId());
-                $this->configWriter->delete($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
-
-                $installationId = $this->scopeConfig->getValue($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
-                $this->configWriter->save($installationIdPath, $installation_id, ScopeInterface::SCOPE_GROUP, $group->getId());
-                $this->configWriter->delete($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
-
+        if(version_compare($context->getVersion(), '0.0.1', '>')) {
+            if (version_compare($context->getVersion(), '0.10. 7', '<')) {
+                $groupCollection = $this->groupCollectionFactory->create();
+                $scriptIdPath = 'doofinder_config_config/doofinder_layer/script';
+                $installationIdPath = 'doofinder_config_config/doofinder_layer/installation_id';
+    
+                foreach ($groupCollection as $group) {
+                    $websiteId = $group->getWebsiteId();
+                    $script = $this->scopeConfig->getValue($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+                    if(!empty($script)){
+                        $this->configWriter->save($scriptIdPath, $script, ScopeInterface::SCOPE_GROUP, $group->getId());
+                        $this->configWriter->delete($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+                    }
+    
+                    $installationId = $this->scopeConfig->getValue($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+                    if(!empty($installationId)){
+                        $this->configWriter->save($installationIdPath, $installationId, ScopeInterface::SCOPE_GROUP, $group->getId());
+                        $this->configWriter->delete($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+                    }
+                }
             }
+            $setup->endSetup();
         }
-
-        $setup->endSetup();
     }
+        
 }
