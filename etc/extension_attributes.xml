@@ -2,6 +2,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
         <attribute code="url_full" type="string"/>
+        <attribute code="is_in_stock" type="boolean"/>
+        <attribute code="base_url" type="string"/>
+        <attribute code="base_media_url" type="string"/>
+        <attribute code="image" type="string"/>
         <attribute code="price" type="float"/>
         <attribute code="special_price" type="float"/>
     </extension_attributes>

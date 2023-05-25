@@ -874,7 +874,7 @@ class StoreConfig extends AbstractHelper
         $attributes = [];
         foreach ($attributeCollection as $attributeTmp) {
             $attribute = $this->eavConfig->getAttribute(Product::ENTITY, $attributeTmp->getAttributeId());
-            if (!$attribute->getIsSearchable()){
+            if (!$attribute->getIsSearchable() || !$attribute->getIsVisible()){
                 continue;
             }
             $attribute_id = $attribute->getAttributeId();

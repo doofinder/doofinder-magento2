@@ -129,30 +129,6 @@ class ManagementClient
     }
 
     /**
-     * Creates a new index for a search engine
-     * @see https://docs.doofinder.com/api/management/v2/#operation/index_create
-     *
-     * @param array $indice
-     * @param string $hashId
-     * @return array
-     * @throws BadRequest
-     * @throws IndexingInProgress
-     * @throws NotAllowed
-     * @throws NotFound
-     * @throws QuotaExhausted
-     * @throws ThrottledResponse
-     * @throws TypeAlreadyExists
-     * @throws WrongResponse
-     * @throws \Zend_Json_Exception
-     */
-    public function createIndice(array $indice, string $hashId): array
-    {
-        $response = $this->client->post($this->getIndicesPath($hashId), $indice);
-
-        return json_decode($response, true);
-    }
-
-    /**
      * Creates a list of items from the index in a single bulk operation.
      * @see https://docs.doofinder.com/api/management/v2/#operation/items_bulk_update
      *
@@ -170,7 +146,7 @@ class ManagementClient
      */
     public function createItemsInBulk(array $items, string $hashId)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_create_v2";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -194,7 +170,7 @@ class ManagementClient
      */
     public function updateItemsInBulk(array $items, string $hashId)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update_v2";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -244,16 +220,5 @@ class ManagementClient
     private function getProcessSearchEnginePath(string $hashId): string
     {
         return self::ENDPOINT_SEARCH_ENGINES . "/{$hashId}/_process";
-    }
-
-    /**
-     * Returns indices endpoint
-     *
-     * @param string $hashId
-     * @return string
-     */
-    private function getIndicesPath(string $hashId): string
-    {
-        return self::ENDPOINT_SEARCH_ENGINES . "/{$hashId}/indices";
     }
 }

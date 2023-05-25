@@ -8,7 +8,6 @@ use Doofinder\Feed\Helper\Indice as IndiceHelper;
 use Doofinder\Feed\Helper\Item as ItemHelper;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedProduct\DocumentsProvider;
-use Doofinder\Feed\Model\Indexer\Data\Mapper;
 use Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory as ChangedProductCollectionFactory;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Psr\Log\LoggerInterface;
@@ -37,11 +36,6 @@ class Processor
     private $itemHelper;
 
     /**
-     * @var Mapper
-     */
-    private $mapper;
-
-    /**
      * @var Batch
      */
     private $batch;
@@ -61,7 +55,6 @@ class Processor
         ChangedProductCollectionFactory $changedProductCollectionFactory,
         DocumentsProvider $documentsProvider,
         ItemHelper $itemHelper,
-        Mapper $mapper,
         Batch $batch,
         LoggerInterface $logger,
         $batchSize = 100
@@ -70,7 +63,6 @@ class Processor
         $this->changedProductCollectionFactory = $changedProductCollectionFactory;
         $this->documentsProvider = $documentsProvider;
         $this->itemHelper = $itemHelper;
-        $this->mapper = $mapper;
         $this->batch = $batch;
         $this->batchSize = $batchSize;
         $this->logger = $logger;
@@ -102,9 +94,9 @@ class Processor
     {
         $collection = $this->changedProductCollectionFactory->create()->filterCreated((int)$store->getId());
         if ($collection->getSize()) {
-            $created = $this->documentsProvider->getUpdated($collection, (int)$store->getId());
+            $created = $this->documentsProvider->getBatched($collection, (int)$store->getId());
             foreach ($this->batch->getItems($created, $this->batchSize) as $batchDocuments) {
-                $items = $this->mapper->get('update')->map($batchDocuments, (int)$store->getId());
+                $items = $this->mapProducts($batchDocuments);
                 if (count($items)) {
                     try {
                         $this->logger->debug('[CreateInBulk]');
@@ -131,9 +123,9 @@ class Processor
     {
         $collection = $this->changedProductCollectionFactory->create()->filterUpdated((int)$store->getId());
         if ($collection->getSize()) {
-            $updated = $this->documentsProvider->getUpdated($collection, (int)$store->getId());
+            $updated = $this->documentsProvider->getBatched($collection, (int)$store->getId());
             foreach ($this->batch->getItems($updated, $this->batchSize) as $batchDocuments) {
-                $items = $this->mapper->get('update')->map($batchDocuments, (int)$store->getId());
+                $items = $this->mapProducts($batchDocuments);
                 if (count($items)) {
                     try {
                         $this->logger->debug('[UpdateInBulk]');
@@ -159,9 +151,9 @@ class Processor
     {
         $collection = $this->changedProductCollectionFactory->create()->filterDeleted((int)$store->getId());
         if ($collection->getSize()) {
-            $deleted = $this->documentsProvider->getDeleted($collection);
+            $deleted = $this->documentsProvider->getBatched($collection);
             foreach ($this->batch->getItems($deleted, $this->batchSize) as $batchDeleted) {
-                $items = $this->mapper->get('delete')->map($batchDeleted, (int)$store->getId());
+                $items = $this->mapProducts($batchDeleted);
                 if (count($items)) {
                     try {
                         $this->logger->debug('[DeleteInBulk]');
@@ -179,5 +171,11 @@ class Processor
             }
             $collection->walk('delete');
         }
+    }
+
+    private function mapProducts($documents) {
+        return array_map(function ($productId) {
+            return ['id' => $productId];
+        }, $documents);
     }
 }
