@@ -43,11 +43,16 @@ class UpgradeToStoreGroupPatch implements DataPatchInterface, PatchVersionInterf
                 $configPathScript = 'doofinder_config_config/doofinder_layer/script';
                 $configPathInstallationId = 'doofinder_config_config/doofinder_layer/installation_id';
                 
-                $valueScript = $this->scopeConfig->getValue($configPathScript, ScopeInterface::SCOPE_WEBSITES, $website->getId());
-                $valueInstallationId = $this->scopeConfig->getValue($configPathInstallationId, ScopeInterface::SCOPE_WEBSITES, $website->getId());
-                
-                $this->configWriter->save($configPathScript, $valueScript, ScopeInterface::SCOPE_GROUPS, $group->getId());
-                $this->configWriter->save($configPathInstallationId, $valueInstallationId, ScopeInterface::SCOPE_GROUPS, $group->getId());
+                if(!empty($script)){
+                    $this->configWriter->save($scriptIdPath, $script, ScopeInterface::SCOPE_GROUP, $group->getId());
+                    $this->configWriter->delete($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+                }
+    
+                $installationId = $this->scopeConfig->getValue($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+                if(!empty($installationId)){
+                    $this->configWriter->save($installationIdPath, $installationId, ScopeInterface::SCOPE_GROUP, $group->getId());
+                    $this->configWriter->delete($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+                }
             }
         }
 
