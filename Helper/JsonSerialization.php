@@ -16,12 +16,6 @@ class JsonSerialization
      */
     public static function encode($data)
     {
-        $json = null;
-        if (class_exists('\Laminas\Json\Json')) {
-            $json = \Laminas\Json\Json::encode($data);
-        } else {
-            $json = \Zend_Json::encode($data);
-        }
-        return $json;
+        json_encode($data);
     }
 }
