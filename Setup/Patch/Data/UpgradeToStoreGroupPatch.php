@@ -1,51 +1,57 @@
 <?php
 
-namespace Magento\Doofinder\Feed\Setup\Patch\Data;
+namespace Doofinder\Feed\Setup\Patch\Data;
 
+use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchVersionInterface;
-use Magento\Framework\App\Config\Storage\WriterInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Vendor\Module\Model\ResourceModel\Group\CollectionFactory as GroupCollectionFactory;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 
 class UpgradeToStoreGroupPatch implements DataPatchInterface, PatchVersionInterface
 {
-    protected $configWriter;
-    protected $scopeConfig;
-    protected $groupCollectionFactory;
+    private $moduleDataSetup;
+    private $storeManager;
+    private $configWriter;
+    private $scopeConfig;
+    private $logger;
 
     public function __construct(
+        ModuleDataSetupInterface $moduleDataSetup,
+        StoreManagerInterface $storeManager,
         WriterInterface $configWriter,
-        ScopeConfigInterface $scopeConfig,
-        GroupCollectionFactory $groupCollectionFactory
-    )
-    {
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+    ) {
+        $this->logger->debug("Entra en el construct");
+        $this->moduleDataSetup = $moduleDataSetup;
+        $this->storeManager = $storeManager;
         $this->configWriter = $configWriter;
         $this->scopeConfig = $scopeConfig;
-        $this->groupCollectionFactory = $groupCollectionFactory;
     }
 
     public function apply()
     {
-        $groupCollection = $this->groupCollectionFactory->create();
-        $scriptIdPath = 'doofinder_config_config/doofinder_layer/script';
-        $installationIdPath = 'doofinder_config_config/doofinder_layer/installation_id';
+        $this->moduleDataSetup->startSetup();
 
-        foreach ($groupCollection as $group) {
-            $websiteId = $group->getWebsiteId();
-            $script = $this->scopeConfig->getValue($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
-            if(!empty($script)){
-                $this->configWriter->save($scriptIdPath, $script, ScopeInterface::SCOPE_GROUP, $group->getId());
-                $this->configWriter->delete($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
-            }
+        $websites = $this->storeManager->getWebsites();
 
-            $installationId = $this->scopeConfig->getValue($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
-            if(!empty($installationId)){
-                $this->configWriter->save($installationIdPath, $installationId, ScopeInterface::SCOPE_GROUP, $group->getId());
-                $this->configWriter->delete($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+        foreach ($websites as $website) {
+            $groups = $website->getGroups();
+            
+            foreach ($groups as $group) {
+                $configPathScript = 'doofinder_config_config/doofinder_layer/script';
+                $configPathInstallationId = 'doofinder_config_config/doofinder_layer/installation_id';
+                
+                $valueScript = $this->scopeConfig->getValue($configPathScript, ScopeInterface::SCOPE_WEBSITES, $website->getId());
+                $valueInstallationId = $this->scopeConfig->getValue($configPathInstallationId, ScopeInterface::SCOPE_WEBSITES, $website->getId());
+                
+                $this->configWriter->save($configPathScript, $valueScript, ScopeInterface::SCOPE_GROUPS, $group->getId());
+                $this->configWriter->save($configPathInstallationId, $valueInstallationId, ScopeInterface::SCOPE_GROUPS, $group->getId());
             }
         }
+
+        $this->moduleDataSetup->endSetup();
     }
 
     public static function getDependencies()
@@ -60,6 +66,6 @@ class UpgradeToStoreGroupPatch implements DataPatchInterface, PatchVersionInterf
 
     public static function getVersion()
     {
-        return '0.10.7';
+        return '0.11.0';
     }
 }
