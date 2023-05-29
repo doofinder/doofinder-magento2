@@ -20,7 +20,6 @@ use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Block\Adminhtml\Integration\Tokens;
 use Magento\Store\Api\Data\StoreInterface;
 use Psr\Log\LoggerInterface;
-use Doofinder\Feed\Helper\JsonSerialization;
 
 class CreateStore extends Action implements HttpGetActionInterface
 {
@@ -234,7 +233,7 @@ class CreateStore extends Action implements HttpGetActionInterface
             ];
         }
 
-        $customAttributes = JsonSerialization::encode($attributes);
+        $customAttributes = json_encode($attributes);
         $this->storeConfig->setCustomAttributes($customAttributes);
     }
 
