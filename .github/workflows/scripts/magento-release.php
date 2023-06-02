@@ -8,6 +8,7 @@ class MagentoReleaseClient
 {
     const API_PATH = 'https://developer-api.magento.com/rest/v1';
     const MAX_RETRIES = 5;
+    const RETRY_AFTER = 20;
     private $version;
     private $release_notes;
     private $ust;
@@ -164,8 +165,12 @@ class MagentoReleaseClient
             "Authorization: Bearer " . $this->ust,
             "Content-Type: application/json"
         ];
-        //Sleep 20S to allow time for files to be verified by malware scanner
-        sleep(20);
+
+        echo "Create Release\n";
+
+        //Sleep a few seconds to allow time for files to be verified by malware scanner
+        sleep(self::RETRY_AFTER);
+
         $payload = [
             [
                 "sku" => "doofinder/doofinder-magento2",
@@ -199,7 +204,6 @@ class MagentoReleaseClient
             ]
         ];
 
-        echo "Create Release\n";
         $result = $this->post("/products/packages", json_encode($payload), $headers);
         if (!empty($result)) {
             $result = reset($result);
@@ -214,7 +218,7 @@ class MagentoReleaseClient
                 echo "-------------------------------\n";
             } elseif ($result->code === 1321 && $this->retries < self::MAX_RETRIES) {
                 $this->retries++;
-                echo " Retry {$this->retries}: Malware scan is still in progress, retrying in a few seconds. \n";
+                echo " Retry {$this->retries}: Malware scan is still in progress, retrying in " . self::RETRY_AFTER ." seconds. \n";
                 //Retry creating the release to give the API more time to analyse the uploaded file
                 $this->create_release();
             } elseif (property_exists($result, 'message')) {
