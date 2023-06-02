@@ -7,8 +7,8 @@
 class MagentoReleaseClient
 {
     const API_PATH = 'https://developer-api.magento.com/rest/v1';
-    const MAX_RETRIES = 5;
-    const RETRY_AFTER = 20;
+    const MAX_RETRIES = 3;
+    const RETRY_AFTER = 30;
     private $version;
     private $release_notes;
     private $ust;
