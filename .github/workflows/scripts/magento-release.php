@@ -7,11 +7,15 @@
 class MagentoReleaseClient
 {
     const API_PATH = 'https://developer-api.magento.com/rest/v1';
+    const MAX_RETRIES = 3;
+    const RETRY_AFTER = 30;
     private $version;
     private $release_notes;
     private $ust;
     private $app_id;
     private $app_secret;
+    private $files;
+    private $retries = 0;
 
     /**
      * Create a MagentoReleaseClient
@@ -27,8 +31,8 @@ class MagentoReleaseClient
         $this->app_secret = $app_secret;
         $this->version = $version;
         $this->release_notes = $this->process_release_notes($release_notes);
-
         $this->obtain_ust();
+        $this->files = $this->upload_files();
     }
 
     /**
@@ -161,9 +165,12 @@ class MagentoReleaseClient
             "Authorization: Bearer " . $this->ust,
             "Content-Type: application/json"
         ];
-        $files = $this->upload_files();
-        //Sleep 20S to allow time for files to be verified by malware scanner
-        sleep(20);
+
+        echo "Create Release\n";
+
+        //Sleep a few seconds to allow time for files to be verified by malware scanner
+        sleep(self::RETRY_AFTER);
+
         $payload = [
             [
                 "sku" => "doofinder/doofinder-magento2",
@@ -187,17 +194,16 @@ class MagentoReleaseClient
                 "release_notes" => $this->release_notes,
                 "version" => $this->version,
                 "artifact" => [
-                    "file_upload_id" =>  $files[0]
+                    "file_upload_id" =>  $this->files[0]
                 ],
                 "documentation_artifacts" => [
                     "user" => [
-                        "file_upload_id" => $files[1]
+                        "file_upload_id" => $this->files[1]
                     ]
                 ]
             ]
         ];
 
-        echo "Create Release\n";
         $result = $this->post("/products/packages", json_encode($payload), $headers);
         if (!empty($result)) {
             $result = reset($result);
@@ -206,11 +212,15 @@ class MagentoReleaseClient
         if (property_exists($result, 'code')) {
             file_put_contents("release_result.txt", $result->code);
             if ($result->code === 200) {
-                file_put_contents("release_result.txt", $result->code);
                 echo "-------------------------------\n";
                 echo " Release finished successfully. \n";
                 echo " - Submission id: {$result->submission_id}\n";
                 echo "-------------------------------\n";
+            } elseif ($result->code === 1321 && $this->retries < self::MAX_RETRIES) {
+                $this->retries++;
+                echo " Retry {$this->retries}: Malware scan is still in progress, retrying in " . self::RETRY_AFTER ." seconds. \n";
+                //Retry creating the release to give the API more time to analyse the uploaded file
+                $this->create_release();
             } elseif (property_exists($result, 'message')) {
                 echo "---------------------------------------------\n";
                 echo " An error ocurred while creating the release \n";
