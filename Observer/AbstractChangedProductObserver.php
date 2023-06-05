@@ -10,6 +10,7 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedProduct;
 use Doofinder\Feed\Model\ChangedProductFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -98,9 +99,13 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
     }
 
     protected function registerChangedProductStore(ProductInterface $product, int $storeId){
-        $changedProduct = $this->createChangedProduct($product, $storeId);
-        if (!$this->checkChangedProductExists($changedProduct)) {
-            $this->changedProductRepository->save($changedProduct);
+        if( $this->getOperationType() == ChangedProductInterface::OPERATION_TYPE_DELETE || 
+            $product->getStatus() == Status::STATUS_ENABLED
+        ) {
+            $changedProduct = $this->createChangedProduct($product, $storeId);
+            if (!$this->checkChangedProductExists($changedProduct)) {
+                $this->changedProductRepository->save($changedProduct);
+            }
         }
     }
 
