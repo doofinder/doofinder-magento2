@@ -38,6 +38,7 @@ define([
                 'Magento_Backend::stores_attributes',
                 'Magento_Catalog::attributes_attributes',
                 'Magento_Catalog::sets',
+                'Magento_Cms::page',
             ],
             formData: {
                 email: '${ $.email }',
