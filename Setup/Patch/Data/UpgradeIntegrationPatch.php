@@ -23,7 +23,7 @@ class UpgradeIntegrationPatch implements DataPatchInterface, PatchVersionInterfa
         'Magento_Backend::stores_attributes',
         'Magento_Catalog::attributes_attributes',
         'Magento_Catalog::sets',
-        'Magento_Cms::page',
+        'Magento_Cms::page'
     ];
 
     private $integrationService;
