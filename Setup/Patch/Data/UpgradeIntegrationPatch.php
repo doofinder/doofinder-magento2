@@ -2,6 +2,7 @@
 
 namespace Doofinder\Feed\Setup\Patch\Data;
 
+use Exception;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Integration\Api\IntegrationServiceInterface;
@@ -40,14 +41,18 @@ class UpgradeIntegrationPatch implements DataPatchInterface
     {
         $this->moduleDataSetup->startSetup();
 
-        $integration = $this->integrationService->findByName(self::DOOFINDER_INTEGRATION_NAME);
-
-        if ($integration) {
-            $integrationData = ['integration_id' => $integration->getId(), 'name' => $integration->getName(), 'resource' => $this->resources];
-            $this->integrationService->update($integrationData);
+        try {
+            $integration = $this->integrationService->findByName(self::DOOFINDER_INTEGRATION_NAME);
+    
+            if ($integration) {
+                $integrationData = ['integration_id' => $integration->getId(), 'name' => $integration->getName(), 'resource' => $this->resources];
+                $this->integrationService->update($integrationData);
+            }
+        } catch(Exception $e) {
+        } finally {
+            $this->moduleDataSetup->endSetup();
         }
 
-        $this->moduleDataSetup->endSetup();
     }
 
     public static function getDependencies()
