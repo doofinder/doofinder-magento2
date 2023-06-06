@@ -4,10 +4,9 @@ namespace Doofinder\Feed\Setup\Patch\Data;
 
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magento\Framework\Setup\Patch\PatchVersionInterface;
 use Magento\Integration\Api\IntegrationServiceInterface;
 
-class UpgradeIntegrationPatch implements DataPatchInterface, PatchVersionInterface
+class UpgradeIntegrationPatch implements DataPatchInterface
 {
     private const DOOFINDER_INTEGRATION_NAME = 'Doofinder Integration';
 
@@ -59,10 +58,5 @@ class UpgradeIntegrationPatch implements DataPatchInterface, PatchVersionInterfa
     public function getAliases()
     {
         return [];
-    }
-
-    public static function getVersion()
-    {
-        return '0.11.2';
     }
 }

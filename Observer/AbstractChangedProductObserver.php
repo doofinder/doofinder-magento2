@@ -67,8 +67,10 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
                 /** @var ProductInterface $product */
                 $product = $observer->getEvent()->getProduct();
                 $operationType = $this->getOperationType();
-                
-                if (
+
+                if ($product->getStatus() == Status::STATUS_DISABLED) {
+                    $this->setOperationType(ChangedProductInterface::OPERATION_TYPE_DELETE);
+                } else if (
                     $product->getUpdatedAt() == $product->getCreatedAt() &&
                     $operationType == ChangedProductInterface::OPERATION_TYPE_UPDATE
                 ) {
@@ -98,14 +100,11 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         }
     }
 
-    protected function registerChangedProductStore(ProductInterface $product, int $storeId){
-        if( $this->getOperationType() == ChangedProductInterface::OPERATION_TYPE_DELETE || 
-            $product->getStatus() == Status::STATUS_ENABLED
-        ) {
-            $changedProduct = $this->createChangedProduct($product, $storeId);
-            if (!$this->checkChangedProductExists($changedProduct)) {
-                $this->changedProductRepository->save($changedProduct);
-            }
+    protected function registerChangedProductStore(ProductInterface $product, int $storeId)
+    {
+        $changedProduct = $this->createChangedProduct($product, $storeId);
+        if (!$this->checkChangedProductExists($changedProduct)) {
+            $this->changedProductRepository->save($changedProduct);
         }
     }
 

@@ -4,13 +4,12 @@ namespace Doofinder\Feed\Setup\Patch\Data;
 
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magento\Framework\Setup\Patch\PatchVersionInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\ResourceModel\Group\CollectionFactory as GroupCollectionFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 
-class UpgradeToStoreGroupPatch implements DataPatchInterface, PatchVersionInterface
+class UpgradeToStoreGroupPatch implements DataPatchInterface
 {
     private $moduleDataSetup;
     private $storeManager;
@@ -65,10 +64,5 @@ class UpgradeToStoreGroupPatch implements DataPatchInterface, PatchVersionInterf
     public function getAliases()
     {
         return [];
-    }
-
-    public static function getVersion()
-    {
-        return '0.11.1';
     }
 }
