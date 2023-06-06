@@ -10,6 +10,7 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedProduct;
 use Doofinder\Feed\Model\ChangedProductFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -66,8 +67,10 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
                 /** @var ProductInterface $product */
                 $product = $observer->getEvent()->getProduct();
                 $operationType = $this->getOperationType();
-                
-                if (
+
+                if ($product->getStatus() == Status::STATUS_DISABLED) {
+                    $this->setOperationType(ChangedProductInterface::OPERATION_TYPE_DELETE);
+                } else if (
                     $product->getUpdatedAt() == $product->getCreatedAt() &&
                     $operationType == ChangedProductInterface::OPERATION_TYPE_UPDATE
                 ) {
@@ -97,7 +100,8 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         }
     }
 
-    protected function registerChangedProductStore(ProductInterface $product, int $storeId){
+    protected function registerChangedProductStore(ProductInterface $product, int $storeId)
+    {
         $changedProduct = $this->createChangedProduct($product, $storeId);
         if (!$this->checkChangedProductExists($changedProduct)) {
             $this->changedProductRepository->save($changedProduct);
