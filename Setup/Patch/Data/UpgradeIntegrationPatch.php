@@ -40,19 +40,14 @@ class UpgradeIntegrationPatch implements DataPatchInterface
     public function apply()
     {
         $this->moduleDataSetup->startSetup();
-
         try {
             $integration = $this->integrationService->findByName(self::DOOFINDER_INTEGRATION_NAME);
-    
-            if ($integration) {
-                $integrationData = ['integration_id' => $integration->getId(), 'name' => $integration->getName(), 'resource' => $this->resources];
-                $this->integrationService->update($integrationData);
-            }
+            $integrationData = ['integration_id' => $integration->getId(), 'name' => $integration->getName(), 'resource' => $this->resources];
+            $this->integrationService->update($integrationData);
         } catch(Exception $e) {
         } finally {
             $this->moduleDataSetup->endSetup();
         }
-
     }
 
     public static function getDependencies()
