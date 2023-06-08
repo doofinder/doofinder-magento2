@@ -400,6 +400,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $categoryResults = [];
         foreach($categories["items"] as $category) {
             $categoryResults[] = [
+                'category_id' => $category['entity_id'],
                 'entity_id' => $category['entity_id'],
                 'name' => $category['name'],
                 'parent_id' => $category['parent_id']
