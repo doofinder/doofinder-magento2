@@ -336,7 +336,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
         $categories =  $extensionAttributes->getCategoryLinks();
         if (is_array($categories)) {
-            $extensionAttributes->setCategoryLinks($this->categoriesInformation($categories));
+            $extensionAttributes->setCategoryLinks($this->getCategoriesInformation($categories));
         }
 
         $price = round($priceHelper->getProductPrice($product, 'regular_price'), 2);
@@ -363,45 +363,50 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         }
     }
 
-    private function categoriesInformation($categories)
+    private function getCategoriesInformation($categories)
     {
         $categoryIds = [];
         foreach ($categories as $category) {
             $categoryIds[$category['category_id']] = true;
         }
+        
+        // Load paths of product categories to load their parents
+        $connection = $this->resourceModel->getConnection();
+        $categoryPaths = $connection->fetchCol(
+            $connection->select()
+                ->from('catalog_category_entity', ['path'])
+                ->where('entity_id IN (?)', array_keys($categoryIds))
+        );
 
+        // Scope category collection with current store Root category
+        $storeRootPath = '1/' . $this->storeManager->getStore()->getRootCategoryId() . '/';
+
+        // Get all category Ids (with parents Ids from paths)
+        $categoryIdsWithParents = array_reduce($categoryPaths, function ($acc, $path) use ($storeRootPath) {
+            $path = str_replace($storeRootPath, '', $path);
+            $ids = explode('/', $path);
+            return array_unique(array_merge($acc, $ids));
+        }, []);
+
+        // Obtain the results using only the ids from categories and their parents
         $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter('entity_id', '1', 'gt')
-            ->addFilter('parent_id', '1', 'gt')
+            ->addFilter('entity_id', $categoryIdsWithParents, 'in')
             ->addFilter('is_active', '1')
             ->create();
 
         $categories = $this->categoryListInterface->getList($searchCriteria)->__toArray();
 
-        // obtain categories with valid ids (with an associative array to avoid duplicates)
-        $items = $categories["items"];
-        $items_number = count($items);
-        for($i = 0; $i < $items_number; $i++) {
-            if(array_key_exists($items[$i]["entity_id"], $categoryIds)) {
-                $categoryIds[$items[$i]["parent_id"]] = true;
-                array_splice($items, $i, 1);
-                $items_number = count($items);
-                $i = 0;
-            }
+        // Get just the information needed in order to make the response lighter
+        $categoryResults = [];
+        foreach($categories["items"] as $category) {
+            $categoryResults[] = [
+                'category_id' => $category['entity_id'],
+                'entity_id' => $category['entity_id'],
+                'name' => $category['name'],
+                'parent_id' => $category['parent_id']
+            ];
         }
 
-        foreach($categories["items"] as $categoryKey => $categoryValue) {
-            if(!array_key_exists($categoryValue["entity_id"], $categoryIds)) {
-                unset($categories["items"][$categoryKey]);
-            }
-        }
-        
-        foreach($categories["items"] as &$category) {
-            $category["category_id"] = $category["entity_id"];
-        }
-
-        // It returns different elements that we don't need, so we are just taking "items"
-        return $categories["items"];
-        
+        return $categoryResults;
     }
 }
