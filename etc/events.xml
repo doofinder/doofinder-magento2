@@ -1,9 +1,21 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="catalog_product_save_after">
-        <observer name="DoofinderFeedSaveAfterObserver" instance="Doofinder\Feed\Observer\CatalogProductSaveAfterObserver" />
+        <observer name="DoofinderFeedProductSaveAfterObserver" instance="Doofinder\Feed\Observer\Product\CatalogProductSaveAfterObserver" />
     </event>
     <event name="catalog_product_delete_after_done">
-        <observer name="DoofinderFeedDeleteAfterObserver" instance="Doofinder\Feed\Observer\CatalogProductDeleteAfterObserver" />
+        <observer name="DoofinderFeedProductDeleteAfterObserver" instance="Doofinder\Feed\Observer\Product\CatalogProductDeleteAfterObserver" />
+    </event>    
+    <event name="cms_page_save_after">
+        <observer name="DoofinderFeedPageSaveAfterObserver" instance="Doofinder\Feed\Observer\Page\CmsPageSaveAfterObserver" />
+    </event>
+    <event name="cms_page_delete_after">
+        <observer name="DoofinderFeedPageDeleteAfterObserver" instance="Doofinder\Feed\Observer\Page\CmsPageDeleteAfterObserver" />
+    </event>    
+    <event name="catalog_category_save_after">
+        <observer name="DoofinderFeedCategorySaveAfterObserver" instance="Doofinder\Feed\Observer\Category\CategorySaveAfterObserver" />
+    </event>
+    <event name="catalog_category_delete_after">
+        <observer name="DoofinderFeedCategoryDeleteAfterObserver" instance="Doofinder\Feed\Observer\Category\CategoryDeleteAfterObserver" />
     </event>
 </config>

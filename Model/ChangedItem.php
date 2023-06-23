@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Model;
 
-use Doofinder\Feed\Api\Data\ChangedProductInterface;
-use Doofinder\Feed\Model\ResourceModel\ChangedProduct as ChangedProductResourceModel;
+use Doofinder\Feed\Api\Data\ChangedItemInterface;
+use Doofinder\Feed\Model\ResourceModel\ChangedItem as ChangedItemResourceModel;
 use Magento\Framework\DataObject\IdentityInterface;
 use Magento\Framework\Model\AbstractModel;
 
-class ChangedProduct extends AbstractModel implements ChangedProductInterface, IdentityInterface
+class ChangedItem extends AbstractModel implements ChangedItemInterface, IdentityInterface
 {
-    const CACHE_TAG = 'doofinder_feed_changed_product';
+    const CACHE_TAG = 'doofinder_feed_changed_item';
 
     /**
-     * ChangedProduct constructor.
+     * ChangedItem constructor.
      * @return void
      */
     public function _construct()
     {
-        $this->_init(ChangedProductResourceModel::class);
+        $this->_init(ChangedItemResourceModel::class);
     }
 
     /**
      * @inheritDoc
      */
-    public function getProductId(): ?int
+    public function getItemId(): ?int
     {
-        $id = $this->_getData(self::PRODUCT_ID);
+        $id = $this->_getData(self::ITEM_ID);
 
         return $id === null ? null : (int)$id;
     }
@@ -35,9 +35,9 @@ class ChangedProduct extends AbstractModel implements ChangedProductInterface, I
     /**
      * @inheritDoc
      */
-    public function setProductId(int $id): ChangedProductInterface
+    public function setItemId(int $id): ChangedItemInterface
     {
-        return $this->setData(self::PRODUCT_ID, $id);
+        return $this->setData(self::ITEM_ID, $id);
     }
 
     /**
@@ -51,9 +51,25 @@ class ChangedProduct extends AbstractModel implements ChangedProductInterface, I
     /**
      * @inheritDoc
      */
-    public function setStoreId(int $id): ChangedProductInterface
+    public function setStoreId(int $id): ChangedItemInterface
     {
         return $this->setData(self::STORE_ID, $id);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function getItemType(): ?int
+    {
+        return $this->_getData(self::ITEM_TYPE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setItemType(int $type): ChangedItemInterface
+    {
+        return $this->setData(self::ITEM_TYPE, $type);
     }
 
     /**
@@ -67,7 +83,7 @@ class ChangedProduct extends AbstractModel implements ChangedProductInterface, I
     /**
      * @inheritDoc
      */
-    public function setOperationType(string $operationType): ChangedProductInterface
+    public function setOperationType(string $operationType): ChangedItemInterface
     {
         return $this->setData(self::OPERATION_TYPE, $operationType);
     }

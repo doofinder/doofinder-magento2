@@ -6,15 +6,15 @@ namespace Doofinder\Feed\Api\Data;
 
 use Magento\Framework\Api\SearchResultsInterface;
 
-interface ChangedProductSearchResultsInterface extends SearchResultsInterface
+interface ChangedItemSearchResultsInterface extends SearchResultsInterface
 {
     /**
-     * @return ChangedProductInterface[]
+     * @return ChangedItemInterface[]
      */
     public function getItems();
 
     /**
-     * @param ChangedProductInterface[] $items
+     * @param ChangedItemInterface[] $items
      * @return void
      */
     public function setItems(array $items);

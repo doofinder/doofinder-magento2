@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Api\Data;
 
-interface ChangedProductInterface
+interface ChangedItemInterface
 {
     /**
-     * Changed product trace row's identity field name.
+     * Changed item trace row's identity field name.
      *
-     * @var string CHANGED_PRODUCT_ID
+     * @var string CHANGED_ITEM_ID
      */
-    const CHANGED_PRODUCT_ID = 'entity_id';
-
+    const CHANGED_ITEM_ID = 'entity_id';
+    
     /**
-     * Changed product's identity field name.
+     * Changed item trace row's identity field name.
      *
-     * @var string PRODUCT_ID
+     * @var string CHANGED_ITEM_ID
      */
-    const PRODUCT_ID = 'product_id';
+    const ITEM_ID = 'item_id';
 
     /**
      * Store view the change was issued on.
@@ -28,7 +28,14 @@ interface ChangedProductInterface
     const STORE_ID = 'store_id';
 
     /**
-     * Operation performed on Changed product field name.
+     * Item type.
+     *
+     * @var string ITEM_TYPE
+     */
+    const ITEM_TYPE = 'item_type';
+
+    /**
+     * Operation performed on Changed item field name.
      *
      * This can be either 'update', 'disable' or 'delete' as of now.
      *
@@ -37,40 +44,40 @@ interface ChangedProductInterface
     const OPERATION_TYPE = 'operation_type';
 
     /**
-     * Tells that the product was updated in regular way.
+     * Tells that the item was updated in regular way.
      *
      * @var string OPERATION_TYPE_UPDATE
      */
     const OPERATION_TYPE_UPDATE = 'update';
 
     /**
-     * Tells that the product was deleted completely.
+     * Tells that the item was deleted completely.
      *
      * @var string OPERATION_TYPE_DELETE
      */
     const OPERATION_TYPE_DELETE = 'delete';
 
     /**
-     * Tells that the product was created.
+     * Tells that the item was created.
      *
      * @var string OPERATION_TYPE_CRATE
      */
     const OPERATION_TYPE_CREATE = 'create';
 
     /**
-     * Get product id
+     * Get item id
      *
      * @return int|null
      */
-    public function getProductId(): ?int;
+    public function getItemId(): ?int;
 
     /**
-     * Set product id
+     * Set item id
      *
      * @param int $id
      * @return $this
      */
-    public function setProductId(int $id): ChangedProductInterface;
+    public function setItemId(int $id): ChangedItemInterface;
 
     /**
      * Get store id
@@ -85,7 +92,22 @@ interface ChangedProductInterface
      * @param int $id
      * @return $this
      */
-    public function setStoreId(int $id): ChangedProductInterface;
+    public function setStoreId(int $id): ChangedItemInterface;
+
+    /**
+     * Get item type
+     *
+     * @return int|null
+     */
+    public function getItemType(): ?int;
+
+    /**
+     * Set item type
+     *
+     * @param int $type
+     * @return $this
+     */
+    public function setItemType(int $type): ChangedItemInterface;
 
     /**
      * Get store id
@@ -100,5 +122,5 @@ interface ChangedProductInterface
      * @param string $operationType
      * @return $this
      */
-    public function setOperationType(string $operationType): ChangedProductInterface;
+    public function setOperationType(string $operationType): ChangedItemInterface;
 }

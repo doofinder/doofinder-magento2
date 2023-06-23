@@ -134,6 +134,7 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
+     * @param string $indice
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -144,9 +145,9 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function createItemsInBulk(array $items, string $hashId)
+    public function createItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_create_v2";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_createApi/Data/ChangedProductInterface.php";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -168,9 +169,9 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function updateItemsInBulk(array $items, string $hashId)
+    public function updateItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update_v2";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_update";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -182,6 +183,7 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
+     * @param string $indice
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -192,9 +194,9 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Zend_Json_Exception
      */
-    public function deleteItemsInBulk(array $items, string $hashId)
+    public function deleteItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_delete";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_delete";
         $response = $this->client->delete($path, $items);
 
         return json_decode($response, true);
