@@ -147,7 +147,7 @@ class ManagementClient
      */
     public function createItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_createApi/Data/ChangedProductInterface.php";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_create";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
