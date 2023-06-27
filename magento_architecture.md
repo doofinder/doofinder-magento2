@@ -4,7 +4,8 @@
 ## Relevant information
 
 * Doofinder module is ALWAYS installed via composer. 
-* Magento creates a store in Doofinder per website. It registers its website's id information inside its corresponding's store's options in order to get the correct products in the feed for the search engines corresponding to the store_views from that website.
+* Magento creates a store in Doofinder per store group. It registers its website's id information inside its corresponding's store's options in order to get the correct products in the feed for the search engines corresponding to the store_views from that website.
+* It also stores its store view's id into the datasource options with the same goal as above, but more accurately.
 * If the Magento app is uninstalled then the associated Doofinder store is NOT deleted, neither its search engines nor indices.
 
 ## Diagrams
@@ -51,4 +52,42 @@ sequenceDiagram
   Dftasks ->> DoofAPI: Index products' feed
   DoofAPI ->> Dftasks: ok
   Dftasks ->> Doomanager: ok
+  Note left of Dftasks: If the multiindex is activated, it goes the same for pages and categories
+
+```
+
+### Update on save process
+```mermaid
+sequenceDiagram
+  Magento ->> Magento: Activate update on save every: Any value except for "everyday"
+  Magento ->> Magento: Change, create or delete a Page, Category or Product
+  Magento ->> Magento: Normalize entity into doofinder_feed_changed_item db's format
+  Magento ->> Magento's DB: Registers into doofinder_feed_changed_item the normalized entity
+  Magento's DB ->> Magento: ok
+  loop Stores
+    loop indices
+      Magento ->> Magento: get items to create/update in Doomanager by indice type
+      Magento ->> Doomanager: ask if the indice exists
+      alt it does exist
+        Doomanager ->> Magento: true
+        Magento ->> Doomanager: send id list and indice type
+        Doomanager ->> Magento: ask for the information of the ids received
+        Magento ->> Doomanager: information of items
+        Doomanager ->> Items transformation: normalize the information
+        Items transformation ->> Doomanager: items normalized for doofindex
+        Doomanager ->> Doofindex: create/update the items
+        Doofindex ->> Doomanager: ok
+        Doomanager ->> Magento: ok
+      end
+      Magento ->> Magento: get items to delete in Doomanager by indice type
+      Magento ->> Doomanager: ask if the indice exists
+      alt it does exist
+        Doomanager ->> Magento: true
+        Magento ->> Doomanager: send id list and indice type
+        Doomanager ->> Doofindex: delete the items
+        Doofindex ->> Doomanager: ok
+        Doomanager ->> Magento: ok
+      end
+    end
+  end
 ```
