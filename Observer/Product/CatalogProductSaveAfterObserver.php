@@ -2,13 +2,13 @@
 declare(strict_types=1);
 
 
-namespace Doofinder\Feed\Observer;
+namespace Doofinder\Feed\Observer\Product;
 
-use Doofinder\Feed\Api\Data\ChangedProductInterface;
+use Doofinder\Feed\Api\Data\ChangedItemInterface;
 
 class CatalogProductSaveAfterObserver extends AbstractChangedProductObserver
 {
-    private $operationType = ChangedProductInterface::OPERATION_TYPE_UPDATE;
+    private $operationType = ChangedItemInterface::OPERATION_TYPE_UPDATE;
 
     protected function getOperationType(): string
     {

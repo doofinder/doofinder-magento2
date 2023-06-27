@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Cron;
 
-use Doofinder\Feed\Helper\Indice as IndiceHelper;
 use Doofinder\Feed\Helper\Item as ItemHelper;
 use Doofinder\Feed\Helper\StoreConfig;
-use Doofinder\Feed\Model\ChangedProduct\DocumentsProvider;
-use Doofinder\Feed\Model\ResourceModel\ChangedProduct\CollectionFactory as ChangedProductCollectionFactory;
+use Doofinder\Feed\Model\ChangedItem\DocumentsProvider;
+use Doofinder\Feed\Model\ChangedItem\ItemType;
+use Doofinder\Feed\Model\ResourceModel\ChangedItem\CollectionFactory as ChangedItemCollectionFactory;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Psr\Log\LoggerInterface;
 
@@ -20,9 +20,9 @@ class Processor
     private $storeConfig;
 
     /**
-     * @var ChangedProductCollectionFactory
+     * @var ChangedItemCollectionFactory
      */
-    private $changedProductCollectionFactory;
+    private $changedItemCollectionFactory;
 
     /**
      * @var DocumentsProvider
@@ -51,7 +51,7 @@ class Processor
 
     public function __construct(
         StoreConfig $storeConfig,
-        ChangedProductCollectionFactory $changedProductCollectionFactory,
+        ChangedItemCollectionFactory $changedItemCollectionFactory,
         DocumentsProvider $documentsProvider,
         ItemHelper $itemHelper,
         Batch $batch,
@@ -59,7 +59,7 @@ class Processor
         $batchSize = 100
     ) {
         $this->storeConfig = $storeConfig;
-        $this->changedProductCollectionFactory = $changedProductCollectionFactory;
+        $this->changedItemCollectionFactory = $changedItemCollectionFactory;
         $this->documentsProvider = $documentsProvider;
         $this->itemHelper = $itemHelper;
         $this->batch = $batch;
@@ -75,10 +75,9 @@ class Processor
         if ($this->storeConfig->isUpdateOnSave()) {
             try {
                 foreach ($this->storeConfig->getAllStores() as $store) {
-                    $indice = IndiceHelper::MAGENTO_INDICE_NAME;
-                    $this->createProducts($store, $indice);
-                    $this->updateProducts($store, $indice);
-                    $this->deleteProducts($store, $indice);
+                    foreach (ItemType::getList() as $itemType => $itemIndice) {
+                        $this->manageItems($store, $itemType, $itemIndice);
+                    }
                 }
             } catch (\Exception $e) {
                 $this->logger->error('[Doofinder] Error processing updates: ' . $e->getMessage());
@@ -87,11 +86,18 @@ class Processor
     }
 
     /**
-     * Function to delete the products that have been stored into the data base as "to be created"
+     * Function to manage the products that have been stored into the data base
      */
-    private function createProducts($store, $indice)
+    private function manageItems($store, $itemType, $indice)
     {
-        $collection = $this->changedProductCollectionFactory->create()->filterCreated((int)$store->getId());
+        $this->createItems($store, $itemType, $indice);
+        $this->updateItems($store, $itemType, $indice);
+        $this->deleteItems($store, $itemType, $indice);
+    }
+
+    private function createItems($store, $itemType, $indice)
+    {
+        $collection = $this->changedItemCollectionFactory->create()->filterCreated((int)$store->getId(), $itemType);
         if ($collection->getSize()) {
             $created = $this->documentsProvider->getBatched($collection, (int)$store->getId());
             foreach ($this->batch->getItems($created, $this->batchSize) as $batchDocuments) {
@@ -115,12 +121,9 @@ class Processor
         }
     }
 
-    /**
-     * Function to update the products that have been stored into the data base as "to be updated"
-     */
-    private function updateProducts($store, $indice)
+    private function updateItems($store, $itemType, $indice)
     {
-        $collection = $this->changedProductCollectionFactory->create()->filterUpdated((int)$store->getId());
+        $collection = $this->changedItemCollectionFactory->create()->filterUpdated((int)$store->getId(), $itemType);
         if ($collection->getSize()) {
             $updated = $this->documentsProvider->getBatched($collection, (int)$store->getId());
             foreach ($this->batch->getItems($updated, $this->batchSize) as $batchDocuments) {
@@ -143,12 +146,10 @@ class Processor
             $collection->walk('delete');
         }
     }
-    /**
-     * Function to delete the products that have been stored into the data base as "to be deleted"
-     */
-    private function deleteProducts($store, $indice)
+
+    private function deleteItems($store, $itemType, $indice)
     {
-        $collection = $this->changedProductCollectionFactory->create()->filterDeleted((int)$store->getId());
+        $collection = $this->changedItemCollectionFactory->create()->filterDeleted((int)$store->getId(), $itemType);
         if ($collection->getSize()) {
             $deleted = $this->documentsProvider->getBatched($collection);
             foreach ($this->batch->getItems($deleted, $this->batchSize) as $batchDeleted) {

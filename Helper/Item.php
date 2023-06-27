@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
-use Doofinder\Feed\Api\Data\ChangedProductInterface;
+use Doofinder\Feed\Api\Data\ChangedItemInterface;
 use Doofinder\Feed\ApiClient\ManagementClientFactory;
 use Doofinder\Feed\Errors\BadRequest;
 use Doofinder\Feed\Errors\IndexingInProgress;
@@ -62,12 +62,12 @@ class Item extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      * @throws NoSuchEntityException
      */
     public function createItemsInBulk(array $items, StoreInterface $store, string $indice)
     {
-        return $this->processItemsInBulk($items, $store, $indice, ChangedProductInterface::OPERATION_TYPE_CREATE);
+        return $this->processItemsInBulk($items, $store, $indice, ChangedItemInterface::OPERATION_TYPE_CREATE);
     }
 
     /**
@@ -84,12 +84,12 @@ class Item extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      * @throws NoSuchEntityException
      */
     public function updateItemsInBulk(array $items, StoreInterface $store, string $indice)
     {
-        return $this->processItemsInBulk($items, $store, $indice, ChangedProductInterface::OPERATION_TYPE_UPDATE);
+        return $this->processItemsInBulk($items, $store, $indice, ChangedItemInterface::OPERATION_TYPE_UPDATE);
     }
 
     /**
@@ -106,12 +106,12 @@ class Item extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      * @throws NoSuchEntityException
      */
     public function deleteItemsInBulk(array $items, StoreInterface $store, string $indice)
     {
-        return $this->processItemsInBulk($items, $store, $indice, ChangedProductInterface::OPERATION_TYPE_DELETE);
+        return $this->processItemsInBulk($items, $store, $indice, ChangedItemInterface::OPERATION_TYPE_DELETE);
     }
 
     /**
@@ -149,12 +149,12 @@ class Item extends AbstractHelper
         ]);
 
         switch ($type) {
-            case ChangedProductInterface::OPERATION_TYPE_CREATE:
-                return $managementClient->createItemsInBulk($items, $hashId);
-            case ChangedProductInterface::OPERATION_TYPE_UPDATE:
-                return $managementClient->updateItemsInBulk($items, $hashId);
-            case ChangedProductInterface::OPERATION_TYPE_DELETE:
-                return $managementClient->deleteItemsInBulk($items, $hashId);
+            case ChangedItemInterface::OPERATION_TYPE_CREATE:
+                return $managementClient->createItemsInBulk($items, $hashId, $indice);
+            case ChangedItemInterface::OPERATION_TYPE_UPDATE:
+                return $managementClient->updateItemsInBulk($items, $hashId, $indice);
+            case ChangedItemInterface::OPERATION_TYPE_DELETE:
+                return $managementClient->deleteItemsInBulk($items, $hashId, $indice);
         }
     }
 

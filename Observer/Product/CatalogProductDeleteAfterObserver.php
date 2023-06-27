@@ -2,13 +2,13 @@
 declare(strict_types=1);
 
 
-namespace Doofinder\Feed\Observer;
+namespace Doofinder\Feed\Observer\Product;
 
-use Doofinder\Feed\Api\Data\ChangedProductInterface;
+use Doofinder\Feed\Api\Data\ChangedItemInterface;
 
 class CatalogProductDeleteAfterObserver extends AbstractChangedProductObserver
 {
-    private $operationType = ChangedProductInterface::OPERATION_TYPE_DELETE;
+    private $operationType = ChangedItemInterface::OPERATION_TYPE_DELETE;
 
     protected function getOperationType(): string
     {

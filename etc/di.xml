@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\Integration\Controller\Adminhtml\Integration\Save" type="Doofinder\Feed\Controller\Adminhtml\Integration\Save" />
-    <preference for="Doofinder\Feed\Api\ChangedProductRepositoryInterface" type="Doofinder\Feed\Model\ChangedProductRepository"/>
-    <preference for="Doofinder\Feed\Api\Data\ChangedProductInterface" type="Doofinder\Feed\Model\ChangedProduct"/>
-    <preference for="Doofinder\Feed\Api\Data\ChangedProductSearchResultsInterface" type="Doofinder\Feed\Model\ChangedProductSearchResults"/>
+    <preference for="Doofinder\Feed\Api\ChangedItemRepositoryInterface" type="Doofinder\Feed\Model\ChangedItemRepository"/>
+    <preference for="Doofinder\Feed\Api\Data\ChangedItemInterface" type="Doofinder\Feed\Model\ChangedItem"/>
+    <preference for="Doofinder\Feed\Api\Data\ChangedItemSearchResultsInterface" type="Doofinder\Feed\Model\ChangedItemSearchResults"/>
     <preference for="Doofinder\Feed\Api\ProductRepositoryInterface" type="Doofinder\Feed\Model\ProductRepository" />
     <preference for="Doofinder\Feed\Api\ModuleDataInterface" type="Doofinder\Feed\Model\ModuleData" />
 </config>

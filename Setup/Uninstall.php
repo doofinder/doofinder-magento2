@@ -12,6 +12,8 @@ use Magento\Framework\Setup\UninstallInterface;
 
 class Uninstall implements UninstallInterface
 {
+    private const ITEM_TABLE = 'doofinder_feed_changed_item';
+
     /**
      * @var ConfigCollectionFactory
      */
@@ -40,8 +42,8 @@ class Uninstall implements UninstallInterface
     public function uninstall(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         //remove table
-        if ($setup->tableExists('doofinder_feed_changed_product')) {
-            $setup->getConnection()->dropTable('doofinder_feed_changed_product');
+        if ($setup->tableExists(self::ITEM_TABLE)) {
+            $setup->getConnection()->dropTable(self::ITEM_TABLE);
         }
         //remove config settings if any
         $collection = $this->collectionFactory->create();

@@ -42,7 +42,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function listSearchEngines(): array
     {
@@ -72,7 +72,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function createSearchEngine(array $searchEngine): array
     {
@@ -96,7 +96,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function processSearchEngine(string $hashId, string $callbackUrl = null): array
     {
@@ -119,7 +119,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function getSearchEngine(string $hashid): array 
     {
@@ -134,6 +134,7 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
+     * @param string $indice
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -142,11 +143,11 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
-    public function createItemsInBulk(array $items, string $hashId)
+    public function createItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_create_v2";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_create";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -166,11 +167,11 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
-    public function updateItemsInBulk(array $items, string $hashId)
+    public function updateItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_update_v2";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_update";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -182,6 +183,7 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
+     * @param string $indice
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -190,11 +192,11 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
-    public function deleteItemsInBulk(array $items, string $hashId)
+    public function deleteItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/product_delete";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_delete";
         $response = $this->client->delete($path, $items);
 
         return json_decode($response, true);
