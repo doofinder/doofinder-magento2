@@ -55,7 +55,7 @@ class SearchEngine extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function __construct(
         ManagementClientFactory $managementClientFactory,
@@ -86,7 +86,7 @@ class SearchEngine extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function listSearchEngines(): array
     {
@@ -112,7 +112,7 @@ class SearchEngine extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function createSearchEngine(array $searchEngine): array
     {
@@ -139,7 +139,7 @@ class SearchEngine extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function processSearchEngine(string $hashId, string $callbackUrl = null): array
     {

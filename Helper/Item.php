@@ -62,7 +62,7 @@ class Item extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      * @throws NoSuchEntityException
      */
     public function createItemsInBulk(array $items, StoreInterface $store, string $indice)
@@ -84,7 +84,7 @@ class Item extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      * @throws NoSuchEntityException
      */
     public function updateItemsInBulk(array $items, StoreInterface $store, string $indice)
@@ -106,7 +106,7 @@ class Item extends AbstractHelper
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      * @throws NoSuchEntityException
      */
     public function deleteItemsInBulk(array $items, StoreInterface $store, string $indice)

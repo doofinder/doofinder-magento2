@@ -9,7 +9,7 @@ use Doofinder\Feed\Model\ChangedItem as ChangedItemModel;
 use Doofinder\Feed\Model\ResourceModel\ChangedItem as ChangedItemResourceModel;
 
 /**
- * Collection of deleted product traces.
+ * Collection of changed items.
  */
 class Collection extends AbstractCollection
 {

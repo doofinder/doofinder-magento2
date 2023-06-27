@@ -42,7 +42,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function listSearchEngines(): array
     {
@@ -72,7 +72,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function createSearchEngine(array $searchEngine): array
     {
@@ -96,7 +96,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function processSearchEngine(string $hashId, string $callbackUrl = null): array
     {
@@ -119,7 +119,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function getSearchEngine(string $hashid): array 
     {
@@ -143,7 +143,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function createItemsInBulk(array $items, string $hashId, string $indice)
     {
@@ -167,7 +167,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function updateItemsInBulk(array $items, string $hashId, string $indice)
     {
@@ -192,7 +192,7 @@ class ManagementClient
      * @throws ThrottledResponse
      * @throws TypeAlreadyExists
      * @throws WrongResponse
-     * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function deleteItemsInBulk(array $items, string $hashId, string $indice)
     {
