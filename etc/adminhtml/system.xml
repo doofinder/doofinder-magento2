@@ -153,6 +153,19 @@
                     </comment>
                 </field>
             </group>
+             <group id="doofinder_update_on_click"
+                   translate="label"
+                   type="text"
+                   sortOrder="400"
+                   showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>Manual indexing (advanced)</label>
+                <field id="update_on_click" translate="label" type="button" sortOrder="400" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Launch manual indexing</label>
+                    <frontend_model>Doofinder\Feed\Block\System\Config\UpdateOnClick</frontend_model>
+                </field>
+            </group>
             <group id="doofinder_custom_attributes"
                    translate="label"
                    type="text"
