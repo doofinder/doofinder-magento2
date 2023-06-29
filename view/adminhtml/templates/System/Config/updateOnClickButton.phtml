@@ -1,0 +1,19 @@
+<script>
+    require([
+        'jquery',
+        'mage/translate'
+    ], function($, _t){
+        $('#manual-indexing').click(_ => {
+            if (confirm(_t("This action will update directly the products waiting to be updated in Doofinder. Do you want to proceed?"))) {
+                new Ajax.Request('<?php echo $block->updateOnClick(); ?>', {
+                    loaderArea:     true,
+                    asynchronous:   true,
+                });
+            }
+        });
+    });
+</script>
+
+<?php
+    echo $block->getButtonHtml();
+?>
