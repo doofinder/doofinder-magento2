@@ -17,6 +17,13 @@ class CleanIntegration extends Action
 
     private $resourceConnection;
 
+    /**
+     * CleanIntegration constructor.
+     *
+     * @param ClientFactory $resourceConnection
+     * @param LoggerInterface $logger
+     * @param Context $context
+     */
     public function __construct(
         ResourceConnection $resourceConnection,
         LoggerInterface $logger,
@@ -35,19 +42,30 @@ class CleanIntegration extends Action
         $connection = $this->resourceConnection->getConnection();
         try {
             foreach ($this->integration_table_column as $table => $column) {
-                $this->delete_integration_entries($connection, $table, $column);
-            } 
+                $this->deleteIntegrationEntries($connection, $table, $column);
+            }
         } catch (Exception $e) {
             $this->logger->error('There was a problem cleaning the database from Doofinder entries: ' . $e->getMessage());
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed('Doofinder_Feed::config');
     }
 
-    private function delete_integration_entries($connection, $table, $column) {
+    /**
+     * Deletes any entry of Doofinder from Magento's database
+     * 
+     * @param $connection 
+     * @param $table 
+     * @param $column 
+     */
+    private function deleteIntegrationEntries($connection, $table, $column)
+    {
         $integrationTable = $this->resourceConnection->getTableName($table);
         $connection->delete(
             $integrationTable,

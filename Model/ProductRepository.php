@@ -218,7 +218,6 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         return $this->productHelperFactory->create()->getProductUrl($product);
     }
 
-
     /**
      * Add product to internal cache and truncate cache if it has more than cacheLimit elements.
      *
@@ -289,9 +288,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $productHelper = $this->productHelperFactory->create();
         $customAttributes = $this->storeConfig->getCustomAttributes($product->getStoreId());
 
-        foreach ($customAttributes as $customAttribute){
+        foreach ($customAttributes as $customAttribute) {
             $code = $customAttribute['code'];
-            if($customAttribute['enabled'] && isset($product[$code])) {
+            if ($customAttribute['enabled'] && isset($product[$code])) {
                 ("array" === $productHelper->getAttributeType($product, $code)) ?
                     $value = $productHelper->getAttributeArray($product, $code) :
                     $value = $productHelper->getAttributeText($product, $code)  ;
@@ -314,6 +313,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      * Function to add the extension attributes to the product
      *
      * @param ProductInterface $product
+     * @param int $storeId
      * @return void
      */
     private function setExtensionAttributes($product, $storeId): void
@@ -332,7 +332,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
         $extensionAttributes->setIsInStock($stockAndStatus[1]);
         $extensionAttributes->setBaseUrl($this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseUrl());
-        $extensionAttributes->setBaseMediaUrl($this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseMediaUrl());
+        $extensionAttributes->setBaseMediaUrl(
+            $this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseMediaUrl()
+        );
 
         $categories =  $extensionAttributes->getCategoryLinks();
         if (is_array($categories)) {
@@ -358,8 +360,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     public function removeExcludedCustomAttributes($product)
     {
         foreach ($this->excludedCustomAttributes as $attribute) {
-            if (isset($product[$attribute]))
+            if (isset($product[$attribute])) {
                 unset($product[$attribute]);
+            }
         }
     }
 
@@ -398,7 +401,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
         // Get just the information needed in order to make the response lighter
         $categoryResults = [];
-        foreach($categories["items"] as $category) {
+        foreach ($categories["items"] as $category) {
             $categoryResults[] = [
                 'category_id' => $category['entity_id'],
                 'entity_id' => $category['entity_id'],

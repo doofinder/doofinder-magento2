@@ -11,11 +11,10 @@ use Magento\Framework\Model\AbstractModel;
 
 class ChangedItem extends AbstractModel implements ChangedItemInterface, IdentityInterface
 {
-    const CACHE_TAG = 'doofinder_feed_changed_item';
+    private const CACHE_TAG = 'doofinder_feed_changed_item';
 
     /**
      * ChangedItem constructor.
-     * @return void
      */
     public function _construct()
     {

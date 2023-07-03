@@ -88,6 +88,7 @@ class Product extends AbstractHelper
      * @param UrlFinderInterface $urlFinder
      * @param EavConfig $eavConfig
      * @param Configurable $configurable
+     * @param InventoryHelper $inventoryHelper
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -243,8 +244,7 @@ class Product extends AbstractHelper
         // Get only needed category to build a tree
         $result = [];
         foreach ($categories as $category) {
-            if (
-                !isset($toRemove[$category->getPath()])
+            if (!isset($toRemove[$category->getPath()])
                 && in_array($category->getPath(), $catTree)
             ) {
                 $result[] = $category;
@@ -330,6 +330,7 @@ class Product extends AbstractHelper
 
     /**
      * Get product image url
+     * 
      * TODO: return same image as endpoint
      *
      * @param ProductModel $product

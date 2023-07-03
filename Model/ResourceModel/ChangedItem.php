@@ -15,7 +15,7 @@ class ChangedItem extends AbstractDB
      *
      * @var string TABLE_NAME
      */
-    const TABLE_NAME = 'doofinder_feed_changed_item';
+    public const TABLE_NAME = 'doofinder_feed_changed_item';
 
     /**
      * Initializes resource model.

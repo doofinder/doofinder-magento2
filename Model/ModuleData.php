@@ -17,9 +17,10 @@ use Magento\Store\Model\ScopeInterface;
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ModuleData {
+class ModuleData
+{
 
-    const MODULE_PACKAGE_NAME = 'Doofinder_Feed';
+    private const MODULE_PACKAGE_NAME = 'Doofinder_Feed';
 
     /**
      * @var DeploymentConfig

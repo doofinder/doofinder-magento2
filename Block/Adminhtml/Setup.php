@@ -126,7 +126,7 @@ class Setup extends Template
     }
 
     /**
-     *Get Sector Changed url
+     * Get Sector Changed url
      *
      * @return string
      */
@@ -145,7 +145,6 @@ class Setup extends Template
         return $this->getUrl('*/integration/createStore');
     }
 
-
     /**
      * Get doofinder connection data endpoint
      *
@@ -155,7 +154,6 @@ class Setup extends Template
     {
         return $this->storeConfig->getDoofinderConnectUrl();
     }
-
 
     /**
      * Get Permissions dialog url

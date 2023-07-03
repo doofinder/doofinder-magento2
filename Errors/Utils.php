@@ -6,6 +6,8 @@ namespace Doofinder\Feed\Errors;
 class Utils
 {
     /**
+     * Function for handling errors by it's code
+     * 
      * @param $statusCode
      * @param $response
      * @throws BadRequest
@@ -59,6 +61,12 @@ class Utils
         }
     }
 
+    /**
+     * Reads the error for it's later processing
+     * 
+     * @param $response
+     * @return string
+     */
     private static function readError($response): string
     {
         $error = json_decode($response, true);

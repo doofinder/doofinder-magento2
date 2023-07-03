@@ -9,6 +9,12 @@ use Magento\Framework\View\Element\AbstractBlock;
  */
 class Enable extends AbstractBlock
 {
+
+    /**
+     * Converts code to html for a section
+     * 
+     * @return string
+     */
     protected function _toHtml()
     {
         $id = $this->getInputId();

@@ -69,5 +69,4 @@ class CustomAttributes extends AbstractFieldArray
         }
         return $result;
     }
-
 }

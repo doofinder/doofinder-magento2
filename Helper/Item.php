@@ -34,6 +34,15 @@ class Item extends AbstractHelper
     /** @var Indice */
     private $indice;
 
+    /**
+     * Item constructor.
+     *
+     * @param ManagementClientFactory $managementClientFactory
+     * @param ThrottleFactory $throttleFactory
+     * @param SearchEngine $searchEngine
+     * @param Indice $indice
+     * @param Context $context
+     */
     public function __construct(
         ManagementClientFactory $managementClientFactory,
         ThrottleFactory $throttleFactory,
@@ -134,6 +143,7 @@ class Item extends AbstractHelper
 
     /**
      * Processes items depending on the type os processing expected
+     * 
      * @param array $items
      * @param StoreInterface $store
      * @param string $indice

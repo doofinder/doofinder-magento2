@@ -15,6 +15,12 @@ class Price extends AbstractHelper
 {
     private $taxConfig;
 
+    /**
+     * Price constructor.
+     *
+     * @param Context $context
+     * @param TaxConfig $taxConfig
+     */
     public function __construct(
         Context $context,
         TaxConfig $taxConfig
@@ -25,6 +31,9 @@ class Price extends AbstractHelper
 
     /**
      * Gets product price by product's id
+     * 
+     * @param $product
+     * @param $type
      */
     public function getProductPrice($product, $type = 'final_price')
     {
@@ -36,6 +45,9 @@ class Price extends AbstractHelper
 
     /**
      * Returns the price type transformed to one of the types we use
+     * 
+     * @param $type
+     * @return string
      */
     private function getPriceType($type)
     {
@@ -51,10 +63,14 @@ class Price extends AbstractHelper
 
     /**
      * Gets the flat price of the product based on it's type
+     * 
+     * @param $product
+     * @param $type
+     * @return int
      */
     private function getProductFlatPrice($product, $type)
     {
-        switch($product->getTypeId()) {
+        switch ($product->getTypeId()) {
             case GroupedType::TYPE_CODE:
                 return $this->getGroupedProductPrice($product, $type);
 
@@ -76,11 +92,16 @@ class Price extends AbstractHelper
 
     /**
      * Gets the price applying the taxes in case it's necessary
+     * 
+     * @param $product
+     * @param $price
+     * @return int
      */
     private function getPriceApplyingCorrespondingTaxes($product, $price)
     {
-        if (!$price)
+        if (!$price) {
             return 0;
+        }
 
         $amount = $price->getAmount();
         $this->getTaxEnabled() ?
@@ -94,6 +115,9 @@ class Price extends AbstractHelper
      * Function that returns the price with the corresponding tax value.
      * The first case contemplates the scenario of the tax already applied to the price
      * The second scenario needs this adjustment to be applied.
+     * 
+     * @param $product
+     * @param $amount
      */
     private function getPriceWithTaxes($product, $amount)
     {
@@ -109,6 +133,8 @@ class Price extends AbstractHelper
 
     /**
      * Returns whether the taxes are enabled in the backoffice or not
+     * 
+     * @return boolean
      */
     private function getTaxEnabled()
     {
@@ -117,6 +143,9 @@ class Price extends AbstractHelper
 
     /**
      * Applies the pricing strategy for bundle-type products and returns the corresponding value
+     * 
+     * @param $product
+     * @param $type
      */
     private function getBundleProductPrice($product, $type)
     {
@@ -128,10 +157,13 @@ class Price extends AbstractHelper
 
     /**
      * Applies the pricing strategy for grouped-type products and returns the corresponding value
+     * 
+     * @param $product
+     * @param $type
      */
     private function getGroupedProductPrice($product, $type)
     {
-        if($type !== 'regular_price') {
+        if ($type !== 'regular_price') {
             return $product->getPriceInfo()->getPrice($type);
         }
 
@@ -141,6 +173,9 @@ class Price extends AbstractHelper
 
     /**
      * Applies the pricing strategy for configurable-type products and returns the corresponding value
+     * 
+     * @param $product
+     * @param $type
      */
     private function getConfigurableProductPrice($product, $type)
     {
@@ -148,7 +183,15 @@ class Price extends AbstractHelper
         return $this->getMinimumComplexProductPrice($product, $usedProds, $type);
     }
 
-    private function getMinimumComplexProductPrice($product, $usedProds, $type) {
+    /**
+     * Gets calculated minimum price for a product
+     * 
+     * @param $product
+     * @param $usedProds
+     * @param $type
+     */
+    private function getMinimumComplexProductPrice($product, $usedProds, $type)
+    {
         $prices = [];
         foreach ($usedProds as $child) {
             if ($child->getId() != $product->getId()) {
@@ -158,8 +201,9 @@ class Price extends AbstractHelper
             }
         }
 
-        if (empty($prices))
+        if (empty($prices)) {
             return null;
+        }
 
         $index = array_search(min($prices['values']), $prices['values']);
         return ($index < 0) ? null : $prices['prices'][$index];

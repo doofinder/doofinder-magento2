@@ -32,12 +32,16 @@ interface ChangedItemRepositoryInterface
     public function get($value, ?string $field): ChangedItemInterface;
 
     /**
+     * Gets entity's list by search criteria
+     * 
      * @param SearchCriteriaInterface $searchCriteria
      * @return ChangedItemSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $searchCriteria): ChangedItemSearchResultsInterface;
 
     /**
+     * Determines whether this item exists or not
+     * 
      * @param ChangedItemInterface $changedItem
      * @return bool
      */

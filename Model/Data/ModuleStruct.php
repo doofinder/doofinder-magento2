@@ -4,7 +4,8 @@ namespace Doofinder\Feed\Model\Data;
 
 use JsonSerializable;
 
-class ModuleStruct implements JsonSerializable{
+class ModuleStruct implements JsonSerializable
+{
 
     private $version;
     private $magentoVersion;
@@ -19,10 +20,10 @@ class ModuleStruct implements JsonSerializable{
 
     public function jsonSerialize(): array
     {
-        return Array(
+        return [
             'version'    => $this->version,
             'magento_version'   => $this->magentoVersion,
             'websites'    => $this->websiteStructs
-         );
+        ];
     }
 }

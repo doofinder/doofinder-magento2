@@ -9,9 +9,8 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote\Item as QuoteItem;
 
 /**
-* Class AddToCart
-* @package Doofinder\Feed\Controller\Product
-*/
+ * Class AddToCart. This class aims at opening a way for adding to cart from the layer
+ */
 class AddToCart extends Action implements HttpPostActionInterface
 {
     /** @var \Magento\Checkout\Model\SessionFactory */
@@ -23,12 +22,6 @@ class AddToCart extends Action implements HttpPostActionInterface
     /** @var \Magento\Catalog\Api\ProductRepositoryInterface */
     private $productRepository;
 
-    /** @var \Magento\Framework\Serialize\Serializer\Json */
-    private $json;
-
-    /** @var \Magento\ConfigurableProduct\Model\Product\Type\Configurable */
-    private $configurableType;
-
     /** @var \Psr\Log\LoggerInterface */
     protected $logger;
 
@@ -36,39 +29,32 @@ class AddToCart extends Action implements HttpPostActionInterface
     private $resultJsonFactory;
 
     /**
-      * AddToCart constructor.
-      * @param Context $context
-      * @param \Magento\Framework\Serialize\Serializer\Json $json
-      * @param \Magento\Checkout\Model\SessionFactory $checkoutSession
-      * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
-      * @param \Magento\ConfigurableProduct\Model\Product\Type\Configurable $configurableType
-      * @param \Psr\Log\LoggerInterface $logger
-      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-      */
+     * AddToCart constructor.
+     * @param Context $context
+     * @param \Magento\Checkout\Model\SessionFactory $checkoutSession
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     */
     public function __construct(
         Context $context,
-        \Magento\Framework\Serialize\Serializer\Json $json,
         \Magento\Checkout\Model\SessionFactory $checkoutSession,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \Magento\ConfigurableProduct\Model\Product\Type\Configurable $configurableType,
         \Psr\Log\LoggerInterface $logger,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->cartRepository = $cartRepository;
         $this->productRepository = $productRepository;
-        $this->json = $json;
-        $this->configurableType = $configurableType;
         $this->logger = $logger;
         $this->resultJsonFactory = $resultJsonFactory;
         parent::__construct($context);
     }
 
     /**
-     * @return ResultInterface
-     * @throws LocalizedException
+     * @inheritDoc
      */
     public function execute()
     {
@@ -80,7 +66,6 @@ class AddToCart extends Action implements HttpPostActionInterface
 
         $this->logger->info("Request add item to cart");
         $this->logger->info("Product: ", ["product" => $product]);
-        
 
         $result = $quote->addProduct($product, $qty);
 

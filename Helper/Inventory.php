@@ -9,6 +9,8 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Module\Manager;
+use Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface;
+use Magento\InventorySales\Model\ResourceModel\GetAssignedStockIdForWebsite;
 use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -99,17 +101,17 @@ class Inventory extends AbstractHelper
 
     /**
      * Get stockId related with the given store.
+     * 
      * Note: Each website is related only with one stock but one stock can be used by several websites.
      *
      * @param int|null $storeId
      * @return string
      */
-    public function getStockIdByStore(int $storeId): ?int 
+    public function getStockIdByStore(int $storeId): ?int
     {
         return $this->isMsiActive() ?
             $this->getStockIdByStoreWithMSI($storeId) :
             null;
-        
     }
 
     /**
@@ -165,6 +167,8 @@ class Inventory extends AbstractHelper
     }
 
     /**
+     * Get the data from a stock item
+     * 
      * @param string $sku
      * @param int|null $stockId
      *
@@ -172,7 +176,7 @@ class Inventory extends AbstractHelper
      */
     private function getStockItemData(string $sku, ?int $stockId = null)
     {
-        $defaultStockProvider = $this->_objectManager->create(\Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface::class);
+        $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
         $getStockItemData = $this->_objectManager->create(GetStockItemDataInterface::class);
         $stockId = $stockId ?? $defaultStockProvider->getId();
         $stockItemData = $getStockItemData->execute($sku, $stockId);
@@ -187,7 +191,6 @@ class Inventory extends AbstractHelper
      * Get quantity and stock status for environments without MSI dependency
      *
      * @param ProductModel $product
-     * @param int|null $stockId
      *
      * @return array
      */
@@ -203,7 +206,6 @@ class Inventory extends AbstractHelper
      * Get quantity and stock status for environments without MSI dependency
      *
      * @param ProductModel $product
-     * @param int|null $stockId
      *
      * @return string
      */
@@ -266,12 +268,13 @@ class Inventory extends AbstractHelper
 
     /**
      * Function to get the stockId related with the given store / website
-     * 
-     * @return int
+     *
+     * @param int $storeId
+     * @return int|null
      */
     private function getStockIdByStoreWithMSI(int $storeId): ?int
     {
-        $getAssignedStockIdForWebsite = $this->_objectManager->create(\Magento\InventorySales\Model\ResourceModel\GetAssignedStockIdForWebsite::class);
+        $getAssignedStockIdForWebsite = $this->_objectManager->create(GetAssignedStockIdForWebsite::class);
         $websiteId = (int)$this->storeManager->getStore($storeId)->getWebsiteId();
         $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
         return $getAssignedStockIdForWebsite->execute($websiteCode);
@@ -279,12 +282,13 @@ class Inventory extends AbstractHelper
 
     /**
      * Function to detect if MSI module is active or not.
-     * For the moment is enugh checking those two dependencies because we're working only with those.
-     * 
+     * For the moment is enough checking those two dependencies because we're working only with those.
+     *
      * @return bool
      */
     private function isMsiActive(): bool
     {
-        return ($this->moduleManager->isEnabled('Magento_InventorySalesApi') && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi'));
+        return $this->moduleManager->isEnabled('Magento_InventorySalesApi')
+            && $this->moduleManager->isEnabled('Magento_InventoryCatalogApi');
     }
 }

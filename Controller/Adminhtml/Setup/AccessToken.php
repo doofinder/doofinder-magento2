@@ -17,6 +17,12 @@ class AccessToken extends Action implements HttpGetActionInterface
      */
     protected $integrationService;
 
+    /**
+     * AccessToken constructor.
+     *
+     * @param IntegrationServiceInterface $integrationService
+     * @param Context $context
+     */
     public function __construct(
         IntegrationServiceInterface $integrationService,
         Context $context

@@ -25,6 +25,14 @@ class SaveSector extends Action implements HttpPostActionInterface
     /** @var LoggerInterface */
     private $logger;
 
+    /**
+     * SaveSector constructor.
+     *
+     * @param WriterInterface $configWriter
+     * @param JsonFactory $resultJsonFactory
+     * @param LoggerInterface $logger
+     * @param Context $context
+     */
     public function __construct(
         WriterInterface $configWriter,
         JsonFactory $resultJsonFactory,

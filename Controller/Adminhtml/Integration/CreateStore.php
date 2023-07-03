@@ -118,7 +118,8 @@ class CreateStore extends Action implements HttpGetActionInterface
                 $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["search_engines"]);
             } catch (Exception $e) {
                 $success = false;
-                $this->logger->error('Error creating store for store group "' . $storeGroup->getName() . '". ' . $e->getMessage());
+                $this->logger->error('Error creating store for store group "' . $storeGroup->getName() .
+                    '". ' . $e->getMessage());
             }
         }
         $this->setCustomAttributes();
@@ -162,13 +163,22 @@ class CreateStore extends Action implements HttpGetActionInterface
             $storesConfig[$language][$currency] = (int)$store->getId();
             $callbackUrls[$language][$currency] = $this->getProcessCallbackUrl($store);
         }
-        return ["searchEngineConfig" => $searchEngineConfig, "storesConfig" => $storesConfig, "callbackUrls" => $callbackUrls];
+        return [
+            "searchEngineConfig" => $searchEngineConfig,
+            "storesConfig" => $storesConfig,
+            "callbackUrls" => $callbackUrls
+        ];
     }
 
-
+    /**
+     * Generates the additional options required for retrieving later the required items
+     * 
+     * @param $websiteId
+     */
     public function generateStoreOptions($websiteId)
     {
-        $integrationToken = $this->integrationService->get($this->storeConfig->getIntegrationId())->getData(Tokens::DATA_TOKEN);
+        $integrationId = $this->storeConfig->getIntegrationId();
+        $integrationToken = $this->integrationService->get($integrationId)->getData(Tokens::DATA_TOKEN);
 
         return [
             'token' => $integrationToken,
@@ -178,6 +188,10 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /**
      * Function to store into the data base the installation id as well as the layer script
+     * 
+     * @param $storeGroupId
+     * @param $installationId
+     * @param $script
      */
     private function saveInstallationConfig($storeGroupId, $installationId, $script)
     {
@@ -193,6 +207,9 @@ class CreateStore extends Action implements HttpGetActionInterface
      * "search_engines":{"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},"en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
      * We're going to iterate over the search_engines because there is the data created in doofinder. May occour that some
      * of the data that we've in storeConfig has some invalid parameter and will be bypass during the creation.
+     * 
+     * @param $storesConfig
+     * @param $searchEngines
      */
     private function saveSearchEngineConfig($storesConfig, $searchEngines)
     {
@@ -207,7 +224,10 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /**
      * Function to store the status of the SE indexation.
+     * 
      * By default we set this value to "STARTED" and will be updated when we receive the callback from doofinder
+     * 
+     * @param $storeId
      */
     private function setIndexationStatus($storeId)
     {

@@ -1,8 +1,11 @@
 <?php
+
 namespace Doofinder\Feed\Block\System\Config;
+
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+
 class CleanIntegration extends Field
 {
     protected $_template = 'Doofinder_Feed::System/Config/cleanIntegrationButton.phtml';

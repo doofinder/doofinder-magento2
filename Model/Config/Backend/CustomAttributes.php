@@ -39,8 +39,7 @@ class CustomAttributes extends ArraySerialized
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         ManagerInterface $messageManager
-    )
-    {
+    ) {
         $this->messageManager = $messageManager;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection);
     }
@@ -53,7 +52,9 @@ class CustomAttributes extends ArraySerialized
      */
     public function beforeSave()
     {
-        $this->messageManager->addNoticeMessage(__('It will be necessary to reindex your feed to so that the changes in the custom attributes will be applied on your feed'));
+        $this->messageManager->addNoticeMessage(
+            __('To apply the changes in the custom attributes to your feed, it will be necessary to reindex it')
+        );
         
         // For value validations
         $exceptions = $this->getValue();

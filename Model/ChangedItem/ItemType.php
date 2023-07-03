@@ -14,9 +14,15 @@ abstract class ItemType
     public const PAGE_INDICE = 'page';
     public const CATEGORY_INDICE = 'category';
 
-    public static function getList() {
+    /**
+     * Gets an associative array for using multiindexes' indices
+     * 
+     * @return array
+     */
+    public static function getList()
+    {
         return [
-            self::PRODUCT => self::PRODUCT_INDICE, 
+            self::PRODUCT => self::PRODUCT_INDICE,
             self::PAGE => self::PAGE_INDICE,
             self::CATEGORY => self::CATEGORY_INDICE
         ];
