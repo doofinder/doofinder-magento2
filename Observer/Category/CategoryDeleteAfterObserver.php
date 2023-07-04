@@ -28,7 +28,10 @@ class CategoryDeleteAfterObserver extends AbstractChangedCategoryObserver
         }
     }
 
-    protected function getOperationType($category)
+    /**
+     * @inheritDoc
+     */
+    protected function getOperationType($category): string
     {
         return ChangedItemInterface::OPERATION_TYPE_DELETE;
     }

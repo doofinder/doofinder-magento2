@@ -22,7 +22,7 @@ class ManagementClient
     private $client;
 
     /**
-     * Setup constructor.
+     * ManagementClient constructor.
      *
      * @param ClientFactory $clientFactory
      * @param string $apiKey

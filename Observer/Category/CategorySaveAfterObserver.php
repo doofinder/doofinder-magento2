@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Observer\Category;
 
-use Doofinder\Feed\Api\ChangedItemRepositoryInterface;
 use Doofinder\Feed\Api\Data\ChangedItemInterface;
-use Doofinder\Feed\Helper\StoreConfig;
-use Doofinder\Feed\Model\ChangedItem;
-use Doofinder\Feed\Model\ChangedItemFactory;
-use Doofinder\Feed\Model\ChangedItem\ItemType;
-use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
-use Psr\Log\LoggerInterface;
 
 class CategorySaveAfterObserver extends AbstractChangedCategoryObserver
 {
