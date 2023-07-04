@@ -38,6 +38,14 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
      */
     private $logger;
 
+    /**
+     * AbstractChangedProductObserver constructor.
+     *
+     * @param StoreConfig $storeConfig
+     * @param ChangedItemFactory $changedItemFactory
+     * @param ChangedItemRepositoryInterface $changedItemRepository
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         StoreConfig $storeConfig,
         ChangedItemFactory $changedItemFactory,
@@ -57,32 +65,27 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
     {
         if ($this->storeConfig->isUpdateOnSave()) {
             try {
-                /** @var ProductInterface $product */
                 $product = $observer->getEvent()->getProduct();
                 $operationType = $this->getOperationType();
 
                 if ($product->getStatus() == Status::STATUS_DISABLED) {
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_DELETE);
-                } else if (
-                    $product->getUpdatedAt() == $product->getCreatedAt() &&
+                } elseif ($product->getUpdatedAt() == $product->getCreatedAt() &&
                     $operationType == ChangedItemInterface::OPERATION_TYPE_UPDATE
                 ) {
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_CREATE);
-                } else if (
-                    $product->getUpdatedAt() != $product->getCreatedAt() && 
+                } elseif ($product->getUpdatedAt() != $product->getCreatedAt() &&
                     $operationType == ChangedItemInterface::OPERATION_TYPE_CREATE
                 ) {
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_UPDATE);
                 }
                 
-                if (
-                    $product->getStore()->getId() == 0 
-                    || $this->getOperationType() == ChangedItemInterface::OPERATION_TYPE_DELETE
+                if ($product->getStore()->getId() == 0 ||
+                    $this->getOperationType() == ChangedItemInterface::OPERATION_TYPE_DELETE
                 ) {
-
                     foreach ($this->storeConfig->getAllStores() as $store) {
                         $this->registerChangedItemStore($product, (int)$store->getId());
-                    } 
+                    }
 
                 } else {
                     $this->registerChangedItemStore($product, (int)$product->getStore()->getId());
@@ -93,6 +96,12 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         }
     }
 
+    /**
+     * Registers the item by it's type in the table doofinder_feed_changed_item, with the corresponding store
+     * 
+     * @param ProductInterface $product
+     * @param int $storeId
+     */
     protected function registerChangedItemStore(ProductInterface $product, int $storeId)
     {
         $changedItem = $this->createChangedItem($product, $storeId);

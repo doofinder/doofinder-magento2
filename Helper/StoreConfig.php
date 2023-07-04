@@ -932,14 +932,15 @@ class StoreConfig extends AbstractHelper
      * 
      * @param int $storeId
      */
-    public function getIndexationStatus(int $storeId): array
+    public function getIndexationStatus(int $storeId): array 
     {
-        try {
-            $status = $this->scopeConfig->getValue(self::INDEXATION_STATUS, ScopeInterface::SCOPE_STORES, $storeId);
-            return json_decode($status, true);
-        } catch (\Exception $e) {
+        $status = $this->scopeConfig->getValue(self::INDEXATION_STATUS, ScopeInterface::SCOPE_STORES, $storeId);
+        
+        if ($status == null) {
             throw new NotFound('There is not a valid indexation status for the current store.');
         }
+
+        return json_decode($status, true);
     }
 
     /**

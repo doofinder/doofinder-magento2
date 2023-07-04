@@ -59,6 +59,8 @@ class Uninstall implements UninstallInterface
     }
 
     /**
+     * Deletes the corresponding configuration
+     * 
      * @param AbstractModel $config
      * @throws Exception
      */

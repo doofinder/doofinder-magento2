@@ -42,6 +42,14 @@ abstract class AbstractChangedCmsPageObserver implements ObserverInterface
      */
     protected $logger;
 
+    /**
+     * AbstractChangedCmsPageObserver constructor.
+     *
+     * @param StoreConfig $storeConfig
+     * @param ChangedItemFactory $changedItemFactory
+     * @param ChangedItemRepositoryInterface $changedItemRepository
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         StoreConfig $storeConfig,
         ChangedItemFactory $changedItemFactory,
@@ -57,8 +65,14 @@ abstract class AbstractChangedCmsPageObserver implements ObserverInterface
     /**
      * @inheritDoc
      */
-    public abstract function execute(Observer $observer);
+    abstract public function execute(Observer $observer);
 
+    /**
+     * Saves the page into changed item table if necessary
+     * 
+     * @param CategoryInterface $category
+     * @param int $storeId
+     */
     protected function registerChangedItemStore(PageInterface $page, int $storeId)
     {
         $changedPage = $this->createChangedItem($page, $storeId);
@@ -87,5 +101,12 @@ abstract class AbstractChangedCmsPageObserver implements ObserverInterface
         return $changedItem;
     }
 
-    protected abstract function getOperationType($page);
+    /**
+     * Gets operation type
+     * 
+     * @param PageInterface $page
+     * 
+     * @return string
+     */
+    abstract protected function getOperationType(PageInterface $page): string;
 }
