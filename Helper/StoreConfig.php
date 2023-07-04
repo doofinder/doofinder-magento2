@@ -910,9 +910,8 @@ class StoreConfig extends AbstractHelper
                 'label'   => $this->escaper->escapeHtml($attribute->getFrontendLabel())
             ];
 
-            $enabled = $saved[$attribute_id]['enabled'];
-
-            $attributes[$attribute_id]['enabled'] = isset($enabled) && $enabled;
+            $enabled = isset($saved[$attribute_id]['enabled']) && $saved[$attribute_id]['enabled'];
+            $attributes[$attribute_id]['enabled'] = $enabled;
         }
         return $attributes;
     }
