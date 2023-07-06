@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Observer\Category;
 
-use Doofinder\Feed\Api\ChangedItemRepositoryInterface;
 use Doofinder\Feed\Api\Data\ChangedItemInterface;
-use Doofinder\Feed\Helper\StoreConfig;
-use Doofinder\Feed\Model\ChangedItem;
-use Doofinder\Feed\Model\ChangedItemFactory;
-use Doofinder\Feed\Model\ChangedItem\ItemType;
-use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
-use Psr\Log\LoggerInterface;
 
 class CategorySaveAfterObserver extends AbstractChangedCategoryObserver
 {
@@ -31,7 +23,6 @@ class CategorySaveAfterObserver extends AbstractChangedCategoryObserver
                     $category->getStore()->getId() == 0 ||
                     $operationType == ChangedItemInterface::OPERATION_TYPE_DELETE
                 ) {
-
                     foreach ($this->storeConfig->getAllStores() as $store) {
                         $this->registerChangedItemStore($category, (int)$store->getId());
                     }
@@ -45,7 +36,10 @@ class CategorySaveAfterObserver extends AbstractChangedCategoryObserver
         }
     }
 
-    protected function getOperationType($category)
+    /**
+     * @inheritDoc
+     */
+    protected function getOperationType($category): string
     {
         return $category->getIsActive() ? 
             ChangedItemInterface::OPERATION_TYPE_UPDATE:

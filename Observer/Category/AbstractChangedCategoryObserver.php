@@ -42,6 +42,14 @@ abstract class AbstractChangedCategoryObserver implements ObserverInterface
      */
     protected $logger;
 
+    /**
+     * AbstractChangedCategoryObserver constructor.
+     *
+     * @param StoreConfig $storeConfig
+     * @param ChangedItemFactory $changedItemFactory
+     * @param ChangedItemRepositoryInterface $changedItemRepository
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         StoreConfig $storeConfig,
         ChangedItemFactory $changedItemFactory,
@@ -57,8 +65,14 @@ abstract class AbstractChangedCategoryObserver implements ObserverInterface
     /**
      * @inheritDoc
      */
-    public abstract function execute(Observer $observer);
+    abstract public function execute(Observer $observer);
 
+    /**
+     * Saves the category into changed item table if necessary
+     * 
+     * @param CategoryInterface $category
+     * @param int $storeId
+     */
     protected function registerChangedItemStore(CategoryInterface $category, int $storeId)
     {
         $changedPage = $this->createChangedItem($category, $storeId);
@@ -87,5 +101,12 @@ abstract class AbstractChangedCategoryObserver implements ObserverInterface
         return $changedItem;
     }
 
-    protected abstract function getOperationType($category);
+    /**
+     * Gets operation type
+     * 
+     * @param CategoryInterface $category
+     * 
+     * @return string
+     */
+    abstract protected function getOperationType(CategoryInterface $category): string;
 }

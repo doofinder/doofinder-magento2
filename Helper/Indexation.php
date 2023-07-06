@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\App\Helper\Context;
 
 class Indexation extends AbstractHelper
 {
@@ -24,16 +23,6 @@ class Indexation extends AbstractHelper
 
     public const DOOFINDER_GRID_SEVERITY_CRITICAL = 'critical';
 
-    /**
-     * Indexation constructor.
-     *
-     * @param Context $context
-     */
-    public function __construct(Context $context) {
-        parent::__construct($context);
-    }
-
-    
     /**
      * Sanitize and prevent undefined index errors
      *

@@ -4,7 +4,8 @@ namespace Doofinder\Feed\Model\Data;
 
 use JsonSerializable;
 
-class StoreStruct implements JsonSerializable {
+class StoreStruct implements JsonSerializable
+{
 
     private $id;
     private $code;
@@ -21,14 +22,17 @@ class StoreStruct implements JsonSerializable {
         $this->installationId = $installationId;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function jsonSerialize(): array
     {
-        return Array(
+        return [
             'id'    => $this->id,
             'code'   => $this->code,
             'language'    => $this->language,
             'currency'    => $this->currency,
             'installationId'    => $this->installationId
-         );
+        ];
     }
 }

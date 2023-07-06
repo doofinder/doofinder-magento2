@@ -75,6 +75,7 @@ class SearchEngine extends AbstractHelper
 
     /**
      * Request all user's search engines throttled
+     * 
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_list
      *
      * @return array
@@ -100,6 +101,7 @@ class SearchEngine extends AbstractHelper
 
     /**
      * Create search engine throttled
+     * 
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_list
      *
      * @param array $searchEngine
@@ -126,6 +128,7 @@ class SearchEngine extends AbstractHelper
 
     /**
      * Process search engine throttled
+     * 
      * @see https://docs.doofinder.com/api/management/v2/#operation/process
      *
      * @param string $hashId
@@ -179,5 +182,4 @@ class SearchEngine extends AbstractHelper
         $hashId = $this->storeConfig->getHashId((int)$store->getId());
         return $this->getSearchEngine($hashId);
     }
-
 }

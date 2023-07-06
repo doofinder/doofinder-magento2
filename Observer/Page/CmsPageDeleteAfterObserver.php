@@ -28,7 +28,10 @@ class CmsPageDeleteAfterObserver extends AbstractChangedCmsPageObserver
         }
     }
 
-    protected function getOperationType($page)
+    /**
+     * @inheritDoc
+     */
+    protected function getOperationType($page): string
     {
         return ChangedItemInterface::OPERATION_TYPE_DELETE;
     }

@@ -13,7 +13,7 @@ use Doofinder\Feed\Errors\ThrottledResponse;
 class Throttle
 {
     /** Max allowed throttle retries **/
-    const THROTTLE_RETRIES = 3;
+    private const THROTTLE_RETRIES = 3;
 
     /**
      * Throttled object

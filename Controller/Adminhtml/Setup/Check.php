@@ -32,7 +32,7 @@ class Check extends Action implements HttpGetActionInterface
     private $logger;
 
     /**
-     * Setup constructor.
+     * Check constructor.
      *
      * @param Action\Context $context
      * @param StoreConfig $storeConfig

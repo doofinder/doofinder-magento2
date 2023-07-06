@@ -42,9 +42,13 @@ class UpgradeIntegrationPatch implements DataPatchInterface
         $this->moduleDataSetup->startSetup();
         try {
             $integration = $this->integrationService->findByName(self::DOOFINDER_INTEGRATION_NAME);
-            $integrationData = ['integration_id' => $integration->getId(), 'name' => $integration->getName(), 'resource' => $this->resources];
+            $integrationData = [
+                'integration_id' => $integration->getId(),
+                'name' => $integration->getName(),
+                'resource' => $this->resources
+            ];
             $this->integrationService->update($integrationData);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
         } finally {
             $this->moduleDataSetup->endSetup();
         }

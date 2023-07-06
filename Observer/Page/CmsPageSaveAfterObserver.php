@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Observer\Page;
 
 use Doofinder\Feed\Api\Data\ChangedItemInterface;
-use Doofinder\Feed\Model\ChangedItem;
-use Doofinder\Feed\Model\ChangedItem\ItemType;
-use Magento\Cms\Api\Data\PageInterface;
 use Magento\Framework\Event\Observer;
 
 class CmsPageSaveAfterObserver extends AbstractChangedCmsPageObserver
@@ -23,18 +20,16 @@ class CmsPageSaveAfterObserver extends AbstractChangedCmsPageObserver
                 $page = $observer->getEvent()->getObject();
                 $operationType = $this->getOperationType($page);
                 $storeIds = [];
-
                 
-                foreach($page->getStores() as $store) {
-                    if($store == 0) {
+                foreach ($page->getStores() as $store) {
+                    if ($store == 0) {
                         $storeIds = [];
                         break;
                     }
                     $storeIds[] = $store;
                 }
 
-                if (
-                    $storeIds == [] ||
+                if ($storeIds == [] ||
                     $operationType == ChangedItemInterface::OPERATION_TYPE_DELETE
                 ) {
                     foreach ($this->storeConfig->getAllStores() as $store) {
@@ -42,7 +37,7 @@ class CmsPageSaveAfterObserver extends AbstractChangedCmsPageObserver
                     }
 
                 } else {
-                    foreach($storeIds as $storeId) {
+                    foreach ($storeIds as $storeId) {
                         $this->registerChangedItemStore($page, (int)$storeId);
                     }
                 }
@@ -52,9 +47,12 @@ class CmsPageSaveAfterObserver extends AbstractChangedCmsPageObserver
         }
     }
 
-    protected function getOperationType($page)
+    /**
+     * @inheritDoc
+     */
+    protected function getOperationType($page): string
     {
-        return $page->isActive() ? 
+        return $page->isActive() ?
             ChangedItemInterface::OPERATION_TYPE_UPDATE:
             ChangedItemInterface::OPERATION_TYPE_DELETE;
     }

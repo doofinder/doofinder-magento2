@@ -11,28 +11,28 @@ interface ChangedItemInterface
      *
      * @var string CHANGED_ITEM_ID
      */
-    const CHANGED_ITEM_ID = 'entity_id';
+    public const CHANGED_ITEM_ID = 'entity_id';
     
     /**
      * Changed item trace row's identity field name.
      *
      * @var string CHANGED_ITEM_ID
      */
-    const ITEM_ID = 'item_id';
+    public const ITEM_ID = 'item_id';
 
     /**
      * Store view the change was issued on.
      *
      * @var string STORE_ID
      */
-    const STORE_ID = 'store_id';
+    public const STORE_ID = 'store_id';
 
     /**
-     * Item type.
+     * The type of item that represents inside the table.
      *
      * @var string ITEM_TYPE
      */
-    const ITEM_TYPE = 'item_type';
+    public const ITEM_TYPE = 'item_type';
 
     /**
      * Operation performed on Changed item field name.
@@ -41,28 +41,28 @@ interface ChangedItemInterface
      *
      * @var string OPERATION_TYPE
      */
-    const OPERATION_TYPE = 'operation_type';
+    public const OPERATION_TYPE = 'operation_type';
 
     /**
      * Tells that the item was updated in regular way.
      *
      * @var string OPERATION_TYPE_UPDATE
      */
-    const OPERATION_TYPE_UPDATE = 'update';
+    public const OPERATION_TYPE_UPDATE = 'update';
 
     /**
      * Tells that the item was deleted completely.
      *
      * @var string OPERATION_TYPE_DELETE
      */
-    const OPERATION_TYPE_DELETE = 'delete';
+    public const OPERATION_TYPE_DELETE = 'delete';
 
     /**
      * Tells that the item was created.
      *
      * @var string OPERATION_TYPE_CRATE
      */
-    const OPERATION_TYPE_CREATE = 'create';
+    public const OPERATION_TYPE_CREATE = 'create';
 
     /**
      * Get item id

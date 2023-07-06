@@ -153,61 +153,40 @@ class StoreConfig extends AbstractHelper
     /** @var ManagementClientFactory  */
     private $managementClientFactory;
 
-    /**
-     * @var StoreManagerInterface
-     */
+    /** @var StoreManagerInterface */
     private $storeManager;
 
-    /**
-     * @var StoreWebsiteRelationInterface
-     */
+    /** @var StoreWebsiteRelationInterface */
     private $storeWebsiteRelation;
 
-    /**
-     * @var WriterInterface
-     */
+    /** @var WriterInterface */
     protected $configWriter;
 
-    /**
-     * @var ConfigCollectionFactory
-     */
+    /** @var ConfigCollectionFactory */
     protected $configCollectionFactory;
 
-    /**
-     * @var AttributeCollectionFactory
-     */
+    /**  @var AttributeCollectionFactory */
     protected $attributeCollectionFactory;
 
     /** @var Indexation  */
     protected $indexationHelper;
 
-    /**
-     * Escaper
-     *
-     * @var \Magento\Framework\Escaper
-     */
+    /** @var \Magento\Framework\Escaper */
     protected $escaper;
 
-    /**
-     * Eav config
-     *
-     * @var Config
-     */
+    /** @var Config */
     private $eavConfig;
 
-    /**
-     * @var Data
-     */
+    /** @var Data */
     private $backendHelper;
 
-    /**
-     * @var \Magento\Framework\App\ResourceConnection
-     */
+    /** @var \Magento\Framework\App\ResourceConnection */
     private $resource;
 
     /**
      * StoreConfig constructor.
      *
+     * @param ManagementClientFactory $managementClientFactory
      * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param StoreWebsiteRelationInterface $storeWebsiteRelation
@@ -249,6 +228,12 @@ class StoreConfig extends AbstractHelper
         parent::__construct($context);
     }
 
+    /**
+     * Creates the store in doofinder's structure
+     * 
+     * @param array $storeData
+     * @return array
+     */
     public function createStore(array $storeData): array
     {
         $managementClient = $this->managementClientFactory->create(['apiType' => 'admin']);
@@ -271,12 +256,17 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to get a store by id
+     * 
+     * @param $storeId
      */
-    public function getStoreById($storeId) {
+    public function getStoreById($storeId)
+    {
         return $this->storeManager->getStore($storeId);
     }
 
     /**
+     * Gets if the Magento is in single store mode
+     * 
      * @return boolean
      */
     public function isSingleStoreMode(): bool
@@ -286,6 +276,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Get current store based on request parameter or store manager
+     * 
      * @return StoreInterface
      * @throws NoSuchEntityException
      */
@@ -299,6 +290,8 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to get the actual scope based on the request parameter
+     * 
+     * @return array
      */
     public function getCurrentScope(): array
     {
@@ -307,10 +300,10 @@ class StoreConfig extends AbstractHelper
 
         $websiteId = (int) $this->_request->getParam('website', 0);
         $storeId = (int) $this->_request->getParam('store', 0);
-        if ($websiteId !== 0){
+        if ($websiteId !== 0) {
             $scope = ScopeInterface::SCOPE_WEBSITES;
             $value = $websiteId;
-        } else if ($storeId !== 0) {
+        } elseif ($storeId !== 0) {
             $scope = ScopeInterface::SCOPE_STORES;
             $value = $storeId;
         }
@@ -319,6 +312,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Get current store code based on request parameter or store manager
+     * 
      * @return string
      * @throws NoSuchEntityException
      */
@@ -340,6 +334,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Check if current operation is a save action
+     * 
      * @return boolean
      */
     public function isSaveAction(): bool
@@ -478,6 +473,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Set API key.
      *
+     * @param $value
      */
     public function setApiKey($value)
     {
@@ -502,16 +498,29 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Set Hashid related with the given store
+     * 
+     * @param string $hashid
+     * @param int $storeId
      */
-    public function setHashId(string $hashid, int $storeId) {
+    public function setHashId(string $hashid, int $storeId)
+    {
         $this->configWriter->save(self::HASH_ID_CONFIG, $hashid, ScopeInterface::SCOPE_STORES, $storeId);
     }
 
     /**
      * Set the installation ID
+     * 
+     * @param string $installationId
+     * @param int $storeGroupId
      */
-    public function setInstallation(string $installationId, int $storeGroupId) {
-        $this->configWriter->save(self::DISPLAY_LAYER_INSTALLATION_ID, $installationId, ScopeInterface::SCOPE_GROUP, $storeGroupId);
+    public function setInstallation(string $installationId, int $storeGroupId)
+    {
+        $this->configWriter->save(
+            self::DISPLAY_LAYER_INSTALLATION_ID,
+            $installationId,
+            ScopeInterface::SCOPE_GROUP,
+            $storeGroupId
+        );
     }
 
     /**
@@ -523,11 +532,16 @@ class StoreConfig extends AbstractHelper
     {
         try {
             $storeGroupId = $this->getCurrentStore()->getStoreGroupId();
-            $displayLayerScript = $this->getValueFromConfig(self::DISPLAY_LAYER_SCRIPT_CONFIG, ScopeInterface::SCOPE_GROUP, (int)$storeGroupId);
-            if ($displayLayerScript != null){
+            $displayLayerScript = $this->getValueFromConfig(
+                self::DISPLAY_LAYER_SCRIPT_CONFIG,
+                ScopeInterface::SCOPE_GROUP,
+                (int)$storeGroupId
+            );
+
+            if ($displayLayerScript != null) {
                 $locale = $this->getLanguageFromStore($this->getCurrentStore());
                 $currency = $this->getCurrentStore()->getCurrentCurrency()->getCode();
-                $displayLayerScript = $this->include_locale_and_currency($displayLayerScript, $locale, $currency);
+                $displayLayerScript = $this->includeLocaleAndCurrency($displayLayerScript, $locale, $currency);
             }
         } catch (\Exception $e) {
             $displayLayerScript = null;
@@ -538,9 +552,18 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Set display layer
+     * 
+     * @param string $script
+     * @param int $storeGroupId
      */
-    public function setDisplayLayer(string $script, int $storeGroupId) {
-        $this->configWriter->save(self::DISPLAY_LAYER_SCRIPT_CONFIG, $script, ScopeInterface::SCOPE_GROUP, $storeGroupId);
+    public function setDisplayLayer(string $script, int $storeGroupId)
+    {
+        $this->configWriter->save(
+            self::DISPLAY_LAYER_SCRIPT_CONFIG,
+            $script,
+            ScopeInterface::SCOPE_GROUP,
+            $storeGroupId
+        );
     }
 
     /**
@@ -708,13 +731,15 @@ class StoreConfig extends AbstractHelper
     public function isUpdateOnSave(): bool
     {
         $updateOnSchedule = $this->scopeConfig->getValue(
-            self::UPDATE_ON_SAVE_CRON_EXPRESSION,   
+            self::UPDATE_ON_SAVE_CRON_EXPRESSION,
             ScopeInterface::SCOPE_STORE
         );
         return $updateOnSchedule !== self::CRON_DISABLED_VALUE;
     }
 
     /**
+     * Gets image size defined by the user
+     * 
      * @param int|null $storeId
      * @return string
      */
@@ -788,7 +813,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Enable display layer if all indexes callback are true
      *
-     * @param bool $enabled
+     * @param bool $callback
      * @param int $storeId
      *
      * @throws NoSuchEntityException
@@ -807,8 +832,9 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
+     * Gets Doofinder attributes to be merged later
+     * 
      * @param int|null $storeId
-     *
      * @return array
      */
     public function getDoofinderAttributes(?int $storeId = null): array
@@ -849,6 +875,8 @@ class StoreConfig extends AbstractHelper
     /**
      * Return array of custom attributes
      *
+     * @param int|null $id
+     * @param string|null $scope
      * @return Array
      */
     public function getCustomAttributes(?int $id = null, ?string $scope = ScopeInterface::SCOPE_STORES): array
@@ -869,11 +897,11 @@ class StoreConfig extends AbstractHelper
         }
 
         $attributeCollection = $this->attributeCollectionFactory->create();
-        $attributeCollection->addFieldToFilter('is_user_defined',['eq' => 1]);
+        $attributeCollection->addFieldToFilter('is_user_defined', ['eq' => 1]);
         $attributes = [];
         foreach ($attributeCollection as $attributeTmp) {
             $attribute = $this->eavConfig->getAttribute(Product::ENTITY, $attributeTmp->getAttributeId());
-            if (!$attribute->getIsSearchable() || !$attribute->getIsVisible()){
+            if (!$attribute->getIsSearchable() || !$attribute->getIsVisible()) {
                 continue;
             }
             $attribute_id = $attribute->getAttributeId();
@@ -882,22 +910,29 @@ class StoreConfig extends AbstractHelper
                 'label'   => $this->escaper->escapeHtml($attribute->getFrontendLabel())
             ];
 
-            $attributes[$attribute_id]['enabled'] = isset($saved[$attribute_id]['enabled']) && $saved[$attribute_id]['enabled'];
+            $enabled = isset($saved[$attribute_id]['enabled']) && $saved[$attribute_id]['enabled'];
+            $attributes[$attribute_id]['enabled'] = $enabled;
         }
         return $attributes;
     }
 
     /**
      * Function to set custom attributes
+     * 
+     * @param string $customAttributes
      */
-    public function setCustomAttributes(string $customAttributes) {
+    public function setCustomAttributes(string $customAttributes)
+    {
         $this->configWriter->save(self::CUSTOM_ATTRIBUTES, $customAttributes);
     }
 
     /**
      * Function to get the indexation status of a given search engine
+     * 
+     * @param int $storeId
      */
-    public function getIndexationStatus(int $storeId): array {
+    public function getIndexationStatus(int $storeId): array 
+    {
         $status = $this->scopeConfig->getValue(self::INDEXATION_STATUS, ScopeInterface::SCOPE_STORES, $storeId);
         
         if ($status == null) {
@@ -909,8 +944,12 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to update the indexation status of a given search engine
+     * 
+     * @param array $status
+     * @param int $storeId
      */
-    public function setIndexationStatus(array $status, int $storeId){
+    public function setIndexationStatus(array $status, int $storeId)
+    {
         $status = $this->indexationHelper->sanitizeProcessTaskStatus($status);
         $status = json_encode($status);
         $this->configWriter->save(self::INDEXATION_STATUS, $status, ScopeInterface::SCOPE_STORES, $storeId);
@@ -946,16 +985,16 @@ class StoreConfig extends AbstractHelper
      *      language: 'fr-FR'
      *    };
      */
-    private function include_locale_and_currency($liveLayerScript, $locale, $currency): string
+    private function includeLocaleAndCurrency($liveLayerScript, $locale, $currency): string
     {
-        if (strpos($liveLayerScript, 'language:') !== false){
+        if (strpos($liveLayerScript, 'language:') !== false) {
             $liveLayerScript = preg_replace("/(\/\/\s*)?(language:)(.*?)(\n|,)/m", "$2 '$locale'$4", $liveLayerScript);
         } else {
             $pos = strpos($liveLayerScript, "{");
             $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tlanguage: '$locale',", $pos+1, 0);
         }
 
-        if (strpos($liveLayerScript, 'currency:') !== false){
+        if (strpos($liveLayerScript, 'currency:') !== false) {
             $liveLayerScript = preg_replace("/(\/\/\s*)?(currency:)(.*?)(\n|,)/m", "$2 '$currency'$4", $liveLayerScript);
         } else {
             $pos = strpos($liveLayerScript, "{");

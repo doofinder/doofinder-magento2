@@ -49,6 +49,17 @@ class Processor
      */
     private $logger;
 
+    /**
+     * Processor constructor.
+     *
+     * @param StoreConfig $storeConfig
+     * @param ChangedItemCollectionFactory $changedItemCollectionFactory
+     * @param DocumentsProvider $documentsProvider
+     * @param ItemHelper $itemHelper
+     * @param Batch $batch
+     * @param LoggerInterface $logger
+     * @param int $batchSize
+     */
     public function __construct(
         StoreConfig $storeConfig,
         ChangedItemCollectionFactory $changedItemCollectionFactory,
@@ -87,6 +98,10 @@ class Processor
 
     /**
      * Function to manage the products that have been stored into the data base
+     * 
+     * @param $store
+     * @param $itemType
+     * @param $indice
      */
     private function manageItems($store, $itemType, $indice)
     {
@@ -95,13 +110,20 @@ class Processor
         $this->deleteItems($store, $itemType, $indice);
     }
 
+    /**
+     * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
+     * 
+     * @param $store
+     * @param $itemType
+     * @param $indice
+     */
     private function createItems($store, $itemType, $indice)
     {
         $collection = $this->changedItemCollectionFactory->create()->filterCreated((int)$store->getId(), $itemType);
         if ($collection->getSize()) {
             $created = $this->documentsProvider->getBatched($collection, (int)$store->getId());
             foreach ($this->batch->getItems($created, $this->batchSize) as $batchDocuments) {
-                $items = $this->mapProducts($batchDocuments);
+                $items = $this->mapItems($batchDocuments);
                 if (count($items)) {
                     try {
                         $this->logger->debug('[CreateInBulk]');
@@ -121,13 +143,20 @@ class Processor
         }
     }
 
+    /**
+     * Executes the UPDATE for items stored with this action in doofinder_feed_changed_items table
+     * 
+     * @param $store
+     * @param $itemType
+     * @param $indice
+     */
     private function updateItems($store, $itemType, $indice)
     {
         $collection = $this->changedItemCollectionFactory->create()->filterUpdated((int)$store->getId(), $itemType);
         if ($collection->getSize()) {
             $updated = $this->documentsProvider->getBatched($collection, (int)$store->getId());
             foreach ($this->batch->getItems($updated, $this->batchSize) as $batchDocuments) {
-                $items = $this->mapProducts($batchDocuments);
+                $items = $this->mapItems($batchDocuments);
                 if (count($items)) {
                     try {
                         $this->logger->debug('[UpdateInBulk]');
@@ -147,13 +176,20 @@ class Processor
         }
     }
 
+    /**
+     * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
+     * 
+     * @param $store
+     * @param $itemType
+     * @param $indice
+     */
     private function deleteItems($store, $itemType, $indice)
     {
         $collection = $this->changedItemCollectionFactory->create()->filterDeleted((int)$store->getId(), $itemType);
         if ($collection->getSize()) {
             $deleted = $this->documentsProvider->getBatched($collection);
             foreach ($this->batch->getItems($deleted, $this->batchSize) as $batchDeleted) {
-                $items = $this->mapProducts($batchDeleted);
+                $items = $this->mapItems($batchDeleted);
                 if (count($items)) {
                     try {
                         $this->logger->debug('[DeleteInBulk]');
@@ -173,7 +209,13 @@ class Processor
         }
     }
 
-    private function mapProducts($documents) {
+    /**
+     * Creates an array with the id of the item
+     * 
+     * @param $documents
+     */
+    private function mapItems($documents)
+    {
         return array_map(function ($productId) {
             return ['id' => $productId];
         }, $documents);

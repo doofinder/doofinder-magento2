@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-
 namespace Doofinder\Feed\Controller\Adminhtml\Integration;
 
 use Doofinder\Feed\Errors\InvalidArgumentException;
@@ -30,6 +29,15 @@ class SaveConfig extends Action implements HttpPostActionInterface
     /** @var Escaper */
     protected $escaper;
 
+    /**
+     * SaveConfig constructor.
+     *
+     * @param WriterInterface $configWriter
+     * @param IntegrationServiceInterface $integrationService
+     * @param JsonFactory $resultJsonFactory
+     * @param Escaper $escaper
+     * @param Context $context
+     */
     public function __construct(
         WriterInterface $configWriter,
         IntegrationServiceInterface $integrationService,

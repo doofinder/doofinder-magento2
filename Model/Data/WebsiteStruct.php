@@ -4,7 +4,8 @@ namespace Doofinder\Feed\Model\Data;
 
 use JsonSerializable;
 
-class WebsiteStruct implements JsonSerializable {
+class WebsiteStruct implements JsonSerializable
+{
 
     private $id;
     private $name;
@@ -19,13 +20,16 @@ class WebsiteStruct implements JsonSerializable {
         $this->storeStructs = $storeStructs;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function jsonSerialize(): array
     {
-        return Array(
+        return [
             'id'    => $this->id,
             'name'   => $this->name,
             'code'   => $this->code,
             'stores'    => $this->storeStructs
-         );
+        ];
     }
 }

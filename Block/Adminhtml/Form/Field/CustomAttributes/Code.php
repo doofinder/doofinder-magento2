@@ -1,4 +1,5 @@
 <?php
+
 namespace Doofinder\Feed\Block\Adminhtml\Form\Field\CustomAttributes;
 
 use Magento\Framework\View\Element\AbstractBlock;
@@ -8,6 +9,11 @@ use Magento\Framework\View\Element\AbstractBlock;
  */
 class Code extends AbstractBlock
 {
+    /**
+     * Converts code to html for a section
+     * 
+     * @return string
+     */
     protected function _toHtml()
     {
         $id = $this->getInputId();
@@ -18,7 +24,7 @@ class Code extends AbstractBlock
         $class = isset($column['class']) ? $column['class'] : 'input-text';
         $style = isset($column['style']) ? $column['style'] : '';
 
-        return "<input type=\"hidden\" id=\"$id\" value=\"<%- $cName %>\" name=\"$iName\"/>" . 
+        return "<input type=\"hidden\" id=\"$id\" value=\"<%- $cName %>\" name=\"$iName\"/>" .
                "<span class=\"productsorting_code $class\" style=\"$style\"><%- $cName %></span>";
     }
 }

@@ -6,29 +6,39 @@
 $statuses =  $block->getSearchEnginesProcessStatus();
 ?>
 <?php if (isset($statuses['error'])): ?>
-    <p><?= __(sprintf('There was an error while requesting search engines process task status: %s', $statuses['error'])) ?></p>
+    <p><?= $block->escapeHtml(__(sprintf('There was an error while requesting search engines process task status: %s', $statuses['error']))) ?></p>
 <?php elseif (isset($statuses['warning'])): ?>
     <?php if ($statuses['warning'] == 'not_found'): ?>
-        <p><?= __('The search engines process task statuses are not ready yet. Please, try again later.') ?></p>
+        <p><?= $block->escapeHtml(__('The search engines process task statuses are not ready yet. Please, try again later.')) ?></p>
     <?php else: ?>
-        <p><?= __(sprintf('There was a warning while requesting search engines process task status: %s', $statuses['warning'])) ?></p>
+        <p><?= $block->escapeHtml(__(sprintf('There was a warning while requesting search engines process task status: %s', $statuses['warning']))) ?></p>
     <?php endif; ?>
 <?php else: ?>
     <div class="admin__data-grid-wrap admin__data-grid-wrap-static">
-        <h2><?= __('Please note that this information refers only to the first indexing process') ?></h2>
+        <h2><?= $block->escapeHtml(__('Please note that this information refers only to the first indexing process')) ?></h2>
         <table class="data-grid" id="gridIndexer_table">
             <thead>
-            <tr>
-                <th class="data-grid-th  no-link col-indexer_title"><span><?= __('Indexer') ?></span></th>
-                <th class="data-grid-th  no-link col-indexer_status"><span><?= __('Status') ?></span></th>
-                <th class="data-grid-th  no-link col-indexer_status"><span><?= __('Result') ?></span></th>
-                <th class="data-grid-th  no-link col-indexer_error_message"><span><?= __('Error Message') ?></span></th>
-                <th class="data-grid-th  no-link col-indexer_updated col-date last"><span><?= __('Finished At') ?></span></th>
-            </tr>
+                <tr>
+                    <th class="data-grid-th  no-link col-indexer_title">
+                        <span><?= $block->escapeHtml(__('Indexer')) ?></span>
+                    </th>
+                    <th class="data-grid-th  no-link col-indexer_status">
+                        <span><?= $block->escapeHtml(__('Status')) ?></span>
+                    </th>
+                    <th class="data-grid-th  no-link col-indexer_status">
+                        <span><?= $block->escapeHtml(__('Result')) ?></span>
+                    </th>
+                    <th class="data-grid-th  no-link col-indexer_error_message">
+                        <span><?= $block->escapeHtml(__('Error Message')) ?></span>
+                    </th>
+                    <th class="data-grid-th  no-link col-indexer_updated col-date last">
+                        <span><?= $block->escapeHtml(__('Finished At')) ?></span>
+                    </th>
+                </tr>
             </thead>
             <tbody>
                 <?php $row = 'even'; foreach ($statuses as $storeCode => $status): ?>
-                    <tr data-role="row" title="#" class="<?= $row ?> _clickable">
+                    <tr data-role="row" title="#" class="<?= $block->escapeHtml($row) ?> _clickable">
                         <td data-column="indexer_title" class="a-left indexer-title col-indexer_title">
                             <?= $block->escapeHtml($status['name']) ?> (<?= $block->escapeHtml($storeCode) ?>)
                         </td>
@@ -47,7 +57,7 @@ $statuses =  $block->getSearchEnginesProcessStatus();
                         </td>
                         <td data-column="indexer_updated" class=" col-date col-indexer_updated last">
                             <!-- TODO: format date -->
-                            <?= $status['finished_at'] ?>
+                            <?= $block->escapeHtml($status['finished_at']) ?>
                         </td>
                     </tr>
                 <?php $row = ($row == 'even') ? '' : 'even'; endforeach; ?>

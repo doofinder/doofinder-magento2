@@ -49,7 +49,6 @@ class Index extends AbstractDb
 
     /**
      * Implementation of abstract construct
-     * @return void
      */
     protected function _construct()
     {

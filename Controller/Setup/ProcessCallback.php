@@ -44,6 +44,16 @@ class ProcessCallback extends Action implements CsrfAwareActionInterface, HttpPo
     /** @var Pool */
     protected $cacheFrontendPool;
 
+    /**
+     * ProcessCallback constructor.
+     *
+     * @param StoreConfig $storeConfig
+     * @param UrlInterface $url
+     * @param JsonSerializer $serializer
+     * @param LoggerInterface $logger
+     * @param Pool $cacheFrontendPool
+     * @param Context $context
+     */
     public function __construct(
         StoreConfig $storeConfig,
         UrlInterface $url,

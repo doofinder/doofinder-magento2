@@ -82,6 +82,8 @@ class HashIdValidation extends Value
     }
 
     /**
+     * Gets the hashid taking into account if is a single-store platform
+     * 
      * @return string|null
      * @throws NoSuchEntityException
      */
