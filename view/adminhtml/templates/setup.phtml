@@ -151,7 +151,7 @@
                 "buttonLogin": "#login-btn",
                 "signupEndpoint": "<?= $block->escapeUrl($this->helper(Doofinder\Feed\Helper\StoreConfig::class)->getSignupEndpoint()) ?>",
                 "loginEndpoint": "<?= $block->escapeUrl($this->helper(Doofinder\Feed\Helper\StoreConfig::class)->getLoginEndpoint()) ?>",
-                "paramsPopup": "<?= $block->escapeHtml($block->getParamsPopup()) ?>",
+                "paramsPopup": "<?= $block->getParamsPopup() ?>",
                 "checkAPIKeyUrl": "<?= $block->escapeUrl($block->getCheckAPIKeyUrl()) ?>",
                 "createStoreUrl": "<?= $block->escapeUrl($block->getCreateStoreUrl()) ?>",
                 "doofinderConnectUrl": "<?= $block->escapeUrl($block->getDoofinderConnectUrl()) ?>"
