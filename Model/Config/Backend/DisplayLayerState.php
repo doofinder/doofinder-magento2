@@ -119,6 +119,10 @@ class DisplayLayerState extends ConfigValue
     private function getAuthToken(): string
     {
         $apiKey = $this->storeConfig->getApiKey();
+        if (empty($apiKey)) {
+            throw new InvalidApiKey("Please enter the API Key");
+        }
+
         $clusterToken = explode('-', $apiKey);
         if (count($clusterToken) != 2) {
             throw new InvalidApiKey("Invalid API Key provided");
