@@ -84,6 +84,10 @@ class AddToCart extends Action implements HttpPostActionInterface
         $result = $quote->addProduct($product, $params);
 
         if (is_a($result, QuoteItem::class)) {
+            //Update totals
+            $quote->setTriggerRecollect(1);
+            $quote->setIsActive(true);
+            $quote->collectTotals();
             $this->cartRepository->save($quote);
             $session->replaceQuote($quote)->unsLastRealOrderId();
         } else {
@@ -103,12 +107,11 @@ class AddToCart extends Action implements HttpPostActionInterface
      */
     private function getBundleOptions($product)
     {
-        $selectionCollection = $product->getTypeInstance()
-            ->getSelectionsCollection(
-                $product->getTypeInstance()->getOptionsIds($product),
-                $product
-            );
         $bundleOptions = [];
+        $productType = $product->getTypeInstance();
+        $optionsIds = $productType->getOptionsIds($product);
+        $selectionCollection = $productType->getSelectionsCollection($optionsIds, $product);
+
         foreach ($selectionCollection as $selection) {
             $bundleOptions[$selection->getOptionId()][] = $selection->getSelectionId();
         }
