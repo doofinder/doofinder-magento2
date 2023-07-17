@@ -1,12 +1,13 @@
 <?php
+
 namespace Doofinder\Feed\Controller\Product;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\Exception\LocalizedException;
+use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Quote\Model\Quote\Item as QuoteItem;
+use Magento\Framework\DataObject;
 
 /**
  * Class AddToCart. This class aims at opening a way for adding to cart from the layer
@@ -58,18 +59,35 @@ class AddToCart extends Action implements HttpPostActionInterface
      */
     public function execute()
     {
-        $product = $this->productRepository->getById($this->getRequest()->getParam('id'));
+        $productId = $this->getRequest()->getParam('id');
+        $product = $this->productRepository->getById($productId);
         $qty = $this->getRequest()->getParam('qty');
-
         $session = $this->checkoutSession->create();
         $quote = $session->getQuote();
+        $params = [
+            'product' => $productId,
+            'qty' => $qty
+        ];
 
         $this->logger->info("Request add item to cart");
         $this->logger->info("Product: ", ["product" => $product]);
 
-        $result = $quote->addProduct($product, $qty);
+        if ($product->getTypeId() == ProductType::TYPE_BUNDLE) {
+            $bundleOptions = $this->getBundleOptions($product);
+            if (!empty($bundleOptions)) {
+                $params['bundle_option'] = $bundleOptions;
+                $this->logger->info("Bundle options: ", ["bundle_options" => $bundleOptions]);
+            }
+        }
+
+        $params = new DataObject($params);
+        $result = $quote->addProduct($product, $params);
 
         if (is_a($result, QuoteItem::class)) {
+            //Update totals
+            $quote->setTriggerRecollect(1);
+            $quote->setIsActive(true);
+            $quote->collectTotals();
             $this->cartRepository->save($quote);
             $session->replaceQuote($quote)->unsLastRealOrderId();
         } else {
@@ -80,5 +98,23 @@ class AddToCart extends Action implements HttpPostActionInterface
             $resultJson = $this->resultJsonFactory->create();
             return $resultJson->setData(['product_url' => $product_url]);
         }
+    }
+
+    /**
+     * Get all the selection products used in bundle product
+     * @param $product
+     * @return mixed
+     */
+    private function getBundleOptions($product)
+    {
+        $bundleOptions = [];
+        $productType = $product->getTypeInstance();
+        $optionsIds = $productType->getOptionsIds($product);
+        $selectionCollection = $productType->getSelectionsCollection($optionsIds, $product);
+
+        foreach ($selectionCollection as $selection) {
+            $bundleOptions[$selection->getOptionId()][] = $selection->getSelectionId();
+        }
+        return $bundleOptions;
     }
 }
