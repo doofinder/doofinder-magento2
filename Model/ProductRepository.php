@@ -370,7 +370,11 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     {
         $categoryIds = [];
         foreach ($categories as $category) {
-            $categoryIds[$category['category_id']] = true;
+            if(is_array($category)){
+                $categoryIds[$category['category_id']] = true;
+            } else {
+                $categoryIds[$category->getCategoryId()] = true;
+            }
         }
         
         // Load paths of product categories to load their parents
