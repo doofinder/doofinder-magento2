@@ -10,3 +10,4 @@
 /\.github                   export-ignore
 /\.env                      export-ignore
 /README.md                  export-ignore
+/build_release\.sh          export-ignore
