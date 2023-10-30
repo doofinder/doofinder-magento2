@@ -16,7 +16,7 @@ use Doofinder\Feed\Errors\WrongResponse;
 class ManagementClient
 {
     private const ENDPOINT_SEARCH_ENGINES = '/api/v2/search_engines';
-    private const ENDPOINT_UPDATE_ON_SAVE = '/plugins/magento2';
+    private const ENDPOINT_UPDATE_ON_SAVE = '/magento2';
 
     /** @var Client */
     private $client;
