@@ -16,7 +16,7 @@ use Doofinder\Feed\Errors\WrongResponse;
 class ManagementClient
 {
     private const ENDPOINT_SEARCH_ENGINES = '/api/v2/search_engines';
-    private const ENDPOINT_UPDATE_ON_SAVE = '/magento2';
+    private const ENDPOINT_UPDATE_ON_SAVE = '/item';
 
     /** @var Client */
     private $client;
@@ -166,7 +166,7 @@ class ManagementClient
      */
     public function createItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_create";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice?action=create&platform=magento2";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -191,7 +191,7 @@ class ManagementClient
      */
     public function updateItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_update";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice?action=update&platform=magento2";
         $response = $this->client->post($path, $items);
 
         return json_decode($response, true);
@@ -217,7 +217,7 @@ class ManagementClient
      */
     public function deleteItemsInBulk(array $items, string $hashId, string $indice)
     {
-        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice/product_delete";
+        $path = self::ENDPOINT_UPDATE_ON_SAVE . "/{$hashId}/$indice?action=delete&platform=magento2";
         $response = $this->client->delete($path, $items);
 
         return json_decode($response, true);
