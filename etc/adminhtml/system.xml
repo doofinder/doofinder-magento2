@@ -127,18 +127,6 @@
                         <![CDATA[ Configure when registered product changes are sent to Doofinder ]]>
                     </comment>
                 </field>
-                <field id="image_size"
-                       translate="label"
-                       type="text"
-                       sortOrder="400"
-                       showInDefault="0"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <label>Image size</label>
-                    <comment>
-                        <![CDATA[Export product image with given width. Leave empty to use original size.]]>
-                    </comment>
-                </field>
                 <field id="categories_in_navigation"
                        translate="label"
                        type="select"
