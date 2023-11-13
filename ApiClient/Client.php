@@ -29,6 +29,9 @@ class Client
     /** Search API type */
     public const SEARCH_API = 'search';
 
+    /** Dooplugins type */
+    public const DOOPLUGINS = 'dooplugins';
+
     /** @var StoreConfig */
     private $storeConfig;
 
@@ -270,6 +273,10 @@ class Client
      */
     private function getApiBaseURL(): string
     {
+        if ($this->apiType === self::DOOPLUGINS)
+        {
+            return sprintf("https://%s-plugins.doofinder.com", $this->clusterRegion);
+        }
         return sprintf("https://%s-%s.doofinder.com", $this->clusterRegion, $this->apiType);
     }
 

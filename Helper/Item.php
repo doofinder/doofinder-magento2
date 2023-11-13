@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Helper;
 
 use Doofinder\Feed\Api\Data\ChangedItemInterface;
+use Doofinder\Feed\ApiClient\Client;
 use Doofinder\Feed\ApiClient\ManagementClientFactory;
 use Doofinder\Feed\Errors\BadRequest;
 use Doofinder\Feed\Errors\IndexingInProgress;
@@ -155,7 +156,7 @@ class Item extends AbstractHelper
         $hashId = $searchEngine['hashid'];
         $this->validateIndice($searchEngine, $indice);
         $managementClient = $this->throttleFactory->create([
-            'obj' => $this->managementClientFactory->create(['apiType' => 'admin']),
+            'obj' => $this->managementClientFactory->create(['apiType' => Client::DOOPLUGINS]),
         ]);
 
         switch ($type) {
