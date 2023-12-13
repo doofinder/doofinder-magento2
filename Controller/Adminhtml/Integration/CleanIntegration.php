@@ -17,6 +17,8 @@ class CleanIntegration extends Action
 
     private $resourceConnection;
 
+    private $logger;
+
     /**
      * CleanIntegration constructor.
      *
