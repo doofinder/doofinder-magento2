@@ -107,7 +107,6 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "platform" => "magento2",
                     "primary_language" => $this->storeConfig->getLanguageFromStore($storeGroup->getDefaultStore()),
                     "skip_indexation" => false,
-                    "callback_urls" => $searchEngineData["callbackUrls"],
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
                     "search_engines" => $searchEngineData["searchEngineConfig"],
                     "options" => $storeOptions,
@@ -132,7 +131,8 @@ class CreateStore extends Action implements HttpGetActionInterface
     {
         $searchEngineConfig = [];
         $storesConfig = [];
-        $callbackUrls = [];
+        $store_id = $store->getId();
+        $base_url = $store->getBaseUrl();
 
         foreach ($this->storeConfig->getStoreGroupStores($storeGroupId) as $store) {
             $language = $this->storeConfig->getLanguageFromStore($store);
@@ -143,30 +143,17 @@ class CreateStore extends Action implements HttpGetActionInterface
                 "name" => $store->getName(),
                 "language" => $language,
                 "currency" => $currency,
-                "site_url" => $store->getBaseUrl(),
-                "datatypes" => [
-                    [
-                        "name" => "product",
-                        "preset" => "product",
-                        'datasources' => [
-                            [
-                                'type' => 'magento2',
-                                'options' => [
-                                    'url' => $this->urlInterface->getBaseUrl() . 'rest/' . $store->getCode() . '/V1/',
-                                    'store_id' => $store->getId()
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+                "site_url" => $base_url,
+                "callback_url" => $base_url . 'doofinderfeed/setup/processCallback?storeId=' . $store_id,
+                "store_id" => $store_id,
+                "index_url" => $base_url . 'rest/' . $store->getCode() . '/V1/'
             ];
-            $storesConfig[$language][$currency] = (int)$store->getId();
-            $callbackUrls[$language][$currency] = $this->getProcessCallbackUrl($store);
+
+            $storesConfig[$language][$currency] = (int)$store_id;
         }
         return [
             "searchEngineConfig" => $searchEngineConfig,
-            "storesConfig" => $storesConfig,
-            "callbackUrls" => $callbackUrls
+            "storesConfig" => $storesConfig
         ];
     }
 
@@ -276,6 +263,6 @@ class CreateStore extends Action implements HttpGetActionInterface
      */
     private function getProcessCallbackUrl(StoreInterface $store): string
     {
-        return $store->getBaseUrl() . 'doofinderfeed/setup/processCallback?storeId=' . $store->getId();
+        return 
     }
 }
