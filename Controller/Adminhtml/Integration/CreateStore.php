@@ -253,16 +253,4 @@ class CreateStore extends Action implements HttpGetActionInterface
             $cacheFrontend->getBackend()->clean();
         }
     }
-
-    /**
-     * Get Process Callback URL
-     *
-     * @param StoreInterface $store
-     *
-     * @return string
-     */
-    private function getProcessCallbackUrl(StoreInterface $store): string
-    {
-        return 
-    }
 }
