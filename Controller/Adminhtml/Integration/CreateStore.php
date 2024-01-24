@@ -101,13 +101,15 @@ class CreateStore extends Action implements HttpGetActionInterface
                 $websiteId = (int)$storeGroup->getWebsiteId();
                 $searchEngineData = $this->generateSearchEngineData($storeGroupId);
                 $storeOptions = $this->generateStoreOptions($websiteId);
+                $primary_language = $this->storeConfig->getLanguageFromStore($storeGroup->getDefaultStore());
 
                 $storeGroupConfig = [
                     "name" => $storeGroup->getName(),
                     "platform" => "magento2",
-                    "primary_language" => $this->storeConfig->getLanguageFromStore($storeGroup->getDefaultStore()),
+                    "primary_language" => $primary_language,
                     "skip_indexation" => false,
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
+                    "site_url" => $this->get_primary_site_url_in_se($searchEngineData["searchEngineConfig"], $primary_language),
                     "search_engines" => $searchEngineData["searchEngineConfig"],
                     "options" => $storeOptions,
                     "query_input" => "#search"
@@ -252,5 +254,16 @@ class CreateStore extends Action implements HttpGetActionInterface
         foreach ($this->cacheFrontendPool as $cacheFrontend) {
             $cacheFrontend->getBackend()->clean();
         }
+    }
+
+    /**
+     * We obtain the url associated with the main language search_engine
+     */
+    function get_primary_site_url_in_se($search_engines, $primary_language) {    
+        $primary_search_engine = array_values(array_filter($search_engines, function ($search_engine) use ($primary_language) {
+            return $search_engine["language"] == $primary_language;
+        }))[0];
+    
+        return $primary_search_engine["site_url"];
     }
 }
