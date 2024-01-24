@@ -261,7 +261,7 @@ class CreateStore extends Action implements HttpGetActionInterface
     /**
      * We obtain the url associated with the main language search_engine
      */
-    function get_primary_site_url_in_se($search_engines, $primary_language) {    
+    private function get_primary_site_url_in_se($search_engines, $primary_language) {    
         $primary_search_engine = array_values(array_filter($search_engines, function ($search_engine) use ($primary_language) {
             return $search_engine["language"] == $primary_language;
         }))[0];
