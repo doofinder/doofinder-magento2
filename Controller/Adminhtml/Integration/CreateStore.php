@@ -131,12 +131,12 @@ class CreateStore extends Action implements HttpGetActionInterface
     {
         $searchEngineConfig = [];
         $storesConfig = [];
-        $store_id = $store->getId();
-        $base_url = $store->getBaseUrl();
 
         foreach ($this->storeConfig->getStoreGroupStores($storeGroupId) as $store) {
             $language = $this->storeConfig->getLanguageFromStore($store);
             $currency = strtoupper($store->getCurrentCurrency()->getCode());
+            $store_id = $store->getId();
+            $base_url = $store->getBaseUrl();
 
             // store_id field refers to store_view's id.
             $searchEngineConfig[] = [
