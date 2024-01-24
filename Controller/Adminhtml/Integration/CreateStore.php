@@ -147,8 +147,10 @@ class CreateStore extends Action implements HttpGetActionInterface
                 "currency" => $currency,
                 "site_url" => $base_url,
                 "callback_url" => $base_url . 'doofinderfeed/setup/processCallback?storeId=' . $store_id,
-                "store_id" => $store_id,
-                "index_url" => $base_url . 'rest/' . $store->getCode() . '/V1/'
+                "options" => [
+                    "store_id" => $store_id,
+                    "index_url" => $base_url . 'rest/' . $store->getCode() . '/V1/'
+                ]
             ];
 
             $storesConfig[$language][$currency] = (int)$store_id;
