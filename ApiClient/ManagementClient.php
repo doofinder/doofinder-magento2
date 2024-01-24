@@ -67,7 +67,7 @@ class ManagementClient
      */
     public function createStore(array $storeData): array 
     {
-        $response = $this->client->post('/plugins/create-store', $storeData);
+        $response = $this->client->post('/install', $storeData);
 
         return json_decode($response, true);
     }

@@ -101,21 +101,22 @@ class CreateStore extends Action implements HttpGetActionInterface
                 $websiteId = (int)$storeGroup->getWebsiteId();
                 $searchEngineData = $this->generateSearchEngineData($storeGroupId);
                 $storeOptions = $this->generateStoreOptions($websiteId);
+                $primary_language = $this->storeConfig->getLanguageFromStore($storeGroup->getDefaultStore());
 
                 $storeGroupConfig = [
                     "name" => $storeGroup->getName(),
                     "platform" => "magento2",
-                    "primary_language" => $this->storeConfig->getLanguageFromStore($storeGroup->getDefaultStore()),
+                    "primary_language" => $primary_language,
                     "skip_indexation" => false,
-                    "callback_urls" => $searchEngineData["callbackUrls"],
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
+                    "site_url" => $this->get_primary_site_url_in_se($searchEngineData["searchEngineConfig"], $primary_language),
                     "search_engines" => $searchEngineData["searchEngineConfig"],
                     "options" => $storeOptions,
                     "query_input" => "#search"
                 ];
                 $response = $this->storeConfig->createStore($storeGroupConfig);
                 $this->saveInstallationConfig((int)$storeGroupId, $response["installation_id"], $response["script"]);
-                $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["search_engines"]);
+                $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["config"]["search_engines"]);
             } catch (Exception $e) {
                 $success = false;
                 $this->logger->error('Error creating store for store group "' . $storeGroup->getName() .
@@ -132,41 +133,31 @@ class CreateStore extends Action implements HttpGetActionInterface
     {
         $searchEngineConfig = [];
         $storesConfig = [];
-        $callbackUrls = [];
 
         foreach ($this->storeConfig->getStoreGroupStores($storeGroupId) as $store) {
             $language = $this->storeConfig->getLanguageFromStore($store);
             $currency = strtoupper($store->getCurrentCurrency()->getCode());
+            $store_id = $store->getId();
+            $base_url = $store->getBaseUrl();
 
             // store_id field refers to store_view's id.
             $searchEngineConfig[] = [
                 "name" => $store->getName(),
                 "language" => $language,
                 "currency" => $currency,
-                "site_url" => $store->getBaseUrl(),
-                "datatypes" => [
-                    [
-                        "name" => "product",
-                        "preset" => "product",
-                        'datasources' => [
-                            [
-                                'type' => 'magento2',
-                                'options' => [
-                                    'url' => $this->urlInterface->getBaseUrl() . 'rest/' . $store->getCode() . '/V1/',
-                                    'store_id' => $store->getId()
-                                ]
-                            ]
-                        ]
-                    ]
+                "site_url" => $base_url,
+                "callback_url" => $base_url . 'doofinderfeed/setup/processCallback?storeId=' . $store_id,
+                "options" => [
+                    "store_id" => $store_id,
+                    "index_url" => $base_url . 'rest/' . $store->getCode() . '/V1/'
                 ]
             ];
-            $storesConfig[$language][$currency] = (int)$store->getId();
-            $callbackUrls[$language][$currency] = $this->getProcessCallbackUrl($store);
+
+            $storesConfig[$language][$currency] = (int)$store_id;
         }
         return [
             "searchEngineConfig" => $searchEngineConfig,
-            "storesConfig" => $storesConfig,
-            "callbackUrls" => $callbackUrls
+            "storesConfig" => $storesConfig
         ];
     }
 
@@ -268,14 +259,13 @@ class CreateStore extends Action implements HttpGetActionInterface
     }
 
     /**
-     * Get Process Callback URL
-     *
-     * @param StoreInterface $store
-     *
-     * @return string
+     * We obtain the url associated with the main language search_engine
      */
-    private function getProcessCallbackUrl(StoreInterface $store): string
-    {
-        return $store->getBaseUrl() . 'doofinderfeed/setup/processCallback?storeId=' . $store->getId();
+    private function get_primary_site_url_in_se($search_engines, $primary_language) {    
+        $primary_search_engine = array_values(array_filter($search_engines, function ($search_engine) use ($primary_language) {
+            return $search_engine["language"] == $primary_language;
+        }))[0];
+    
+        return $primary_search_engine["site_url"];
     }
 }
