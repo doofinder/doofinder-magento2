@@ -377,11 +377,14 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
             }
         }
         
+        // Get table name with prefix if it exists
+        $catalogCategoryEntityTable = $this->resourceModel->getTable('catalog_category_entity');
+
         // Load paths of product categories to load their parents
         $connection = $this->resourceModel->getConnection();
         $categoryPaths = $connection->fetchCol(
             $connection->select()
-                ->from('catalog_category_entity', ['path'])
+                ->from($catalogCategoryEntityTable, ['path'])
                 ->where('entity_id IN (?)', array_keys($categoryIds))
         );
 
