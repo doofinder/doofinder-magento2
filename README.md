@@ -6,39 +6,18 @@
 
 ## Docker Environment
 
-To use the docker environment clone this repo inside a folder structure like this:
-
-```
-some_directory <- Name is not important
-  |- package <- This repo code inside that folder
-  |- src <- An empty folder to be used in the automatic installation process
-```
-
-And copy this repo's `docker-compose.yml` & `build.sh` & `.env` files to the root of the base directory (`some_directory` in the example).
-
 > **NOTE**: If you are in Windows or WSL, probably you'll have to fix CONTROL-M (^M) carriage return characters in `build.sh` file. Run this command to get rid of this characters:
 
 ```
 dos2unix build.sh
 ```
 
-So you'll have:
-
-```
-some_directory <- Name is not important
-  |- package <- This repo code inside that folder
-  |- src <- An empty folder to be used in the automatic installation process
-  |- docker-compose.yml
-  |- build.sh
-  |- .env
-```
-
-Edit the copy of `.env` and set your tokens in the `COMPOSER_AUTH` environment variable. You can also set the version of Magento you wish to install.
+Rename the `.env.example` to `.env` and set your tokens provided by magento at the [admin panel](https://commercemarketplace.adobe.com/customer/accessKeys) in the `COMPOSER_AUTH` environment variable. You can also set the version of Magento you wish to install.
 
 Then run the environment by executing:
 
 ```
-$ docker-compose up
+$ docker-compose up --profile setup
 ```
 
 from the base directory where the copy of `docker-compose.yml` is located.
@@ -46,9 +25,9 @@ The installation process will take some minutes to be finished. You can follow t
 
 ```docker logs setup -f```
 
-Finally, Magento 2 with the module installed will be running at `http://localhost:80`.
+Finally, Magento 2 with the module installed will be running at `http://localhost:9012`.
 
-The admin panel will be available at `http://localhost:80/admin`. Admin credentials are easy:
+The admin panel will be available at `http://localhost:9012/admin`. Admin credentials are easy:
 
 ```
 User: admin

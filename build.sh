@@ -27,8 +27,8 @@ php -d memory_limit=-1 /usr/local/bin/composer create-project --repository=https
 
 chmod u+x /src/bin/magento
 
-chown -R www-data:www-data /src
-chmod -R 777 /src
+# chown -R www-data:www-data /src
+# chmod -R 777 /src
 
 if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
   php /src/bin/magento setup:install \
@@ -74,12 +74,12 @@ if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
 	--elasticsearch-host=elasticsearch
 fi
 
-mkdir /src/app/code
-mkdir /src/app/code/Doofinder
-mkdir /src/app/code/Doofinder/Feed
-cp -r /package/* /src/app/code/Doofinder/Feed
+# mkdir /src/app/code
+# mkdir /src/app/code/Doofinder
+# mkdir /src/app/code/Doofinder/Feed
+# cp -r /package/* /src/app/code/Doofinder/Feed
 cp -r /src/* /app
-chown -R www-data:www-data /app
+# chown -R www-data:www-data /app
 chmod -R 777 /app
 
 rm /app/pub/index.html
@@ -95,7 +95,7 @@ fi
 
 php /app/bin/magento cache:flush
 
-chown -R www-data:www-data /app
+# chown -R www-data:www-data /app
 chmod -R 777 /app
 
 if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then

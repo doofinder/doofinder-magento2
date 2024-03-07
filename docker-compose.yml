@@ -6,28 +6,34 @@ services:
   web:
     image: webdevops/php-apache-dev:${PHP_VERSION}
     container_name: web
-    user: www-data
+    # user: www-data
+    # user: "1000:1000"
     environment:
+      APACHE_RUN_USER: '#1000'
+      APACHE_RUN_GROUP: '#1000'
       WEB_ALIAS_DOMAIN: ${MAGENTO_BASE_URL}
       COMPOSER_VERSION: ${COMPOSER_VERSION}
       WEB_DOCUMENT_ROOT: /app/pub
       PHP_MAX_EXECUTION_TIME: 300
-      XDEBUG_CONFIG: "remote_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} remote_autostart=1 remote_connect_back=0 remote_enable=1 remote_handler=dbgp remote_mode=req remote_port=9000"
+      # XDEBUG_CONFIG: "remote_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} remote_autostart=1 remote_connect_back=0 remote_enable=1 remote_handler=dbgp remote_mode=req remote_port=9000"
     volumes:
       - ./src:/app
+      - ./:/app/app/code/Doofinder/Feed
       - ./auth_json:/auth_json
     ports:
-      - "80:80"
+      - "9012:80"
       - "443:443"
     links:
       - db
       - elasticsearch
-      - setup
+      # - setup
 
   # Setup container
   setup:
     image: webdevops/php-apache:${PHP_VERSION}
     container_name: setup
+    profiles:
+      - setup
     user: root
     environment:
       COMPOSER_VERSION: ${COMPOSER_VERSION}
@@ -51,12 +57,14 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ./build.sh:/build.sh
-      - ./package:/package
       - ./src:/app
+      - ./:/app/app/code/Doofinder/Feed
+      - ./src/empty:/app/app/code/Doofinder/Feed/src
     entrypoint: sh -c "chmod +x /build.sh; /build.sh" 
     links:
       - db
       - elasticsearch
+      - web
     depends_on:
       db:
         condition: service_healthy
@@ -66,7 +74,7 @@ services:
     image: mysql:5.7
     container_name: db
     ports:
-      - 3306:3306
+      - 3312:3306
     healthcheck:
       test: 'mysqladmin ping -h localhost -p${MYSQL_DATABASE}'
       interval: 30s
@@ -84,7 +92,7 @@ services:
     container_name: phpmyadmin
     environment:
       PMA_HOST: db
-      PMA_PORT: 3306
+      PMA_PORT: 3312
       PMA_USER: ${MYSQL_USER}
       PMA_PASSWORD: ${MYSQL_PASSWORD}
     ports:
