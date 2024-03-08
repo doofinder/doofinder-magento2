@@ -78,8 +78,8 @@ fi
 # mkdir /src/app/code/Doofinder
 # mkdir /src/app/code/Doofinder/Feed
 # cp -r /package/* /src/app/code/Doofinder/Feed
+chown -R 1000:1000 /src
 cp -r /src/* /app
-# chown -R www-data:www-data /app
 chmod -R 777 /app
 
 rm /app/pub/index.html
