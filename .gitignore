@@ -3,5 +3,7 @@
 
 # Dev files
 /node_modules
+.env
 
+# Magento files
 /src
