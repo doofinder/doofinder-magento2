@@ -96,6 +96,7 @@ fi
 php /app/bin/magento cache:flush
 
 # chown -R www-data:www-data /app
+chown -R 1000:1000 /app
 chmod -R 777 /app
 
 if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
