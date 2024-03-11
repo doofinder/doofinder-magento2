@@ -120,11 +120,11 @@
                        showInDefault="1"
                        showInWebsite="0"
                        showInStore="0">
-                    <label>Index my data every</label>
+                    <label>Automatically process modified products</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\Cronexpression</source_model>
                     <backend_model>Doofinder\Feed\Model\Config\Backend\Cron</backend_model>
                     <comment>
-                        <![CDATA[ Configure when registered product changes are sent to Doofinder ]]>
+                        <![CDATA[ Configure how often changes will be sent to Doofinder. It will only be executed if there are changes. ]]>
                     </comment>
                 </field>
                 <field id="categories_in_navigation"
