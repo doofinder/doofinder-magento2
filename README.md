@@ -46,12 +46,16 @@ OR if you'd rather load the data manually, you can also:
 
 ```
 $ docker exec -it web bash
-www-data@...:~# cd /app
-www-data@...:/app# php -d memory_limit=-1 bin/magento sampledata:deploy
-www-data@...:/app# bin/magento setup:upgrade
-www-data@...:/app# bin/magento setup:di:compile
-www-data@...:/app# bin/magento setup:static-content:deploy -f
+root@...:~# cd /app
+root@...:/app# php -d memory_limit=-1 bin/magento sampledata:deploy
+root@...:/app# bin/magento setup:upgrade
+root@...:/app# bin/magento setup:di:compile
+root@...:/app# bin/magento setup:static-content:deploy -f
 ```
+
+**Important:**
+After running the `bin/magento setup:upgrade` inside the docker container some folders are created and the user running apache can loose permissions to execute returning 500 Error.
+To restore permissions for these folders run in the host terminal `sudo chmod 777 -R src/`.
 
 **Note:** After you run the ```bin/magento sampledata:deploy``` command you will be prompted for authentication:
 ```Authentication required (repo.magento.com):```. You will have to use simply the same Magento repository tokens that you used in the `.env` file:
@@ -85,8 +89,8 @@ You can remove the Doofinder module using this straightforward method:
 
 ```
 $ docker exec -it web bash
-www-data@...:~# cd /app
-www-data@...:/app# bin/magento module:uninstall Doofinder_Feed --remove-data
+root@...:~# cd /app
+root@...:/app# bin/magento module:uninstall Doofinder_Feed --remove-data
 ```
 Manual Uninstall
 ```

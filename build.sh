@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+if [ ! -d "/app/app" ]; then
+  exit 1 "There's still an app, please delete the src folder if you want the build to run again."
+fi
+
 if [ ! -d "/app/pub" ]; then
   mkdir /app/pub
 fi

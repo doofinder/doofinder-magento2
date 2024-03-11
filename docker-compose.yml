@@ -6,8 +6,7 @@ services:
   web:
     image: webdevops/php-apache-dev:${PHP_VERSION}
     container_name: web
-    # user: www-data
-    user: "1000"
+    user: "root"
     environment:
       APACHE_RUN_USER: '#1000'
       APACHE_RUN_GROUP: '#1000'
@@ -17,17 +16,16 @@ services:
       PHP_MAX_EXECUTION_TIME: 300
       # XDEBUG_CONFIG: "remote_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} remote_autostart=1 remote_connect_back=0 remote_enable=1 remote_handler=dbgp remote_mode=req remote_port=9000"
     volumes:
+      - ./auth_json:/auth_json
       - ./src:/app
       - ./:/app/app/code/Doofinder/Feed
-      - ./auth_json:/auth_json
-      - ./src/empty:/app/app/code/Doofinder/Feed/src
+      - ./src/ignore-folder-src-loop:/app/app/code/Doofinder/Feed/src
     ports:
       - "9012:80"
       - "443:443"
     links:
       - db
       - elasticsearch
-      # - setup
 
   # Setup container
   setup:
@@ -60,7 +58,7 @@ services:
       - ./build.sh:/build.sh
       - ./src:/app
       - ./:/app/app/code/Doofinder/Feed
-      - ./src/empty:/app/app/code/Doofinder/Feed/src
+      - ./src/ignore-folder-src-loop:/app/app/code/Doofinder/Feed/src
     entrypoint: sh -c "chmod +x /build.sh; /build.sh" 
     links:
       - db

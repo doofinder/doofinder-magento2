@@ -4,6 +4,7 @@
 # Dev files
 /node_modules
 .env
+auth_json
 
 # Magento files
 /src
