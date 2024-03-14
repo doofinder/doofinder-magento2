@@ -91,7 +91,7 @@ services:
     container_name: phpmyadmin
     environment:
       PMA_HOST: db
-      PMA_PORT: 3312
+      PMA_PORT: 3306
       PMA_USER: ${MYSQL_USER}
       PMA_PASSWORD: ${MYSQL_PASSWORD}
     ports:
