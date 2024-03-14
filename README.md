@@ -17,7 +17,7 @@ Rename the `.env.example` to `.env` and set your tokens provided by magento at t
 Then run the environment by executing:
 
 ```
-$ docker-compose up --profile setup
+$ docker-compose --profile setup up
 ```
 
 from the base directory where the copy of `docker-compose.yml` is located.
