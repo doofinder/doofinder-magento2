@@ -6,39 +6,18 @@
 
 ## Docker Environment
 
-To use the docker environment clone this repo inside a folder structure like this:
-
-```
-some_directory <- Name is not important
-  |- package <- This repo code inside that folder
-  |- src <- An empty folder to be used in the automatic installation process
-```
-
-And copy this repo's `docker-compose.yml` & `build.sh` & `.env` files to the root of the base directory (`some_directory` in the example).
-
 > **NOTE**: If you are in Windows or WSL, probably you'll have to fix CONTROL-M (^M) carriage return characters in `build.sh` file. Run this command to get rid of this characters:
 
 ```
 dos2unix build.sh
 ```
 
-So you'll have:
-
-```
-some_directory <- Name is not important
-  |- package <- This repo code inside that folder
-  |- src <- An empty folder to be used in the automatic installation process
-  |- docker-compose.yml
-  |- build.sh
-  |- .env
-```
-
-Edit the copy of `.env` and set your tokens in the `COMPOSER_AUTH` environment variable. You can also set the version of Magento you wish to install.
+Rename the `.env.example` to `.env` and set your tokens provided by magento at the [admin panel](https://commercemarketplace.adobe.com/customer/accessKeys) in the `COMPOSER_AUTH` environment variable. You can also set the version of Magento you wish to install.
 
 Then run the environment by executing:
 
 ```
-$ docker-compose up
+$ docker-compose --profile setup up
 ```
 
 from the base directory where the copy of `docker-compose.yml` is located.
@@ -46,9 +25,9 @@ The installation process will take some minutes to be finished. You can follow t
 
 ```docker logs setup -f```
 
-Finally, Magento 2 with the module installed will be running at `http://localhost:80`.
+Finally, Magento 2 with the module installed will be running at `http://localhost:9012`.
 
-The admin panel will be available at `http://localhost:80/admin`. Admin credentials are easy:
+The admin panel will be available at `http://localhost:9012/admin`. Admin credentials are easy:
 
 ```
 User: admin
@@ -67,12 +46,16 @@ OR if you'd rather load the data manually, you can also:
 
 ```
 $ docker exec -it web bash
-www-data@...:~# cd /app
-www-data@...:/app# php -d memory_limit=-1 bin/magento sampledata:deploy
-www-data@...:/app# bin/magento setup:upgrade
-www-data@...:/app# bin/magento setup:di:compile
-www-data@...:/app# bin/magento setup:static-content:deploy -f
+root@...:~# cd /app
+root@...:/app# php -d memory_limit=-1 bin/magento sampledata:deploy
+root@...:/app# bin/magento setup:upgrade
+root@...:/app# bin/magento setup:di:compile
+root@...:/app# bin/magento setup:static-content:deploy -f
 ```
+
+**Important:**
+After running the `bin/magento setup:upgrade` inside the docker container some folders are created and the user running apache can loose permissions to execute returning 500 Error.
+To restore permissions for these folders run in the host terminal `sudo chmod 777 -R src/`.
 
 **Note:** After you run the ```bin/magento sampledata:deploy``` command you will be prompted for authentication:
 ```Authentication required (repo.magento.com):```. You will have to use simply the same Magento repository tokens that you used in the `.env` file:
@@ -106,8 +89,8 @@ You can remove the Doofinder module using this straightforward method:
 
 ```
 $ docker exec -it web bash
-www-data@...:~# cd /app
-www-data@...:/app# bin/magento module:uninstall Doofinder_Feed --remove-data
+root@...:~# cd /app
+root@...:/app# bin/magento module:uninstall Doofinder_Feed --remove-data
 ```
 Manual Uninstall
 ```

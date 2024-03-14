@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+if [ ! -d "/app/app" ]; then
+  exit 1 "There's still an app, please delete the src folder if you want the build to run again."
+fi
+
 if [ ! -d "/app/pub" ]; then
   mkdir /app/pub
 fi
@@ -26,9 +30,6 @@ mkdir /src
 php -d memory_limit=-1 /usr/local/bin/composer create-project --repository=https://repo.magento.com/ magento/project-"$MAGENTO_EDITION"-edition="$MAGENTO_VERSION" /src
 
 chmod u+x /src/bin/magento
-
-chown -R www-data:www-data /src
-chmod -R 777 /src
 
 if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
   php /src/bin/magento setup:install \
@@ -74,12 +75,7 @@ if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
 	--elasticsearch-host=elasticsearch
 fi
 
-mkdir /src/app/code
-mkdir /src/app/code/Doofinder
-mkdir /src/app/code/Doofinder/Feed
-cp -r /package/* /src/app/code/Doofinder/Feed
 cp -r /src/* /app
-chown -R www-data:www-data /app
 chmod -R 777 /app
 
 rm /app/pub/index.html
@@ -95,7 +91,6 @@ fi
 
 php /app/bin/magento cache:flush
 
-chown -R www-data:www-data /app
 chmod -R 777 /app
 
 if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
