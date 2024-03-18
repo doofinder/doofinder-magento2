@@ -72,6 +72,8 @@ services:
   db:
     image: mysql:5.7
     container_name: db
+    volumes:
+      - magento-db:/var/lib/mysql
     ports:
       - 3312:3306
     healthcheck:
