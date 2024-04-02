@@ -20,7 +20,7 @@ Then run the environment by executing:
 $ docker-compose --profile setup up
 ```
 
-from the base directory where the copy of `docker-compose.yml` is located.
+from the base directory where the `docker-compose.yml` is located.
 The installation process will take some minutes to be finished. You can follow the status logging with:
 
 ```docker logs setup -f```
@@ -40,7 +40,7 @@ To install sample data, with the containers running, you can simply execute:
 $ ./data_loader.sh
 ```
 
-In order to make this script work, the only thing you'll need to do is to fill the username and password fields in the `auth_json` file, with the same values used previously in the `.env` file.
+In order to make this script work, the only thing you'll need to do is to fill the username and password fields in the `src/auth_json` file, with the same values used previously in the `.env` file, base your file in the `auth.json.sample` file.
 
 OR if you'd rather load the data manually, you can also:
 
