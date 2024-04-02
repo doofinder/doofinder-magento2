@@ -22,7 +22,6 @@ services:
       - ./src/ignore-folder-src-loop:/app/app/code/Doofinder/Feed/src
     ports:
       - "9012:80"
-      - "443:443"
     links:
       - db
       - elasticsearch
@@ -105,11 +104,9 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
     container_name: elasticsearch
-    ports:
-      - "9200:9200"
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-          
-      
+volumes:
+  magento-db:
