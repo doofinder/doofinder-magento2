@@ -38,7 +38,7 @@ if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
 	--admin-email="$MAGENTO_ADMIN_EMAIL" \
 	--admin-user="$MAGENTO_ADMIN_USER" \
 	--admin-password="$MAGENTO_ADMIN_PASSWORD" \
-	--base-url=https://"$MAGENTO_BASE_URL" \
+	--base-url=http://"$MAGENTO_BASE_URL" \
 	--base-url-secure=https://"$MAGENTO_BASE_URL" \
 	--backend-frontname="$MAGENTO_ADMIN_FRONTNAME" \
 	--db-host=db \
@@ -49,7 +49,7 @@ if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
 	--language="$MAGENTO_LOCALE" \
 	--currency="$MAGENTO_CURRENCY" \
 	--timezone="$MAGENTO_TIMEZONE" \
-	--use-secure-admin=1
+	--use-secure-admin=0
 fi
 
 if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
@@ -59,7 +59,7 @@ if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
 	--admin-email="$MAGENTO_ADMIN_EMAIL" \
 	--admin-user="$MAGENTO_ADMIN_USER" \
 	--admin-password="$MAGENTO_ADMIN_PASSWORD" \
-	--base-url=https://"$MAGENTO_BASE_URL" \
+	--base-url=http://"$MAGENTO_BASE_URL" \
 	--base-url-secure=https://"$MAGENTO_BASE_URL" \
 	--backend-frontname="$MAGENTO_ADMIN_FRONTNAME" \
 	--db-host=db \
@@ -70,7 +70,7 @@ if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
 	--language="$MAGENTO_LOCALE" \
 	--currency="$MAGENTO_CURRENCY" \
 	--timezone="$MAGENTO_TIMEZONE" \
-	--use-secure-admin=1 \
+	--use-secure-admin=0 \
 	--search-engine=elasticsearch7 \
 	--elasticsearch-host=elasticsearch
 fi
