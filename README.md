@@ -12,9 +12,17 @@
 dos2unix build.sh
 ```
 
-Rename the `.env.example` to `.env` and set your tokens provided by magento at the [admin panel](https://commercemarketplace.adobe.com/customer/accessKeys) in the `COMPOSER_AUTH` environment variable. You can also set the version of Magento you wish to install.
+**Configure NGROK**
+In order to be able to create an account or login to an existing Doofinder account during the module initial setup, you will have to expose your local webserver to internet (to receive a callback).
 
-Then run the environment by executing:
+To do so, you can use, for example; the utility Ngrok: https://dashboard.ngrok.com/get-started/setup
+
+And once you have the external url created simply edit the `.env` file and set the MAGENTO_BASE_URL={your-url.ngrok-free.app} (for example: MAGENTO_BASE_URL=forcibly-ethical-apple.ngrok-free.app)
+
+So, when the installation process finished, instead of accessing to `http://localhost:9012` you will use your url (for example: `http://forcibly-ethical-apple.ngrok-free.app`).
+Notice that you'll need to specify the 9012 port when executing ngrok.
+
+Then setup the environment by executing:
 
 ```
 $ docker-compose --profile setup up
@@ -27,7 +35,7 @@ The installation process will take some minutes to be finished. You can follow t
 
 Finally, Magento 2 with the module installed will be running at `http://localhost:9012`.
 
-The admin panel will be available at `http://localhost:9012/admin`. Admin credentials are easy:
+The admin panel will be available at `http://localhost:9012/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
 
 ```
 User: admin
@@ -53,26 +61,12 @@ root@...:/app# bin/magento setup:di:compile
 root@...:/app# bin/magento setup:static-content:deploy -f
 ```
 
-**Important:**
-After running the `bin/magento setup:upgrade` inside the docker container some folders are created and the user running apache can loose permissions to execute returning 500 Error.
-To restore permissions for these folders run in the host terminal `sudo chmod 777 -R src/`.
-
 **Note:** After you run the ```bin/magento sampledata:deploy``` command you will be prompted for authentication:
 ```Authentication required (repo.magento.com):```. You will have to use simply the same Magento repository tokens that you used in the `.env` file:
 ```
 COMPOSER_AUTH_USERNAME & COMPOSER_AUTH_PASSWORD
 ```
 These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and creating an access key. The public key will be COMPOSER_AUTH_USERNAME and the private key will be COMPOSER_AUTH_PASSWORD.
-
-## Using the module
-
-In order to be able to create an account or login to an existing Doofinder account during the module initial setup, you will have to expose your local webserver to internet (to receive a callback).
-
-To do so, you can use, for example; the utility Ngrok: https://dashboard.ngrok.com/get-started/setup
-
-And once you have the external ip created (and before running the `docker-compose up`) simply edit the `.env` file and set the MAGENTO_BASE_URL=ip (for example: MAGENTO_BASE_URL=7dd5-80-26-218-151.ngrok.io)
-
-So, when the installation process finished, instead of accessing to `http://localhost:80` you will use: `http://ip:80` (for example: `https://7dd5-80-26-218-151.ngrok.io`).
 
 ## Xdebug ready to use
 
@@ -138,3 +132,17 @@ And please, don't forget to copy in `.env` your Magento repository tokens fillin
 COMPOSER_AUTH_USERNAME=
 COMPOSER_AUTH_PASSWORD=
 ```
+
+## Troubleshooting
+
+**Permissions issues**
+After running the `bin/magento setup:upgrade` or other magento commands inside the docker container some folders are created and the user running apache can loose permissions to execute returning 500 Error.
+To restore permissions for these folders run in the host terminal `sudo chmod 777 -R src/`.
+
+**Redirect issues**
+If after the setup process has finished the website doesn't load you may need to change the urls in the database.
+Connect to the database in `localhost:3312` using the mysql user and password defined in the `.env` (`magentobase`).
+In the table `core_config_data` there are two configs for the base urls that magento will redirect to, with paths:
+- `web/unsecure/base_url`
+- `web/secure/base_url`
+Make sure that those urls are the ones you'll be using to connect to your site or magento will always redirect to them.
