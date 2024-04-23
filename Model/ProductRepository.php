@@ -108,7 +108,6 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
         parent::__construct(
             $productFactory,
-            $initializationHelper,
             $searchResultsFactory,
             $collectionFactory,
             $searchCriteriaBuilder,
