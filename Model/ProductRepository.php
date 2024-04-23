@@ -9,7 +9,6 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\Data\ProductSearchResultsInterfaceFactory;
 use Magento\Catalog\Api\CategoryListInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
-use Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\Product;
@@ -71,7 +70,6 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         StoreConfig $storeConfig,
         MagentoStoreConfig $magentoStoreConfig,
         ProductFactory $productFactory,
-        Helper $initializationHelper,
         ProductSearchResultsInterfaceFactory $searchResultsFactory,
         ProductCollectionFactory $collectionFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
@@ -108,7 +106,6 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
         parent::__construct(
             $productFactory,
-            $initializationHelper,
             $searchResultsFactory,
             $collectionFactory,
             $searchCriteriaBuilder,
