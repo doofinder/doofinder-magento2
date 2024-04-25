@@ -9,6 +9,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\Data\ProductSearchResultsInterfaceFactory;
 use Magento\Catalog\Api\CategoryListInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
+use Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\Product;
@@ -30,6 +31,7 @@ use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\App\Area;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\EntityManager\Operation\Read\ReadExtensions;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
@@ -58,6 +60,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     private $magentoStoreConfig;
     private $excludedCustomAttributes;
     private $categoryListInterface;
+    private $productMetadataInterface;
 
     public function __construct(
         ImageFactory $imageHelperFactory,
@@ -70,6 +73,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         StoreConfig $storeConfig,
         MagentoStoreConfig $magentoStoreConfig,
         ProductFactory $productFactory,
+        Helper $initializationHelper,
         ProductSearchResultsInterfaceFactory $searchResultsFactory,
         ProductCollectionFactory $collectionFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
@@ -91,7 +95,8 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         CollectionProcessorInterface $collectionProcessor = null,
         JsonSerializer $serializer = null,
         $cacheLimit = 1000,
-        ReadExtensions $readExtensions = null
+        ReadExtensions $readExtensions = null,
+        ProductMetadataInterface $productMetadataInterface
     ) {
         $this->imageHelperFactory = $imageHelperFactory;
         $this->appEmulation = $appEmulation;
@@ -102,33 +107,64 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $this->inventoryHelperFactory = $inventoryHelperFactory;
         $this->storeConfig = $storeConfig;
         $this->magentoStoreConfig = $magentoStoreConfig;
+        $this->productMetadataInterface = $productMetadataInterface;
         //Add here any custom attributes we want to exclude from indexation
         $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
-        parent::__construct(
-            $productFactory,
-            $searchResultsFactory,
-            $collectionFactory,
-            $searchCriteriaBuilder,
-            $attributeRepository,
-            $resourceModel,
-            $linkInitializer,
-            $linkTypeProvider,
-            $storeManager,
-            $filterBuilder,
-            $metadataServiceInterface,
-            $extensibleDataObjectConverter,
-            $optionConverter,
-            $fileSystem,
-            $contentValidator,
-            $contentFactory,
-            $mimeTypeExtensionMap,
-            $imageProcessor,
-            $extensionAttributesJoinProcessor,
-            $collectionProcessor,
-            $serializer,
-            $cacheLimit,
-            $readExtensions
-        );
+        if (method_exists($this->productMetadataInterface, 'getVersion') && 
+            version_compare($this->productMetadataInterface->getVersion(), '2.4.7', '>=')) {
+            parent::__construct(
+                $productFactory,
+                $searchResultsFactory,
+                $collectionFactory,
+                $searchCriteriaBuilder,
+                $attributeRepository,
+                $resourceModel,
+                $linkInitializer,
+                $linkTypeProvider,
+                $storeManager,
+                $filterBuilder,
+                $metadataServiceInterface,
+                $extensibleDataObjectConverter,
+                $optionConverter,
+                $fileSystem,
+                $contentValidator,
+                $contentFactory,
+                $mimeTypeExtensionMap,
+                $imageProcessor,
+                $extensionAttributesJoinProcessor,
+                $collectionProcessor,
+                $serializer,
+                $cacheLimit,
+                $readExtensions
+            );
+        } else {
+            parent::__construct(
+                $productFactory,
+                $initializationHelper,
+                $searchResultsFactory,
+                $collectionFactory,
+                $searchCriteriaBuilder,
+                $attributeRepository,
+                $resourceModel,
+                $linkInitializer,
+                $linkTypeProvider,
+                $storeManager,
+                $filterBuilder,
+                $metadataServiceInterface,
+                $extensibleDataObjectConverter,
+                $optionConverter,
+                $fileSystem,
+                $contentValidator,
+                $contentFactory,
+                $mimeTypeExtensionMap,
+                $imageProcessor,
+                $extensionAttributesJoinProcessor,
+                $collectionProcessor,
+                $serializer,
+                $cacheLimit,
+                $readExtensions
+            );
+        }
     }
 
     /**
