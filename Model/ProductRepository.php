@@ -31,6 +31,7 @@ use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\App\Area;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\EntityManager\Operation\Read\ReadExtensions;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem;
@@ -50,6 +51,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 {
     protected $imageHelperFactory;
     protected $appEmulation;
+    private $productMetadataInterface;
     private $stockRegistry;
     private $cacheLimit = 0;
     private $productHelperFactory;
@@ -61,6 +63,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
     private $categoryListInterface;
 
     public function __construct(
+        ProductMetadataInterface $productMetadataInterface,
         ImageFactory $imageHelperFactory,
         Emulation $appEmulation,
         StockRegistryInterface $stockRegistry,
@@ -106,32 +109,60 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $this->magentoStoreConfig = $magentoStoreConfig;
         //Add here any custom attributes we want to exclude from indexation
         $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
-        parent::__construct(
-            $productFactory,
-            $initializationHelper,
-            $searchResultsFactory,
-            $collectionFactory,
-            $searchCriteriaBuilder,
-            $attributeRepository,
-            $resourceModel,
-            $linkInitializer,
-            $linkTypeProvider,
-            $storeManager,
-            $filterBuilder,
-            $metadataServiceInterface,
-            $extensibleDataObjectConverter,
-            $optionConverter,
-            $fileSystem,
-            $contentValidator,
-            $contentFactory,
-            $mimeTypeExtensionMap,
-            $imageProcessor,
-            $extensionAttributesJoinProcessor,
-            $collectionProcessor,
-            $serializer,
-            $cacheLimit,
-            $readExtensions
-        );
+        if (version_compare($productMetadataInterface->getVersion(), '2.4.7', '>=')) {
+            parent::__construct(
+                $productFactory,
+                $searchResultsFactory,
+                $collectionFactory,
+                $searchCriteriaBuilder,
+                $attributeRepository,
+                $resourceModel,
+                $linkInitializer,
+                $linkTypeProvider,
+                $storeManager,
+                $filterBuilder,
+                $metadataServiceInterface,
+                $extensibleDataObjectConverter,
+                $optionConverter,
+                $fileSystem,
+                $contentValidator,
+                $contentFactory,
+                $mimeTypeExtensionMap,
+                $imageProcessor,
+                $extensionAttributesJoinProcessor,
+                $collectionProcessor,
+                $serializer,
+                $cacheLimit,
+                $readExtensions
+            );
+        } else {
+            parent::__construct(
+                $productFactory,
+                $initializationHelper,
+                $searchResultsFactory,
+                $collectionFactory,
+                $searchCriteriaBuilder,
+                $attributeRepository,
+                $resourceModel,
+                $linkInitializer,
+                $linkTypeProvider,
+                $storeManager,
+                $filterBuilder,
+                $metadataServiceInterface,
+                $extensibleDataObjectConverter,
+                $optionConverter,
+                $fileSystem,
+                $contentValidator,
+                $contentFactory,
+                $mimeTypeExtensionMap,
+                $imageProcessor,
+                $extensionAttributesJoinProcessor,
+                $collectionProcessor,
+                $serializer,
+                $cacheLimit,
+                $readExtensions
+            );
+        }
     }
 
     /**
@@ -376,7 +407,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
                 $categoryIds[$category->getCategoryId()] = true;
             }
         }
-        
+
         // Get table name with prefix if it exists
         $catalogCategoryEntityTable = $this->resourceModel->getTable('catalog_category_entity');
 
