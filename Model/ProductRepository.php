@@ -51,7 +51,6 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 {
     protected $imageHelperFactory;
     protected $appEmulation;
-    private $productMetadataInterface;
     private $stockRegistry;
     private $cacheLimit = 0;
     private $productHelperFactory;
