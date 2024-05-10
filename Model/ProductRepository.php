@@ -6,38 +6,16 @@ namespace Doofinder\Feed\Model;
 
 use Magento\Catalog\Api\Data\ProductExtension;
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Api\Data\ProductSearchResultsInterfaceFactory;
 use Magento\Catalog\Api\CategoryListInterface;
-use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
-use Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\Product;
-use Magento\Catalog\Model\Product\Gallery\MimeTypeExtensionMap;
-use Magento\Catalog\Model\Product\Initialization\Helper\ProductLinks;
-use Magento\Catalog\Model\Product\LinkTypeProvider as ProductLinkTypeProvider;
-use Magento\Catalog\Model\Product\Option\Converter as ProductOptionConverter;
-use Magento\Catalog\Model\ProductFactory;
-use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
-use Magento\CatalogInventory\Api\StockRegistryInterface;
-use Magento\Framework\Api\Data\ImageContentInterfaceFactory;
-use Magento\Framework\Api\ExtensibleDataObjectConverter;
-use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
-use Magento\Framework\Api\FilterBuilder as ApiFilterBuilder;
-use Magento\Framework\Api\ImageContentValidatorInterface;
-use Magento\Framework\Api\ImageProcessorInterface;
-use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\App\Area;
-use Magento\Framework\EntityManager\Operation\Read\ReadExtensions;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Filesystem;
-use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Api\StoreConfigManagerInterface as MagentoStoreConfig;
-use Magento\Store\Model\StoreManagerInterface;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\PriceFactory as PriceHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
@@ -48,91 +26,20 @@ use Doofinder\Feed\Helper\StoreConfig;
  */
 class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 {
-    protected $imageHelperFactory;
-    protected $appEmulation;
-    private $stockRegistry;
+    private $imageHelperFactory;
+    private $appEmulation;
     private $cacheLimit = 0;
     private $productHelperFactory;
     private $priceHelperFactory;
     private $inventoryHelperFactory;
     private $storeConfig;
     private $magentoStoreConfig;
-    private $excludedCustomAttributes;
-    private $categoryListInterface;
+    private $categoryList;
 
-    public function __construct(
-        ImageFactory $imageHelperFactory,
-        Emulation $appEmulation,
-        StockRegistryInterface $stockRegistry,
-        CategoryListInterface $categoryListInterface,
-        ProductHelperFactory $productHelperFactory,
-        PriceHelperFactory $priceHelperFactory,
-        InventoryHelperFactory $inventoryHelperFactory,
-        StoreConfig $storeConfig,
-        MagentoStoreConfig $magentoStoreConfig,
-        ProductFactory $productFactory,
-        Helper $initializationHelper,
-        ProductSearchResultsInterfaceFactory $searchResultsFactory,
-        ProductCollectionFactory $collectionFactory,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductAttributeRepositoryInterface $attributeRepository,
-        ProductResourceModel $resourceModel,
-        ProductLinks $linkInitializer,
-        ProductLinkTypeProvider $linkTypeProvider,
-        StoreManagerInterface $storeManager,
-        ApiFilterBuilder $filterBuilder,
-        ProductAttributeRepositoryInterface $metadataServiceInterface,
-        ExtensibleDataObjectConverter $extensibleDataObjectConverter,
-        ProductOptionConverter $optionConverter,
-        Filesystem $fileSystem,
-        ImageContentValidatorInterface $contentValidator,
-        ImageContentInterfaceFactory $contentFactory,
-        MimeTypeExtensionMap $mimeTypeExtensionMap,
-        ImageProcessorInterface $imageProcessor,
-        JoinProcessorInterface $extensionAttributesJoinProcessor,
-        CollectionProcessorInterface $collectionProcessor = null,
-        JsonSerializer $serializer = null,
-        $cacheLimit = 1000,
-        ReadExtensions $readExtensions = null
-    ) {
-        $this->imageHelperFactory = $imageHelperFactory;
-        $this->appEmulation = $appEmulation;
-        $this->stockRegistry = $stockRegistry;
-        $this->categoryListInterface = $categoryListInterface;
-        $this->productHelperFactory = $productHelperFactory;
-        $this->priceHelperFactory = $priceHelperFactory;
-        $this->inventoryHelperFactory = $inventoryHelperFactory;
-        $this->storeConfig = $storeConfig;
-        $this->magentoStoreConfig = $magentoStoreConfig;
-        //Add here any custom attributes we want to exclude from indexation
-        $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
-        parent::__construct(
-            $productFactory,
-            $initializationHelper,
-            $searchResultsFactory,
-            $collectionFactory,
-            $searchCriteriaBuilder,
-            $attributeRepository,
-            $resourceModel,
-            $linkInitializer,
-            $linkTypeProvider,
-            $storeManager,
-            $filterBuilder,
-            $metadataServiceInterface,
-            $extensibleDataObjectConverter,
-            $optionConverter,
-            $fileSystem,
-            $contentValidator,
-            $contentFactory,
-            $mimeTypeExtensionMap,
-            $imageProcessor,
-            $extensionAttributesJoinProcessor,
-            $collectionProcessor,
-            $serializer,
-            $cacheLimit,
-            $readExtensions
-        );
-    }
+    /**
+     * List of custom attributes we want to exclude from indexation
+     */
+    const EXCLUDED_CUSTOM_ATTRIBUTES = ['special_price', 'special_from_date', 'special_to_date'];
 
     /**
      * @inheritDoc
@@ -159,10 +66,11 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
                 $storeId = $this->storeManager->getStore()->getId();
             }
             $product->load($productId);
-            $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
+            $appEmulation = $this->getAppEmulation();
+            $appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             $this->setExtensionAttributes($product, $storeId);
             $this->setCustomAttributes($product);
-            $this->appEmulation->stopEnvironmentEmulation();
+            $appEmulation->stopEnvironmentEmulation();
             // End Custom code here
             $this->cacheProduct($cacheKey, $product);
             $cachedProduct = $product;
@@ -179,17 +87,18 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         $searchResult = parent::getList($searchCriteria);
         $storeId = null;
 
+        $appEmulation = $this->getAppEmulation();
         foreach ($searchResult->getItems() as $product) {
             if ($storeId !== $product->getStoreId()) {
                 $storeId = $product->getStoreId();
-                $this->appEmulation->stopEnvironmentEmulation();
-                $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
+                $appEmulation->stopEnvironmentEmulation();
+                $appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             }
 
             $this->setExtensionAttributes($product, $storeId);
             $this->setCustomAttributes($product);
         }
-        $this->appEmulation->stopEnvironmentEmulation();
+        $appEmulation->stopEnvironmentEmulation();
 
         return $searchResult;
     }
@@ -199,12 +108,12 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      *
      * @param Product $product
      * @param string $imageId
-     * @param array|null $attributes
+     * @param array $attributes
      * @return ImageHelper
      */
-    private function getImage(Product $product, string $imageId, ?array $attributes = []): ImageHelper
+    private function getImage(Product $product, string $imageId, array $attributes = []): ImageHelper
     {
-        return $this->imageHelperFactory->create()->init($product, $imageId, $attributes);
+        return $this->getImageHelperFactory()->create()->init($product, $imageId, $attributes);
     }
 
     /**
@@ -213,9 +122,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      * @param Product $product
      * @return String
      */
-    private function getProductUrl(Product $product): String
+    private function getProductUrl(Product $product): string
     {
-        return $this->productHelperFactory->create()->getProductUrl($product);
+        return $this->getProductHelperFactory()->create()->getProductUrl($product);
     }
 
     /**
@@ -285,8 +194,8 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      */
     private function setCustomAttributes($product): void
     {
-        $productHelper = $this->productHelperFactory->create();
-        $customAttributes = $this->storeConfig->getCustomAttributes($product->getStoreId());
+        $productHelper = $this->getProductHelperFactory()->create();
+        $customAttributes = $this->getStoreConfig()->getCustomAttributes($product->getStoreId());
 
         foreach ($customAttributes as $customAttribute) {
             $code = $customAttribute['code'];
@@ -318,9 +227,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      */
     private function setExtensionAttributes($product, $storeId): void
     {
-        $priceHelper = $this->priceHelperFactory->create();
-        $productHelper = $this->productHelperFactory->create();
-        $inventoryHelper = $this->inventoryHelperFactory->create();
+        $priceHelper = $this->getPriceHelperFactory()->create();
+        $productHelper = $this->getProductHelperFactory()->create();
+        $inventoryHelper = $this->getInventoryHelperFactory()->create();
         $storeCode = $this->storeManager->getStore($storeId)->getCode();
 
         /** @var ProductExtension $extensionAttributes */
@@ -331,9 +240,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
         $extensionAttributes->setIsInStock($stockAndStatus[1]);
-        $extensionAttributes->setBaseUrl($this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseUrl());
+        $extensionAttributes->setBaseUrl($this->getMagentoStoreConfig()->getStoreConfigs([$storeCode])[0]->getBaseUrl());
         $extensionAttributes->setBaseMediaUrl(
-            $this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseMediaUrl()
+            $this->getMagentoStoreConfig()->getStoreConfigs([$storeCode])[0]->getBaseMediaUrl()
         );
 
         $categories =  $extensionAttributes->getCategoryLinks();
@@ -357,9 +266,9 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
      * @param ProductInterface $product
      * @return void
      */
-    public function removeExcludedCustomAttributes($product)
+    public function removeExcludedCustomAttributes($product): void
     {
-        foreach ($this->excludedCustomAttributes as $attribute) {
+        foreach (self::EXCLUDED_CUSTOM_ATTRIBUTES as $attribute) {
             if (isset($product[$attribute])) {
                 unset($product[$attribute]);
             }
@@ -376,7 +285,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
                 $categoryIds[$category->getCategoryId()] = true;
             }
         }
-        
+
         // Get table name with prefix if it exists
         $catalogCategoryEntityTable = $this->resourceModel->getTable('catalog_category_entity');
 
@@ -404,7 +313,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
             ->addFilter('is_active', '1')
             ->create();
 
-        $categories = $this->categoryListInterface->getList($searchCriteria)->__toArray();
+        $categories = $this->getCategoryList()->getList($searchCriteria)->__toArray();
 
         // Get just the information needed in order to make the response lighter
         $categoryResults = [];
@@ -418,5 +327,109 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         }
 
         return $categoryResults;
+    }
+
+    /**
+     * Get the ImageFactory instance
+     *
+     * @return ImageFactory
+     */
+    private function getImageHelperFactory(): ImageFactory
+    {
+        if ($this->imageHelperFactory === null) {
+            $this->imageHelperFactory = ObjectManager::getInstance()->get(ImageFactory::class);
+        }
+        return $this->imageHelperFactory;
+    }
+
+    /**
+     * Get the ProductHelperFactory instance
+     *
+     * @return ProductHelperFactory
+     */
+    private function getProductHelperFactory(): ProductHelperFactory
+    {
+        if ($this->productHelperFactory === null) {
+            $this->productHelperFactory = ObjectManager::getInstance()->get(ProductHelperFactory::class);
+        }
+        return $this->productHelperFactory;
+    }
+
+    /**
+     * Get the PriceHelperFactory instance
+     *
+     * @return PriceHelperFactory
+     */
+    private function getPriceHelperFactory(): PriceHelperFactory
+    {
+        if ($this->priceHelperFactory === null) {
+            $this->priceHelperFactory = ObjectManager::getInstance()->get(PriceHelperFactory::class);
+        }
+        return $this->priceHelperFactory;
+    }
+
+    /**
+     * Get the InventoryHelperFactory instance
+     *
+     * @return InventoryHelperFactory
+     */
+    private function getInventoryHelperFactory(): InventoryHelperFactory
+    {
+        if ($this->inventoryHelperFactory === null) {
+            $this->inventoryHelperFactory = ObjectManager::getInstance()->get(InventoryHelperFactory::class);
+        }
+        return $this->inventoryHelper;
+    }
+
+    /**
+     * Get the StoreConfig instance
+     *
+     * @return StoreConfig
+     */
+    private function getStoreConfig(): StoreConfig
+    {
+        if ($this->storeConfig === null) {
+            $this->storeConfig = ObjectManager::getInstance()->get(StoreConfig::class);
+        }
+        return $this->storeConfig;
+    }
+
+    /**
+     * Get the CategoryListInterface instance
+     *
+     * @return CategoryListInterface
+     */
+    private function getCategoryList(): CategoryListInterface
+    {
+        if ($this->categoryList === null) {
+            $this->categoryList = ObjectManager::getInstance()->get(CategoryListInterface::class);
+        }
+        return $this->categoryList;
+    }
+
+    /**
+     * Get the MagentoStoreConfig instance
+     *
+     * @return MagentoStoreConfig
+     */
+    private function getMagentoStoreConfig(): MagentoStoreConfig
+    {
+        if ($this->magentoStoreConfig === null) {
+            $this->magentoStoreConfig = ObjectManager::getInstance()->get(MagentoStoreConfig::class);
+        }
+        return $this->magentoStoreConfig;
+    }
+
+    /**
+     * Get the Emulation instance
+     *
+     * @return Emulation
+     */
+    private function getAppEmulation(): Emulation
+    {
+        if ($this->appEmulation === null) {
+            $this->appEmulation = ObjectManager::getInstance()->get(Emulation::class);
+        }
+        return $this->appEmulation;
     }
 }
