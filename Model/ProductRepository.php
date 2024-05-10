@@ -378,7 +378,7 @@ class ProductRepository extends \Magento\Catalog\Model\ProductRepository
         if ($this->inventoryHelperFactory === null) {
             $this->inventoryHelperFactory = ObjectManager::getInstance()->get(InventoryHelperFactory::class);
         }
-        return $this->inventoryHelper;
+        return $this->inventoryHelperFactory;
     }
 
     /**
