@@ -144,23 +144,41 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         return $searchResult;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function save(ProductInterface $product, $saveOptions = false) {
         return $this->productRepositoryBase->save($product, $saveOptions);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function delete(ProductInterface $product) {
         return $this->productRepositoryBase->delete($product);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getById($productId, $editMode = false, $storeId = null, $forceReload = false) {
         return $this->productRepositoryBase->getById($productId, $editMode, $storeId, $forceReload);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deleteById($sku)
     {
         return $this->productRepositoryBase->deleteById($sku);
     }
 
+    /**
+     * Get key for cache
+     *
+     * @param array $data
+     * @return string
+     */
     public function getCacheKey($data)
     {
         $serializeData = [];
@@ -175,7 +193,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         return md5(serialize($serializeData));
     }
 
-    public function _resetState(): void
+    public function _resetState()
     {
         $this->instances = [];
         $this->instancesById = [];
