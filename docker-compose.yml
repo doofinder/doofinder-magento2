@@ -22,6 +22,7 @@ services:
       - ./src/ignore-folder-src-loop:/app/app/code/Doofinder/Feed/src
     ports:
       - "9012:80"
+      - "4012:443"
     links:
       - db
       - elasticsearch
