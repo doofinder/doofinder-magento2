@@ -10,12 +10,15 @@ use Magento\Catalog\Api\CategoryListInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ProductRepository as ProductRepositoryBase;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\App\Area;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Api\StoreConfigManagerInterface as MagentoStoreConfig;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
@@ -46,6 +49,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     protected $instances;
     protected $instancesById;
     protected $excludedCustomAttributes;
+    private $serializer;
     
 
     public function __construct(
@@ -57,12 +61,13 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         InventoryHelperFactory $inventoryHelperFactory,
         StoreConfig $storeConfig,
         MagentoStoreConfig $magentoStoreConfig,
-        ProductHelperFactory $productFactory,
+        ProductFactory $productFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductResourceModel $resourceModel,
         StoreManagerInterface $storeManager,
         ProductRepositoryBase $productRepositoryBase,
-        $cacheLimit = 1000
+        $cacheLimit = 1000,
+        Json $serializer = null
     ) {
         $this->imageHelperFactory = $imageHelperFactory;
         $this->appEmulation = $appEmulation;
@@ -82,6 +87,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $this->instancesById = [];
         //Add here any custom attributes we want to exclude from indexation
         $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
+        $this->serializer = $serializer ?: ObjectManager::getInstance()->get(Json::class);
     }
 
     /**
@@ -190,7 +196,8 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             }
         }
 
-        return md5(serialize($serializeData));
+        $serializeData = $this->serializer->serialize($serializeData);
+        return sha1($serializeData);
     }
 
     public function _resetState()
