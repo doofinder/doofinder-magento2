@@ -204,7 +204,7 @@ class Price extends AbstractHelper
             if ($child->getId() != $product->getId()) {
                 $variant_minimum_price = $this->getMinimumVariantPrice($child);
 
-                if ($minimum_price === null) {
+                if (is_null($minimum_price)) {
                     $minimum_price = $variant_minimum_price;
                     $minimum_variant = $child;
                 } elseif ($variant_minimum_price < $minimum_price) {
@@ -228,13 +228,13 @@ class Price extends AbstractHelper
      */
     private function getMinimumVariantPrice($variant)
     {
-        $regular_price = $variant->getPriceInfo()->getPrice('regular_price');
-        $final_price = $variant->getPriceInfo()->getPrice('final_price');
+        $regular_price = $variant->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
+        $final_price = $variant->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
 
-        if ($final_price->getAmount()->getValue() !== null) {
-            return $final_price->getAmount()->getValue();
+        if (!is_null($final_price)) {
+            return $final_price;
         } else {
-            return $regular_price->getAmount()->getValue();
+            return $regular_price;
         }
     }
 }
