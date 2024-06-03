@@ -275,12 +275,11 @@ class CreateStore extends Action implements HttpGetActionInterface
     private function getModuleVersion(): string
     {
         $objectManager = ObjectManager::getInstance();
-        $componentreg = $objectManager->get('\Magento\Framework\Component\ComponentRegistrarInterface');
-        $register=$objectManager->get('\Magento\Framework\Filesystem\Directory\ReadFactory');
-        
-        $path = $componentreg->getPath(
+        $componentReg = $objectManager->get('\Magento\Framework\Component\ComponentRegistrarInterface');
+        $register = $objectManager->get('\Magento\Framework\Filesystem\Directory\ReadFactory');
+        $path = $componentReg->getPath(
             ComponentRegistrar::MODULE,
-            'doofinder-magento2'
+            'Doofinder_Feed'
         );
         $directoryRead = $register->create($path);
         $composerJsonData = '';
