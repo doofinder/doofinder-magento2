@@ -214,7 +214,7 @@ class Price extends AbstractHelper
             }
         }
 
-        if ($minimum_variant === null) {
+        if (is_null($minimum_variant)) {
             return null;
         }
 
