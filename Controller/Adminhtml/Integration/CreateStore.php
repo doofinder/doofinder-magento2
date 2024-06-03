@@ -9,9 +9,11 @@ use Doofinder\Feed\Helper\Indexation;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\ObjectManager;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Component\ComponentRegistrar;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\App\Cache\Frontend\Pool;
@@ -112,7 +114,8 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "site_url" => $this->get_primary_site_url_in_se($searchEngineData["searchEngineConfig"], $primary_language),
                     "search_engines" => $searchEngineData["searchEngineConfig"],
                     "options" => $storeOptions,
-                    "query_input" => "#search"
+                    "query_input" => "#search",
+                    "plugin_version" => $this->getModuleVersion()
                 ];
                 $response = $this->storeConfig->createStore($storeGroupConfig);
                 $this->saveInstallationConfig((int)$storeGroupId, $response["installation_id"], $response["script"]);
@@ -267,5 +270,25 @@ class CreateStore extends Action implements HttpGetActionInterface
         }))[0];
     
         return $primary_search_engine["site_url"];
+    }
+
+    private function getModuleVersion(): string
+    {
+        $objectManager = ObjectManager::getInstance();
+        $componentreg = $objectManager->get('\Magento\Framework\Component\ComponentRegistrarInterface');
+        $register=$objectManager->get('\Magento\Framework\Filesystem\Directory\ReadFactory');
+        
+        $path = $componentreg->getPath(
+            ComponentRegistrar::MODULE,
+            'doofinder-magento2'
+        );
+        $directoryRead = $register->create($path);
+        $composerJsonData = '';
+        if ($directoryRead->isFile('composer.json')) {
+            $composerJsonData = $directoryRead->readFile('composer.json');
+        }
+        $data = json_decode($composerJsonData);
+    
+        return !empty($data->version) ? $data->version : '';
     }
 }
