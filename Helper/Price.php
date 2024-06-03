@@ -192,20 +192,49 @@ class Price extends AbstractHelper
      */
     private function getMinimumComplexProductPrice($product, $usedProds, $type)
     {
-        $prices = [];
+        $minimum_price = null;
+        $minimum_variant = null;
+
+        /*
+        We identify the variant with the minimum final price (or price), and
+        that is the one that is used to obtain the requested price for the
+        parent as the variant is chosen as the representative for the product
+        */
         foreach ($usedProds as $child) {
             if ($child->getId() != $product->getId()) {
-                $price = $child->getPriceInfo()->getPrice($type);
-                $prices['prices'][] =  $price;
-                $prices['values'][] =  $price->getAmount()->getValue();
+                $variant_minimum_price = $this->getMinimumVariantPrice($child);
+
+                if ($minimum_price === null) {
+                    $minimum_price = $variant_minimum_price;
+                    $minimum_variant = $child;
+                } elseif ($variant_minimum_price < $minimum_price) {
+                    $minimum_price = $variant_minimum_price;
+                    $minimum_variant = $child;
+                }
             }
         }
 
-        if (empty($prices)) {
+        if ($minimum_variant === null) {
             return null;
         }
 
-        $index = array_search(min($prices['values']), $prices['values']);
-        return ($index < 0) ? null : $prices['prices'][$index];
+        return $minimum_variant->getPriceInfo()->getPrice($type);
+    }
+
+    /**
+     * Gets the minimum price of the variant
+     *
+     * @param $variant
+     */
+    private function getMinimumVariantPrice($variant)
+    {
+        $regular_price = $variant->getPriceInfo()->getPrice('regular_price');
+        $final_price = $variant->getPriceInfo()->getPrice('final_price');
+
+        if ($final_price->getAmount()->getValue() !== null) {
+            return $final_price->getAmount()->getValue();
+        } else {
+            return $regular_price->getAmount()->getValue();
+        }
     }
 }
