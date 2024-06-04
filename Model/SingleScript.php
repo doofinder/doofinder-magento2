@@ -104,7 +104,7 @@ class SingleScript
                         doofinderApp("config", "language", "$language")
                         doofinderApp("config", "currency", "$currency")
                     </script>
-                    
+                    <script src="https://$region-config.doofinder.com/2.x/$installationId.js" async></script>  
                 EOT;
 
                 $storeGroupId = $store->getStoreGroupId();
