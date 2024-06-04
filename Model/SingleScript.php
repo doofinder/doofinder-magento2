@@ -6,10 +6,12 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\Data\SingleScriptStruct;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\DeploymentConfig;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Component\ComponentRegistrarInterface;
 use Magento\Framework\Filesystem\Directory\ReadFactory;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\ScopeInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -43,22 +45,32 @@ class SingleScript
     protected $scopeConfig;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param DeploymentConfig $deploymentConfig
      * @param ComponentRegistrarInterface $componentRegistrar
+     * @param StoreConfig $storeConfig
      * @param ReadFactory $readFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param LoggerInterface $logger
      */
     public function __construct(
         DeploymentConfig $deploymentConfig,
         ComponentRegistrarInterface $componentRegistrar,
         StoreConfig $storeConfig,
         ReadFactory $readFactory,
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        LoggerInterface $logger
     ) {
         $this->deploymentConfig = $deploymentConfig;
         $this->componentRegistrar = $componentRegistrar;
         $this->storeConfig = $storeConfig;
         $this->readFactory = $readFactory;
         $this->scopeConfig = $scopeConfig;
+        $this->logger = $logger;
     }
     
     /**
@@ -101,6 +113,8 @@ class SingleScript
             }
         }
 
+        $this->executeCacheCleaner();
+
         return $scripts;
     }
 
@@ -130,8 +144,27 @@ class SingleScript
         return $region;
     }
 
-    private function getTwoLettersLanguage(string $language_country): string {
+    private function getTwoLettersLanguage(string $language_country): string 
+    {
         $lang_parts = explode('-', $language_country);
         return $lang_parts[0];
+    }
+
+    /*
+     * Possible types:
+     * 'config','layout','block_html','collections','reflection',
+     * 'db_ddl','eav','config_integration','config_integration_api',
+     * 'full_page','translate','config_webservice'
+     */
+    private function executeCacheCleaner(): void
+    {
+        try {
+            $objectManager = ObjectManager::getInstance();
+            $cacheTypeList = $objectManager->create('Magento\Framework\App\Cache\TypeListInterface');
+            $type = 'full_page';
+            $cacheTypeList->cleanType($type);
+        } catch(\Exception $e) {
+            $this->logger->error("Error cleaning cache: " . $e->getMessage());
+        }
     }
 }
