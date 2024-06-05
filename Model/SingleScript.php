@@ -78,9 +78,10 @@ class SingleScript
      */
     public function replace()
     {
-        return json_encode(new SingleScriptStruct(
+        $singleScriptStruct = new SingleScriptStruct(
             $this->replaceAndGetScripts()
-        ));
+        );
+        return [$singleScriptStruct->jsonSerialize()];
     }
     
     private function replaceAndGetScripts(): array
@@ -108,7 +109,7 @@ class SingleScript
                 EOT;
 
                 $storeGroupId = $store->getStoreGroupId();
-                $scripts[$language] = $singleScript;
+                $scripts[$language] = trim($singleScript);
                 $this->storeConfig->setDisplayLayer($singleScript, $storeGroupId);
             }
         }

@@ -78,11 +78,12 @@ class ModuleData
      */
     public function get()
     {
-        return json_encode(new ModuleStruct(
+        $moduleStruct = new ModuleStruct(
             $this->getModuleVersion(),
             $this->getMagentoVersion(),
             $this->getWebsiteStructures()
-        ));
+        );
+        return [$moduleStruct->jsonSerialize()];
     }
 
     private function getModuleVersion()
@@ -109,20 +110,20 @@ class ModuleData
             $websiteId = $website->getId();
             foreach ($this->storeConfig->getWebsiteStores($websiteId) as $store) {
                 $storeCode = $store->getCode();
-                $storeStructs[] = new StoreStruct(
+                $storeStructs[] = (new StoreStruct(
                     $store->getId(),
                     $storeCode,
                     $this->storeConfig->getLanguageFromStore($store),
                     $store->getCurrentCurrencyCode(),
                     $this->getInstallationId($store)
-                );
+                ))->jsonSerialize();
             }
-            $websiteStructs[] = new WebsiteStruct(
+            $websiteStructs[] = (new WebsiteStruct(
                 $websiteId,
                 $website->getName(),
                 $website->getCode(),
                 $storeStructs
-            );
+            ))->jsonSerialize();
         }
         return $websiteStructs;
     }
