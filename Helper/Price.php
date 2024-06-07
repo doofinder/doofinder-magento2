@@ -192,49 +192,20 @@ class Price extends AbstractHelper
      */
     private function getMinimumComplexProductPrice($product, $usedProds, $type)
     {
-        $minimum_price = null;
-        $minimum_variant = null;
-
-        /*
-        We identify the variant with the minimum final price (or price), and
-        that is the one that is used to obtain the requested price for the
-        parent as the variant is chosen as the representative for the product
-        */
+        $prices = [];
         foreach ($usedProds as $child) {
             if ($child->getId() != $product->getId()) {
-                $variant_minimum_price = $this->getMinimumVariantPrice($child);
-
-                if (is_null($minimum_price)) {
-                    $minimum_price = $variant_minimum_price;
-                    $minimum_variant = $child;
-                } elseif ($variant_minimum_price < $minimum_price) {
-                    $minimum_price = $variant_minimum_price;
-                    $minimum_variant = $child;
-                }
+                $price = $child->getPriceInfo()->getPrice($type);
+                $prices['prices'][] =  $price;
+                $prices['values'][] =  $price->getAmount()->getValue();
             }
         }
 
-        if (is_null($minimum_variant)) {
+        if (empty($prices)) {
             return null;
         }
 
-        return $minimum_variant->getPriceInfo()->getPrice($type);
-    }
-
-    /**
-     * Gets the minimum price of the variant
-     *
-     * @param $variant
-     */
-    private function getMinimumVariantPrice($variant)
-    {
-        $regular_price = $variant->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
-        $final_price = $variant->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
-
-        if (!is_null($final_price)) {
-            return $final_price;
-        } else {
-            return $regular_price;
-        }
+        $index = array_search(min($prices['values']), $prices['values']);
+        return ($index < 0) ? null : $prices['prices'][$index];
     }
 }
