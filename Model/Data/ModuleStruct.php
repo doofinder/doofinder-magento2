@@ -20,10 +20,15 @@ class ModuleStruct implements JsonSerializable
 
     public function jsonSerialize(): array
     {
-        return [
-            'version'    => $this->version,
-            'magento_version'   => $this->magentoVersion,
-            'websites'    => $this->websiteStructs
+        return 
+            ["platform" => [
+                "name" => "Magento",
+                "version" => $this->magentoVersion,
+            ],
+            "module" => [
+                "options" => $this->websiteStructs,
+                "version" => $this->version,
+            ],
         ];
     }
 }

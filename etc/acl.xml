@@ -8,6 +8,7 @@
               <resource id="Doofinder_Feed::config" title="Config" sortOrder="100" />
               <resource id="Doofinder_Feed::setup" title="Setup" sortOrder="150" />
               <resource id="Doofinder_Feed::searchEnginesProcessStatus" title="Process Status" sortOrder="200" />
+              <resource id="Doofinder_Feed::singleScript" title="Single Script" sortOrder="250" />
            </resource>
         </resource>
      </resources>

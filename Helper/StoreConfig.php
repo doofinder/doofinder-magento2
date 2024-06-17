@@ -959,6 +959,10 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to include the locale and the currency into the script.
+     * 
+     * IMPORTANT NOTE: Once the single script is released, this method
+     * will become deprecated and it will be removed soon.
+     * 
      * The following entries are covered:
      *    const dfLayerOptions = {
      *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
