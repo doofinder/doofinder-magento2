@@ -24,12 +24,6 @@ class Save extends IntegrationSave {
             return $this;
         }
 
-        $password = $this->getRequest()->getParam(
-            \Magento\Integration\Block\Adminhtml\Integration\Edit\Tab\Info::DATA_CONSUMER_PASSWORD
-        );
-        $user = $this->_auth->getUser();
-        $user->performIdentityCheck($password);
-
-        return $this;
+        return parent::validateUser();
     }
 }
