@@ -972,59 +972,6 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
-     * Function to include the locale and the currency into the script.
-     * 
-     * IMPORTANT NOTE: Once the single script is released, this method
-     * will become deprecated and it will be removed soon.
-     * 
-     * The following entries are covered:
-     *    const dfLayerOptions = {
-     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
-     *      zone: 'eu1',
-     *      currency: 'USD',
-     *      language: 'fr-FR'
-     *    };
-     *
-     *    const dfLayerOptions = {
-     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
-     *      zone: 'eu1',
-     *      //currency: 'USD',
-     *      //language: 'fr-FR'
-     *    };
-     *
-     *    const dfLayerOptions = {
-     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
-     *      zone: 'eu1'
-     *    };
-     *
-     * @return string
-     *    const dfLayerOptions = {
-     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
-     *      zone: 'eu1',
-     *      currency: 'USD',
-     *      language: 'fr-FR'
-     *    };
-     */
-    private function includeLocaleAndCurrency($liveLayerScript, $locale, $currency): string
-    {
-        if (strpos($liveLayerScript, 'language:') !== false) {
-            $liveLayerScript = preg_replace("/(\/\/\s*)?(language:)(.*?)(\n|,)/m", "$2 '$locale'$4", $liveLayerScript);
-        } else {
-            $pos = strpos($liveLayerScript, "{");
-            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tlanguage: '$locale',", $pos+1, 0);
-        }
-
-        if (strpos($liveLayerScript, 'currency:') !== false) {
-            $liveLayerScript = preg_replace("/(\/\/\s*)?(currency:)(.*?)(\n|,)/m", "$2 '$currency'$4", $liveLayerScript);
-        } else {
-            $pos = strpos($liveLayerScript, "{");
-            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tcurrency: '$currency',", $pos+1, 0);
-        }
-
-        return $liveLayerScript;
-    }
-
-    /**
      * Get stores by store_group id
      *
      * @param int $storeGroupId
