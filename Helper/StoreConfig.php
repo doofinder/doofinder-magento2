@@ -546,7 +546,7 @@ class StoreConfig extends AbstractHelper
                 $language = $lang_parts[0];
 
                 $singleScriptAdditionalConfig = <<<EOT
-                    <script data-additional-config>
+                    <script>
                         (function(w, k) {w[k] = window[k] || function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
                     
                         doofinderApp("config", "language", "$language")
