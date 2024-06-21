@@ -91,25 +91,15 @@ class SingleScript
             $websiteId = $website->getId();
             foreach ($this->storeConfig->getWebsiteStores($websiteId) as $store) {
                 $installationId = $this->getInstallationId($store);
-                $currency = $store->getCurrentCurrencyCode();
-                $language = $this->getTwoLettersLanguage($this->storeConfig->getLanguageFromStore($store));
                 $region = $this->getRegionFromApiKey();
-                if (empty($installationId) || empty($currency) || empty($language || empty($region))) {
+                if (empty($installationId) || empty($region)) {
                     continue;
                 }
                 
-                $singleScript = <<<EOT
-                    <script>
-                        (function(w, k) {w[k] = window[k] || function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
-                    
-                        doofinderApp("config", "language", "$language")
-                        doofinderApp("config", "currency", "$currency")
-                    </script>
-                    <script src="https://$region-config.doofinder.com/2.x/$installationId.js" async></script>  
-                EOT;
+                $singleScript = '<script src="https://' . $region . '-config.doofinder.com/2.x/' . $installationId . '.js" async></script>';
 
                 $storeGroupId = $store->getStoreGroupId();
-                $scripts[$language] = trim($singleScript);
+                $scripts[] = trim($singleScript);
                 $this->storeConfig->setDisplayLayer($singleScript, $storeGroupId);
             }
         }
@@ -143,12 +133,6 @@ class SingleScript
         }
 
         return $region;
-    }
-
-    private function getTwoLettersLanguage(string $language_country): string 
-    {
-        $lang_parts = explode('-', $language_country);
-        return $lang_parts[0];
     }
 
     /*
