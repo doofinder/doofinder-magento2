@@ -67,6 +67,7 @@ define([
             integrationData.current_password = "";
             integrationData.all_resources = 0;
             integrationData.resource = this.resource;
+            integrationData.is_doofinder_integration = true;
 
             let data = await ajax_post(this.urls.save, integrationData);
             return await this.createIntegrationTokens(data);
