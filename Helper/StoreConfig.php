@@ -538,7 +538,7 @@ class StoreConfig extends AbstractHelper
                 (int)$storeGroupId
             );
 
-            if (1 !== preg_match('/doofinderApp/', $displayLayerScript)) {
+            if (!empty($displayLayerScript) && 1 !== preg_match('/dfLayerOptions/', $displayLayerScript) && 1 !== preg_match('/doofinderApp/', $displayLayerScript)) {
                 $store = $this->getCurrentStore();
                 $currency = $store->getCurrentCurrency()->getCode();
                 $language_country = $this->getLanguageFromStore($store);
@@ -556,6 +556,10 @@ class StoreConfig extends AbstractHelper
                 EOT;
 
                 $displayLayerScript = $singleScriptAdditionalConfig . $displayLayerScript;
+            } elseif (!empty($displayLayerScript) && 1 === preg_match('/dfLayerOptions/', $displayLayerScript)) {
+                $locale = $this->getLanguageFromStore($this->getCurrentStore());
+                $currency = $this->getCurrentStore()->getCurrentCurrency()->getCode();
+                $displayLayerScript = $this->includeLocaleAndCurrency($displayLayerScript, $locale, $currency);
             }
         } catch (\Exception $e) {
             $displayLayerScript = null;
@@ -969,6 +973,59 @@ class StoreConfig extends AbstractHelper
         $status = $this->indexationHelper->sanitizeProcessTaskStatus($status);
         $status = json_encode($status);
         $this->configWriter->save(self::INDEXATION_STATUS, $status, ScopeInterface::SCOPE_STORES, $storeId);
+    }
+
+    /**
+     * Function to include the locale and the currency into the script.
+     * 
+     * IMPORTANT NOTE: Once the single script is released, this method
+     * will become deprecated and it will be removed soon.
+     * 
+     * The following entries are covered:
+     *    const dfLayerOptions = {
+     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
+     *      zone: 'eu1',
+     *      currency: 'USD',
+     *      language: 'fr-FR'
+     *    };
+     *
+     *    const dfLayerOptions = {
+     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
+     *      zone: 'eu1',
+     *      //currency: 'USD',
+     *      //language: 'fr-FR'
+     *    };
+     *
+     *    const dfLayerOptions = {
+     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
+     *      zone: 'eu1'
+     *    };
+     *
+     * @return string
+     *    const dfLayerOptions = {
+     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
+     *      zone: 'eu1',
+     *      currency: 'USD',
+     *      language: 'fr-FR'
+     *    };
+     */
+    private function includeLocaleAndCurrency($liveLayerScript, $locale, $currency): string
+    {
+        if (strpos($liveLayerScript, 'language:') !== false) {
+            $liveLayerScript = preg_replace("/(\/\/\s*)?(language:)(.*?)(\n|,)/m", "$2 '$locale'$4", $liveLayerScript);
+        } else {
+            $pos = strpos($liveLayerScript, "{");
+            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tlanguage: '$locale',", $pos+1, 0);
+        }
+
+        if (strpos($liveLayerScript, 'currency:') !== false) {
+            $liveLayerScript = preg_replace("/(\/\/\s*)?(currency:)(.*?)(\n|,)/m", "$2 '$currency'$4", $liveLayerScript);
+        } else {
+            $pos = strpos($liveLayerScript, "{");
+            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tcurrency: '$currency',", $pos+1, 0);
+        }
+
+        return $liveLayerScript;
     }
 
     /**
