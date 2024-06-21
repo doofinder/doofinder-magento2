@@ -538,10 +538,24 @@ class StoreConfig extends AbstractHelper
                 (int)$storeGroupId
             );
 
-            if ($displayLayerScript != null) {
-                $locale = $this->getLanguageFromStore($this->getCurrentStore());
-                $currency = $this->getCurrentStore()->getCurrentCurrency()->getCode();
-                $displayLayerScript = $this->includeLocaleAndCurrency($displayLayerScript, $locale, $currency);
+            if (1 !== preg_match('/doofinderApp/', $displayLayerScript)) {
+                $store = $this->getCurrentStore();
+                $currency = $store->getCurrentCurrency()->getCode();
+                $language_country = $this->getLanguageFromStore($store);
+                $lang_parts = explode('-', $language_country);
+                $language = $lang_parts[0];
+
+                $singleScriptAdditionalConfig = <<<EOT
+                    <script data-additional-config>
+                        (function(w, k) {w[k] = window[k] || function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
+                    
+                        doofinderApp("config", "language", "$language")
+                        doofinderApp("config", "currency", "$currency")
+                    </script>
+
+                EOT;
+
+                $displayLayerScript = $singleScriptAdditionalConfig . $displayLayerScript;
             }
         } catch (\Exception $e) {
             $displayLayerScript = null;
