@@ -330,8 +330,6 @@ class Product extends AbstractHelper
 
     /**
      * Get product image url
-     * 
-     * TODO: return same image as endpoint
      *
      * @param ProductModel $product
      * @param string|null $size
@@ -339,16 +337,35 @@ class Product extends AbstractHelper
      *
      * @return string|null
      */
-    public function getProductImageUrl(ProductModel $product, ?string $size = null, ?string $field = 'image'): ?string
+    public function getProductImageUrl(ProductModel $product, ?string $size): ?string
     {
-        if ($product->hasData($field)) {
-            return $this->imageHelper
-                ->init($product, 'doofinder_' . $field)
-                ->resize($size)
-                ->getUrl();
+        if (! $this->isSizeAllowed($size)) {
+            return null;
         }
 
-        return null;
+        /*
+        The image role that allow us to identify which image to use is the
+        first one that we finde between "small_image" and "thumbnail"
+        */
+        $imageRole = $this->findRoleToUse($product);
+
+        if (is_null($imageRole)) {
+            return null;
+        }
+
+        $url = $this->imageHelper
+            ->init($product, $size, ["type" => $imageRole])
+            ->getUrl();
+
+        /*
+        In case a placeholder image is returned, we return null so dooplugins
+        can fall back to the default behaviour
+        */
+        if (str_contains($url, "/placeholder/")) {
+            return null;
+        }
+
+        return $url;
     }
 
     /**
@@ -469,5 +486,46 @@ class Product extends AbstractHelper
     public function getProductAvailability(ProductModel $product, ?int $stockId = null): string
     {
         return $this->inventoryHelper->getProductAvailability($product, $stockId);
+    }
+
+    /**
+     * Checks if the size is one of the allowed values
+     *
+     * @param string|null $size
+     *
+     * @return bool
+     */
+    public function isSizeAllowed(?string $size): bool
+    {
+        return in_array($size, ["df_small", "df_thumbnail", "df_base", "df_swatch"]);
+    }
+
+    /**
+     * Find the first role that shows up in the list of images that is either
+     * "small_image" or "thumbnail"
+     *
+     * @param ProductModel $product
+     *
+     * @return string|null
+     */
+    public function findRoleToUse(ProductModel $product): ?string
+    {
+        $images = $product->getMediaGalleryEntries();
+
+        foreach ($images as $image) {
+            if ($image->getMediaType() != "image" || $image->isDisabled()) {
+                continue;
+            }
+
+            $imageRoles = $image->getTypes();
+
+            foreach (["small_image", "thumbnail"] as $allowedRole) {
+                if (in_array($allowedRole, $imageRoles)) {
+                    return $allowedRole;
+                }
+            }
+        }
+
+        return null;
     }
 }
