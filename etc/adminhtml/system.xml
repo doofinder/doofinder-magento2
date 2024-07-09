@@ -105,6 +105,28 @@
                     </comment>
                 </field>
             </group>
+            <group id="doofinder_image"
+                   translate="label"
+                   type="text"
+                   sortOrder="210"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Image Configuration</label>
+                <field id="doofinder_image_size"
+                       translate="label"
+                       type="select"
+                       sortOrder="100"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Resize Image</label>
+                    <source_model>Doofinder\Feed\Model\Config\Source\ImageResize</source_model>
+                    <comment>
+                        <![CDATA[ Select the size of the image to display on the layer. Once the size has been chosen, you must reindex the products in Doofinder. ]]>
+                    </comment>
+                </field>
+            </group>
             <group id="update_on_save"
                    translate="label"
                    type="text"

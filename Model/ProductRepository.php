@@ -358,7 +358,13 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $extensionAttributes->setPrice($price);
         ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
 
-        $extensionAttributes->setImage($productHelper->getProductImageUrl($product));
+        $extensionAttributes->setImage($productHelper
+            ->getProductImageUrl(
+                $product,
+                $this
+                ->storeConfig
+                ->getValueFromConfig("doofinder_config_config/doofinder_image/doofinder_image_size")
+            ));
 
         $product->setExtensionAttributes($extensionAttributes);
     }
