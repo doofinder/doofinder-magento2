@@ -57,21 +57,6 @@ class Inventory extends AbstractHelper
     }
 
     /**
-     * Get quantity and stock status
-     *
-     * @param ProductModel $product
-     * @param int|null $stockId
-     *
-     * @return string
-     */
-    public function getQuantityAndStockStatus(ProductModel $product, ?int $stockId = null)
-    {
-        return $this->isMsiActive() ?
-            $this->getQuantityAndStockStatusWithMSIMessage($product, $stockId) :
-            $this->getQuantityAndStockStatusWithoutMSIMessage($product);
-    }
-
-    /**
      * Get quantity and product availability
      *
      * @param ProductModel $product
@@ -172,24 +157,6 @@ class Inventory extends AbstractHelper
     }
 
     /**
-     * Get quantity and stock status for environments with MSI dependency
-     *
-     * @param ProductModel $product
-     * @param int|null $stockId
-     *
-     * @return string
-     */
-    private function getQuantityAndStockStatusWithMSIMessage(ProductModel $product, ?int $stockId = null)
-    {
-        $qtyAndAvailability = $this->getQuantityAndStockStatusWithMSI($product, $stockId);
-        $qtyAndAvailability[1] = $qtyAndAvailability[1] ? $this->getInStockLabel(): $this->getOutOfStockLabel();
-
-        return implode(' - ', array_filter($qtyAndAvailability, function ($item) {
-            return $item !== null;
-        }));
-    }
-
-    /**
      * Get product availability for environments with MSI dependency
      *
      * @param ProductModel $product
@@ -240,23 +207,6 @@ class Inventory extends AbstractHelper
         $availability = $this->getStockItem($product->getId())->getIsInStock();
 
         return [$qty, $availability];
-    }
-
-    /**
-     * Get quantity and stock status for environments without MSI dependency
-     *
-     * @param ProductModel $product
-     *
-     * @return string
-     */
-    private function getQuantityAndStockStatusWithoutMSIMessage(ProductModel $product)
-    {
-        $qtyAndAvailability = $this->getQuantityAndStockStatusWithoutMSI($product);
-        $qtyAndAvailability[1] = $qtyAndAvailability[1] ? $this->getInStockLabel(): $this->getOutOfStockLabel();
-
-        return implode(' - ', array_filter($qtyAndAvailability, function ($item) {
-            return $item !== null;
-        }));
     }
 
     /**
