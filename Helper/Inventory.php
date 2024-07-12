@@ -147,13 +147,26 @@ class Inventory extends AbstractHelper
         if ($product->getTypeId() == Grouped::TYPE_CODE) {
             $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
             foreach ($associatedProducts as $associatedProduct) {
-                if ($this->isProductSalable($associatedProduct, $stockId)) {
+                if ($this->isNonGroupedProductSalable($associatedProduct, $stockId)) {
                     return true;
                 }
             }
             return false;
         }
         
+        return $this->isNonGroupedProductSalable($product, $stockId);
+    }
+
+    /**
+     * Get info about the salability of any product that is not grouped
+     *
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return boolean
+     */
+    private function isNonGroupedProductSalable(ProductModel $product, ?int $stockId = null)
+    {           
         $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
         return $stockItemData[GetStockItemDataInterface::IS_SALABLE];
     }
