@@ -127,14 +127,14 @@ class Inventory extends AbstractHelper
     {
         $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
         $qty = $stockItemData[GetStockItemDataInterface::QUANTITY];
-        $availability = $this->isProductSalable($product, $stockId);
+        $availability = $this->isProductAvailable($product, $stockId);
 
         return [$qty, $availability];
     }
 
     /**
-     * Get info about the salability of a product
-     * If a product is a grouped product, we consider it is salable
+     * Get info about the availability of a product
+     * If a product is a grouped product, we consider it is available
      * if any of its associated products is salable
      *
      * @param ProductModel $product
@@ -142,30 +142,30 @@ class Inventory extends AbstractHelper
      *
      * @return boolean
      */
-    private function isProductSalable(ProductModel $product, ?int $stockId = null)
+    private function isProductAvailable(ProductModel $product, ?int $stockId = null)
     {   
         if ($product->getTypeId() == Grouped::TYPE_CODE) {
             $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
             foreach ($associatedProducts as $associatedProduct) {
-                if ($this->isNonGroupedProductSalable($associatedProduct, $stockId)) {
+                if ($this->isProductSalable($associatedProduct, $stockId)) {
                     return true;
                 }
             }
             return false;
         }
         
-        return $this->isNonGroupedProductSalable($product, $stockId);
+        return $this->isProductSalable($product, $stockId);
     }
 
     /**
-     * Get info about the salability of any product that is not grouped
+     * Get info about the salability of any product
      *
      * @param ProductModel $product
      * @param int|null $stockId
      *
      * @return boolean
      */
-    private function isNonGroupedProductSalable(ProductModel $product, ?int $stockId = null)
+    private function isProductSalable(ProductModel $product, ?int $stockId = null)
     {           
         $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
         return $stockItemData[GetStockItemDataInterface::IS_SALABLE];
