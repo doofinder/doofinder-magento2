@@ -9,6 +9,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Module\Manager;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface;
 use Magento\InventorySales\Model\ResourceModel\GetAssignedStockIdForWebsite;
 use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
@@ -126,9 +127,35 @@ class Inventory extends AbstractHelper
     {
         $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
         $qty = $stockItemData[GetStockItemDataInterface::QUANTITY];
-        $availability = $stockItemData[GetStockItemDataInterface::IS_SALABLE];
+        $availability = $this->isProductSalable($product, $stockId);
 
         return [$qty, $availability];
+    }
+
+    /**
+     * Get info about the salability of a product
+     * If a product is a grouped product, we consider it is salable
+     * if any of its associated products is salable
+     *
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return boolean
+     */
+    private function isProductSalable(ProductModel $product, ?int $stockId = null)
+    {   
+        if ($product->getTypeId() == Grouped::TYPE_CODE) {
+            $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
+            foreach ($associatedProducts as $associatedProduct) {
+                if ($this->isProductSalable($associatedProduct, $stockId)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
+        return $stockItemData[GetStockItemDataInterface::IS_SALABLE];
     }
 
     /**
