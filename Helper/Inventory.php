@@ -9,6 +9,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Module\Manager;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface;
 use Magento\InventorySales\Model\ResourceModel\GetAssignedStockIdForWebsite;
 use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
@@ -53,21 +54,6 @@ class Inventory extends AbstractHelper
         $this->moduleManager = $moduleManager;
         $this->storeManager = $storeManager;
         parent::__construct($context);
-    }
-
-    /**
-     * Get quantity and stock status
-     *
-     * @param ProductModel $product
-     * @param int|null $stockId
-     *
-     * @return string
-     */
-    public function getQuantityAndStockStatus(ProductModel $product, ?int $stockId = null)
-    {
-        return $this->isMsiActive() ?
-            $this->getQuantityAndStockStatusWithMSIMessage($product, $stockId) :
-            $this->getQuantityAndStockStatusWithoutMSIMessage($product);
     }
 
     /**
@@ -126,27 +112,48 @@ class Inventory extends AbstractHelper
     {
         $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
         $qty = $stockItemData[GetStockItemDataInterface::QUANTITY];
-        $availability = $stockItemData[GetStockItemDataInterface::IS_SALABLE];
+        $availability = $this->isProductAvailable($product, $stockId);
 
         return [$qty, $availability];
     }
 
     /**
-     * Get quantity and stock status for environments with MSI dependency
+     * Get info about the availability of a product
+     * If a product is a grouped product, we consider it is available
+     * if any of its associated products is salable
      *
      * @param ProductModel $product
      * @param int|null $stockId
      *
-     * @return string
+     * @return boolean
      */
-    private function getQuantityAndStockStatusWithMSIMessage(ProductModel $product, ?int $stockId = null)
-    {
-        $qtyAndAvailability = $this->getQuantityAndStockStatusWithMSI($product, $stockId);
-        $qtyAndAvailability[1] = $qtyAndAvailability[1] ? $this->getInStockLabel(): $this->getOutOfStockLabel();
+    private function isProductAvailable(ProductModel $product, ?int $stockId = null)
+    {   
+        if ($product->getTypeId() == Grouped::TYPE_CODE) {
+            $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
+            foreach ($associatedProducts as $associatedProduct) {
+                if ($this->isProductSalable($associatedProduct, $stockId)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        return $this->isProductSalable($product, $stockId);
+    }
 
-        return implode(' - ', array_filter($qtyAndAvailability, function ($item) {
-            return $item !== null;
-        }));
+    /**
+     * Get info about the salability of any product
+     *
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return boolean
+     */
+    private function isProductSalable(ProductModel $product, ?int $stockId = null)
+    {           
+        $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
+        return $stockItemData[GetStockItemDataInterface::IS_SALABLE];
     }
 
     /**
@@ -200,23 +207,6 @@ class Inventory extends AbstractHelper
         $availability = $this->getStockItem($product->getId())->getIsInStock();
 
         return [$qty, $availability];
-    }
-
-    /**
-     * Get quantity and stock status for environments without MSI dependency
-     *
-     * @param ProductModel $product
-     *
-     * @return string
-     */
-    private function getQuantityAndStockStatusWithoutMSIMessage(ProductModel $product)
-    {
-        $qtyAndAvailability = $this->getQuantityAndStockStatusWithoutMSI($product);
-        $qtyAndAvailability[1] = $qtyAndAvailability[1] ? $this->getInStockLabel(): $this->getOutOfStockLabel();
-
-        return implode(' - ', array_filter($qtyAndAvailability, function ($item) {
-            return $item !== null;
-        }));
     }
 
     /**

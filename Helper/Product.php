@@ -461,20 +461,6 @@ class Product extends AbstractHelper
     }
 
     /**
-     * Get quantity and stock status
-     *
-     * @param ProductModel $product
-     * @param int|null $stockId
-     *
-     * @return string
-     * @throws LocalizedException
-     */
-    public function getQuantityAndStockStatus(ProductModel $product, ?int $stockId = null): string
-    {
-        return $this->inventoryHelper->getQuantityAndStockStatus($product, $stockId);
-    }
-
-    /**
      * Get product availability
      *
      * @param ProductModel $product
