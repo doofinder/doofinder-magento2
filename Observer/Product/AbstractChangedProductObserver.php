@@ -121,6 +121,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         if (count($parentProduct) > 0) {
             $itemsToInsert = $parentProduct;
         }
+        
         foreach ($itemsToInsert as $itemToInsert) {
             $changedItem = $this->createChangedItem((int)$itemToInsert, $storeId);
             if (!$this->changedItemRepository->exists($changedItem)) {
