@@ -114,9 +114,18 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
      */
     protected function registerChangedItemStore(ProductInterface $product, int $storeId)
     {
-        $changedItem = $this->createChangedItem($product, $storeId);
-        if (!$this->changedItemRepository->exists($changedItem)) {
-            $this->changedItemRepository->save($changedItem);
+        $itemId = $product->getId();
+
+        $itemsToInsert = [$itemId];
+        $parentProduct = $this->configurableProductType->getParentIdsByChild($itemId);
+        if (count($parentProduct) > 0) {
+            $itemsToInsert = $parentProduct;
+        }
+        foreach ($itemsToInsert as $itemToInsert) {
+            $changedItem = $this->createChangedItem((int)$itemToInsert, $storeId);
+            if (!$this->changedItemRepository->exists($changedItem)) {
+                $this->changedItemRepository->save($changedItem);
+            }
         }
     }
 
@@ -128,15 +137,8 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
      *
      * @return ChangedItem
      */
-    protected function createChangedItem(ProductInterface $product, int $storeId): ChangedItem
+    protected function createChangedItem(int $itemId, int $storeId): ChangedItem
     {
-        $itemId = (int)$product->getId();
-
-        $parentProduct = $this->configurableProductType->getParentIdsByChild($itemId);
-        if (count($parentProduct) > 0) {
-            $itemId = (int)$parentProduct[0];
-        }
-        
         $changedItem = $this->changedItemFactory->create();
         $changedItem
             ->setItemId($itemId)
