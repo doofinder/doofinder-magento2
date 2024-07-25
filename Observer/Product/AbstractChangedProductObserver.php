@@ -12,6 +12,7 @@ use Doofinder\Feed\Model\ChangedItem\ItemType;
 use Doofinder\Feed\Model\ChangedItemFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Psr\Log\LoggerInterface;
@@ -39,23 +40,32 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
     private $logger;
 
     /**
+     * @var Configurable
+     */
+    private $configurableProductType;
+
+    /**
      * AbstractChangedProductObserver constructor.
      *
      * @param StoreConfig $storeConfig
      * @param ChangedItemFactory $changedItemFactory
      * @param ChangedItemRepositoryInterface $changedItemRepository
      * @param LoggerInterface $logger
+     * @param Configurable $configurableProductType
      */
     public function __construct(
         StoreConfig $storeConfig,
         ChangedItemFactory $changedItemFactory,
         ChangedItemRepositoryInterface $changedItemRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Configurable $configurableProductType
+        
     ) {
         $this->storeConfig                  = $storeConfig;
         $this->changedItemFactory           = $changedItemFactory;
         $this->changedItemRepository        = $changedItemRepository;
         $this->logger                       = $logger;
+        $this->configurableProductType      = $configurableProductType;
     }
 
     /**
@@ -120,9 +130,16 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
      */
     protected function createChangedItem(ProductInterface $product, int $storeId): ChangedItem
     {
+        $itemId = (int)$product->getId();
+
+        $parentProduct = $this->configurableProductType->getParentIdsByChild($itemId);
+        if (count($parentProduct) > 0) {
+            $itemId = (int)$parentProduct[0];
+        }
+        
         $changedItem = $this->changedItemFactory->create();
         $changedItem
-            ->setItemId((int)$product->getId())
+            ->setItemId($itemId)
             ->setStoreId($storeId)
             ->setItemType(ItemType::PRODUCT)
             ->setOperationType($this->getOperationType());
