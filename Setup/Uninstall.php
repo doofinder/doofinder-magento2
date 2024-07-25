@@ -53,7 +53,7 @@ class Uninstall implements UninstallInterface
         }
         //remove cron entries
         $collection = $this->collectionFactory->create();
-        $collection->addFieldToFilter('path', 'crontab/default/jobs/doofinder_update_on_save/schedule/cron_expr');
+        $collection->addFieldToFilter('path', 'doofinder_config_config/update_on_save/cron_expression');
         $config = $collection->getFirstItem();
         $this->deleteConfig($config);
     }

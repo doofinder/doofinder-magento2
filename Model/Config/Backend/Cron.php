@@ -16,7 +16,7 @@ use Magento\Framework\Registry;
 
 class Cron extends ConfigValue
 {
-    public const CRON_STRING_PATH = 'crontab/default/jobs/doofinder_update_on_save/schedule/cron_expr';
+    public const CRON_STRING_PATH = 'doofinder_config_config/update_on_save/cron_expression';
 
     protected $storeConfigFactory;
 
