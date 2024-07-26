@@ -119,6 +119,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         $itemsToInsert = [$itemId];
         $parentProducts = $this->configurableProductType->getParentIdsByChild($itemId);
         if (count($parentProducts) > 0) {
+            /* When updating a product it's children are also updated, so in this case we include the parentId but don't need to specify the itemId */
             $itemsToInsert = $parentProducts;
         }
         
