@@ -366,6 +366,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                 ->getValueFromConfig("doofinder_config_config/doofinder_image/doofinder_image_size")
             ));
 
+        $configurableProductsOptions = $extensionAttributes->getConfigurableProductOptions();
+        $extensionAttributes->setConfigurableProductOptions($this->updateConfigurableProductOptions($configurableProductsOptions));
+
         $product->setExtensionAttributes($extensionAttributes);
     }
 
@@ -436,5 +439,23 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         }
 
         return $categoryResults;
+    }
+
+    private function updateConfigurableProductOptions($configurableProductsOptions){
+        $eavConfig  = ObjectManager::getInstance()->get('\Magento\Eav\Model\Config');
+        $configurableProductsOptionsResult = [];
+
+        if($configurableProductsOptions != NULL) {
+            foreach ($configurableProductsOptions as $configurableProductOption) {
+                $attribute = $eavConfig->getAttribute('catalog_product', $configurableProductOption->getAttributeId());
+                $configurableProductsOptionsResult[] = [
+                    'attribute_id' => $configurableProductOption->getAttributeId(),
+                    'label' => $configurableProductOption->getLabel(),
+                    'code' => $attribute->getAttributeCode(),
+                    'product_id' => $configurableProductOption->getProductId()
+                ];
+            }
+        }
+        return $configurableProductsOptionsResult;
     }
 }

@@ -12,6 +12,7 @@ use Doofinder\Feed\Model\ChangedItem\ItemType;
 use Doofinder\Feed\Model\ChangedItemFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Psr\Log\LoggerInterface;
@@ -39,23 +40,32 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
     private $logger;
 
     /**
+     * @var Configurable
+     */
+    private $configurableProductType;
+
+    /**
      * AbstractChangedProductObserver constructor.
      *
      * @param StoreConfig $storeConfig
      * @param ChangedItemFactory $changedItemFactory
      * @param ChangedItemRepositoryInterface $changedItemRepository
      * @param LoggerInterface $logger
+     * @param Configurable $configurableProductType
      */
     public function __construct(
         StoreConfig $storeConfig,
         ChangedItemFactory $changedItemFactory,
         ChangedItemRepositoryInterface $changedItemRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Configurable $configurableProductType
+        
     ) {
         $this->storeConfig                  = $storeConfig;
         $this->changedItemFactory           = $changedItemFactory;
         $this->changedItemRepository        = $changedItemRepository;
         $this->logger                       = $logger;
+        $this->configurableProductType      = $configurableProductType;
     }
 
     /**
@@ -104,9 +114,20 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
      */
     protected function registerChangedItemStore(ProductInterface $product, int $storeId)
     {
-        $changedItem = $this->createChangedItem($product, $storeId);
-        if (!$this->changedItemRepository->exists($changedItem)) {
-            $this->changedItemRepository->save($changedItem);
+        $itemId = $product->getId();
+
+        $itemsToInsert = [$itemId];
+        $parentProducts = $this->configurableProductType->getParentIdsByChild($itemId);
+        if (count($parentProducts) > 0) {
+            /* When updating a product it's children are also updated, so in this case we include the parentId but don't need to specify the itemId */
+            $itemsToInsert = $parentProducts;
+        }
+        
+        foreach ($itemsToInsert as $itemToInsert) {
+            $changedItem = $this->createChangedItem((int)$itemToInsert, $storeId);
+            if (!$this->changedItemRepository->exists($changedItem)) {
+                $this->changedItemRepository->save($changedItem);
+            }
         }
     }
 
@@ -118,11 +139,11 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
      *
      * @return ChangedItem
      */
-    protected function createChangedItem(ProductInterface $product, int $storeId): ChangedItem
+    protected function createChangedItem(int $itemId, int $storeId): ChangedItem
     {
         $changedItem = $this->changedItemFactory->create();
         $changedItem
-            ->setItemId((int)$product->getId())
+            ->setItemId($itemId)
             ->setStoreId($storeId)
             ->setItemType(ItemType::PRODUCT)
             ->setOperationType($this->getOperationType());
