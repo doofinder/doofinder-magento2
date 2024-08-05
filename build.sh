@@ -86,6 +86,7 @@ php /app/bin/magento indexer:reindex
 php /app/bin/magento setup:static-content:deploy es_ES en_US -f
 
 if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
+  php /app/bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth --clear-static-content
   php /app/bin/magento module:disable Magento_TwoFactorAuth --clear-static-content
 fi
 
