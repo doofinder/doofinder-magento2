@@ -117,7 +117,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             $product->load($productId);
             $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             $this->setExtensionAttributes($product, $storeId);
-            $this->setCustomAttributes($product);
+            $this->setCustomAttributes($product, $storeId);
             $this->appEmulation->stopEnvironmentEmulation();
             // End Custom code here
             $this->cacheProduct($cacheKey, $product);
@@ -143,7 +143,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             }
 
             $this->setExtensionAttributes($product, $storeId);
-            $this->setCustomAttributes($product);
+            $this->setCustomAttributes($product, $storeId);
         }
         $this->appEmulation->stopEnvironmentEmulation();
 
@@ -293,11 +293,14 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * Here we will update also the value of the custom attribute (id of the option selected) by the option text.
      *
      * @param ProductInterface $product
+     * @param int $storeId
      * @return void
      */
-    private function setCustomAttributes($product): void
+    private function setCustomAttributes($product, $storeId): void
     {
         $productHelper = $this->productHelperFactory->create();
+        $priceHelper = $this->priceHelperFactory->create();
+        $store = $this->storeManager->getStore($storeId);
         $customAttributes = $this->storeConfig->getCustomAttributes($product->getStoreId());
 
         foreach ($customAttributes as $customAttribute) {
@@ -318,6 +321,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $product->setCustomAttribute('thumbnail', $thumbnailImageUrl);
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
+
         $this->removeExcludedCustomAttributes($product);
     }
 
@@ -330,10 +334,11 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      */
     private function setExtensionAttributes($product, $storeId): void
     {
-        $priceHelper = $this->priceHelperFactory->create();
         $productHelper = $this->productHelperFactory->create();
         $inventoryHelper = $this->inventoryHelperFactory->create();
         $storeCode = $this->storeManager->getStore($storeId)->getCode();
+        $store = $this->storeManager->getStore($storeId);
+        $priceHelper = $this->priceHelperFactory->create();
 
         /** @var ProductExtension $extensionAttributes */
         $extensionAttributes = $product->getExtensionAttributes();
@@ -353,11 +358,6 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             $extensionAttributes->setCategoryLinks($this->getCategoriesInformation($categories));
         }
 
-        $price = round($priceHelper->getProductPrice($product, 'regular_price'), 2);
-        $specialPrice = round($priceHelper->getProductPrice($product, 'final_price'), 2);
-        $extensionAttributes->setPrice($price);
-        ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
-
         $extensionAttributes->setImage($productHelper
             ->getProductImageUrl(
                 $product,
@@ -365,6 +365,13 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                 ->storeConfig
                 ->getValueFromConfig("doofinder_config_config/doofinder_image/doofinder_image_size")
             ));
+
+        $currency = $store->getCurrentCurrency()->getCode();
+        $price = round($priceHelper->getProductPrice($product, 'regular_price'), 2);
+        $specialPrice = round($priceHelper->getProductPrice($product, 'final_price'), 2);
+
+        $prices = [$currency => ["price" => $price, "sale_price" => $specialPrice]];
+        $extensionAttributes->setPrices(json_encode($prices));
 
         $product->setExtensionAttributes($extensionAttributes);
     }

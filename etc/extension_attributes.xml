@@ -8,5 +8,6 @@
         <attribute code="image" type="string"/>
         <attribute code="price" type="float"/>
         <attribute code="special_price" type="float"/>
+        <attribute code="prices" type="string"/>
     </extension_attributes>
 </config>

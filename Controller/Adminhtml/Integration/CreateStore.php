@@ -139,7 +139,6 @@ class CreateStore extends Action implements HttpGetActionInterface
 
         foreach ($this->storeConfig->getStoreGroupStores($storeGroupId) as $store) {
             $language = $this->storeConfig->getLanguageFromStore($store);
-            $currency = strtoupper($store->getCurrentCurrency()->getCode());
             $store_id = $store->getId();
             $base_url = $store->getBaseUrl();
 
@@ -147,7 +146,6 @@ class CreateStore extends Action implements HttpGetActionInterface
             $searchEngineConfig[] = [
                 "name" => $store->getName(),
                 "language" => $language,
-                "currency" => $currency,
                 "site_url" => $base_url,
                 "callback_url" => $base_url . 'doofinderfeed/setup/processCallback?storeId=' . $store_id,
                 "options" => [
@@ -156,7 +154,7 @@ class CreateStore extends Action implements HttpGetActionInterface
                 ]
             ];
 
-            $storesConfig[$language][$currency] = (int)$store_id;
+            $storesConfig[$language] = (int)$store_id;
         }
         return [
             "searchEngineConfig" => $searchEngineConfig,
@@ -201,26 +199,24 @@ class CreateStore extends Action implements HttpGetActionInterface
      * "search_engines":{"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},"en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
      * We're going to iterate over the search_engines because there is the data created in doofinder. May occour that some
      * of the data that we've in storeConfig has some invalid parameter and will be bypass during the creation.
-     * 
+     *
      * @param $storesConfig
      * @param $searchEngines
      */
     private function saveSearchEngineConfig($storesConfig, $searchEngines)
     {
-        foreach ($searchEngines as $language => $values) {
-            foreach ($values as $currency => $hashid) {
-                $storeId = $storesConfig[$language][$currency];
-                $this->storeConfig->setHashId($hashid, $storeId);
-                $this->setIndexationStatus($storeId);
-            }
+        foreach ($searchEngines as $language => $hashid) {
+            $storeId = $storesConfig[$language];
+            $this->storeConfig->setHashId($hashid, $storeId);
+            $this->setIndexationStatus($storeId);
         }
     }
 
     /**
      * Function to store the status of the SE indexation.
-     * 
+     *
      * By default we set this value to "STARTED" and will be updated when we receive the callback from doofinder
-     * 
+     *
      * @param $storeId
      */
     private function setIndexationStatus($storeId)

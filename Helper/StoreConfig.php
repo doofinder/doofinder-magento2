@@ -540,6 +540,7 @@ class StoreConfig extends AbstractHelper
 
             if (!empty($displayLayerScript) && 1 !== preg_match('/dfLayerOptions/', $displayLayerScript) && 1 !== preg_match('/doofinderApp/', $displayLayerScript)) {
                 $store = $this->getCurrentStore();
+                //TODO: Adapt in case layer needs the info in a different format
                 $currency = $store->getCurrentCurrency()->getCode();
                 $language_country = $this->getLanguageFromStore($store);
                 $lang_parts = explode('-', $language_country);
