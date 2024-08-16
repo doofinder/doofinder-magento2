@@ -298,7 +298,6 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      */
     private function setCustomAttributes($product, $storeId): void
     {
-        $productHelper = $this->productHelperFactory->create();
         $priceHelper = $this->priceHelperFactory->create();
         $store = $this->storeManager->getStore($storeId);
         $customAttributes = $this->storeConfig->getCustomAttributes($product->getStoreId());
