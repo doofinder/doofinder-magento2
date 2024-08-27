@@ -56,7 +56,7 @@
                        showInStore="0">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Doofinder\Feed\Model\Config\Backend\DisplayLayerState</backend_model>
+                    <backend_model>Magento\Framework\App\Config\Value</backend_model>
                     <comment>
                         <![CDATA[ Activate/deactivate the search layer. ]]>
                     </comment>
