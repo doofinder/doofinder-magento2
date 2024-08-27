@@ -58,16 +58,6 @@ class StoreConfig extends AbstractHelper
     public const INSTALLING_LOOP_STATUS = 'doofinder_config_config/installing_loop/status';
 
     /**
-     * Path to display layer create endpoint
-     */
-    public const DISPLAY_LAYER_CREATE_ENDPOINT = 'doofinder_config_config/doofinder_integration/display_layer_create_endpoint';
-
-    /**
-     * Path to display layer create endpoint
-     */
-    public const DISPLAY_LAYER_STATE_ENDPOINT = 'doofinder_config_config/doofinder_integration/display_layer_state_endpoint';
-
-    /**
      * Path to search engine settings in config.xml/core_config_data
      */
     public const SEARCH_ENGINE_CONFIG = 'doofinder_config_config/doofinder_search_engine';
@@ -681,28 +671,6 @@ class StoreConfig extends AbstractHelper
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
             null
         ) ?? self::URL.'/plugins/signup/magento2';
-    }
-
-    /**
-     * Get display layer create endpoint
-     *
-     * @return string
-     */
-    public function getDisplayLayerCreateEndpoint(): string
-    {
-        return $this->getValueFromConfig(self::DISPLAY_LAYER_CREATE_ENDPOINT)
-            ?? self::URL.'/plugins/script/magento2';
-    }
-
-    /**
-     * Get display layer state endpoint
-     *
-     * @return string
-     */
-    public function getDisplayLayerStateEndpoint(): string
-    {
-        return $this->getValueFromConfig(self::DISPLAY_LAYER_STATE_ENDPOINT)
-            ?? self::URL.'/plugins/state/magento2';
     }
 
     /**

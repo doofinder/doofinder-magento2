@@ -243,30 +243,6 @@
                         <![CDATA[ Doofinder endpoint URL where the signup integration request will be sent. ]]>
                     </comment>
                 </field>
-                <field id="display_layer_create_endpoint"
-                       translate="label"
-                       type="text"
-                       sortOrder="400"
-                       showInDefault="0"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <label>Doofinder Display Layer Create URL</label>
-                    <comment>
-                        <![CDATA[ Doofinder endpoint URL where display layer and installation id are created. ]]>
-                    </comment>
-                </field>
-                <field id="display_layer_state_endpoint"
-                       translate="label"
-                       type="text"
-                       sortOrder="500"
-                       showInDefault="0"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <label>Doofinder Display Layer State URL</label>
-                    <comment>
-                        <![CDATA[ Doofinder endpoint URL where display layer is enabled or disabled. ]]>
-                    </comment>
-                </field>
                 <field id="clean_integration" translate="label" type="button" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Unsynchronize your integration with Doofinder (irreversible)</label>
                     <frontend_model>Doofinder\Feed\Block\System\Config\CleanIntegration</frontend_model>
