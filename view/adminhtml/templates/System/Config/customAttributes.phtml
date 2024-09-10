@@ -1,8 +1,15 @@
 <?php
     $_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
 ?>
+<style>
+    /* To make custom attributes table scrollable */
+    .admin__df-custom-attributes-wrapper {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+</style>
 <div class="design_theme_ua_regexp" id="grid<?= $block->escapeHtml($_htmlId) ?>">
-    <div class="admin__control-table-wrapper">
+    <div class="admin__control-table-wrapper admin__df-custom-attributes-wrapper">
         <table class="admin__control-table">
             <thead>
                 <tr>
