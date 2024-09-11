@@ -889,7 +889,7 @@ class StoreConfig extends AbstractHelper
         $attributes = [];
         foreach ($attributeCollection as $attributeTmp) {
             $attribute = $this->eavConfig->getAttribute(Product::ENTITY, $attributeTmp->getAttributeId());
-            if (!$attribute->getIsSearchable() || !$attribute->getIsVisible()) {
+            if (!$attribute->getIsVisible()) {
                 continue;
             }
             $attribute_id = $attribute->getAttributeId();
@@ -901,6 +901,7 @@ class StoreConfig extends AbstractHelper
             $enabled = isset($saved[$attribute_id]['enabled']) && $saved[$attribute_id]['enabled'];
             $attributes[$attribute_id]['enabled'] = $enabled;
         }
+        array_multisort(array_column($attributes, 'label'), SORT_ASC, $attributes);
         return $attributes;
     }
 

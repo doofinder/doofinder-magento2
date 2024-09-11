@@ -1,8 +1,15 @@
 <?php
     $_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
 ?>
+<style>
+    /* To make custom attributes table scrollable */
+    .admin__df-custom-attributes-wrapper {
+        max-height: 450px;
+        overflow-y: auto;
+    }
+</style>
 <div class="design_theme_ua_regexp" id="grid<?= $block->escapeHtml($_htmlId) ?>">
-    <div class="admin__control-table-wrapper">
+    <div class="admin__control-table-wrapper admin__df-custom-attributes-wrapper">
         <table class="admin__control-table">
             <thead>
                 <tr>
@@ -11,7 +18,17 @@
                     <?php endforeach ?>
                 </tr>
             </thead>
-            <tbody id="addRow<?= $block->escapeHtml($_htmlId) ?>"></tbody>
+            <tbody id="addRow<?= $block->escapeHtml($_htmlId) ?>">
+                <tr>
+                    <td>
+                        <strong class="productsorting_code input-text">Select All/None</strong>
+                    </td>
+                    <td>&nbsp;</td>
+                    <td>
+                        <input type="checkbox" id="toggle-custom-fields" class="input-text">
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
     <input type="hidden" name="<?= $block->escapeHtml($block->getElement()->getName()) ?>[__empty]" value="" />
@@ -21,6 +38,20 @@
             'mage/template',
             'prototype'
         ], function (mageTemplate) {
+            function toggleCustomAttributesCheckboxes(event) {
+                const checkboxes = document.querySelectorAll('.admin__df-custom-attributes-wrapper input[type="checkbox"]:not(#toggle-custom-fields)');
+                const checkboxStatus = event.target.checked;
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = checkboxStatus;
+                });
+            }
+
+            const customFieldsToggler = document.getElementById('toggle-custom-fields');
+            if (null !== customFieldsToggler) {
+                customFieldsToggler.checked = false;
+                customFieldsToggler.addEventListener('change', toggleCustomAttributesCheckboxes);
+            }
+            
             // create row creator
             window.arrayAttributes<?= $block->escapeHtml($_htmlId) ?> = {
                 // define row prototypeJS template
