@@ -901,7 +901,9 @@ class StoreConfig extends AbstractHelper
             $enabled = isset($saved[$attribute_id]['enabled']) && $saved[$attribute_id]['enabled'];
             $attributes[$attribute_id]['enabled'] = $enabled;
         }
-        array_multisort(array_column($attributes, 'label'), SORT_ASC, $attributes);
+        $attribute_keys = array_keys($attributes);
+        array_multisort(array_column($attributes, 'label'), SORT_ASC, $attributes, $attribute_keys);
+        $attributes = array_combine($attribute_keys, $attributes);
         return $attributes;
     }
 
