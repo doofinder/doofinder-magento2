@@ -59,8 +59,7 @@
                     '<tr id="<%- _id %>">'
                         <?php foreach ($block->getColumns() as $columnName => $column): ?>
                             + '<td>'
-                            // phpcs:ignore Generic.CodeAnalysis.UnsafeOutput
-                            + '<?= $block->renderCellTemplate($columnName) ?>'
+                            + '<?= $block->renderCellTemplate($columnName) // phpcs:ignore ?>'
                             + '<\/td>'
                         <?php endforeach ?>
                     +'<\/tr>'
@@ -89,9 +88,7 @@
                     $_row->setAction('');
                     $_row->setActionClass('hidden');
                 }
-                
-                // phpcs:ignore Generic.CodeAnalysis.UnsafeOutput
-                echo "arrayAttributes{$escaper->escapeJs($_htmlId)}.add(" . $_row->toJson() . ");\n";
+                echo "arrayAttributes{$escaper->escapeJs($_htmlId)}.add(" . $_row->toJson() /* phpcs:ignore */ . ");\n";
             }
             ?>
 
