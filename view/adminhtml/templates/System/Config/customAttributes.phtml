@@ -53,13 +53,13 @@
             }
             
             // create row creator
-            window.arrayAttributes<?= $escaper->escapeHtml($_htmlId) ?> = {
+            window.arrayAttributes<?= $escaper->escapeJs($_htmlId) ?> = {
                 // define row prototypeJS template
                 template: mageTemplate(
                     '<tr id="<%- _id %>">'
                         <?php foreach ($block->getColumns() as $columnName => $column): ?>
                             + '<td>'
-                            + '<?= $escaper->escapeHtml($block->renderCellTemplate($columnName))?>'
+                            + '<?= $block->renderCellTemplate($columnName)?>'
                             + '<\/td>'
                         <?php endforeach ?>
                     +'<\/tr>'
@@ -88,7 +88,7 @@
                     $_row->setAction('');
                     $_row->setActionClass('hidden');
                 }
-                echo $escaper->escapeHtml("arrayAttributes{$_htmlId}.add(" . $_row->toJson() . ");\n");
+                echo "arrayAttributes{$escaper->escapeJs($_htmlId)}.add(" . $_row->toJson() . ");\n";
             }
             ?>
 
