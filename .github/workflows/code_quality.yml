@@ -32,13 +32,13 @@ jobs:
     - name: Run PHP Code Sniffer (phpcs)
       id: phpcs
       run: |
-        vendor/bin/phpcs . --standard=Magento2 --ignore=vendor
+        vendor/bin/phpcs . --standard=Magento2 --ignore=vendor --severity=10
       continue-on-error: false
 
     - name: Run PHP Code Beautifier and Fixer (phpcbf) in Report-Only Mode
       id: phpcbf
       run: |
-        vendor/bin/phpcbf . --standard=Magento2 --report-only --ignore=vendor
+        vendor/bin/phpcbf . --standard=Magento2 --report-only --ignore=vendor --severity=10
       continue-on-error: false
 
     - name: Verify Code Quality Checks
