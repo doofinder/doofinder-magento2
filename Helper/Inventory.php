@@ -87,7 +87,7 @@ class Inventory extends AbstractHelper
 
     /**
      * Get stockId related with the given store.
-     * 
+     *
      * Note: Each website is related only with one stock but one stock can be used by several websites.
      *
      * @param int|null $storeId
@@ -128,7 +128,7 @@ class Inventory extends AbstractHelper
      * @return boolean
      */
     private function isProductAvailable(ProductModel $product, ?int $stockId = null)
-    {   
+    {
         if ($product->getTypeId() == Grouped::TYPE_CODE) {
             $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
             foreach ($associatedProducts as $associatedProduct) {
@@ -151,7 +151,7 @@ class Inventory extends AbstractHelper
      * @return boolean
      */
     private function isProductSalable(ProductModel $product, ?int $stockId = null)
-    {           
+    {
         $stockItemData = $this->getStockItemData($product->getSku(), $stockId);
         return $stockItemData[GetStockItemDataInterface::IS_SALABLE];
     }
@@ -175,7 +175,7 @@ class Inventory extends AbstractHelper
 
     /**
      * Get the data from a stock item
-     * 
+     *
      * @param string $sku
      * @param int|null $stockId
      *

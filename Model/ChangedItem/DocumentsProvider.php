@@ -13,7 +13,7 @@ class DocumentsProvider
 
     /**
      * Gets the response batched
-     * 
+     *
      * @param ChangedItemCollection $collection
      * @return Generator
      */

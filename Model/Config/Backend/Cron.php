@@ -36,7 +36,7 @@ class Cron extends ConfigValue
 
     /**
      * Actions to take after saving the periodicity of cron for update on save
-     * 
+     *
      * @return Cron
      * @throws DoofinderFeedException
      */

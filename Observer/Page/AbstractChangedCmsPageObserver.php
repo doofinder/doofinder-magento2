@@ -69,7 +69,7 @@ abstract class AbstractChangedCmsPageObserver implements ObserverInterface
 
     /**
      * Saves the page into changed item table if necessary
-     * 
+     *
      * @param CategoryInterface $category
      * @param int $storeId
      */
@@ -103,9 +103,9 @@ abstract class AbstractChangedCmsPageObserver implements ObserverInterface
 
     /**
      * Gets operation type
-     * 
+     *
      * @param PageInterface $page
-     * 
+     *
      * @return string
      */
     abstract protected function getOperationType(PageInterface $page): string;

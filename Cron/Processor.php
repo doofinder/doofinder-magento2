@@ -98,7 +98,7 @@ class Processor
 
     /**
      * Function to manage the products that have been stored into the data base
-     * 
+     *
      * @param $store
      * @param $itemType
      * @param $indice
@@ -112,7 +112,7 @@ class Processor
 
     /**
      * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
-     * 
+     *
      * @param $store
      * @param $itemType
      * @param $indice
@@ -145,7 +145,7 @@ class Processor
 
     /**
      * Executes the UPDATE for items stored with this action in doofinder_feed_changed_items table
-     * 
+     *
      * @param $store
      * @param $itemType
      * @param $indice
@@ -178,7 +178,7 @@ class Processor
 
     /**
      * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
-     * 
+     *
      * @param $store
      * @param $itemType
      * @param $indice
@@ -211,7 +211,7 @@ class Processor
 
     /**
      * Creates an array with the id of the item
-     * 
+     *
      * @param $documents
      */
     private function mapItems($documents)

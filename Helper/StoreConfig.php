@@ -220,7 +220,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Creates the store in doofinder's structure
-     * 
+     *
      * @param array $storeData
      * @return array
      */
@@ -246,7 +246,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to get a store by id
-     * 
+     *
      * @param $storeId
      */
     public function getStoreById($storeId)
@@ -256,7 +256,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Gets if the Magento is in single store mode
-     * 
+     *
      * @return boolean
      */
     public function isSingleStoreMode(): bool
@@ -266,7 +266,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Get current store based on request parameter or store manager
-     * 
+     *
      * @return StoreInterface
      * @throws NoSuchEntityException
      */
@@ -280,7 +280,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to get the actual scope based on the request parameter
-     * 
+     *
      * @return array
      */
     public function getCurrentScope(): array
@@ -297,12 +297,12 @@ class StoreConfig extends AbstractHelper
             $scope = ScopeInterface::SCOPE_STORES;
             $value = $storeId;
         }
-        return array($scope, $value);
+        return [$scope, $value];
     }
 
     /**
      * Get current store code based on request parameter or store manager
-     * 
+     *
      * @return string
      * @throws NoSuchEntityException
      */
@@ -324,7 +324,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Check if current operation is a save action
-     * 
+     *
      * @return boolean
      */
     public function isSaveAction(): bool
@@ -488,7 +488,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Set Hashid related with the given store
-     * 
+     *
      * @param string $hashid
      * @param int $storeId
      */
@@ -499,7 +499,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Set the installation ID
-     * 
+     *
      * @param string $installationId
      * @param int $storeGroupId
      */
@@ -560,7 +560,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Set display layer
-     * 
+     *
      * @param string $script
      * @param int $storeGroupId
      */
@@ -727,7 +727,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Gets image size defined by the user
-     * 
+     *
      * @param int|null $storeId
      * @return string
      */
@@ -821,7 +821,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Gets Doofinder attributes to be merged later
-     * 
+     *
      * @param int|null $storeId
      * @return array
      */
@@ -909,7 +909,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to set custom attributes
-     * 
+     *
      * @param string $customAttributes
      */
     public function setCustomAttributes(string $customAttributes)
@@ -919,10 +919,10 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to get the indexation status of a given search engine
-     * 
+     *
      * @param int $storeId
      */
-    public function getIndexationStatus(int $storeId): array 
+    public function getIndexationStatus(int $storeId): array
     {
         $status = $this->scopeConfig->getValue(self::INDEXATION_STATUS, ScopeInterface::SCOPE_STORES, $storeId);
         
@@ -935,7 +935,7 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to update the indexation status of a given search engine
-     * 
+     *
      * @param array $status
      * @param int $storeId
      */
@@ -948,10 +948,10 @@ class StoreConfig extends AbstractHelper
 
     /**
      * Function to include the locale and the currency into the script.
-     * 
+     *
      * IMPORTANT NOTE: Once the single script is released, this method
      * will become deprecated and it will be removed soon.
-     * 
+     *
      * The following entries are covered:
      *    const dfLayerOptions = {
      *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',

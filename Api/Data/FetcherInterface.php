@@ -8,7 +8,7 @@ interface FetcherInterface
 {
     /**
      * Processes the item's fetched result
-     * 
+     *
      * @param array $documents
      * @param integer $storeId
      * @return void
@@ -17,7 +17,7 @@ interface FetcherInterface
 
     /**
      * Obtains the fetched result
-     * 
+     *
      * @param integer $productId
      * @return array
      */
@@ -25,7 +25,7 @@ interface FetcherInterface
 
     /**
      * Clears the fetched result
-     * 
+     *
      * @return void
      */
     public function clear();

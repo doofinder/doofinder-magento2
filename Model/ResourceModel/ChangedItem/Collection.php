@@ -28,7 +28,7 @@ class Collection extends AbstractCollection
 
     /**
      * Filter for obtaining the DELETED items
-     * 
+     *
      * @param int $storeId
      * @param int $itemType
      * @return $this
@@ -55,7 +55,7 @@ class Collection extends AbstractCollection
 
     /**
      * Filter for obtaining the UPDATED items
-     * 
+     *
      * @param int $storeId
      * @param int $itemType
      * @return $this
@@ -82,7 +82,7 @@ class Collection extends AbstractCollection
 
     /**
      * Filter for obtaining the CREATED items
-     * 
+     *
      * @param int $storeId
      * @param int $itemType
      * @return $this

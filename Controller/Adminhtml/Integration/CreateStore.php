@@ -166,7 +166,7 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /**
      * Generates the additional options required for retrieving later the required items
-     * 
+     *
      * @param $websiteId
      */
     public function generateStoreOptions($websiteId)
@@ -182,7 +182,7 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /**
      * Function to store into the data base the installation id as well as the layer script
-     * 
+     *
      * @param $storeGroupId
      * @param $installationId
      * @param $script
@@ -201,7 +201,7 @@ class CreateStore extends Action implements HttpGetActionInterface
      * "search_engines":{"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},"en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
      * We're going to iterate over the search_engines because there is the data created in doofinder. May occour that some
      * of the data that we've in storeConfig has some invalid parameter and will be bypass during the creation.
-     * 
+     *
      * @param $storesConfig
      * @param $searchEngines
      */
@@ -218,9 +218,9 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /**
      * Function to store the status of the SE indexation.
-     * 
+     *
      * By default we set this value to "STARTED" and will be updated when we receive the callback from doofinder
-     * 
+     *
      * @param $storeId
      */
     private function setIndexationStatus($storeId)
@@ -264,7 +264,8 @@ class CreateStore extends Action implements HttpGetActionInterface
     /**
      * We obtain the url associated with the main language search_engine
      */
-    private function get_primary_site_url_in_se($search_engines, $primary_language) {    
+    private function get_primary_site_url_in_se($search_engines, $primary_language)
+    {
         $primary_search_engine = array_values(array_filter($search_engines, function ($search_engine) use ($primary_language) {
             return $search_engine["language"] == $primary_language;
         }))[0];
