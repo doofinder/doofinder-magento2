@@ -69,7 +69,7 @@ abstract class AbstractChangedCategoryObserver implements ObserverInterface
 
     /**
      * Saves the category into changed item table if necessary
-     * 
+     *
      * @param CategoryInterface $category
      * @param int $storeId
      */
@@ -103,9 +103,9 @@ abstract class AbstractChangedCategoryObserver implements ObserverInterface
 
     /**
      * Gets operation type
-     * 
+     *
      * @param CategoryInterface $category
-     * 
+     *
      * @return string
      */
     abstract protected function getOperationType(CategoryInterface $category): string;

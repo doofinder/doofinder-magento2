@@ -128,7 +128,7 @@ class SingleScript
         $apiKeyParts = explode('-', $apiKey);
         $region = $apiKeyParts[0];
 
-        if (0 === preg_match('/^(us|eu)[0-9]+$/', $region) ) {
+        if (0 === preg_match('/^(us|eu)[0-9]+$/', $region)) {
             return '';
         }
 
@@ -148,7 +148,7 @@ class SingleScript
             $cacheTypeList = $objectManager->create('Magento\Framework\App\Cache\TypeListInterface');
             $type = 'full_page';
             $cacheTypeList->cleanType($type);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error("Error cleaning cache: " . $e->getMessage());
         }
     }

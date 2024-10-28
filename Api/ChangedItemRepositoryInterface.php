@@ -33,7 +33,7 @@ interface ChangedItemRepositoryInterface
 
     /**
      * Gets entity's list by search criteria
-     * 
+     *
      * @param SearchCriteriaInterface $searchCriteria
      * @return ChangedItemSearchResultsInterface
      */
@@ -41,7 +41,7 @@ interface ChangedItemRepositoryInterface
 
     /**
      * Determines whether this item exists or not
-     * 
+     *
      * @param ChangedItemInterface $changedItem
      * @return bool
      */

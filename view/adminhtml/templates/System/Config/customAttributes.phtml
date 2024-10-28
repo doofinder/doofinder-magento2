@@ -8,17 +8,17 @@
         overflow-y: auto;
     }
 </style>
-<div class="design_theme_ua_regexp" id="grid<?= $block->escapeHtml($_htmlId) ?>">
+<div class="design_theme_ua_regexp" id="grid<?= $escaper->escapeHtml($_htmlId) ?>">
     <div class="admin__control-table-wrapper admin__df-custom-attributes-wrapper">
         <table class="admin__control-table">
             <thead>
                 <tr>
                     <?php foreach ($block->getColumns() as $columnName => $column): ?>
-                        <th><?= $block->escapeHtml($column['label']) ?></th>
+                        <th><?= $escaper->escapeHtml($column['label']) ?></th>
                     <?php endforeach ?>
                 </tr>
             </thead>
-            <tbody id="addRow<?= $block->escapeHtml($_htmlId) ?>">
+            <tbody id="addRow<?= $escaper->escapeHtml($_htmlId) ?>">
                 <tr>
                     <td>
                         <strong class="productsorting_code input-text">Select All/None</strong>
@@ -31,7 +31,7 @@
             </tbody>
         </table>
     </div>
-    <input type="hidden" name="<?= $block->escapeHtml($block->getElement()->getName()) ?>[__empty]" value="" />
+    <input type="hidden" name="<?= $escaper->escapeHtml($block->getElement()->getName()) ?>[__empty]" value="" />
 
     <script>
         require([
@@ -53,13 +53,13 @@
             }
             
             // create row creator
-            window.arrayAttributes<?= $block->escapeHtml($_htmlId) ?> = {
+            window.arrayAttributes<?= $escaper->escapeJs($_htmlId) ?> = {
                 // define row prototypeJS template
                 template: mageTemplate(
                     '<tr id="<%- _id %>">'
                         <?php foreach ($block->getColumns() as $columnName => $column): ?>
                             + '<td>'
-                            + '<?= $block->renderCellTemplate($columnName)?>'
+                            + '<?= $block->renderCellTemplate($columnName) // phpcs:ignore ?>'
                             + '<\/td>'
                         <?php endforeach ?>
                     +'<\/tr>'
@@ -73,7 +73,7 @@
                     if (insertAfterId) {
                         Element.insert($(insertAfterId), {after: this.template(templateValues)});
                     } else {
-                        Element.insert($('addRow<?= $block->escapeHtml($_htmlId) ?>'), {bottom: this.template(templateValues)});
+                        Element.insert($('addRow<?= $escaper->escapeHtml($_htmlId) ?>'), {bottom: this.template(templateValues)});
                     }
                 },
             }
@@ -88,13 +88,13 @@
                     $_row->setAction('');
                     $_row->setActionClass('hidden');
                 }
-                echo "arrayAttributes{$block->escapeHtml($_htmlId)}.add(" . $_row->toJson() . ");\n";
+                echo "arrayAttributes{$escaper->escapeJs($_htmlId)}.add(" . $_row->toJson() /* phpcs:ignore */ . ");\n";
             }
             ?>
 
             // Toggle the grid availability, if element is disabled (depending on scope)
             <?php if ($block->getElement()->getDisabled()):?>
-                toggleValueElements({checked: true}, $('grid<?= $block->escapeHtml($_htmlId) ?>').parentNode);
+                toggleValueElements({checked: true}, $('grid<?= $escaper->escapeHtml($_htmlId) ?>').parentNode);
             <?php endif ?>
         });
     </script>

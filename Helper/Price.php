@@ -31,7 +31,7 @@ class Price extends AbstractHelper
 
     /**
      * Gets product price by product's id
-     * 
+     *
      * @param $product
      * @param $type
      */
@@ -45,7 +45,7 @@ class Price extends AbstractHelper
 
     /**
      * Returns the price type transformed to one of the types we use
-     * 
+     *
      * @param $type
      * @return string
      */
@@ -63,7 +63,7 @@ class Price extends AbstractHelper
 
     /**
      * Gets the flat price of the product based on it's type
-     * 
+     *
      * @param $product
      * @param $type
      * @return int
@@ -92,7 +92,7 @@ class Price extends AbstractHelper
 
     /**
      * Gets the price applying the taxes in case it's necessary
-     * 
+     *
      * @param $product
      * @param $price
      * @return int
@@ -115,7 +115,7 @@ class Price extends AbstractHelper
      * Function that returns the price with the corresponding tax value.
      * The first case contemplates the scenario of the tax already applied to the price
      * The second scenario needs this adjustment to be applied.
-     * 
+     *
      * @param $product
      * @param $amount
      */
@@ -133,7 +133,7 @@ class Price extends AbstractHelper
 
     /**
      * Returns whether the taxes are enabled in the backoffice or not
-     * 
+     *
      * @return boolean
      */
     private function getTaxEnabled()
@@ -143,7 +143,7 @@ class Price extends AbstractHelper
 
     /**
      * Applies the pricing strategy for bundle-type products and returns the corresponding value
-     * 
+     *
      * @param $product
      * @param $type
      */
@@ -157,7 +157,7 @@ class Price extends AbstractHelper
 
     /**
      * Applies the pricing strategy for grouped-type products and returns the corresponding value
-     * 
+     *
      * @param $product
      * @param $type
      */
@@ -173,7 +173,7 @@ class Price extends AbstractHelper
 
     /**
      * Applies the pricing strategy for configurable-type products and returns the corresponding value
-     * 
+     *
      * @param $product
      * @param $type
      */
@@ -185,7 +185,7 @@ class Price extends AbstractHelper
 
     /**
      * Gets calculated minimum price for a product
-     * 
+     *
      * @param $product
      * @param $usedProds
      * @param $type

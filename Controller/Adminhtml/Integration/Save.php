@@ -11,13 +11,15 @@ use Magento\Integration\Controller\Adminhtml\Integration\Save as IntegrationSave
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class Save extends IntegrationSave {
+class Save extends IntegrationSave
+{
     /**
      * If the integration is ours, ignore the current user password validation
      *
      * @return $this
      */
-    protected function validateUser() {
+    protected function validateUser()
+    {
         $integration_name = $this->getRequest()->getParam("name");
         $is_doofinder_integration = $this->getRequest()->getParam("is_doofinder_integration") === "true" ? true : false;
         if ($is_doofinder_integration && $integration_name === "Doofinder Integration") {

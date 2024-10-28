@@ -15,5 +15,7 @@ class CatalogProductDeleteAfterObserver extends AbstractChangedProductObserver
         return $this->operationType;
     }
 
-    protected function setOperationType(string $operationType) {}
+    protected function setOperationType(string $operationType)
+    {
+    }
 }

@@ -5,7 +5,7 @@
     ], function($, _t){
         $('#clean-integration').click(_ => {
             if (confirm(_t("Are you sure? This action will unsynchronize your search engines with your stores."))) {
-                new Ajax.Request('<?= $block->escapeUrl($block->getAjaxUrl()) ?>', {
+                new Ajax.Request('<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>', {
                     loaderArea:     true,
                     asynchronous:   true,
                 });

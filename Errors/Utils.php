@@ -7,7 +7,7 @@ class Utils
 {
     /**
      * Function for handling errors by it's code
-     * 
+     *
      * @param $statusCode
      * @param $response
      * @throws BadRequest
@@ -63,7 +63,7 @@ class Utils
 
     /**
      * Reads the error for it's later processing
-     * 
+     *
      * @param $response
      * @return string
      */

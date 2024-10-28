@@ -19,8 +19,7 @@ class CategorySaveAfterObserver extends AbstractChangedCategoryObserver
                 $category = $observer->getEvent()->getData('category');
                 $operationType = $this->getOperationType($category);
 
-                if (
-                    $category->getStore()->getId() == 0 ||
+                if ($category->getStore()->getId() == 0 ||
                     $operationType == ChangedItemInterface::OPERATION_TYPE_DELETE
                 ) {
                     foreach ($this->storeConfig->getAllStores() as $store) {
@@ -41,7 +40,7 @@ class CategorySaveAfterObserver extends AbstractChangedCategoryObserver
      */
     protected function getOperationType($category): string
     {
-        return $category->getIsActive() ? 
+        return $category->getIsActive() ?
             ChangedItemInterface::OPERATION_TYPE_UPDATE:
             ChangedItemInterface::OPERATION_TYPE_DELETE;
     }

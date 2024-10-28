@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<ruleset name="Magento2Custom">
+    <description>Custom PHPCS rules for Magento 2 Module</description>
+
+    <!-- Inherit the Magento 2 coding standard -->
+    <rule ref="Magento2"/>
+
+    <!-- Define directories to be checked -->
+    <file>.</file>
+
+    <!-- Set the minimum severity level -->
+    <arg value="-severity=10"/>
+
+    <!-- Exclude the vendor directory -->
+    <exclude-pattern>vendor/*</exclude-pattern>
+
+    <!-- Specify additional settings -->
+    <arg value="-colors"/>
+    <arg value="-report=summary"/>
+    <arg value="-extensions=php,phtml"/>
+
+    <!-- Add other custom rules or exclusions as needed -->
+</ruleset>

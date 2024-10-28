@@ -1,0 +1,46 @@
+name: Code Quality Check
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+
+    - name: Configure Magento Auth for Composer
+      env:
+        COMPOSER_AUTH_USERNAME: ${{ secrets.COMPOSER_AUTH_USERNAME }}
+        COMPOSER_AUTH_PASSWORD: ${{ secrets.COMPOSER_AUTH_PASSWORD }}
+      run: |
+        composer config --global http-basic.repo.magento.com $COMPOSER_AUTH_USERNAME $COMPOSER_AUTH_PASSWORD
+
+    - name: Install dependencies for CI
+      run: |
+        COMPOSER=composer-ci.json composer install --no-interaction --prefer-dist
+
+    - name: Run PHP Code Sniffer (phpcs)
+      id: phpcs
+      run: |
+        vendor/bin/phpcs
+      continue-on-error: false
+
+    - name: Run PHP Code Beautifier and Fixer (phpcbf) in Report-Only Mode
+      id: phpcbf
+      run: |
+        vendor/bin/phpcbf --report-only
+      continue-on-error: false
+
+    - name: Verify Code Quality Checks
+      if: failure()
+      run: echo "Code quality checks failed. Please fix the reported issues before merging." && exit 1

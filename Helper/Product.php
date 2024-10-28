@@ -155,8 +155,7 @@ class Product extends AbstractHelper
         } else {
             $routePath = 'catalog/product/view';
             // In case the product is a variant we need the ID of the configurable
-            if (
-                $product->getTypeId() == ProductType::TYPE_SIMPLE
+            if ($product->getTypeId() == ProductType::TYPE_SIMPLE
                 && count($parents = $this->configurable->getParentIdsByChild($product->getId())) > 0
             ) {
                 $routeParams['id'] = $parents[0];

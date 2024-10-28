@@ -44,7 +44,7 @@ class Attributes
 
     /**
      * Gets the result of merging every type of attribute
-     * 
+     *
      * @param integer $storeId
      * @return array
      */
@@ -66,7 +66,7 @@ class Attributes
 
     /**
      * Obtains Doofinder attributes
-     * 
+     *
      * @param int|null $storeId
      * @return array
      */
@@ -77,7 +77,7 @@ class Attributes
 
     /**
      * Obtains the custom attributes wanted to be synchronized
-     * 
+     *
      * @param int|null $storeId
      * @return array
      */
@@ -100,7 +100,7 @@ class Attributes
 
     /**
      * Merges the different attribute types with the custom ones
-     * 
+     *
      * @param integer $storeId
      * @return void
      */
