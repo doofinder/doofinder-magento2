@@ -5,10 +5,6 @@ backend default {
     .port = "80";
 }
 
-acl purge {
-    "web";
-} 
-
 sub vcl_recv {
     if (req.method == "PURGE") {
         if (req.http.X-Magento-Tags-Pattern) {

@@ -77,6 +77,13 @@ If you wish to debug your new Magento installation, just simply set the correct 
 Once the installation has finished, you can also access to a ready to use phpMyAdmin local server listening in port 8080: http://localhost:8080.
 Here you will see all the Magento 2 tables in the database specified in the file `.env` (by default: magentobase)
 
+## Varnish was added to manage cache
+
+By default Varnish is commented on docker-compose. So if you need to use it, you can uncomment and restart your containers.
+To enable Magento to use Varnish as cache manager, you can follow the official doc from Adobe: [Configure the Commerce application to use Varnish](https://experienceleague.adobe.com/en/docs/commerce-operations/configuration-guide/cache/configure-varnish-commerce).
+
+If you uncomment Varnish container, remember to comment the port `9012:80` in the `web` container.
+
 ## Uninstall the module
 
 You can remove the Doofinder module using this straightforward method:
@@ -107,7 +114,6 @@ php bin/magento module:enable Doofinder_Feed  --clear-static-content
 php bin/magento cache:clean
 php bin/magento cache:flush
 ```
-
 
 ## Last notes
 
