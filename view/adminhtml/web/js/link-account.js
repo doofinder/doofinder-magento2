@@ -110,7 +110,7 @@ define([
                 }).done(function () {
                     addAjaxMessage($.mage.__(
                         'The setup wizard has successfully finished but search engine cannot be used until ' +
-                        'index processing has completed.<br/>Now, you can check process task status or go ' +
+                        'index processing has completed.<br>Now, you can check process task status or go ' +
                         'to configuration page.'));
                       $('.setup-finish-buttons').removeClass('hidden');
                 }).fail(ajaxRequestFail);
