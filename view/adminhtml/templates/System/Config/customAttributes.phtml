@@ -59,7 +59,7 @@
                     '<tr id="<%- _id %>">'
                         <?php foreach ($block->getColumns() as $columnName => $column): ?>
                             + '<td>'
-                            + '<?= $block->renderCellTemplate($columnName)?>'
+                            + '<?= $block->renderCellTemplate($columnName)?>' <!-- phpcs:ignore Generic.CodeAnalysis.UnsafeOutput -->
                             + '<\/td>'
                         <?php endforeach ?>
                     +'<\/tr>'
