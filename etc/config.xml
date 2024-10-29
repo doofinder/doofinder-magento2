@@ -13,8 +13,8 @@
                 <categories_in_navigation>0</categories_in_navigation>
             </update_on_save>
             <doofinder_integration>
-                <login_endpoint><![CDATA[https://edu-doomanager.ngrok.doofinder.com/plugins/login/magento2]]></login_endpoint>
-                <signup_endpoint><![CDATA[https://edu-doomanager.ngrok.doofinder.com/plugins/signup/magento2]]></signup_endpoint>
+                <login_endpoint><![CDATA[https://admin.doofinder.com/plugins/login/magento2]]></login_endpoint>
+                <signup_endpoint><![CDATA[https://admin.doofinder.com/plugins/signup/magento2]]></signup_endpoint>
             </doofinder_integration>
             <installing_loop>
                 <status>0</status>
