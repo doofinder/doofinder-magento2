@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Cron;
 
+use Doofinder\Feed\Api\Data\ChangedItemInterface;
 use Doofinder\Feed\Helper\Item as ItemHelper;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedItem\DocumentsProvider;
@@ -120,8 +121,12 @@ class Processor
     private function createItems($store, $itemType, $indice)
     {
         $collection = $this->changedItemCollectionFactory->create()->filterCreated((int)$store->getId(), $itemType);
-        if ($collection->getSize()) {
-            $created = $this->documentsProvider->getBatched($collection, (int)$store->getId());
+        
+        $groupedCollection = clone $collection;
+        $groupedCollection->getSelect()->group(ChangedItemInterface::ITEM_ID);
+
+        if ($groupedCollection->getSize()) {
+            $created = $this->documentsProvider->getBatched($groupedCollection, (int)$store->getId());
             foreach ($this->batch->getItems($created, $this->batchSize) as $batchDocuments) {
                 $items = $this->mapItems($batchDocuments);
                 if (count($items)) {
@@ -153,8 +158,12 @@ class Processor
     private function updateItems($store, $itemType, $indice)
     {
         $collection = $this->changedItemCollectionFactory->create()->filterUpdated((int)$store->getId(), $itemType);
-        if ($collection->getSize()) {
-            $updated = $this->documentsProvider->getBatched($collection, (int)$store->getId());
+
+        $groupedCollection = clone $collection;
+        $groupedCollection->getSelect()->group(ChangedItemInterface::ITEM_ID);
+
+        if ($groupedCollection->getSize()) {
+            $updated = $this->documentsProvider->getBatched($groupedCollection, (int)$store->getId());
             foreach ($this->batch->getItems($updated, $this->batchSize) as $batchDocuments) {
                 $items = $this->mapItems($batchDocuments);
                 if (count($items)) {
@@ -186,8 +195,12 @@ class Processor
     private function deleteItems($store, $itemType, $indice)
     {
         $collection = $this->changedItemCollectionFactory->create()->filterDeleted((int)$store->getId(), $itemType);
-        if ($collection->getSize()) {
-            $deleted = $this->documentsProvider->getBatched($collection);
+
+        $groupedCollection = clone $collection;
+        $groupedCollection->getSelect()->group(ChangedItemInterface::ITEM_ID);
+
+        if ($groupedCollection->getSize()) {
+            $deleted = $this->documentsProvider->getBatched($groupedCollection);
             foreach ($this->batch->getItems($deleted, $this->batchSize) as $batchDeleted) {
                 $items = $this->mapItems($batchDeleted);
                 if (count($items)) {
