@@ -122,6 +122,20 @@ class Processor
     {
         $collection = $this->changedItemCollectionFactory->create()->filterCreated((int)$store->getId(), $itemType);
         
+        /**
+         * By removing the UNIQUE restriction from our table, it happens that during imports or product generation with fixtures, 
+         * duplicate elements are inserted into the table. These operations are handled within transactions and it seems that our code 
+         * is currently not able to determine if the element is already added when it is within a transaction.
+         * 
+         * As a result, when executing the Processor for the Update on Save, we receive more elements than we actually need to process, 
+         * because many of them are duplicates.
+         * 
+         * So what we do here is clone the original collection that has all the ungrouped elements. 
+         * Then, a group is applied to the copy and thus we ensure that we process unique elements. 
+         * At the end, the elements of the original collection are deleted from the table.
+         * 
+         * This logic is applied in the same way in the others two functions updateItems and deleteItems.
+         */
         $groupedCollection = clone $collection;
         $groupedCollection->getSelect()->group(ChangedItemInterface::ITEM_ID);
 
@@ -159,6 +173,7 @@ class Processor
     {
         $collection = $this->changedItemCollectionFactory->create()->filterUpdated((int)$store->getId(), $itemType);
 
+        // In the createItems function you can find the explanation of why this logic with the collection is necessary.
         $groupedCollection = clone $collection;
         $groupedCollection->getSelect()->group(ChangedItemInterface::ITEM_ID);
 
@@ -196,6 +211,7 @@ class Processor
     {
         $collection = $this->changedItemCollectionFactory->create()->filterDeleted((int)$store->getId(), $itemType);
 
+        // In the createItems function you can find the explanation of why this logic with the collection is necessary.
         $groupedCollection = clone $collection;
         $groupedCollection->getSelect()->group(ChangedItemInterface::ITEM_ID);
 
