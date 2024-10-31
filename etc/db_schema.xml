@@ -14,6 +14,6 @@
         </constraint>
         <constraint xsi:type="foreign" referenceId="DOOFINDER_FEED_CHANGED_ITEM_SKIP_ENTITY_ID_BINDING_FK"
                     table="doofinder_feed_changed_item" column="skip_entity_id_binding" 
-                    referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+                    referenceTable="catalog_product_entity" referenceColumn="entity_id"/>
     </table>
 </schema>
