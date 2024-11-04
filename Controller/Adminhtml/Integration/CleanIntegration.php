@@ -61,10 +61,10 @@ class CleanIntegration extends Action
 
     /**
      * Deletes any entry of Doofinder from Magento's database
-     * 
-     * @param $connection 
-     * @param $table 
-     * @param $column 
+     *
+     * @param $connection
+     * @param $table
+     * @param $column
      */
     private function deleteIntegrationEntries($connection, $table, $column)
     {

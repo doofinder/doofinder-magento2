@@ -10,14 +10,14 @@ interface ChangedItemSearchResultsInterface extends SearchResultsInterface
 {
     /**
      * Obtains the resulting items from a search
-     * 
+     *
      * @return ChangedItemInterface[]
      */
     public function getItems();
 
     /**
      * Sets the items inside the attribute
-     * 
+     *
      * @param ChangedItemInterface[] $items
      * @return void
      */

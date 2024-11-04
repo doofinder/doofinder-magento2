@@ -74,7 +74,7 @@ class Client
 
     /**
      * Request with GET verb
-     * 
+     *
      * @param string $path
      * @return string
      * @throws BadRequest
@@ -108,7 +108,7 @@ class Client
 
     /**
      * Request with POST verb
-     * 
+     *
      * @param string $path
      * @param array $body
      * @return string
@@ -144,7 +144,7 @@ class Client
 
     /**
      * Request with PATCH verb
-     * 
+     *
      * @param string $path
      * @param array $body
      * @return string
@@ -180,7 +180,7 @@ class Client
 
     /**
      * Request with DELETE verb
-     * 
+     *
      * @param string $path
      * @param array $body
      * @return string
@@ -216,7 +216,7 @@ class Client
 
     /**
      * Gets results handling errors
-     * 
+     *
      * @return string
      * @throws BadRequest
      * @throws IndexingInProgress
@@ -241,7 +241,7 @@ class Client
 
     /**
      * Gets necessary headers for the requests
-     * 
+     *
      * @return string[]
      */
     private function getHeaders(): array
@@ -253,7 +253,7 @@ class Client
 
     /**
      * Sets API token region in order to match the corresponding one
-     * 
+     *
      * @param string|null $apiKey
      * @throws InvalidApiKey
      */
@@ -273,8 +273,7 @@ class Client
      */
     private function getApiBaseURL(): string
     {
-        if ($this->apiType === self::DOOPLUGINS)
-        {
+        if ($this->apiType === self::DOOPLUGINS) {
             return sprintf("https://%s-plugins.doofinder.com", $this->clusterRegion);
         }
         return sprintf("https://%s-%s.doofinder.com", $this->clusterRegion, $this->apiType);
@@ -298,7 +297,7 @@ class Client
     private function flattenArray(array $ids): array
     {
         $flattened_ids = [];
-        array_walk_recursive($ids, function($id) use (&$flattened_ids) {
+        array_walk_recursive($ids, function ($id) use (&$flattened_ids) {
              $flattened_ids[] = $id;
         });
         return $flattened_ids;

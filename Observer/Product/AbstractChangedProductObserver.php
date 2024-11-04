@@ -59,7 +59,6 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         ChangedItemRepositoryInterface $changedItemRepository,
         LoggerInterface $logger,
         Configurable $configurableProductType
-        
     ) {
         $this->storeConfig                  = $storeConfig;
         $this->changedItemFactory           = $changedItemFactory;
@@ -108,7 +107,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
 
     /**
      * Registers the item by it's type in the table doofinder_feed_changed_item, with the corresponding store
-     * 
+     *
      * @param ProductInterface $product
      * @param int $storeId
      */

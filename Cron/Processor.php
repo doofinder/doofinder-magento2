@@ -1,9 +1,24 @@
 <?php
+/**
+ * By removing the UNIQUE restriction from our table, it happens that during imports or product generation with fixtures, 
+ * duplicate elements are inserted into the table. These operations are handled within transactions and it seems that our code 
+ * is currently not able to determine if the element is already added when it is within a transaction.
+ * 
+ * As a result, when executing the Processor for the Update on Save, we receive more elements than we actually need to process, 
+ * because many of them are duplicates.
+ * 
+ * So what we do here is clone the original collection that has all the ungrouped elements. 
+ * Then, a group is applied to the copy and thus we ensure that we process unique elements. 
+ * At the end, the elements of the original collection are deleted from the table.
+ * 
+ * This logic is applied in the same way in the others two functions updateItems and deleteItems.
+ */
 
 declare(strict_types=1);
 
 namespace Doofinder\Feed\Cron;
 
+use Doofinder\Feed\Api\Data\ChangedItemInterface;
 use Doofinder\Feed\Helper\Item as ItemHelper;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedItem\DocumentsProvider;
@@ -98,7 +113,7 @@ class Processor
 
     /**
      * Function to manage the products that have been stored into the data base
-     * 
+     *
      * @param $store
      * @param $itemType
      * @param $indice
@@ -112,7 +127,7 @@ class Processor
 
     /**
      * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
-     * 
+     *
      * @param $store
      * @param $itemType
      * @param $indice
@@ -120,8 +135,13 @@ class Processor
     private function createItems($store, $itemType, $indice)
     {
         $collection = $this->changedItemCollectionFactory->create()->filterCreated((int)$store->getId(), $itemType);
-        if ($collection->getSize()) {
-            $created = $this->documentsProvider->getBatched($collection, (int)$store->getId());
+        
+        // Avoid process more than once the same product due to Magento2 product import process.
+        $groupedCollection = clone $collection;
+        $groupedCollection->getSelect()->group(ChangedItemInterface::ITEM_ID);
+
+        if ($groupedCollection->getSize()) {
+            $created = $this->documentsProvider->getBatched($groupedCollection, (int)$store->getId());
             foreach ($this->batch->getItems($created, $this->batchSize) as $batchDocuments) {
                 $items = $this->mapItems($batchDocuments);
                 if (count($items)) {
@@ -145,7 +165,7 @@ class Processor
 
     /**
      * Executes the UPDATE for items stored with this action in doofinder_feed_changed_items table
-     * 
+     *
      * @param $store
      * @param $itemType
      * @param $indice
@@ -153,8 +173,13 @@ class Processor
     private function updateItems($store, $itemType, $indice)
     {
         $collection = $this->changedItemCollectionFactory->create()->filterUpdated((int)$store->getId(), $itemType);
-        if ($collection->getSize()) {
-            $updated = $this->documentsProvider->getBatched($collection, (int)$store->getId());
+
+        // Avoid process more than once the same product due to Magento2 product import process.
+        $groupedCollection = clone $collection;
+        $groupedCollection->getSelect()->group(ChangedItemInterface::ITEM_ID);
+
+        if ($groupedCollection->getSize()) {
+            $updated = $this->documentsProvider->getBatched($groupedCollection, (int)$store->getId());
             foreach ($this->batch->getItems($updated, $this->batchSize) as $batchDocuments) {
                 $items = $this->mapItems($batchDocuments);
                 if (count($items)) {
@@ -178,7 +203,7 @@ class Processor
 
     /**
      * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
-     * 
+     *
      * @param $store
      * @param $itemType
      * @param $indice
@@ -186,8 +211,13 @@ class Processor
     private function deleteItems($store, $itemType, $indice)
     {
         $collection = $this->changedItemCollectionFactory->create()->filterDeleted((int)$store->getId(), $itemType);
-        if ($collection->getSize()) {
-            $deleted = $this->documentsProvider->getBatched($collection);
+
+        // Avoid process more than once the same product due to Magento2 product import process.
+        $groupedCollection = clone $collection;
+        $groupedCollection->getSelect()->group(ChangedItemInterface::ITEM_ID);
+
+        if ($groupedCollection->getSize()) {
+            $deleted = $this->documentsProvider->getBatched($groupedCollection);
             foreach ($this->batch->getItems($deleted, $this->batchSize) as $batchDeleted) {
                 $items = $this->mapItems($batchDeleted);
                 if (count($items)) {
@@ -211,7 +241,7 @@ class Processor
 
     /**
      * Creates an array with the id of the item
-     * 
+     *
      * @param $documents
      */
     private function mapItems($documents)

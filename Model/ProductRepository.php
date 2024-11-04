@@ -153,21 +153,24 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     /**
      * {@inheritdoc}
      */
-    public function save(ProductInterface $product, $saveOptions = false) {
+    public function save(ProductInterface $product, $saveOptions = false)
+    {
         return $this->productRepositoryBase->save($product, $saveOptions);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(ProductInterface $product) {
+    public function delete(ProductInterface $product)
+    {
         return $this->productRepositoryBase->delete($product);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getById($productId, $editMode = false, $storeId = null, $forceReload = false) {
+    public function getById($productId, $editMode = false, $storeId = null, $forceReload = false)
+    {
         return $this->productRepositoryBase->getById($productId, $editMode, $storeId, $forceReload);
     }
 
@@ -391,7 +394,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     {
         $categoryIds = [];
         foreach ($categories as $category) {
-            if(is_array($category)){
+            if (is_array($category)) {
                 $categoryIds[$category['category_id']] = true;
             } else {
                 $categoryIds[$category->getCategoryId()] = true;
@@ -441,11 +444,12 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         return $categoryResults;
     }
 
-    private function updateConfigurableProductOptions($configurableProductsOptions){
+    private function updateConfigurableProductOptions($configurableProductsOptions)
+    {
         $eavConfig  = ObjectManager::getInstance()->get('\Magento\Eav\Model\Config');
         $configurableProductsOptionsResult = [];
 
-        if($configurableProductsOptions != NULL) {
+        if ($configurableProductsOptions != null) {
             foreach ($configurableProductsOptions as $configurableProductOption) {
                 $attribute = $eavConfig->getAttribute('catalog_product', $configurableProductOption->getAttributeId());
                 $configurableProductsOptionsResult[] = [

@@ -38,7 +38,7 @@ class ManagementClient
 
     /**
      * Request all user's search engines throttled
-     * 
+     *
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_list
      *
      * @return array
@@ -61,11 +61,11 @@ class ManagementClient
 
     /**
      * Creates the store structure in Doofinder
-     * 
+     *
      * @param array $storeData
      * @return array
      */
-    public function createStore(array $storeData): array 
+    public function createStore(array $storeData): array
     {
         $response = $this->client->post('/install', $storeData);
 
@@ -74,7 +74,7 @@ class ManagementClient
 
     /**
      * Creates a new search engine with the provided data
-     * 
+     *
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_create
      *
      * @param array $searchEngine
@@ -98,7 +98,7 @@ class ManagementClient
 
     /**
      * Schedules a task for processing all search engine's data sources.
-     * 
+     *
      * @see https://docs.doofinder.com/api/management/v2/#operation/process
      *
      * @param string $hashId
@@ -124,9 +124,9 @@ class ManagementClient
 
     /**
      * Request a search engine details
-     * 
+     *
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_show
-     * 
+     *
      * @param string $hashId
      * @return array
      * @throws BadRequest
@@ -139,7 +139,7 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Exception
      */
-    public function getSearchEngine(string $hashid): array 
+    public function getSearchEngine(string $hashid): array
     {
         $url = $this->getSearchEnginePath($hashid);
         $response = $this->client->get($url);
@@ -148,7 +148,7 @@ class ManagementClient
 
     /**
      * Creates a list of items from the index in a single bulk operation.
-     * 
+     *
      * @see https://docs.doofinder.com/api/management/v2/#operation/items_bulk_update
      *
      * @param array $items
@@ -174,7 +174,7 @@ class ManagementClient
 
     /**
      * Updates a list of items from the index in a single bulk operation.
-     * 
+     *
      * @see https://docs.doofinder.com/api/management/v2/#operation/items_bulk_update
      *
      * @param array $items
@@ -199,7 +199,7 @@ class ManagementClient
 
     /**
      * Deletes a list of items from the index in a single bulk operation.
-     * 
+     *
      * @see https://docs.doofinder.com/api/management/v2/#operation/items_bulk_delete
      *
      * @param array $items
