@@ -1,6 +1,6 @@
 <?php
 
-namespace Doofinder\Module\Model;
+namespace Doofinder\Feed\Model;
 
 use Magento\Catalog\Api\CategoryListInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -36,6 +36,7 @@ class CategoryListRepository
                 'parent_id' => $category->getParentId(),
                 'position' => $category->getPosition(),
                 'level' => $category->getLevel(),
+                'include_in_menu' => $category->getIncludeInMenu(),
             ];
         }
 
