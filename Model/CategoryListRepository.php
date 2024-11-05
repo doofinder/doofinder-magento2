@@ -50,12 +50,9 @@ class CategoryListRepository implements \Magento\Catalog\Api\CategoryListInterfa
     
         foreach ($searchResult->getItems() as $category) {
             $categoryData = $category->getData();
-            $fullPath = $baseUrl . $categoryData['url_path'] . $category_url_suffix;
-            $category->setData("url_path", $fullPath);    
-
+            $fullPath = $baseUrl . $categoryData['url_path'] . $category_url_suffix; 
             $extensionAttributes = $category->getExtensionAttributes();
             $extensionAttributes->setUrlFull($fullPath);
-
         }
     
         return $searchResult;
