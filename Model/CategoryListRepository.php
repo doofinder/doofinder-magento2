@@ -2,19 +2,20 @@
 
 namespace Doofinder\Feed\Model;
 
-use Magento\Catalog\Api\CategoryListInterface;
+use Magento\Catalog\Model\CategoryList;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\FilterBuilder;
 
-class CategoryListRepository
+
+class CategoryListRepository implements \Magento\Catalog\Api\CategoryListInterface
 {
     protected $categoryRepository;
     protected $searchCriteriaBuilder;
     protected $filterBuilder;
 
     public function __construct(
-        CategoryListInterface $categoryRepository,
+        CategoryList $categoryRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         FilterBuilder $filterBuilder
     ) {
@@ -25,21 +26,6 @@ class CategoryListRepository
 
     public function getList(SearchCriteriaInterface $searchCriteria)
     {
-        $categories = $this->categoryRepository->getList($searchCriteria)->getItems();
-
-        $categoryData = [];
-        foreach ($categories as $category) {
-            $categoryData[] = [
-                'id' => $category->getId(),
-                'name' => $category->getName(),
-                'is_active' => $category->getIsActive(),
-                'parent_id' => $category->getParentId(),
-                'position' => $category->getPosition(),
-                'level' => $category->getLevel(),
-                'include_in_menu' => $category->getIncludeInMenu(),
-            ];
-        }
-
-        return $categoryData;
+        return  $this->categoryRepository->getList($searchCriteria);
     }
 }
