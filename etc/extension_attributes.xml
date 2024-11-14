@@ -9,4 +9,7 @@
         <attribute code="price" type="float"/>
         <attribute code="special_price" type="float"/>
     </extension_attributes>
+    <extension_attributes for="Magento\Catalog\Api\Data\CategoryInterface">
+        <attribute code="url_full" type="string"/>
+    </extension_attributes>
 </config>
