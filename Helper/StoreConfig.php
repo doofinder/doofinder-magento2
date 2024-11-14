@@ -34,7 +34,7 @@ use Magento\Backend\Helper\Data;
  */
 class StoreConfig extends AbstractHelper
 {
-    public const CRON_DISABLED_VALUE = 'everyday';
+    public const CRON_DISABLED_VALUE = '0 0 * * *';
     /**
      * URL to make the doofinder requests
      */
