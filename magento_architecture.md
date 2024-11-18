@@ -34,7 +34,7 @@ sequenceDiagram
   Note over Magento,Doomanager: includes callback_url to be called after it
   Doomanager ->> Magento: ok response
   Doomanager --) Magento: calls callback_url
-  Magento --) Magento: enables doofinder layer
+  Magento --) Magento: enables doofinder script
   Note left of Magento: {<br/>"installation_id": installation_id,<br/>"script": script,<br/>"search_endpoints": "search_endpoints",<br/>}
   Magento ->> Client: Enjoy Doofinder :)
 ```

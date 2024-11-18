@@ -46,7 +46,7 @@
                    showInDefault="1"
                    showInWebsite="1"
                    showInStore="1">
-                <label>Doofinder Layer</label>
+                <label>Doofinder Script</label>
                 <field id="doofinder_layer_enabled"
                        translate="label"
                        type="select"
@@ -58,7 +58,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>Magento\Framework\App\Config\Value</backend_model>
                     <comment>
-                        <![CDATA[ Activate/deactivate the search layer. ]]>
+                        <![CDATA[ Activating this option you are inserting the script into your store code. You can manage product visibility in Doofinder. ]]>
                     </comment>
                 </field>
                 <field id="installation_id"
