@@ -6,6 +6,7 @@ namespace Doofinder\Feed\Helper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Catalog\Model\Product\Type as ProductType;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 use Magento\Downloadable\Model\Product\Type as DownloadableType;
 use Magento\GroupedProduct\Model\Product\Type\Grouped as GroupedType;
@@ -194,6 +195,11 @@ class Price extends AbstractHelper
     {
         $minimum_price = null;
         $minimum_variant = null;
+
+        // To exclude disabled variants from the calculations
+        $usedProds = array_filter($usedProds, function($child) {
+            return Status::STATUS_ENABLED === (int)$child->getStatus();
+        });
 
         /*
         We identify the variant with the minimum final price (or price), and

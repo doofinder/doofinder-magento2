@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Model\ResourceModel;
 
-use Magento\Framework\Model\ResourceModel\Db\AbstractDB;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 /**
  * The resource model of product change trace.
  */
-class ChangedItem extends AbstractDB
+class ChangedItem extends AbstractDb
 {
     /**
      * Holds the name of the table responsible for storing identities of deleted products.
@@ -17,6 +17,8 @@ class ChangedItem extends AbstractDB
      */
     public const TABLE_NAME = 'doofinder_feed_changed_item';
 
+    public const ENTITY_ID = 'entity_id';
+
     /**
      * Initializes resource model.
      *
@@ -24,9 +26,6 @@ class ChangedItem extends AbstractDB
      */
     protected function _construct()
     {
-        $this->_init(
-            self::TABLE_NAME,
-            'entity_id'
-        );
+        $this->_init(self::TABLE_NAME, self::ENTITY_ID);
     }
 }

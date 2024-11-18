@@ -82,6 +82,7 @@ class AddToCart extends Action implements HttpPostActionInterface
 
         $params = new DataObject($params);
         $result = $quote->addProduct($product, $params);
+        $resultJson = $this->resultJsonFactory->create();
 
         if (is_a($result, QuoteItem::class)) {
             //Update totals
@@ -90,12 +91,13 @@ class AddToCart extends Action implements HttpPostActionInterface
             $quote->collectTotals();
             $this->cartRepository->save($quote);
             $session->replaceQuote($quote)->unsLastRealOrderId();
+
+            return $resultJson->setData(['success' => true]);
         } else {
             $this->logger->info("This product is variable, return the url");
             $product_url = $product->getProductUrl();
             $this->logger->info("Product url: ", ["product_url" => $product_url]);
 
-            $resultJson = $this->resultJsonFactory->create();
             return $resultJson->setData(['product_url' => $product_url]);
         }
     }
