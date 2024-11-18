@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!-- For hyva themes, jQuery can't be used among other modifications.
+        In that case we use a different JS  -->
+        <remove src="Doofinder_Feed::js/df_add_to_cart.js"/>
+        <script src="Doofinder_Feed::js/df_add_to_cart_hyva.js"/>
+    </head>
+    <body>
+        <referenceBlock name="head.additional">
+            <block
+                class="Doofinder\Feed\Block\Display\Layer"
+                name="doofinderfeed_display_layer"
+                as="doofinderfeed.display.layer"
+                template="Doofinder_Feed::display/layer.phtml"
+                ifconfig="doofinder_config_config/doofinder_layer/doofinder_layer_enabled"
+                after="-"/>
+        </referenceBlock>
+    </body>
+</page>
