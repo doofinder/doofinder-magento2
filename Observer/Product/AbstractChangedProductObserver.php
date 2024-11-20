@@ -12,6 +12,7 @@ use Doofinder\Feed\Model\ChangedItem\ItemType;
 use Doofinder\Feed\Model\ChangedItemFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\Product\Visibility;
 use \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -45,6 +46,11 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
     private $configurableProductType;
 
     /**
+     * @var []
+     */
+    private $visibilityAllowed;
+
+    /**
      * AbstractChangedProductObserver constructor.
      *
      * @param StoreConfig $storeConfig
@@ -65,6 +71,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         $this->changedItemRepository        = $changedItemRepository;
         $this->logger                       = $logger;
         $this->configurableProductType      = $configurableProductType;
+        $this->visibilityAllowed            =  [Visibility::VISIBILITY_IN_SEARCH, visibility::VISIBILITY_BOTH];
     }
 
     /**
@@ -78,6 +85,8 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
                 $operationType = $this->getOperationType();
 
                 if ($product->getStatus() == Status::STATUS_DISABLED) {
+                    $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_DELETE);
+                } elseif (!in_array($product->getVisibility(), $this->visibilityAllowed)){
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_DELETE);
                 } elseif ($product->getUpdatedAt() == $product->getCreatedAt() &&
                     $operationType == ChangedItemInterface::OPERATION_TYPE_UPDATE
