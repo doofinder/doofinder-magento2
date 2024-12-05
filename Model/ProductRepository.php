@@ -10,6 +10,7 @@ use Magento\Catalog\Api\CategoryListInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ProductRepository as ProductRepositoryBase;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
@@ -347,6 +348,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
         $extensionAttributes->setIsInStock($stockAndStatus[1]);
         $extensionAttributes->setBaseUrl($this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseUrl());
+        $enabledCfgLinks = $this->getEnabledConfigurableLinks($extensionAttributes->getConfigurableProductLinks());
+        $extensionAttributes->setConfigurableProductLinks($enabledCfgLinks);
+        // $extensionAttributes->setConfigurableProductLinks();
         $extensionAttributes->setBaseMediaUrl(
             $this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseMediaUrl()
         );
@@ -375,13 +379,28 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $product->setExtensionAttributes($extensionAttributes);
     }
 
+    private function getEnabledConfigurableLinks($configurableLinksIds) {
+        $enabledProductIds = [];
+        
+        foreach($configurableLinksIds as $productId) {
+            $product = $this->productFactory->create()->load($productId);
+            if (Status::STATUS_ENABLED !== (int)$product->getStatus()) {
+                continue;
+            }
+            
+            $enabledProductIds[] = $productId;
+        }
+
+        return $enabledProductIds;
+    }
+
     /**
      * Function to remove the excluded custom_attributes.
      *
      * @param ProductInterface $product
      * @return void
      */
-    public function removeExcludedCustomAttributes($product)
+    private function removeExcludedCustomAttributes($product)
     {
         foreach ($this->excludedCustomAttributes as $attribute) {
             if (isset($product[$attribute])) {
