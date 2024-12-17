@@ -83,10 +83,11 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
             try {
                 $product = $observer->getEvent()->getProduct();
                 $operationType = $this->getOperationType();
-
+                $parentProducts = $this->configurableProductType->getParentIdsByChild($product->getId());
+                
                 if ($product->getStatus() == Status::STATUS_DISABLED) {
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_DELETE);
-                } elseif (!in_array($product->getVisibility(), $this->visibilityAllowed)){
+                } elseif (!in_array($product->getVisibility(), $this->visibilityAllowed) && count($parentProducts) == 0){
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_DELETE);
                 } elseif ($product->getUpdatedAt() == $product->getCreatedAt() &&
                     $operationType == ChangedItemInterface::OPERATION_TYPE_UPDATE
@@ -99,7 +100,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
                 }
                 
                 if ($product->getStore()->getId() == 0 ||
-                    $this->getOperationType() == ChangedItemInterface::OPERATION_TYPE_DELETE
+                    $operationType == ChangedItemInterface::OPERATION_TYPE_DELETE
                 ) {
                     foreach ($this->storeConfig->getAllStores() as $store) {
                         $this->registerChangedItemStore($product, (int)$store->getId());
@@ -126,7 +127,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
 
         $itemsToInsert = [$itemId];
         $parentProducts = $this->configurableProductType->getParentIdsByChild($itemId);
-        if (count($parentProducts) > 0) {
+        if (count($parentProducts) > 0 && $this->getOperationType() != ChangedItemInterface::OPERATION_TYPE_DELETE) {
             /* When updating a product it's children are also updated, so in this case we include the parentId but don't need to specify the itemId */
             $itemsToInsert = $parentProducts;
         }
