@@ -100,7 +100,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
                 }
                 
                 if ($product->getStore()->getId() == 0 ||
-                    $operationType == ChangedItemInterface::OPERATION_TYPE_DELETE
+                    $this->getOperationType() == ChangedItemInterface::OPERATION_TYPE_DELETE
                 ) {
                     foreach ($this->storeConfig->getAllStores() as $store) {
                         $this->registerChangedItemStore($product, (int)$store->getId());
