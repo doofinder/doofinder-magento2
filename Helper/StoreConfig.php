@@ -445,7 +445,7 @@ class StoreConfig extends AbstractHelper
         return array_filter(
             $stores,
             function ($store) {
-                return $store->isActive();
+                return $store->isActive() && getHashId($store) != null;
             }
         );
     }
