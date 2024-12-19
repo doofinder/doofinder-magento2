@@ -51,7 +51,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     protected $instancesById;
     protected $excludedCustomAttributes;
     private $serializer;
-    
+
 
     public function __construct(
         ImageFactory $imageHelperFactory,
@@ -379,15 +379,20 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $product->setExtensionAttributes($extensionAttributes);
     }
 
-    private function getEnabledConfigurableLinks($configurableLinksIds) {
+    private function getEnabledConfigurableLinks($configurableLinksIds)
+    {
         $enabledProductIds = [];
-        
-        foreach($configurableLinksIds as $productId) {
+
+        if (is_null($configurableLinksIds)) {
+            return $enabledProductIds;
+        }
+
+        foreach ($configurableLinksIds as $productId) {
             $product = $this->productFactory->create()->load($productId);
             if (Status::STATUS_ENABLED !== (int)$product->getStatus()) {
                 continue;
             }
-            
+
             $enabledProductIds[] = $productId;
         }
 
@@ -419,7 +424,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                 $categoryIds[$category->getCategoryId()] = true;
             }
         }
-        
+
         // Get table name with prefix if it exists
         $catalogCategoryEntityTable = $this->resourceModel->getTable('catalog_category_entity');
 
