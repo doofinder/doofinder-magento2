@@ -9,6 +9,11 @@
 /build\.sh                  export-ignore
 /\.github                   export-ignore
 /\.env                      export-ignore
+/\.env\.example             export-ignore
 /README.md                  export-ignore
 /build_release\.sh          export-ignore
 /default.vcl                export-ignore
+/phpcs\.xml                 export-ignore
+/Makefile                   export-ignore
+/data_loader\.sh            export-ignore
+/composer-ci\.json          export-ignore
