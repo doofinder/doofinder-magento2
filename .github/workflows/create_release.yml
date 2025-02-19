@@ -1,0 +1,29 @@
+name: Create Release
+on:
+  push:
+    tags:
+      - "v*.*.*"
+jobs:
+  create-release:
+    name: Build & Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install zip (if needed)
+        run: apt-get update && apt-get install -y git
+      - name: Checkout
+        uses: actions/checkout@v2.0.0
+      - name: Create ZIP archive
+        id: vars
+        run: |
+          tag=${GITHUB_REF#refs/*/}
+          zip_path="doofinder-magento2-${GITHUB_REF#refs/*/}.zip"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "zip_path=$zip_path" >> $GITHUB_OUTPUT
+          git archive --format=zip -o $zip_path $tag
+      - name: Create release & upload asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.vars.outputs.zip_path }}
+          name: Doofinder for Magento 2 - ${{ steps.vars.outputs.tag }}
+          generate_release_notes: true
