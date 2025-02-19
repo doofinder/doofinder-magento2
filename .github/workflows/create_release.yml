@@ -8,8 +8,6 @@ jobs:
     name: Build & Create Release
     runs-on: ubuntu-latest
     steps:
-      - name: Install zip (if needed)
-        run: apt-get update && apt-get install -y git
       - name: Checkout
         uses: actions/checkout@v4
       - name: Create ZIP archive
