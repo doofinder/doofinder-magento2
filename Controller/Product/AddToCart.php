@@ -86,11 +86,11 @@ class AddToCart extends Action implements HttpPostActionInterface
 
         if (is_a($result, QuoteItem::class)) {
             //Update totals
-            $quote->setTriggerRecollect(1);
             $quote->setIsActive(true);
-            $quote->collectTotals();
-            $this->cartRepository->save($quote);
+            $quote->collectTotals()->save();
             $session->replaceQuote($quote)->unsLastRealOrderId();
+            $cart = $this->cartRepository->get($quote->getId());
+            $this->cartRepository->save($cart);
 
             return $resultJson->setData(['success' => true]);
         } else {
