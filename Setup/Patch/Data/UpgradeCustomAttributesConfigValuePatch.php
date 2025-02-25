@@ -67,7 +67,7 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface
             try {
                 list($scope, $id) = $this->storeConfig->getCurrentScope();
                 $customAttributes = $this->scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope, $id);
-                if ($customAttributes === null) {
+                if ($customAttributes !== null) {
                     $jsonDecodedAttributes = json_decode($customAttributes, true) ?: [];
                     $jsonData = json_encode($jsonDecodedAttributes);
                     if ($jsonData === false) {
