@@ -6,6 +6,7 @@ namespace Doofinder\Feed\Setup\Patch\Data;
 
 use Exception;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchVersionInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
@@ -14,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Serializer\Base64GzJson;
 
-class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface
+class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, PatchVersionInterface
 {
     /**
      * @var ModuleDataSetupInterface
