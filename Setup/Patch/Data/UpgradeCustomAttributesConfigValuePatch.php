@@ -14,10 +14,9 @@ use Psr\Log\LoggerInterface;
 
 use Doofinder\Feed\Helper\StoreConfig;
 
-
 class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface
 {
-    /** 
+    /**
      * @var StoreConfig
      */
     private $storeConfig;
@@ -45,6 +44,9 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface
     /**
      * @param Context $context
      * @param StoreConfig $storeConfig
+     * @param ModuleDataSetupInterface $moduleDataSetup
+     * @param ModuleContextInterface $moduleContext
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -60,12 +62,20 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface
         $this->logger = $logger;
     }
 
-    public function apply()
+    /**
+     * Apply data patch to upgrade custom attributes storage format.
+     *
+     * This patch compresses and base64 encodes custom attributes when updating
+     * from a module version less than 1.0.7. This change reduces storage size.
+     *
+     * @return $this
+     */
+    public function apply(): UpgradeCustomAttributesConfigValuePatch
     {
         if (version_compare($this->moduleContext->getVersion(), '1.0.7', '<')) {
             $this->moduleDataSetup->startSetup();
             try {
-                list($scope, $id) = $this->storeConfig->getCurrentScope();
+                [$scope, $id] = $this->storeConfig->getCurrentScope();
                 $customAttributes = $this->scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope, $id);
                 if ($customAttributes !== null) {
                     $jsonDecodedAttributes = json_decode($customAttributes, true) ?: [];
@@ -86,14 +96,32 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface
                 $this->moduleDataSetup->endSetup();
             }
         }
+        return $this;
     }
 
-    public static function getDependencies()
+    /**
+     * Get array of patches that have to be executed prior to this.
+     *
+     * Example of implementation:
+     *
+     * [
+     *      \Vendor_Name\Module_Name\Setup\Patch\Patch1::class,
+     *      \Vendor_Name\Module_Name\Setup\Patch\Patch2::class
+     * ]
+     *
+     * @return string[]
+     */
+    public static function getDependencies(): array
     {
         return [];
     }
 
-    public function getAliases()
+    /**
+     * Get aliases (previous names) for the patch.
+     *
+     * @return string[]
+     */
+    public function getAliases(): array
     {
         return [];
     }
