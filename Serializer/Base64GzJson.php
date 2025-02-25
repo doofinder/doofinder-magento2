@@ -34,8 +34,9 @@ class Base64GzJson extends Json
      */
     public function unserialize($string)
     {
-
-
+    public function unserialize($string)
+    {
+        $decoded = base64_decode($string, true);
         $decoded = base64_decode($string, true);
         if ($decoded === false) {
             return parent::unserialize($string);
