@@ -32,8 +32,7 @@ class Base64GzJson extends Json
      * @param string $string
      * @return string|int|float|bool|array|null
      */
-    public function unserialize($string)
-    {
+
     public function unserialize($string)
     {
         $decoded = base64_decode($string, true);
@@ -42,6 +41,7 @@ class Base64GzJson extends Json
             return parent::unserialize($string);
         }
 
+        // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
         $uncompressed = @gzuncompress($decoded);
         if ($uncompressed === false) {
             return parent::unserialize($string);
