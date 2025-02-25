@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Doofinder\Feed\Helper\StoreConfig;
 
 
-class UpgradeData implements DataPatchInterface
+class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface
 {
     /** 
      * @var StoreConfig
