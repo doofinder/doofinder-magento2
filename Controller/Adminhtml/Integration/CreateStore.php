@@ -85,6 +85,7 @@ class CreateStore extends Action implements HttpGetActionInterface
     public function execute()
     {
         $resultJson = $this->resultJsonFactory->create();
+
         if ($this->generateDoofinderStores() == true) {
             $resultJson->setData(true);
         } else {
@@ -121,6 +122,9 @@ class CreateStore extends Action implements HttpGetActionInterface
                 $this->saveInstallationConfig((int)$storeGroupId, $response["installation_id"], $response["script"]);
                 $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["config"]["search_engines"]);
             } catch (Exception $e) {
+                var_dump($e->getMessage());
+                var_dump($e->getTraceAsString());
+                exit;
                 $success = false;
                 $this->logger->error('Error creating store for store group "' . $storeGroup->getName() .
                     '". ' . $e->getMessage());
@@ -247,7 +251,7 @@ class CreateStore extends Action implements HttpGetActionInterface
             ];
         }
 
-        $customAttributes = json_encode($attributes);
+        $customAttributes = base64_encode(gzcompress(json_encode($attributes)));
         $this->storeConfig->setCustomAttributes($customAttributes);
     }
 
@@ -269,7 +273,7 @@ class CreateStore extends Action implements HttpGetActionInterface
         $primary_search_engine = array_values(array_filter($search_engines, function ($search_engine) use ($primary_language) {
             return $search_engine["language"] == $primary_language;
         }))[0];
-    
+
         return $primary_search_engine["site_url"];
     }
 
@@ -288,7 +292,7 @@ class CreateStore extends Action implements HttpGetActionInterface
             $composerJsonData = $directoryRead->readFile('composer.json');
         }
         $data = json_decode($composerJsonData);
-    
+
         return !empty($data->version) ? $data->version : '';
     }
 }
