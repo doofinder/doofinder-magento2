@@ -122,9 +122,6 @@ class CreateStore extends Action implements HttpGetActionInterface
                 $this->saveInstallationConfig((int)$storeGroupId, $response["installation_id"], $response["script"]);
                 $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["config"]["search_engines"]);
             } catch (Exception $e) {
-                var_dump($e->getMessage());
-                var_dump($e->getTraceAsString());
-                exit;
                 $success = false;
                 $this->logger->error('Error creating store for store group "' . $storeGroup->getName() .
                     '". ' . $e->getMessage());

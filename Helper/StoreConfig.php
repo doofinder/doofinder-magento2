@@ -38,7 +38,7 @@ class StoreConfig extends AbstractHelper
     /**
      * URL to make the doofinder requests
      */
-    public const URL = 'https://mursisoy-doomanager.ngrok.doofinder.com';
+    public const URL = 'https://admin.doofinder.com';
 
     /**
      * Path to account settings in config.xml/core_config_data
@@ -873,11 +873,11 @@ class StoreConfig extends AbstractHelper
             list($scope, $id) = $this->getCurrentScope();
         }
 
-        $custom_attributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, $scope, $id);
-        $custom_attributes = ($custom_attributes) ? json_decode(gzuncompress(base64_decode($custom_attributes)), true) : null;
+        $customAttributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, $scope, $id);
+        $customAttributes = ($customAttributes) ? json_decode(gzuncompress(base64_decode($customAttributes)), true) : null;
         $saved = [];
-        if ($custom_attributes && is_array($custom_attributes)) {
-            foreach ($custom_attributes as $rowId => $row) {
+        if ($customAttributes && is_array($customAttributes)) {
+            foreach ($customAttributes as $rowId => $row) {
                 if (!isset($saved[$rowId])) {
                     $saved[$rowId] = $row;
                 }

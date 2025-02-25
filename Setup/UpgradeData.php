@@ -39,17 +39,11 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), '1.0.7', '<')) {
 
             list($scope, $id) = $this->storeConfig->getCurrentScope();
-            $custom_attributes = $this->scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope, $id);
+            $customAttributes = $this->scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope, $id);
+            $jsonDecodedAttributes = json_decode($customAttributes, true) ?: [];
 
-            if ($custom_attributes !== null) {
-                $json_decoded_attributes = json_decode($custom_attributes, true);
-                if (null !== $json_decoded_attributes) {
-                    $encoded_attributes = base64_encode(gzcompress(json_encode($json_decoded_attributes)));
-                    $this->storeConfig->setCustomAttributes($encoded_attributes);
-                } else {
-                    $this->storeConfig->setCustomAttributes(null);
-                }
-            }
+            $encodedAttributes = base64_encode(gzcompress(json_encode($jsonDecodedAttributes)));
+            $this->storeConfig->setCustomAttributes($encodedAttributes);
         }
     }
 }
