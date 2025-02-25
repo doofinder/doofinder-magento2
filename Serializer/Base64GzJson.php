@@ -38,16 +38,12 @@ class Base64GzJson extends Json
 
         $decoded = base64_decode($string, true);
         if ($decoded === false) {
-            throw new \InvalidArgumentException(
-                'Unable to decode value. Error: Parameter must be a valid base64 string.'
-            );
+            return parent::unserialize($string);
         }
 
         $uncompressed = @gzuncompress($decoded);
         if ($uncompressed === false) {
-            throw new \InvalidArgumentException(
-                'Unable to uncompress value. Error: Parameter must be a valid gz string.'
-            );
+            return parent::unserialize($string);
         }
 
         return parent::unserialize($uncompressed);

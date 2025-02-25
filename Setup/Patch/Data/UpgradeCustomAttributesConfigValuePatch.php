@@ -7,59 +7,50 @@ namespace Doofinder\Feed\Setup\Patch\Data;
 use Exception;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
-use Magento\Framework\Setup\ModuleContextInterface;
-use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 use Psr\Log\LoggerInterface;
 
 use Doofinder\Feed\Helper\StoreConfig;
+use Doofinder\Feed\Serializer\Base64GzJson;
 
 class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface
 {
     /**
-     * @var StoreConfig
+     * @var ModuleDataSetupInterface
      */
-    private $storeConfig;
+    private $_moduleDataSetup;
 
     /**
      * @var ScopeConfigInterface
      */
-    private $scopeConfig;
+    private $_scopeConfig;
 
     /**
-     * @var ModuleDataSetupInterface
+     * @var WriterInterface
      */
-    private $moduleDataSetup;
-
-    /**
-     * @var ModuleContextInterface
-     */
-    private $moduleContext;
-
+    private $_configWriter;
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private $_logger;
 
     /**
-     * @param Context $context
-     * @param StoreConfig $storeConfig
      * @param ModuleDataSetupInterface $moduleDataSetup
-     * @param ModuleContextInterface $moduleContext
+     * @param ScopeConfigInterface $scopeConfig
+     * @param WriterInterface $configWriter
      * @param LoggerInterface $logger
      */
     public function __construct(
-        Context $context,
-        StoreConfig $storeConfig,
         ModuleDataSetupInterface $moduleDataSetup,
-        ModuleContextInterface $moduleContext,
+        ScopeConfigInterface $scopeConfig,
+        WriterInterface $configWriter,
         LoggerInterface $logger
     ) {
-        $this->storeConfig = $storeConfig;
-        $this->scopeConfig = $context->getScopeConfig();
-        $this->moduleDataSetup = $moduleDataSetup;
-        $this->moduleContext = $moduleContext;
-        $this->logger = $logger;
+        $this->_moduleDataSetup = $moduleDataSetup;
+        $this->_scopeConfig = $scopeConfig;
+        $this->_configWriter = $configWriter;
+        $this->_logger = $logger;
     }
 
     /**
@@ -72,57 +63,43 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface
      */
     public function apply(): UpgradeCustomAttributesConfigValuePatch
     {
-        if (version_compare($this->moduleContext->getVersion(), '1.0.7', '<')) {
-            $this->moduleDataSetup->startSetup();
-            try {
-                [$scope, $id] = $this->storeConfig->getCurrentScope();
-                $customAttributes = $this->scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope, $id);
-                if ($customAttributes !== null) {
-                    $jsonDecodedAttributes = json_decode($customAttributes, true) ?: [];
-                    $jsonData = json_encode($jsonDecodedAttributes);
-                    if ($jsonData === false) {
-                        throw new \Exception('Failed to encode attributes to JSON');
-                    }
-                    $compressedData = gzcompress($jsonData);
-                    if ($compressedData === false) {
-                        throw new \Exception('Failed to compress attributes data');
-                    }
-                    $encodedAttributes = base64_encode($compressedData);
-                    $this->storeConfig->setCustomAttributes($encodedAttributes);
-                }
-            } catch (Exception $e) {
-                $this->logger->error('Failed to update custom attributes: ' . $e->getMessage());
-            } finally {
-                $this->moduleDataSetup->endSetup();
-            }
+
+        $this->_moduleDataSetup->startSetup();
+        $customAttributes = $this->_scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, null);
+        if ($customAttributes !== null) {
+            $serializer = new Base64GzJson();
+            $this->_configWriter->save(
+                StoreConfig::CUSTOM_ATTRIBUTES,
+                $serializer->serialize($customAttributes),
+                ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+                null
+            );
         }
+        $this->_moduleDataSetup->endSetup();
         return $this;
     }
 
     /**
-     * Get array of patches that have to be executed prior to this.
-     *
-     * Example of implementation:
-     *
-     * [
-     *      \Vendor_Name\Module_Name\Setup\Patch\Patch1::class,
-     *      \Vendor_Name\Module_Name\Setup\Patch\Patch2::class
-     * ]
-     *
-     * @return string[]
+     * {@inheritdoc}
      */
-    public static function getDependencies(): array
+    public static function getDependencies()
     {
         return [];
     }
 
     /**
-     * Get aliases (previous names) for the patch.
-     *
-     * @return string[]
+     * {@inheritdoc}
      */
-    public function getAliases(): array
+    public function getAliases()
     {
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getVersion()
+    {
+        return '1.0.7';
     }
 }
