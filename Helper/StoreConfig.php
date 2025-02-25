@@ -874,7 +874,7 @@ class StoreConfig extends AbstractHelper
         }
 
         $customAttributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, $scope, $id);
-        $customAttributes = ($customAttributes) ? json_decode(gzuncompress(base64_decode($customAttributes)), true) : null;
+
         $saved = [];
         if ($customAttributes && is_array($customAttributes)) {
             foreach ($customAttributes as $rowId => $row) {
