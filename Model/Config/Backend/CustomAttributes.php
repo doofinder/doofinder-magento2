@@ -1,24 +1,32 @@
 <?php
+
 declare(strict_types=1);
 
 
 namespace Doofinder\Feed\Model\Config\Backend;
 
+use Doofinder\Feed\Serializer\Base64GzJson;
 use Magento\Config\Model\Config\Backend\Serialized\ArraySerialized;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Model\Context;
 use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Config\Data\ProcessorInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 
-class CustomAttributes extends ArraySerialized
+class CustomAttributes extends ArraySerialized implements ProcessorInterface
 {
     /**
      * @var ManagerInterface
      */
     private $messageManager;
+
+    /**
+     * @var Json
+     */
+    private $serializer;
 
     /**
      * CustomAttributes constructor.
@@ -41,9 +49,10 @@ class CustomAttributes extends ArraySerialized
         ManagerInterface $messageManager
     ) {
         $this->messageManager = $messageManager;
-        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection);
+        $this->serializer = new Base64GzJson();
+        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, [], $this->serializer);
     }
-    
+
     /**
      * Validate value
      *
@@ -55,12 +64,20 @@ class CustomAttributes extends ArraySerialized
         $this->messageManager->addNoticeMessage(
             __('To apply the changes in the custom attributes to your feed, it will be necessary to reindex it')
         );
-        
+
         // For value validations
         $exceptions = $this->getValue();
 
         $this->setValue($exceptions);
 
         return parent::beforeSave();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function processValue($value)
+    {
+        return empty($value) ? '' : $this->serializer->unserialize($value);
     }
 }

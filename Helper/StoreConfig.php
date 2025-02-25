@@ -656,7 +656,7 @@ class StoreConfig extends AbstractHelper
             self::LOGIN_ENDPOINT,
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
             null
-        ) ?? self::URL.'/plugins/login/magento2';
+        ) ?? self::URL . '/plugins/login/magento2';
     }
 
     /**
@@ -670,7 +670,7 @@ class StoreConfig extends AbstractHelper
             self::SIGNUP_ENDPOINT,
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
             null
-        ) ?? self::URL.'/plugins/signup/magento2';
+        ) ?? self::URL . '/plugins/signup/magento2';
     }
 
     /**
@@ -873,11 +873,11 @@ class StoreConfig extends AbstractHelper
             list($scope, $id) = $this->getCurrentScope();
         }
 
-        $custom_attributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, $scope, $id);
-        $custom_attributes = ($custom_attributes) ? json_decode($custom_attributes, true) : null;
+        $customAttributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, $scope, $id);
+
         $saved = [];
-        if ($custom_attributes && is_array($custom_attributes)) {
-            foreach ($custom_attributes as $rowId => $row) {
+        if ($customAttributes && is_array($customAttributes)) {
+            foreach ($customAttributes as $rowId => $row) {
                 if (!isset($saved[$rowId])) {
                     $saved[$rowId] = $row;
                 }
@@ -925,7 +925,7 @@ class StoreConfig extends AbstractHelper
     public function getIndexationStatus(int $storeId): array
     {
         $status = $this->scopeConfig->getValue(self::INDEXATION_STATUS, ScopeInterface::SCOPE_STORES, $storeId);
-        
+
         if ($status == null) {
             throw new NotFound('There is not a valid indexation status for the current store.');
         }
@@ -986,14 +986,14 @@ class StoreConfig extends AbstractHelper
             $liveLayerScript = preg_replace("/(\/\/\s*)?(language:)(.*?)(\n|,)/m", "$2 '$locale'$4", $liveLayerScript);
         } else {
             $pos = strpos($liveLayerScript, "{");
-            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tlanguage: '$locale',", $pos+1, 0);
+            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tlanguage: '$locale',", $pos + 1, 0);
         }
 
         if (strpos($liveLayerScript, 'currency:') !== false) {
             $liveLayerScript = preg_replace("/(\/\/\s*)?(currency:)(.*?)(\n|,)/m", "$2 '$currency'$4", $liveLayerScript);
         } else {
             $pos = strpos($liveLayerScript, "{");
-            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tcurrency: '$currency',", $pos+1, 0);
+            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tcurrency: '$currency',", $pos + 1, 0);
         }
 
         return $liveLayerScript;
