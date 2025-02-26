@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Setup\Patch\Data;
 
-use Exception;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchVersionInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\App\ResourceConnection;
 use Psr\Log\LoggerInterface;
 
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Serializer\Base64GzJson;
+
 
 class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, PatchVersionInterface
 {
@@ -21,6 +22,11 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
      * @var ModuleDataSetupInterface
      */
     private $_moduleDataSetup;
+
+    /**
+     * @var ResourceConnection
+     */
+    private $_resourceConnection;
 
     /**
      * @var ScopeConfigInterface
@@ -38,17 +44,20 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
 
     /**
      * @param ModuleDataSetupInterface $moduleDataSetup
+     * @param ResourceConnection $resourceConnection
      * @param ScopeConfigInterface $scopeConfig
      * @param WriterInterface $configWriter
      * @param LoggerInterface $logger
      */
     public function __construct(
         ModuleDataSetupInterface $moduleDataSetup,
+        ResourceConnection $resourceConnection,
         ScopeConfigInterface $scopeConfig,
         WriterInterface $configWriter,
         LoggerInterface $logger
     ) {
         $this->_moduleDataSetup = $moduleDataSetup;
+        $this->_resourceConnection = $resourceConnection;
         $this->_scopeConfig = $scopeConfig;
         $this->_configWriter = $configWriter;
         $this->_logger = $logger;
@@ -64,18 +73,28 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
      */
     public function apply(): UpgradeCustomAttributesConfigValuePatch
     {
-
         $this->_moduleDataSetup->startSetup();
-        $customAttributes = $this->_scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, null);
-        if ($customAttributes !== null) {
+
+        $connection = $this->_resourceConnection->getConnection();
+
+        $tableName = $this->_resourceConnection->getTableName('core_config_data');
+
+        $select = $connection->select()
+            ->from(['c' => $tableName], ['scope', 'scope_id'])
+            ->where('c.path = ?', StoreConfig::CUSTOM_ATTRIBUTES);
+
+        $configuredScopes = $connection->fetchAll($select);
+        foreach ($configuredScopes as $scope) {
+            $customAttributes = $this->_scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope['scope'], $scope['scope_id']);
             $serializer = new Base64GzJson();
             $this->_configWriter->save(
                 StoreConfig::CUSTOM_ATTRIBUTES,
                 $serializer->serialize($customAttributes),
-                ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
-                null
+                $scope['scope'],
+                $scope['scope_id']
             );
         }
+
         $this->_moduleDataSetup->endSetup();
         return $this;
     }
@@ -101,6 +120,6 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
      */
     public static function getVersion(): string
     {
-        return '1.0.7';
+        return '1.0.8';
     }
 }
