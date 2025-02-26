@@ -100,7 +100,6 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
             $this->_logger->info('Found ' . count($configuredScopes) . ' scopes with custom attributes configuration');
             foreach ($configuredScopes as $scope) {
                 $customAttributes = $this->_scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope['scope'], $scope['scope_id']);
-                $serializer = new Base64GzJson();
                 $this->_configWriter->save(
                     StoreConfig::CUSTOM_ATTRIBUTES,
                     $this->_serializer->serialize($customAttributes),
