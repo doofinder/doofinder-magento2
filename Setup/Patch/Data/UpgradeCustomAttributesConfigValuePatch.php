@@ -91,7 +91,7 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
     /**
      * {@inheritdoc}
      */
-    public function getAliases()
+    public function getAliases(): array
     {
         return [];
     }
