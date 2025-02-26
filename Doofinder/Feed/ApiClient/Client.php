@@ -273,19 +273,10 @@ class Client
      */
     private function getApiBaseURL(): string
     {
-        $url = getenv("DOOFINDER_ADMIN_URL") ?: "https://admin.doofinder.com";
-        switch ($this->apiType) {
-            case self::DOOPLUGINS:
-                $url = sprintf(getenv("DOOFINDER_PLUGINS_URL_FORMAT") ?: "https://%s-plugins.doofinder.com", $this->clusterRegion);
-                break;
-            case 'search':
-                $url = sprintf(getenv("DOOFINDER_API_URL_FORMAT") ?: "https://%s-search.doofinder.com", $this->clusterRegion);
-                break;
-            case 'api':
-                $url = sprintf(getenv("DOOFINDER_API_URL_FORMAT") ?: "https://%s-api.doofinder.com", $this->clusterRegion);
-                break;
+        if ($this->apiType === self::DOOPLUGINS) {
+            return sprintf("https://%s-plugins.doofinder.com", $this->clusterRegion);
         }
-        return $url;
+        return sprintf("https://%s-%s.doofinder.com", $this->clusterRegion, $this->apiType);
     }
 
     /**
@@ -307,7 +298,7 @@ class Client
     {
         $flattened_ids = [];
         array_walk_recursive($ids, function ($id) use (&$flattened_ids) {
-             $flattened_ids[] = $id;
+            $flattened_ids[] = $id;
         });
         return $flattened_ids;
     }
