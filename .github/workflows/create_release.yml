@@ -17,7 +17,7 @@ jobs:
           zip_path="doofinder-magento2-${GITHUB_REF#refs/*/}.zip"
           echo "tag=$tag" >> $GITHUB_OUTPUT
           echo "zip_path=$zip_path" >> $GITHUB_OUTPUT
-          git archive --format=zip -o $zip_path $tag
+          git archive --format=zip -o $zip_path $tag:Doofinder/Feed
       - name: Create release & upload asset
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
