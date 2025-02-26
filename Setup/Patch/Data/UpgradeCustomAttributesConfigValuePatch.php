@@ -83,7 +83,7 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
     /**
      * {@inheritdoc}
      */
-    public static function getDependencies()
+    public static function getDependencies(): array
     {
         return [];
     }
