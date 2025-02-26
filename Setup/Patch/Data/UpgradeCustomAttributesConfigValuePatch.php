@@ -99,7 +99,7 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
     /**
      * {@inheritdoc}
      */
-    public static function getVersion()
+    public static function getVersion(): string
     {
         return '1.0.7';
     }
