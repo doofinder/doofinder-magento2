@@ -115,7 +115,7 @@ class ModuleData
                     $storeCode,
                     $this->storeConfig->getLanguageFromStore($store),
                     $store->getCurrentCurrencyCode(),
-                    $this->getInstallationId($store)
+                    $this->getInstallationId($store) ?: ""
                 ))->jsonSerialize();
             }
             $websiteStructs[] = (new WebsiteStruct(

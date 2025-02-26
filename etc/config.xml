@@ -19,6 +19,9 @@
             <installing_loop>
                 <status>0</status>
             </installing_loop>
+            <doofinder_custom_attributes>
+                <custom_attributes backend_model="Doofinder\Feed\Model\Config\Backend\CustomAttributes"></custom_attributes>
+            </doofinder_custom_attributes>
         </doofinder_config_config>
         <csp>
             <policies>
