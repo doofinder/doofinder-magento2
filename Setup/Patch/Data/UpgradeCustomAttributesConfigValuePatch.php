@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Serializer\Base64GzJson;
-
+use Exception;
 
 class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, PatchVersionInterface
 {
@@ -37,6 +37,12 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
      * @var WriterInterface
      */
     private $_configWriter;
+
+    /**
+     * @var Base64GzJson
+     */
+    private $_serializer;
+
     /**
      * @var LoggerInterface
      */
@@ -47,6 +53,7 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
      * @param ResourceConnection $resourceConnection
      * @param ScopeConfigInterface $scopeConfig
      * @param WriterInterface $configWriter
+     * @param Base64GzJson $serializer
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -54,12 +61,14 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
         ResourceConnection $resourceConnection,
         ScopeConfigInterface $scopeConfig,
         WriterInterface $configWriter,
+        Base64GzJson $serializer,
         LoggerInterface $logger
     ) {
         $this->_moduleDataSetup = $moduleDataSetup;
         $this->_resourceConnection = $resourceConnection;
         $this->_scopeConfig = $scopeConfig;
         $this->_configWriter = $configWriter;
+        $this->_serializer = $serializer;
         $this->_logger = $logger;
     }
 
@@ -74,28 +83,41 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
     public function apply(): UpgradeCustomAttributesConfigValuePatch
     {
         $this->_moduleDataSetup->startSetup();
+        $this->_logger->info('Starting custom attributes upgrade process');
 
         $connection = $this->_resourceConnection->getConnection();
 
-        $tableName = $this->_resourceConnection->getTableName('core_config_data');
+        try {
+            // Start transaction
+            $connection->beginTransaction();
+            $tableName = $this->_resourceConnection->getTableName('core_config_data');
 
-        $select = $connection->select()
-            ->from(['c' => $tableName], ['scope', 'scope_id'])
-            ->where('c.path = ?', StoreConfig::CUSTOM_ATTRIBUTES);
+            $select = $connection->select()
+                ->from(['c' => $tableName], ['scope', 'scope_id'])
+                ->where('c.path = ?', StoreConfig::CUSTOM_ATTRIBUTES);
 
-        $configuredScopes = $connection->fetchAll($select);
-        foreach ($configuredScopes as $scope) {
-            $customAttributes = $this->_scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope['scope'], $scope['scope_id']);
-            $serializer = new Base64GzJson();
-            $this->_configWriter->save(
-                StoreConfig::CUSTOM_ATTRIBUTES,
-                $serializer->serialize($customAttributes),
-                $scope['scope'],
-                $scope['scope_id']
-            );
+            $configuredScopes = $connection->fetchAll($select);
+            $this->_logger->info('Found ' . count($configuredScopes) . ' scopes with custom attributes configuration');
+            foreach ($configuredScopes as $scope) {
+                $customAttributes = $this->_scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope['scope'], $scope['scope_id']);
+                $serializer = new Base64GzJson();
+                $this->_configWriter->save(
+                    StoreConfig::CUSTOM_ATTRIBUTES,
+                    $this->_serializer->serialize($customAttributes),
+                    $scope['scope'],
+                    $scope['scope_id']
+                );
+                $this->_logger->info('Successfully upgraded custom attributes for scope: ' . $scope['scope'] . ', scope_id: ' . $scope['scope_id']);
+            }
+            $connection->commit();
+        } catch (Exception $e) {
+            // Rollback the transaction in case of error
+            $connection->rollBack();
+            $this->_logger->critical('Failed to upgrade custom attributes: ' . $e->getMessage(), ['exception' => $e]);
+            throw $e;
         }
-
         $this->_moduleDataSetup->endSetup();
+        $this->_logger->info('Completed custom attributes upgrade process');
         return $this;
     }
 
