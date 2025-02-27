@@ -1,0 +1,65 @@
+#!/bin/bash
+set -e
+
+MAGENTO_BIN="php /app/bin/magento"
+
+if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
+  ${MAGENTO_BIN} setup:install \
+	--admin-firstname="$MAGENTO_ADMIN_FIRST_NAME" \
+	--admin-lastname="$MAGENTO_ADMIN_LAST_NAME" \
+	--admin-email="$MAGENTO_ADMIN_EMAIL" \
+	--admin-user="$MAGENTO_ADMIN_USER" \
+	--admin-password="$MAGENTO_ADMIN_PASSWORD" \
+	--base-url=http://"$MAGENTO_BASE_URL" \
+	--base-url-secure=https://"$MAGENTO_BASE_URL" \
+	--backend-frontname="$MAGENTO_ADMIN_FRONTNAME" \
+	--db-host=db \
+	--db-name="$MYSQL_DATABASE" \
+	--db-user="$MYSQL_USER" \
+	--db-password="$MYSQL_PASSWORD" \
+	--use-rewrites=1 \
+	--language="$MAGENTO_LOCALE" \
+	--currency="$MAGENTO_CURRENCY" \
+	--timezone="$MAGENTO_TIMEZONE" \
+	--use-secure-admin=0
+fi
+
+if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
+  ${MAGENTO_BIN} setup:install \
+	--admin-firstname="$MAGENTO_ADMIN_FIRST_NAME" \
+	--admin-lastname="$MAGENTO_ADMIN_LAST_NAME" \
+	--admin-email="$MAGENTO_ADMIN_EMAIL" \
+	--admin-user="$MAGENTO_ADMIN_USER" \
+	--admin-password="$MAGENTO_ADMIN_PASSWORD" \
+	--base-url=http://"$MAGENTO_BASE_URL" \
+	--base-url-secure=https://"$MAGENTO_BASE_URL" \
+	--backend-frontname="$MAGENTO_ADMIN_FRONTNAME" \
+	--db-host=db \
+	--db-name="$MYSQL_DATABASE" \
+	--db-user="$MYSQL_USER" \
+	--db-password="$MYSQL_PASSWORD" \
+	--use-rewrites=1 \
+	--language="$MAGENTO_LOCALE" \
+	--currency="$MAGENTO_CURRENCY" \
+	--timezone="$MAGENTO_TIMEZONE" \
+	--use-secure-admin=0 \
+	--search-engine=elasticsearch7 \
+	--elasticsearch-host=elasticsearch
+fi
+
+
+${MAGENTO_BIN} deploy:mode:set developer
+${MAGENTO_BIN} indexer:reindex
+
+if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
+  ${MAGENTO_BIN} module:disable Magento_AdminAdobeImsTwoFactorAuth --clear-static-content
+  ${MAGENTO_BIN} module:disable Magento_TwoFactorAuth --clear-static-content
+fi
+
+if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
+  sed -i 's/xdebug_disable();/ /g' /app/vendor/magento/magento2-functional-testing-framework/src/Magento/FunctionalTestingFramework/_bootstrap.php
+fi
+
+cp $(composer config home)/auth.json /app/var/composer_home/auth.json
+
+echo "Magento installation complete!"
