@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -84,7 +85,9 @@ class Config extends Action implements HttpPostActionInterface
         $region = 'eu1';
         if ($apiEndpoint) {
             $apiEndpointParts = explode('-', str_replace('https://', '', $apiEndpoint));
-            $region = $apiEndpointParts[0];
+            if (preg_match("/^[a-z]{2}[0-9]$/", $apiEndpointParts[0]) === 1) {
+                $region = $apiEndpointParts[0];
+            }
         }
 
         return $region;
