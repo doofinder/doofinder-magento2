@@ -28,7 +28,7 @@ class SingleScript
      * @var ComponentRegistrarInterface
      */
     protected $componentRegistrar;
-    
+
     /**
      * @var StoreConfig
      */
@@ -72,7 +72,7 @@ class SingleScript
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -83,7 +83,7 @@ class SingleScript
         );
         return [$singleScriptStruct->jsonSerialize()];
     }
-    
+
     private function replaceAndGetScripts(): array
     {
         $scripts = [];
@@ -95,8 +95,8 @@ class SingleScript
                 if (empty($installationId) || empty($region)) {
                     continue;
                 }
-                
-                $singleScript = '<script src="https://' . $region . '-config.doofinder.com/2.x/' . $installationId . '.js" async></script>';
+
+                $singleScript = '<script src="' . sprintf(getenv("DOOFINDER_SCRIPT_URL_FORMAT") ?: "https://%s-config.doofinder.com/2.x/%s.js", $region, $installationId) . '" async></script>';
 
                 $storeGroupId = $store->getStoreGroupId();
                 $scripts[] = trim($singleScript);
