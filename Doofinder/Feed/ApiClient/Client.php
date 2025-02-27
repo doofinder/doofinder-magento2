@@ -298,7 +298,7 @@ class Client
     {
         $flattened_ids = [];
         array_walk_recursive($ids, function ($id) use (&$flattened_ids) {
-             $flattened_ids[] = $id;
+            $flattened_ids[] = $id;
         });
         return $flattened_ids;
     }

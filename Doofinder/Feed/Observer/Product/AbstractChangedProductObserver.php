@@ -87,7 +87,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
                 
                 if ($product->getStatus() == Status::STATUS_DISABLED) {
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_DELETE);
-                } elseif (!in_array($product->getVisibility(), $this->visibilityAllowed) && count($parentProducts) == 0){
+                } elseif (!in_array($product->getVisibility(), $this->visibilityAllowed) && count($parentProducts) == 0) {
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_DELETE);
                 } elseif ($product->getUpdatedAt() == $product->getCreatedAt() &&
                     $operationType == ChangedItemInterface::OPERATION_TYPE_UPDATE

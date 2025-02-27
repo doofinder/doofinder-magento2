@@ -18,7 +18,7 @@ services:
     volumes:
       - ./auth_json:/auth_json
       - ./src:/app
-      - ./:/app/app/code/Doofinder/Feed
+      - ./Doofinder:/app/app/code/Doofinder
       - ./src/ignore-folder-src-loop:/app/app/code/Doofinder/Feed/src
     ports:
       - "9012:80"
@@ -72,7 +72,7 @@ services:
     volumes:
       - ./build.sh:/build.sh
       - ./src:/app
-      - ./:/app/app/code/Doofinder/Feed
+      - ./Doofinder:/app/app/code/Doofinder
       - ./src/ignore-folder-src-loop:/app/app/code/Doofinder/Feed/src
     entrypoint: sh -c "chmod +x /build.sh; /build.sh" 
     links:
