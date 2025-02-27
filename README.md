@@ -69,6 +69,19 @@ Change your branch to the tag that you want inside package directory
 make upgrade-doofinder
 ```
 
+## Backup and Restore Database
+
+During development, it is sometimes useful to create a data snapshot before performing an action.
+
+- To create a database dump, use:
+  ```sh
+  make backup-db [prefix=_some_state]
+  ```
+- To restore a previous state, run:
+  ```sh
+  make restore-db file=backup_file.sql.gz
+  ```
+
 ## Last notes
 
 Please, take care when you change in `.env` the MAGENTO_VERSION parameter since you'll have to change probably the PHP_VERSION & COMPOSER_VERSION ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:
