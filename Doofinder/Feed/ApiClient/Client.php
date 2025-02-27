@@ -273,10 +273,19 @@ class Client
      */
     private function getApiBaseURL(): string
     {
-        if ($this->apiType === self::DOOPLUGINS) {
-            return sprintf("https://%s-plugins.doofinder.com", $this->clusterRegion);
+        $url = getenv("DOOFINDER_ADMIN_URL") ?: "https://admin.doofinder.com";
+        switch ($this->apiType) {
+            case self::DOOPLUGINS:
+                $url = sprintf(getenv("DOOFINDER_PLUGINS_URL_FORMAT") ?: "https://%s-plugins.doofinder.com", $this->clusterRegion);
+                break;
+            case self::SEARCH_API:
+                $url = sprintf(getenv("DOOFINDER_SEARCH_URL_FORMAT") ?: "https://%s-search.doofinder.com", $this->clusterRegion);
+                break;
+            case self::MANAGEMENT_API:
+                $url = sprintf(getenv("DOOFINDER_API_URL_FORMAT") ?: "https://%s-api.doofinder.com", $this->clusterRegion);
+                break;
         }
-        return sprintf("https://%s-%s.doofinder.com", $this->clusterRegion, $this->apiType);
+        return $url;
     }
 
     /**
