@@ -17,7 +17,7 @@ $(eval $(ARGS):;@:)
 ifeq ($(DOOFINDER_LOCAL),true)
 	docker_compose = docker compose --env-file .env --env-file .env.local
 else
-	ocker_compose = docker compose
+	docker_compose = docker compose
 endif
 
 docker_exec_web = $(docker_compose) exec -u application web
