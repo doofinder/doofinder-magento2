@@ -10,8 +10,6 @@ ARG MAGENTO_VERSION
 
 RUN composer self-update "$COMPOSER_VERSION"
 
-RUN hash composer 2>/dev/null && IS_COMPOSER_ON_HOST=true
-
 RUN mkdir -p /app
 
 RUN chown -R application:application /app
@@ -29,6 +27,6 @@ USER root
 
 COPY /bin/install_magento /usr/local/bin/install_magento
 
-RUN chmod 4755 /usr/local/bin/install_magento
+RUN chmod 755 /usr/local/bin/install_magento
 
 RUN chown application:application /usr/local/bin/install_magento
