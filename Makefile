@@ -58,17 +58,18 @@ cache-flush:
 
 # Build Docker images, install Magento, and start containers
 setup: configure
+	$(docker_compose) pull --ignore-buildable
 	$(docker_compose) build
 	$(docker_compose) run --rm web su application -c magento_install
 	$(docker_compose) up -d
+
+# Setup Magento and deploy sample data
+setup-with-data: setup load-sampledata
 
 # Deploy sample data and upgrade Magento
 load-sampledata: configure
 	$(docker_exec_web) php bin/magento sampledata:deploy
 	$(docker_exec_web) php bin/magento setup:upgrade
-
-# Setup Magento and deploy sample data
-setup-with-data: setup load-sampledata
 
 # Check code compliance for the Doofinder Feed module using PHP Code Sniffer
 compliance:
