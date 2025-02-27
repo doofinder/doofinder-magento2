@@ -59,7 +59,7 @@ If you uncomment Varnish container, remember to comment the port `9012:80` in th
 You can remove the Doofinder module using this straightforward method:
 
 ```
-make unistall-doofinder
+make uninstall-doofinder
 ```
 
 ## Test another versions
