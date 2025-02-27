@@ -21,6 +21,8 @@ services:
       elasticsearch:
           condition: service_healthy
     environment:
+      MYSQL_HOST: db
+      ELASTICSEARCH_HOST: elasticsearch
       MAGENTO_EDITION: ${MAGENTO_EDITION}
       MAGENTO_VERSION: ${MAGENTO_VERSION}
       MAGENTO_BASE_URL: ${MAGENTO_BASE_URL}
@@ -41,9 +43,7 @@ services:
       WEB_ALIAS_DOMAIN: ${MAGENTO_BASE_URL}
       WEB_DOCUMENT_ROOT: /app/pub
       PHP_MAX_EXECUTION_TIME: 300
-
       # XDEBUG_CONFIG: "remote_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} remote_autostart=1 remote_connect_back=0 remote_enable=1 remote_handler=dbgp remote_mode=req remote_port=9000"
-
     volumes:
       - magento-src:/app
       - ./Doofinder:/app/app/code/Doofinder

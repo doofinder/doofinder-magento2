@@ -13,7 +13,7 @@ if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
 	--base-url=http://"$MAGENTO_BASE_URL" \
 	--base-url-secure=https://"$MAGENTO_BASE_URL" \
 	--backend-frontname="$MAGENTO_ADMIN_FRONTNAME" \
-	--db-host=db \
+	--db-host="$MYSQL_HOST" \
 	--db-name="$MYSQL_DATABASE" \
 	--db-user="$MYSQL_USER" \
 	--db-password="$MYSQL_PASSWORD" \
@@ -34,7 +34,7 @@ if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
 	--base-url=http://"$MAGENTO_BASE_URL" \
 	--base-url-secure=https://"$MAGENTO_BASE_URL" \
 	--backend-frontname="$MAGENTO_ADMIN_FRONTNAME" \
-	--db-host=db \
+	--db-host="$MYSQL_HOST" \
 	--db-name="$MYSQL_DATABASE" \
 	--db-user="$MYSQL_USER" \
 	--db-password="$MYSQL_PASSWORD" \
@@ -44,7 +44,7 @@ if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
 	--timezone="$MAGENTO_TIMEZONE" \
 	--use-secure-admin=0 \
 	--search-engine=elasticsearch7 \
-	--elasticsearch-host=elasticsearch
+	--elasticsearch-host="$ELASTICSEARCH_HOST"
 fi
 
 
