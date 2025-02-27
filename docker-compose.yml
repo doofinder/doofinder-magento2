@@ -12,8 +12,9 @@ services:
         MAGENTO_EDITION: ${MAGENTO_EDITION}
         MAGENTO_VERSION: ${MAGENTO_VERSION}
         COMPOSER_VERSION: ${COMPOSER_VERSION}
-        COMPOSER_AUTH_USERNAME: ${COMPOSER_AUTH_USERNAME}
-        COMPOSER_AUTH_PASSWORD: ${COMPOSER_AUTH_PASSWORD}
+      secrets:
+        - composer_auth_username
+        - composer_auth_password
     depends_on:
       db:
           condition: service_healthy
@@ -49,6 +50,9 @@ services:
     ports:
       - "9012:80"
       - "4012:443"
+    secrets:
+        - composer_auth_username
+        - composer_auth_password
 
   # MySQL container
   db:
@@ -94,6 +98,11 @@ services:
         interval: 30s
         timeout: 30s
         retries: 3
+secrets:
+  composer_auth_username:
+    environment: COMPOSER_AUTH_USERNAME
+  composer_auth_password:
+    environment: COMPOSER_AUTH_PASSWORD
 volumes:
   magento-db:
   magento-src:
