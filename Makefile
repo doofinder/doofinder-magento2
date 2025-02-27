@@ -35,6 +35,7 @@ backup-db:
 
 # Restore the MySQL database using a provided backup file (pass file=<backupfile> as argument)
 restore-db:
+	@test -z "$(file)" && echo "Error: 'file' variable not provided. Use file=<backupfile>" && exit 1;
 	gunzip < $(file) | $(docker_compose) exec -T db /usr/bin/mysql -u root -pmagentobase magentobase
 
 # Enable the Doofinder module, upgrade Magento, and clean the cache
