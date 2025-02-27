@@ -197,7 +197,7 @@ class Price extends AbstractHelper
         $minimum_variant = null;
 
         // To exclude disabled variants from the calculations
-        $usedProds = array_filter($usedProds, function($child) {
+        $usedProds = array_filter($usedProds, function ($child) {
             return Status::STATUS_ENABLED === (int)$child->getStatus();
         });
 
