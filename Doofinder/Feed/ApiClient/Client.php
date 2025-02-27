@@ -278,10 +278,10 @@ class Client
             case self::DOOPLUGINS:
                 $url = sprintf(getenv("DOOFINDER_PLUGINS_URL_FORMAT") ?: "https://%s-plugins.doofinder.com", $this->clusterRegion);
                 break;
-            case 'search':
+            case self::SEARCH_API:
                 $url = sprintf(getenv("DOOFINDER_API_URL_FORMAT") ?: "https://%s-search.doofinder.com", $this->clusterRegion);
                 break;
-            case 'api':
+            case self::MANAGEMENT_API:
                 $url = sprintf(getenv("DOOFINDER_API_URL_FORMAT") ?: "https://%s-api.doofinder.com", $this->clusterRegion);
                 break;
         }
