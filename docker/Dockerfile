@@ -25,8 +25,8 @@ RUN php -d memory_limit=-1 /usr/local/bin/composer create-project \
 
 USER root
 
-COPY /bin/install_magento /usr/local/bin/install_magento
+COPY /bin/magento_install /usr/local/bin/magento_install
 
-RUN chmod 755 /usr/local/bin/install_magento
+RUN chmod 755 /usr/local/bin/magento_install
 
-RUN chown application:application /usr/local/bin/install_magento
+RUN chown application:application /usr/local/bin/magento_install

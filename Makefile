@@ -48,7 +48,7 @@ cache-flush:
 # Build Docker images, install Magento, and start containers
 setup:
 	docker compose build
-	docker compose run --rm web su application -c install_magento
+	docker compose run --rm web su application -c magento_install
 	docker compose up -d
 
 # Deploy sample data and upgrade Magento
