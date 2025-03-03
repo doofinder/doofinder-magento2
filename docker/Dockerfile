@@ -10,11 +10,7 @@ RUN mkdir -p /app
 
 RUN chown -R application:application /app
 
-USER application
-
 WORKDIR /app
-
-USER root
 
 COPY /bin/magento_install /usr/local/bin/magento_install
 
@@ -23,3 +19,4 @@ RUN chmod 755 /usr/local/bin/magento_install
 COPY /bin/magento_download /usr/local/bin/magento_download
 
 RUN chmod 755 /usr/local/bin/magento_download
+
