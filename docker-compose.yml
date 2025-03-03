@@ -4,14 +4,12 @@ services:
 
   # Web container
   web:
-    image: doofinder-magento2:php-${PHP_VERSION}-composer-${COMPOSER_VERSION}-magento-${MAGENTO_EDITION}-${MAGENTO_VERSION}
+    image: doofinder-magento2:php-${PHP_VERSION}-composer-${COMPOSER_VERSION}
     build:
       context: docker
       args:
         PHP_VERSION: ${PHP_VERSION}
         COMPOSER_VERSION: ${COMPOSER_VERSION}
-        MAGENTO_EDITION: ${MAGENTO_EDITION}
-        MAGENTO_VERSION: ${MAGENTO_VERSION}
       secrets:
         - composer_auth_username
         - composer_auth_password
@@ -55,7 +53,7 @@ services:
         - composer_auth_password
 
   setup:
-    image:  doofinder-magento2:php-${PHP_VERSION}-composer-${COMPOSER_VERSION}-magento-${MAGENTO_EDITION}-${MAGENTO_VERSION}
+    image:  doofinder-magento2:php-${PHP_VERSION}-composer-${COMPOSER_VERSION}
     pull_policy: never
     profiles:
       - setup
@@ -64,6 +62,7 @@ services:
       MAGENTO_VERSION: ${MAGENTO_VERSION}
     volumes:
       - ./app:/app
+      - ~/.composer/cache:/root/.composer/cache
     secrets:
         - composer_auth_username
         - composer_auth_password
@@ -128,7 +127,6 @@ services:
     #     - web
     #   volumes:
     #     - ./default.vcl:/etc/varnish/default.vcl
-
 secrets:
   composer_auth_username:
     environment: COMPOSER_AUTH_USERNAME
