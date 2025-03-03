@@ -21,13 +21,12 @@ It is mandatory to obtain credentials for composer usage. These fields can be ob
 
 ### Initial setup
 
-You can setup a fresh magento installation using provided `Makefile` targets `setup`or `setup-with-data`. This command will:
-- Pull the images
-- Build a base Magento 2 image with defined `PHP_VERSION`, `MAGENTO_EDITION` and `MAGENTO_VERSION` environment variables.
-- Run a magento installation with variables defined in `.env` file.
-- Optionally: Load sample data into magento
-- Spin up services
-
+You can setup a fresh magento installation using provided `Makefile` targets `init`or `init-with-data`. This command will:
+- `make pull-build`: Pull and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
+- `make magento-download`: Run a magento `create-project` command inside a bind mount into `./app`.
+- `make start`: Start the containers
+- `make magento-install`: Run a magento installation with variables defined in `.env` file.
+- `make magento-load-sampledata`: Optionally: Load sample data into magento
 
 Finally, Magento 2 with the module installed will be running at `http://MAGENTO_BASE_URL:9012`.
 
@@ -40,7 +39,7 @@ Pass: admin123
 
 ## Xdebug ready to use
 
-If you wish to debug your new Magento installation, just simply set the correct values in `.env` and configure your IDE attending to the remote PHP docker container `web`. You should also bind your local source path: `./src` to the docker one: `/app`
+If you wish to debug your new Magento installation, just simply set the correct values in `.env` and configure your IDE attending to the remote PHP docker container `web`.
 
 ## PhpMyAdmin ready to use
 
