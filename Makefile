@@ -25,10 +25,22 @@ docker_run_web = $(docker_compose) run --rm web su application -c
 
 # Default target: list available tasks
 all:
+	@echo "Before \`make init\` be sure to set up your environment with a proper \`.env\` file."
 	@echo "Select a task defined in the Makefile:"
 	@echo "  command, console, start, stop, backup-db, restore-db, upgrade-doofinder,"
 	@echo "  uninstall-doofinder, reinstall-doofinder, cache-flush, setup, load-sampledata,"
 	@echo "  setup-with-data, compliance"
+
+check-env:
+ifeq ($(COMPOSER_AUTH_USERNAME),"")
+	$(error COMPOSER_AUTH_USERNAME is undefined.)
+endif
+ifeq ($(COMPOSER_AUTH_PASSWORD),"")
+	$(error COMPOSER_AUTH_PASSWORD is undefined.)
+endif
+ifeq ($(MAGENTO_BASE_URL),"")
+	$(error MAGENTO_BASE_URL is undefined. Please be sure all environment variables from `.env.example` are defined and correct.)
+endif
 
 # Configures extension static files
 configure:
@@ -76,11 +88,11 @@ pull-build:
 	$(docker_compose) build
 
 # Downloads and update a magento project
-magento-download:
+magento-download: check-env
 	$(docker_compose) run --rm setup
 
 # Install a magento site
-magento-install: configure start
+magento-install: check-env configure start
 	$(docker_exec_web) magento_install
 
 # Deploy sample data and upgrade Magento
