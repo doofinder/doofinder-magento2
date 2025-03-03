@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+chown application:application /app
+
+composer config --global http-basic.repo.magento.com \
+	$(< /var/run/secrets/composer_auth_username) $(< /var/run/secrets/composer_auth_password)
+
+php -d memory_limit=-1 /usr/local/bin/composer create-project \
+    --repository=https://repo.magento.com/ magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION /app
+
+composer update
+
+find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
+
+find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
+
+chown -R application:application /app
