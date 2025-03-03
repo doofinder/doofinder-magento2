@@ -89,7 +89,6 @@ services:
   # PhpMyAdmin container
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
     environment:
       PMA_HOST: db
       PMA_PORT: 3306
@@ -116,7 +115,6 @@ services:
     # Varnish container
     # varnish:
     #   image: varnish:stable
-    #   container_name: varnish
     #   environment:
     #     VARNISH_BACKEND_HOST: web
     #     VARNISH_BACKEND_PORT: 80
