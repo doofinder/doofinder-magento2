@@ -1,4 +1,4 @@
-.PHONY: backup-db cache-flush clean command compliance configure console init init-with-data load-sampledata magento-download magento-install magento-load-sampledata Makefile pull-build reinstall-doofinder restore-db setup setup-with-data start stop uninstall-doofinder upgrade-doofinder
+.PHONY: backup-db cache-flush clean command compliance configure console init init-with-data load-sampledata magento-download magento-install magento-load-sampledata pull-build reinstall-doofinder restore-db setup setup-with-data start stop uninstall-doofinder upgrade-doofinder
 
 # Include environment variables from .env file
 include .env
