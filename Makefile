@@ -114,5 +114,5 @@ stop:
 
 clean:
 	@echo -n "Are you sure, this will delete volumes and ./app directory? [y/N] " && read ans && [ $${ans:-N} = y ]
-	docker compose down -v
+	$(docker_compose) down -v
 	sudo rm -rf ./app
