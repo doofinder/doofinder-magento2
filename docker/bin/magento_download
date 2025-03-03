@@ -1,10 +1,23 @@
 #!/bin/bash
 set -e
 
+COMPOSER_AUTH_USERNAME_SECRET=/var/run/secrets/composer_auth_username
+COMPOSER_AUTH_PASSWORD_SECRET=/var/run/secrets/composer_auth_password
+
+if [ ! -e $COMPOSER_AUTH_USERNAME_SECRET ] || [ ! -s $COMPOSER_AUTH_USERNAME_SECRET ]; then
+    echo "COMPOSER_AUTH_USERNAME secret not found or empty"
+    exit 1
+fi
+
+if [ ! -e $COMPOSER_AUTH_PASSWORD_SECRET ] || [ ! -s $COMPOSER_AUTH_PASSWORD_SECRET ]; then
+    echo "COMPOSER_AUTH_PASSWORD_SECRET secret not found or empty"
+    exit 1
+fi
+
 chown application:application /app
 
 composer config --global http-basic.repo.magento.com \
-	$(< /var/run/secrets/composer_auth_username) $(< /var/run/secrets/composer_auth_password)
+	$(< $COMPOSER_AUTH_USERNAME_SECRET) $(< $COMPOSER_AUTH_PASSWORD_SECRET)
 
 php -d memory_limit=-1 /usr/local/bin/composer create-project \
     --repository=https://repo.magento.com/ magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION /app
