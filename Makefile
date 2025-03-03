@@ -105,8 +105,11 @@ compliance:
 	$(docker_exec_web) vendor/bin/phpcs -vs --standard=Magento2 app/code/Doofinder/Feed/
 
 # Execute an arbitrary command in the web container (pass additional arguments)
-command:
-	$(docker_compose) run --rm web $(ARGS)
+run-web:
+	$(docker_run_web) $(ARGS)
+
+exec-web:
+	$(docker_exec_web) $(ARGS)
 
 # Open an interactive shell in the web container as the 'application' user
 console:
