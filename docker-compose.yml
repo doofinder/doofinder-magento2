@@ -4,17 +4,8 @@ services:
 
   # Web container
   web:
-    image: doofinder-magento2:php-${PHP_VERSION}-magento-${MAGENTO_EDITION}-edition-${MAGENTO_VERSION}
-    build:
-      context: docker
-      args:
-        PHP_VERSION: ${PHP_VERSION}
-        MAGENTO_EDITION: ${MAGENTO_EDITION}
-        MAGENTO_VERSION: ${MAGENTO_VERSION}
-        COMPOSER_VERSION: ${COMPOSER_VERSION}
-      secrets:
-        - composer_auth_username
-        - composer_auth_password
+    image: doofinder-magento2:php-${PHP_VERSION}-composer-${COMPOSER_VERSION}
+    pull_policy: never
     depends_on:
       db:
           condition: service_healthy
@@ -45,7 +36,7 @@ services:
       PHP_MAX_EXECUTION_TIME: 300
       # XDEBUG_CONFIG: "remote_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} remote_autostart=1 remote_connect_back=0 remote_enable=1 remote_handler=dbgp remote_mode=req remote_port=9000"
     volumes:
-      - magento-src:/app
+      - ./app:/app
       - ./Doofinder:/app/app/code/Doofinder
     ports:
       - "9012:80"
@@ -53,6 +44,25 @@ services:
     secrets:
         - composer_auth_username
         - composer_auth_password
+
+  setup:
+    image: doofinder-magento2:php-${PHP_VERSION}-composer-${COMPOSER_VERSION}
+    build:
+      context: docker
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        COMPOSER_VERSION: ${COMPOSER_VERSION}
+    profiles:
+      - setup
+    environment:
+      MAGENTO_EDITION: ${MAGENTO_EDITION}
+      MAGENTO_VERSION: ${MAGENTO_VERSION}
+    volumes:
+      - ./app:/app
+    secrets:
+        - composer_auth_username
+        - composer_auth_password
+    entrypoint: /usr/local/bin/magento_download
 
   # MySQL container
   db:
@@ -121,4 +131,3 @@ secrets:
     environment: COMPOSER_AUTH_PASSWORD
 volumes:
   magento-db:
-  magento-src:
