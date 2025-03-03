@@ -21,7 +21,7 @@ It is mandatory to obtain credentials for composer usage. These fields can be ob
 
 ### Initial setup
 
-You can setup a fresh magento installation using provided `Makefile` targets `init`or `init-with-data`. This command will:
+You can setup a fresh magento installation using provided `Makefile` targets `init` or `init-with-data`. This command will:
 - `make pull-build`: Pull and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
 - `make magento-download`: Run a magento `create-project` command inside a bind mount into `./app`.
 - `make start`: Start the containers
@@ -32,14 +32,12 @@ Finally, Magento 2 with the module installed will be running at `http://MAGENTO_
 
 The admin panel will be available at `http://MAGENTO_BASE_URL:9012/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
 
-```
-User: admin
-Pass: admin123
-```
+* User: `admin`
+* Pass: `admin123`
 
 ## Xdebug ready to use
 
-If you wish to debug your new Magento installation, just simply set the correct values in `.env` and configure your IDE attending to the remote PHP docker container `web`.
+If you wish to debug your new Magento installation, simply set the correct values in `.env` and configure your IDE attending to the remote PHP docker container `web`.
 
 ## PhpMyAdmin ready to use
 
@@ -57,14 +55,14 @@ If you uncomment Varnish container, remember to comment the port `9012:80` in th
 
 You can remove the Doofinder module using this straightforward method:
 
-```
+```sh
 make uninstall-doofinder
 ```
 
 ## Test another versions
 Change your branch to the tag that you want inside package directory
 
-```
+```sh
 make upgrade-doofinder
 ```
 
@@ -85,7 +83,7 @@ During development, it is sometimes useful to create a data snapshot before perf
 
 Please, take care when you change in `.env` the MAGENTO_VERSION parameter since you'll have to change probably the PHP_VERSION & COMPOSER_VERSION ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:
 
-```
+```sh
 PHP_VERSION=7.4
 COMPOSER_VERSION=2.0.14
 MAGENTO_EDITION=community
@@ -93,7 +91,7 @@ MAGENTO_VERSION=2.4.3
 ```
 but if you want to test, let's say, the 2.3.1 version you should have something like this:
 
-```
+```sh
 PHP_VERSION=7.2
 COMPOSER_VERSION=1.4.3
 MAGENTO_EDITION=community
@@ -101,7 +99,7 @@ MAGENTO_VERSION=2.3.1
 ```
 
 And please, don't forget to copy in `.env` your Magento repository tokens filling the parameters:
-```
+```sh
 COMPOSER_AUTH_USERNAME=
 COMPOSER_AUTH_PASSWORD=
 ```
