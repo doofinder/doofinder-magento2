@@ -47,7 +47,6 @@ if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
 	--elasticsearch-host="$ELASTICSEARCH_HOST"
 fi
 
-
 ${MAGENTO_BIN} deploy:mode:set developer
 ${MAGENTO_BIN} indexer:reindex
 
