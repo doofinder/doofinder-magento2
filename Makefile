@@ -21,6 +21,7 @@ else
 endif
 
 docker_exec_web = $(docker_compose) exec -u application web
+docker_run_web = $(docker_compose) run --rm web su application -c
 
 # Default target: list available tasks
 all:
@@ -28,6 +29,10 @@ all:
 	@echo "  command, console, start, stop, backup-db, restore-db, upgrade-doofinder,"
 	@echo "  uninstall-doofinder, reinstall-doofinder, cache-flush, setup, load-sampledata,"
 	@echo "  setup-with-data, compliance"
+
+# Configures extension static files
+configure:
+	@envsubst < templates/etc/config.xml > Doofinder/Feed/etc/config.xml
 
 # Backup the MySQL database from the 'db' container and compress the output
 backup-db:
@@ -58,17 +63,28 @@ cache-flush:
 	$(docker_exec_web) php bin/magento cache:flush
 
 # Build Docker images, install Magento, and start containers
-setup: configure
+init: setup start magento-install
+
+init-with-data: init magento-load-sampledata
+
+# Same as init but do not start
+setup: configure pull-build magento-download
+
+# Pull and build project images
+pull-build:
 	$(docker_compose) pull --ignore-buildable
 	$(docker_compose) build
-	$(docker_compose) run --rm web su application -c magento_install
-	$(docker_compose) up -d
 
-# Setup Magento and deploy sample data
-setup-with-data: setup load-sampledata
+# Downloads and update a magento project
+magento-download:
+	$(docker_compose) run --rm setup
+
+# Install a magento site
+magento-install: configure start
+	$(docker_exec_web) magento_install
 
 # Deploy sample data and upgrade Magento
-load-sampledata: configure
+magento-load-sampledata: configure
 	$(docker_exec_web) php bin/magento sampledata:deploy
 	$(docker_exec_web) php bin/magento setup:upgrade
 
@@ -90,11 +106,12 @@ start: configure
 	@$(docker_compose) up -d
 	@echo "(Magento) Started"
 
-configure:
-	@envsubst < templates/etc/config.xml > Doofinder/Feed/etc/config.xml
-
 # Stop the Magento Docker containers
 stop:
 	@echo "(Magento) Stopping"
 	@$(docker_compose) down
 	@echo "(Magento) Stopped"
+
+clean:
+	docker compose down -v
+	rm -rf ./app
