@@ -41,7 +41,7 @@ services:
       WEB_ALIAS_DOMAIN: ${MAGENTO_BASE_URL}
       WEB_DOCUMENT_ROOT: /app/pub
       PHP_MAX_EXECUTION_TIME: 300
-      # XDEBUG_CONFIG: "remote_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} remote_autostart=1 remote_connect_back=0 remote_enable=1 remote_handler=dbgp remote_mode=req remote_port=9000"
+      #XDEBUG_CONFIG: "client_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} mode=develop,debug start_with_request=yes"
     volumes:
       - ./app:/app
       - ./Doofinder:/app/app/code/Doofinder
