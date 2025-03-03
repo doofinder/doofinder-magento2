@@ -1,6 +1,6 @@
 ARG PHP_VERSION=8.3
 
-FROM webdevops/php-apache:${PHP_VERSION}
+FROM webdevops/php-apache-dev:${PHP_VERSION}
 
 ARG COMPOSER_VERSION
 
