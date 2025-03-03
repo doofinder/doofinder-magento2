@@ -113,5 +113,6 @@ stop:
 	@echo "(Magento) Stopped"
 
 clean:
+	@echo -n "Are you sure, this will delete volumes and ./app directory? [y/N] " && read ans && [ $${ans:-N} = y ]
 	docker compose down -v
-	rm -rf ./app
+	sudo rm -rf ./app
