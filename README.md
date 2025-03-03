@@ -32,8 +32,8 @@ Finally, Magento 2 with the module installed will be running at `http://MAGENTO_
 
 The admin panel will be available at `http://MAGENTO_BASE_URL:9012/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
 
-* User: `admin`
-* Pass: `admin123`
+- User: `admin`
+- Pass: `admin123`
 
 ## Xdebug ready to use
 
