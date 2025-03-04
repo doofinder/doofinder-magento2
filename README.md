@@ -69,7 +69,7 @@ During development, it is sometimes useful to create a data snapshot before perf
 
 - To create a database dump, use:
   ```sh
-  make dp-backup [prefix=_some_state]
+  make db-backup [prefix=_some_state]
   ```
 - To restore a previous state, run:
   ```sh
