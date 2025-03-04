@@ -28,7 +28,7 @@ all:
 
 check-env:
 ifeq ($(DOOFINDER_LOCAL),true)
-	@echo "\e[3;32;44mDOOFINDER_LOCAL mode=ON\n"
+	@echo "\e[3;32;44mDOOFINDER_LOCAL mode=ON\033[0m"
 endif
 ifeq ($(COMPOSER_AUTH_USERNAME),"")
 	$(error COMPOSER_AUTH_USERNAME is undefined.)
