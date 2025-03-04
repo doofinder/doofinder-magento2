@@ -16,33 +16,30 @@ And once you have the external url created simply edit the `.env` file and set t
 So, when the installation process finished, instead of accessing to `http://localhost:9012` you will use your url (for example: `http://forcibly-ethical-apple.ngrok-free.app`).
 Notice that you'll need to specify the 9012 port when executing ngrok.
 
-**Get composer credentials**
-It is mandatory to obtain credentials for composer usage. These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and creating an access key. The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD`. Please fill in `.env` file.
+> [!IMPORTANT]
+> **Get composer credentials**
+> It is mandatory to obtain credentials for composer usage. These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and creating an access key. The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD`. Please fill in `.env` file.
 
 ### Initial setup
 
 You can setup a fresh magento installation using provided `Makefile` targets `init` or `init-with-data`. This command will:
-- `make pull-build`: Pull and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
-- `make magento-download`: Run a magento `create-project` command inside a bind mount into `./app`.
-- `make start`: Start the containers
-- `make magento-install`: Run a magento installation with variables defined in `.env` file.
-- `make magento-load-sampledata`: Optionally: Load sample data into magento
+- Pulls and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
+- Runs a magento `create-project` command inside a bind mount into `./app`.
+- Starts the containers
+- Runs a magento installation with variables defined in `.env` file.
+- Optionally: Loads sample data into magento
 
-Finally, Magento 2 with the module installed will be running at `http://MAGENTO_BASE_URL:9012`.
+Finally, Magento 2 with the module installed will be running at `http://MAGENTO_BASE_URL`.
 
-The admin panel will be available at `http://MAGENTO_BASE_URL:9012/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
+The admin panel will be available at `http://MAGENTO_BASE_URL/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
 
 - User: `admin`
 - Pass: `admin123`
 
 ## Xdebug ready to use
 
-If you wish to debug your new Magento installation, simply set the correct values in `.env` and configure your IDE attending to the remote PHP docker container `web`.
+If you wish to debug your new Magento installation, simply uncomment the `XDEBUG_CONFIG` environment variable in `docker-compose.yml` configure your IDE accordingly and have fun!
 
-## PhpMyAdmin ready to use
-
-Once the installation has finished, you can also access to a ready to use phpMyAdmin local server listening in port 8080: http://localhost:8080.
-Here you will see all the Magento 2 tables in the database specified in the file `.env` (by default: magentobase)
 
 ## Varnish was added to manage cache
 
