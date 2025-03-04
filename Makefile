@@ -1,24 +1,27 @@
-.PHONY: all cache-flush check-env clean consistency db-backup db-restore dev-console doofinder-configure doofinder-reinstall doofinder-uninstall doofinder-upgrade init init-with-data start stop
+.PHONY: all cache-flush clean consistency db-backup db-restore dev-console doofinder-configure doofinder-reinstall doofinder-uninstall doofinder-upgrade init init-with-data start stop
+
 
 # Include environment variables from .env file
+ifeq ("$(wildcard .env)","")
+	$(error Please be sure a `.env` file is present in the root directory. You can make a copy of `.env.example`)
+endif
+
 include .env
 export
 
-ifeq ("$(wildcard .env)","")
-  $(error Please be sure a `.env` file is present in the root directory. You can make a copy of `.env.example`)
+ifeq ($(origin COMPOSER_AUTH_USERNAME), undefined)
+  $(error COMPOSER_AUTH_USERNAME is undefined.)
 endif
 
+ifeq ($(origin COMPOSER_AUTH_PASSWORD), undefined)
+  $(error COMPOSER_AUTH_PASSWORD is undefined.)
+endif
 
-ifeq ($(DOOFINDER_LOCAL),true)
+docker_compose ?= docker compose
+ifneq ("$(wildcard .env.local)","")
 	include .env.local
 	export
-endif
-
-# Shortcut for executing commands in the web container as the 'application' user
-ifeq ($(DOOFINDER_LOCAL),true)
 	docker_compose = docker compose --env-file .env --env-file .env.local
-else
-	docker_compose = docker compose
 endif
 
 docker_exec_web = $(docker_compose) exec -u application web
@@ -27,23 +30,9 @@ docker_exec_web = $(docker_compose) exec -u application web
 all:
 	@echo "Before \`make init\` be sure to set up your environment with a proper \`.env\` file."
 	@echo "Select a task defined in the Makefile:"
-	@echo "  all, cache-flush, check-env, clean, consistency, db-backup, db-restore,"
-	@echo "  dev-console, doofinder-configure, doofinder-reinstall, doofinder-uninstall,"
+	@echo "  all, cache-flush, clean, consistency, db-backup, db-restore, dev-console,"
+	@echo "  doofinder-configure, doofinder-reinstall, doofinder-uninstall,"
 	@echo "  doofinder-upgrade, init, init-with-data, start, stop"
-
-check-env:
-ifeq ($(DOOFINDER_LOCAL),true)
-	@echo "\e[3;32;44mDOOFINDER_LOCAL mode=ON\033[0m"
-endif
-ifeq ($(COMPOSER_AUTH_USERNAME),"")
-	$(error COMPOSER_AUTH_USERNAME is undefined.)
-endif
-ifeq ($(COMPOSER_AUTH_PASSWORD),"")
-	$(error COMPOSER_AUTH_PASSWORD is undefined.)
-endif
-ifeq ($(MAGENTO_BASE_URL),"")
-	$(error MAGENTO_BASE_URL is undefined. Please be sure all environment variables from `.env.example` are defined and correct.)
-endif
 
 # Backup the MySQL database from the 'db' container and compress the output
 db-backup:
@@ -55,7 +44,7 @@ db-restore:
 	gunzip < $(file) | $(docker_compose) exec -T db /usr/bin/mysql -u root -pmagentobase magentobase
 
 # Configures extension static files
-doofinder-configure: check-env
+doofinder-configure:
 	@envsubst < templates/etc/config.xml > Doofinder/Feed/etc/config.xml
 
 # Enable the Doofinder module, upgrade Magento, and clean the cache
