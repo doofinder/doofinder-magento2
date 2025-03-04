@@ -72,7 +72,7 @@ As a best practice, an extension should be installed and tested in a development
 
 ## Installation via Magento Marketplace
 
-For up-to-date instructions refer to the [official Magento documentation](https://docs.magento.com/m2/ce/user_guide/system/web-setup-extension-manager.html).
+For up-to-date instructions refer to the [official Magento documentation](https://experienceleague.adobe.com/en/docs/commerce-operations/installation-guide/tutorials/extensions).
 
 Installation via Composer
 
@@ -125,7 +125,7 @@ The initial configuration of the module is easy and almost unattended. The whole
 
 1. Go into the the Initial Setup: clicking in this menu option.
 
-2. Create the system integration: simply by clicking the “Create inrtegration” button.
+2. Create the system integration: simply by clicking the “Create integration” button.
 
 3. Your website to a Doofinder account: you can login using an existing account or   register a new one in a very simple way.
 
