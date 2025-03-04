@@ -1,4 +1,4 @@
-.PHONY: all backup-db cache-flush check-env clean consistency dev-console doofinder-configure doofinder-reinstall doofinder-uninstall doofinder-upgrade init init-with-data restore-db start stop
+.PHONY: all cache-flush check-env clean consistency db-backup db-restore dev-console doofinder-configure doofinder-reinstall doofinder-uninstall doofinder-upgrade init init-with-data start stop
 
 # Include environment variables from .env file
 include .env
@@ -22,9 +22,9 @@ docker_exec_web = $(docker_compose) exec -u application web
 all:
 	@echo "Before \`make init\` be sure to set up your environment with a proper \`.env\` file."
 	@echo "Select a task defined in the Makefile:"
-	@echo "  command, console, start, stop, backup-db, restore-db, upgrade-doofinder,"
-	@echo "  uninstall-doofinder, reinstall-doofinder, cache-flush, setup, load-sampledata,"
-	@echo "  setup-with-data, compliance"
+	@echo "  all, cache-flush, check-env, clean, consistency, db-backup, db-restore,"
+	@echo "  dev-console, doofinder-configure, doofinder-reinstall, doofinder-uninstall,"
+	@echo "  doofinder-upgrade, init, init-with-data, start, stop"
 
 check-env:
 ifeq ($(DOOFINDER_LOCAL),true)
@@ -41,11 +41,11 @@ ifeq ($(MAGENTO_BASE_URL),"")
 endif
 
 # Backup the MySQL database from the 'db' container and compress the output
-backup-db:
+db-backup:
 	$(docker_compose) exec db /usr/bin/mysqldump -u root -pmagentobase magentobase | gzip > backup_$(shell date +%Y%m%d%H%M%S)$(prefix).sql.gz
 
 # Restore the MySQL database using a provided backup file (pass file=<backupfile> as argument)
-restore-db:
+db-restore:
 	@[ -e "$(file)" ] || (echo "Error: 'file' variable not provided. Use file=<backupfile>" && exit 1)
 	gunzip < $(file) | $(docker_compose) exec -T db /usr/bin/mysql -u root -pmagentobase magentobase
 
