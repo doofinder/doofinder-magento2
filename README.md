@@ -53,14 +53,14 @@ If you uncomment Varnish container, remember to comment the port `9012:80` in th
 You can remove the Doofinder module using this straightforward method:
 
 ```sh
-make uninstall-doofinder
+make doofinder-uninstall
 ```
 
 ## Test another versions
 Change your branch to the tag that you want inside package directory
 
 ```sh
-make upgrade-doofinder
+make doofinder-upgrade
 ```
 
 ## Backup and Restore Database
@@ -69,11 +69,11 @@ During development, it is sometimes useful to create a data snapshot before perf
 
 - To create a database dump, use:
   ```sh
-  make backup-db [prefix=_some_state]
+  make dp-backup [prefix=_some_state]
   ```
 - To restore a previous state, run:
   ```sh
-  make restore-db file=backup_file.sql.gz
+  make db-restore file=backup_file.sql.gz
   ```
 
 ## Last notes
