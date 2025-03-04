@@ -27,6 +27,9 @@ all:
 	@echo "  setup-with-data, compliance"
 
 check-env:
+ifeq ($(DOOFINDER_LOCAL),true)
+	@echo "\e[3;32;44mDOOFINDER_LOCAL mode=ON\n"
+endif
 ifeq ($(COMPOSER_AUTH_USERNAME),"")
 	$(error COMPOSER_AUTH_USERNAME is undefined.)
 endif
@@ -47,7 +50,7 @@ restore-db:
 	gunzip < $(file) | $(docker_compose) exec -T db /usr/bin/mysql -u root -pmagentobase magentobase
 
 # Configures extension static files
-doofinder-configure:
+doofinder-configure: check-env
 	@envsubst < templates/etc/config.xml > Doofinder/Feed/etc/config.xml
 
 # Enable the Doofinder module, upgrade Magento, and clean the cache
@@ -70,18 +73,15 @@ cache-flush:
 	$(docker_exec_web) php bin/magento cache:flush
 
 # Build Docker images, install Magento, and start containers
-init: setup start
+init: doofinder-configure setup start
+	$(docker_compose) pull --ignore-buildable
+	$(docker_compose) build
+	$(docker_compose) run --rm setup
 	$(docker_exec_web) magento_install
 
 init-with-data: init
 	$(docker_exec_web) php bin/magento sampledata:deploy
 	$(docker_exec_web) php bin/magento setup:upgrade
-
-# Same as init but do not start
-setup: check-env doofinder-configure
-	$(docker_compose) pull --ignore-buildable
-	$(docker_compose) build
-	$(docker_compose) run --rm setup
 
 # Check code consitency for the Doofinder Feed module using PHP Code Sniffer
 consistency:
