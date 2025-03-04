@@ -1,4 +1,4 @@
-.PHONY: all backup-db cache-flush check-env clean consistency console doofinder-configure doofinder-reinstall doofinder-uninstall doofinder-upgrade init init-with-data restore-db setup start stop
+.PHONY: all backup-db cache-flush check-env clean consistency dev-console doofinder-configure doofinder-reinstall doofinder-uninstall doofinder-upgrade init init-with-data restore-db start stop
 
 # Include environment variables from .env file
 include .env
@@ -46,7 +46,7 @@ backup-db:
 
 # Restore the MySQL database using a provided backup file (pass file=<backupfile> as argument)
 restore-db:
-	@test -z "$(file)" && echo "Error: 'file' variable not provided. Use file=<backupfile>" && exit 1;
+	@[ -e "$(file)" ] || (echo "Error: 'file' variable not provided. Use file=<backupfile>" && exit 1)
 	gunzip < $(file) | $(docker_compose) exec -T db /usr/bin/mysql -u root -pmagentobase magentobase
 
 # Configures extension static files
@@ -73,10 +73,11 @@ cache-flush:
 	$(docker_exec_web) php bin/magento cache:flush
 
 # Build Docker images, install Magento, and start containers
-init: doofinder-configure setup start
+init: doofinder-configure
 	$(docker_compose) pull --ignore-buildable
 	$(docker_compose) build
 	$(docker_compose) run --rm setup
+	$(docker_compose) up -d
 	$(docker_exec_web) magento_install
 
 init-with-data: init
@@ -88,7 +89,7 @@ consistency:
 	$(docker_exec_web) vendor/bin/phpcs -vs --standard=Magento2 app/code/Doofinder/Feed/
 
 # Open an interactive shell in the web container as the 'application' user
-console:
+dev-console:
 	$(docker_exec_web) bash
 
 # Start the Magento Docker containers
