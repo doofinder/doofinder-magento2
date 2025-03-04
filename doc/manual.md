@@ -1,7 +1,6 @@
 ---
 title: "Doofinder for Magento 2"
 subtitle: "User Manual"
-date: "2025-04-03"
 subject: "Doofinder for Magento 2 - User Manual"
 keywords: [Doofinder, Magento2, User Manual]
 lang: "en"
@@ -48,17 +47,17 @@ If you’re a developer, you can file an issue or contribution request in our pu
 
 * This module is heavily based on Cron. Magento 2 requires Cron to properly work, so you must have Cron up and running in your server for the module to work.
 
-* To use the Doofinder module you need an active Doofinder account. Doofinder is a paid service but you can try it 30 days for free and benefit from the freemium plan if you have a small store. If you don’t have an account yet you can sign up at: [https://www.doofinder.com/signup](https://www.doofinder.com/signup)
+* To use the Doofinder module you need an active Doofinder account. Doofinder is a paid service, but you can try it 30 days for free and benefit from the freemium plan if you have a small store. If you don’t have an account yet you can sign up at: [https://www.doofinder.com/signup](https://www.doofinder.com/signup)
 
 Plans and pricing are available at:
 
 [https://www.doofinder.com/price](https://www.doofinder.com/price)
 
-* Doofinder module is a free purchase so you have to pay nothing to use it. The only cost for you is the price of the Doofinder service once the trial period has ended.
+* Doofinder module is a free purchase, so you have to pay nothing to use it. The only cost for you is the price of the Doofinder service once the trial period has ended.
 
 # Installation
 
-Doofinder can be installed via Component Manager as a free purchase done in Magento Marketplace, or via Composer, the the-facto PHP package manager, if you feel at home working from the command line directly in your server.
+Doofinder can be installed via Component Manager as a free purchase done in Magento Marketplace, or via Composer, the de facto PHP package manager, if you feel at home working from the command line directly in your server.
 
 ::: warning
 Do not install this module via FTP or direct upload to your server’s filesystem. This module has external software dependencies that Component Manager and Composer know how to deal with. If you try to install the module by any other way than recommended you may experience errors in your system.
@@ -72,7 +71,7 @@ As a best practice, an extension should be installed and tested in a development
 
 ## Installation via Magento Marketplace
 
-For up-to-date instructions refer to the [official Magento documentation](https://experienceleague.adobe.com/en/docs/commerce-operations/installation-guide/tutorials/extensions).
+For up-to-date instructions, refer to the [official Magento documentation](https://experienceleague.adobe.com/en/docs/commerce-operations/installation-guide/tutorials/extensions).
 
 Installation via Composer
 
@@ -103,7 +102,7 @@ There you will find all the module configuration options.
 
 As you will probably know, Magento 2 can be conﬁgured at different levels; you can set up default values and be more speciﬁc for each store view.
 
-This module makes use of that conﬁguration scheme but not all settings are available at all levels, some will be at the default level and some others will be speciﬁc for each store view. You must pay attention so the module is properly conﬁgured.
+This module makes use of that conﬁguration scheme but not all settings are available at all levels, some will be at the default level and some others will be speciﬁc for each store view. You must pay attention, so the module is properly conﬁgured.
 
 Before conﬁguring the module we should clarify some concepts:
 
@@ -123,17 +122,17 @@ Almost all module configuration will take place inside the Initial Setup step so
 
 The initial configuration of the module is easy and almost unattended. The whole process happens in the Initial Setup section of the menu, and after going through a couple of steps you'll have Doofinder up and running in no time. In summary:
 
-1. Go into the the Initial Setup: clicking in this menu option.
+1. Go into the Initial Setup: clicking in this menu option.
 
 2. Create the system integration: simply by clicking the “Create integration” button.
 
-3. Your website to a Doofinder account: you can login using an existing account or   register a new one in a very simple way.
+3. Your website to a Doofinder account: you can log in using an existing account or   register a new one in a very simple way.
 
 4. Make sure all settings have been set correctly
 
 ### Go into the Initial Setup
 
-After clicking in the Initial Setup menu option, you will access to an almost unattended configuration process. Only two simple steps are requiered.
+After clicking in the Initial Setup menu option, you will access to an almost unattended configuration process. Only two simple steps are required.
 
 
 ### Create the system integration
@@ -142,9 +141,11 @@ Just click on the "Create integration" button to create the system integration n
 
 ### Link your website to a Doofinder account
 
-To link your website to a Doofinder account, you can either login using an existing account or register a new free trial in a very simple way. Just click the appropriate button and fill out the popup form. After submitting this form with the corresponding information, the popup will be closed and the initial setup flow will have ended.
+To link your website to a Doofinder account, you can either log in using an existing account or register a new free trial in a very simple way. Just click the appropriate button and fill out the popup form. After submitting this form with the corresponding information, the popup will be closed and the initial setup flow will have ended.
 
-NOTICE: If you are creating a new account, be sure to use an email that you have not used before. It is a unique field. Also, make sure your website has not previously been linked to a Doofinder account. You can only link your website to one account.
+::: note
+If you are creating a new account, be sure to use an email that you have not used before. It is a unique field. Also, make sure your website has not previously been linked to a Doofinder account. You can only link your website to one account.
+:::
 
 ### Make sure all settings have been set correctly
 
@@ -179,8 +180,11 @@ In the main menu section of Doofinder, we have an option called: "Index Processi
 
 # Troubleshooting
 
-**Q: I have my indexes conﬁgured to be updated on save: when will the items be indexed?**
-**A:** They should be indexed after a while, assuming cron works properly \- indexes are revalidated in case of invalidation in cron no matter of index mode. You can also configure manually the time to be: each 5, 10, 15, 30, or 60 minutes. This parameter can be change in the global “Update on save” configuration section.
+**Q: I have my indexes conﬁgured to be updated on save - when will the items be indexed?**
+
+**A:** They should be indexed after a while, assuming cron works properly \- indexes are revalidated in case of invalidation in cron no matter of index mode. You can also configure manually the time to be: each 5, 10, 15, 30, or 60 minutes. This parameter can be changed in the global “Update on save” configuration section.
+
 **Q: In the configuration section my API Key, Hash Id and/or my Installation Id are empty**
+
 **A:** Go to the Doofinder options menu "Initial Configuration" and follow the steps described in the Configuration Flow section of this manual.
 
