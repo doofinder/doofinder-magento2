@@ -105,6 +105,10 @@ stop:
 	@echo "(Magento) Stopped"
 
 clean:
-	@echo -n "Are you sure, this will delete volumes and ./app directory? [y/N] " && read ans && [ $${ans:-N} = y ]
+	@echo "\033[33m⚠️ WARNING ⚠️\033[0m"
+	@echo "This will permanently delete"
+	@echo "  - All Docker volumes for this project"
+	@echo "  - The entire ./app directory, including all Magento files"
+	@echo -n "Type 'DELETE' to confirm removing all volumes and ./app directory: " && read ans && [ "$${ans}" = "DELETE" ]
 	$(docker_compose) down -v
 	sudo rm -rf ./app
