@@ -1,10 +1,4 @@
-# Composer lockfile
-/composer.lock
-
-# Dev files
-/node_modules
 .env
-auth_json
+.env.local
 
-# Magento files
-/src
+app/

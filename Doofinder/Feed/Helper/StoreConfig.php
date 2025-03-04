@@ -35,10 +35,6 @@ use Magento\Backend\Helper\Data;
 class StoreConfig extends AbstractHelper
 {
     public const CRON_DISABLED_VALUE = '0 0 * * *';
-    /**
-     * URL to make the doofinder requests
-     */
-    public const URL = 'https://admin.doofinder.com';
 
     /**
      * Path to account settings in config.xml/core_config_data
@@ -538,7 +534,7 @@ class StoreConfig extends AbstractHelper
                 $singleScriptAdditionalConfig = <<<EOT
                     <script>
                         (function(w, k) {w[k] = window[k] || function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
-                    
+
                         doofinderApp("config", "language", "$language")
                         doofinderApp("config", "currency", "$currency")
                     </script>
@@ -656,7 +652,7 @@ class StoreConfig extends AbstractHelper
             self::LOGIN_ENDPOINT,
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
             null
-        ) ?? self::URL . '/plugins/login/magento2';
+        ) ?? (getenv("DOOFINDER_ADMIN_URL") ?: "https://admin.doofinder.com") . '/plugins/login/magento2';
     }
 
     /**
@@ -670,7 +666,7 @@ class StoreConfig extends AbstractHelper
             self::SIGNUP_ENDPOINT,
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
             null
-        ) ?? self::URL . '/plugins/signup/magento2';
+        ) ?? (getenv("DOOFINDER_ADMIN_URL") ?: "https://admin.doofinder.com") . '/plugins/signup/magento2';
     }
 
     /**

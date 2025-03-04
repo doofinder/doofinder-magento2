@@ -1,16 +1,10 @@
-# doofinder-magento2
+# Doofinder for Magento 2
 
 [![Build Status](https://travis-ci.org/doofinder/doofinder-magento2.svg?branch=master)](https://travis-ci.org/doofinder/doofinder-magento2)
 
-**IMPORTANT:** If you are in trouble with the module, please contact Doofinder Support from the Doofinder website.
+**IMPORTANT:** If you are in trouble with the module, please [contact Doofinder Support](https://support.doofinder.com/pages/contact-us) from the Doofinder website.
 
 ## Docker Environment
-
-> **NOTE**: If you are in Windows or WSL, probably you'll have to fix CONTROL-M (^M) carriage return characters in `build.sh` file. Run this command to get rid of this characters:
-
-```
-dos2unix build.sh
-```
 
 **Configure NGROK**
 In order to be able to create an account or login to an existing Doofinder account during the module initial setup, you will have to expose your local webserver to internet (to receive a callback).
@@ -22,60 +16,30 @@ And once you have the external url created simply edit the `.env` file and set t
 So, when the installation process finished, instead of accessing to `http://localhost:9012` you will use your url (for example: `http://forcibly-ethical-apple.ngrok-free.app`).
 Notice that you'll need to specify the 9012 port when executing ngrok.
 
-Then setup the environment by executing:
+> [!IMPORTANT]
+> **Get composer credentials**
+> It is mandatory to obtain credentials for composer usage. These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and creating an access key. The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD`. Please fill in `.env` file.
 
-```
-$ docker-compose --profile setup up
-```
+### Initial setup
 
-from the base directory where the `docker-compose.yml` is located.
-The installation process will take some minutes to be finished. You can follow the status logging with:
+You can set up a fresh magento installation using provided `Makefile` targets `init` or `init-with-data`. This command will:
+- Pulls and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
+- Runs a magento `create-project` command inside a bind mount into `./app`.
+- Starts the containers
+- Runs a magento installation with variables defined in `.env` file.
+- Optionally: Loads sample data into magento
 
-```docker logs setup -f```
+Finally, Magento 2 with the module installed will be running at `http://MAGENTO_BASE_URL`.
 
-Finally, Magento 2 with the module installed will be running at `http://localhost:9012`.
+The admin panel will be available at `http://MAGENTO_BASE_URL/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
 
-The admin panel will be available at `http://localhost:9012/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
-
-```
-User: admin
-Pass: admin123
-```
-
-To install sample data, with the containers running, you can simply execute:
-
-```
-$ ./data_loader.sh
-```
-
-In order to make this script work, the only thing you'll need to do is to fill the username and password fields in the `src/auth_json` file, with the same values used previously in the `.env` file, base your file in the `auth.json.sample` file.
-
-OR if you'd rather load the data manually, you can also:
-
-```
-$ docker exec -it web bash
-root@...:~# cd /app
-root@...:/app# php -d memory_limit=-1 bin/magento sampledata:deploy
-root@...:/app# bin/magento setup:upgrade
-root@...:/app# bin/magento setup:di:compile
-root@...:/app# bin/magento setup:static-content:deploy -f
-```
-
-**Note:** After you run the ```bin/magento sampledata:deploy``` command you will be prompted for authentication:
-```Authentication required (repo.magento.com):```. You will have to use simply the same Magento repository tokens that you used in the `.env` file:
-```
-COMPOSER_AUTH_USERNAME & COMPOSER_AUTH_PASSWORD
-```
-These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and creating an access key. The public key will be COMPOSER_AUTH_USERNAME and the private key will be COMPOSER_AUTH_PASSWORD.
+- User: `admin`
+- Pass: `admin123`
 
 ## Xdebug ready to use
 
-If you wish to debug your new Magento installation, just simply set the correct values in `.env` and configure your IDE attending to the remote PHP docker container `web`. You should also bind your local source path: `./src` to the docker one: `/app`
+If you wish to debug your new Magento installation, simply uncomment the `XDEBUG_CONFIG` environment variable in `docker-compose.yml` configure your IDE accordingly and have fun!
 
-## PhpMyAdmin ready to use
-
-Once the installation has finished, you can also access to a ready to use phpMyAdmin local server listening in port 8080: http://localhost:8080.
-Here you will see all the Magento 2 tables in the database specified in the file `.env` (by default: magentobase)
 
 ## Varnish was added to manage cache
 
@@ -88,38 +52,35 @@ If you uncomment Varnish container, remember to comment the port `9012:80` in th
 
 You can remove the Doofinder module using this straightforward method:
 
-```
-$ docker exec -it web bash
-root@...:~# cd /app
-root@...:/app# bin/magento module:uninstall Doofinder_Feed --remove-data
-```
-Manual Uninstall
-```
-php bin/magento module:disable Doofinder_Feed --clear-static-content
-php bin/magento setup:upgrade
-php bin/magento cache:flush
-remove directory inside src/app/code
+```sh
+make uninstall-doofinder
 ```
 
 ## Test another versions
 Change your branch to the tag that you want inside package directory
 
-Go inside the magento container 
+```sh
+make upgrade-doofinder
 ```
-cd app
-php bin/magento setup:upgrade
-php bin/magento setup:di:compile
-php bin/magento setup:static-content:deploy -f
-php bin/magento module:enable Doofinder_Feed  --clear-static-content
-php bin/magento cache:clean
-php bin/magento cache:flush
-```
+
+## Backup and Restore Database
+
+During development, it is sometimes useful to create a data snapshot before performing an action.
+
+- To create a database dump, use:
+  ```sh
+  make backup-db [prefix=_some_state]
+  ```
+- To restore a previous state, run:
+  ```sh
+  make restore-db file=backup_file.sql.gz
+  ```
 
 ## Last notes
 
-Please, take care when you change in `.env` the MAGENTO_VERSION parameter since you'll have to change probably the PHP_VERSION & COMPOSER_VERSION ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:
+Please take care when you change in `.env` the MAGENTO_VERSION parameter since you'll have to change probably the PHP_VERSION & COMPOSER_VERSION ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:
 
-```
+```sh
 PHP_VERSION=7.4
 COMPOSER_VERSION=2.0.14
 MAGENTO_EDITION=community
@@ -127,23 +88,20 @@ MAGENTO_VERSION=2.4.3
 ```
 but if you want to test, let's say, the 2.3.1 version you should have something like this:
 
-```
+```sh
 PHP_VERSION=7.2
 COMPOSER_VERSION=1.4.3
 MAGENTO_EDITION=community
 MAGENTO_VERSION=2.3.1
 ```
+
 And please, don't forget to copy in `.env` your Magento repository tokens filling the parameters:
-```
+```sh
 COMPOSER_AUTH_USERNAME=
 COMPOSER_AUTH_PASSWORD=
 ```
 
 ## Troubleshooting
-
-**Permissions issues**
-After running the `bin/magento setup:upgrade` or other magento commands inside the docker container some folders are created and the user running apache can loose permissions to execute returning 500 Error.
-To restore permissions for these folders run in the host terminal `sudo chmod 777 -R src/`.
 
 **Redirect issues**
 If after the setup process has finished the website doesn't load you may need to change the urls in the database.
