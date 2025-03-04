@@ -106,3 +106,9 @@ clean:
 	@echo -n "Type 'DELETE' to confirm removing all volumes and ./app directory: " && read ans && [ "$${ans}" = "DELETE" ]
 	$(docker_compose) down -v
 	sudo rm -rf ./app
+
+docs:
+	docker run --rm --volume "$(shell pwd)/doc:/data" --user $(shell id -u):$(shell id -g) \
+		pandoc/extra --pdf-engine=xelatex manual.md -o Manual.pdf --template ./template/eisvogel \
+		--listings --filter pandoc-latex-environment --toc
+	mv ./doc/Manual.pdf ./Doofinder/Feed/Manual.pdf
