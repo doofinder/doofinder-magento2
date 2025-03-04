@@ -22,7 +22,7 @@ Notice that you'll need to specify the 9012 port when executing ngrok.
 
 ### Initial setup
 
-You can setup a fresh magento installation using provided `Makefile` targets `init` or `init-with-data`. This command will:
+You can set up a fresh magento installation using provided `Makefile` targets `init` or `init-with-data`. This command will:
 - Pulls and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
 - Runs a magento `create-project` command inside a bind mount into `./app`.
 - Starts the containers

@@ -4,6 +4,11 @@
 include .env
 export
 
+ifeq ("$(wildcard .env)","")
+  $(error Please be sure a `.env` file is present in the root directory. You can make a copy of `.env.example`)
+endif
+
+
 ifeq ($(DOOFINDER_LOCAL),true)
 	include .env.local
 	export
