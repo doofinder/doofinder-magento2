@@ -196,7 +196,7 @@ If you are using Magento 2, the Recommendations Script for required JS is differ
 
 ### New Script Line
 
-```
+```javascript
 <script>
   var dfUrl = 'https://cdn.doofinder.com/recommendations/js/doofinderRecommendation.min.js';
   (function(c,o,k,e){var r,t,i=setInterval(function(){t+=c;r=typeof(require)==='function';
@@ -208,7 +208,7 @@ If you are using Magento 2, the Recommendations Script for required JS is differ
 
 The final script should look like this:
 
-```
+```javascript
 <script>
   var dfUrl = 'https://cdn.doofinder.com/recommendations/js/doofinderRecommendation.min.js';
   (function(c,o,k,e){var r,t,i=setInterval(function(){t+=c;r=typeof(require)==='function';
