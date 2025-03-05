@@ -1,4 +1,2 @@
-.env
 .env.local
-
 app/
