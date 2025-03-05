@@ -11,7 +11,7 @@ In order to be able to create an account or login to an existing Doofinder accou
 
 To do so, you can use, for example; the utility Ngrok: https://dashboard.ngrok.com/get-started/setup
 
-And once you have the external url created simply set the MAGENTO_BASE_URL={your-url.ngrok-free.app} (for example: MAGENTO_BASE_URL=forcibly-ethical-apple.ngrok-free.app)
+And once you have the external url created, simply set the `MAGENTO_BASE_URL` (for example: `MAGENTO_BASE_URL=forcibly-ethical-apple.ngrok-free.app`).
 
 So, when the installation process finished, instead of accessing to `http://localhost:9012` you will use your url (for example: `http://forcibly-ethical-apple.ngrok-free.app`).
 Notice that you'll need to specify the 9012 port when executing ngrok.
@@ -36,15 +36,15 @@ COMPOSER_AUTH_USERNAME=YOUR_COMPOSER_PUBLIC_KEY
 COMPOSER_AUTH_PASSWORD=YOUR_COMPOSER_PRIVATE_KEY
 ```
 
-The Makefile automatically overrides `.env` vars with the ones found in `.env.local`.
+The `Makefile` automatically overrides `.env` vars with the ones found in `.env.local`.
 
 > [!IMPORTANT]
-> The Makefile internally appends `--env-file .env --env-file .env.local` to `docker compose` command for properly configuring container environment. So take it into account when interacting directly with `docker compose`.
+> The `Makefile` internally appends `--env-file .env --env-file .env.local` to `docker compose` command for properly configuring container environment. So take it into account when interacting directly with `docker compose`.
 
 
 ### Initial setup
 
-You can set up a fresh magento installation using provided `Makefile` targets `init` or `init-with-data`. This command will:
+You can set up a fresh magento installation using the provided `Makefile` targets `init` or `init-with-data`. This command will:
 - Pulls and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
 - Runs a magento `create-project` command inside a bind mount into `./app`.
 - Starts the containers
