@@ -32,7 +32,7 @@ This module provides integration between Magento 2.3+ and the Doofinder search s
 
 To do that, your product data is indexed in Doofinder servers and updated whenever a product is changed. When a search occurs, our front-end Javascript layers enhances the user search experience with faster results.
 
-For an up to date documentation, please, visit: [Doofinder Magento Installation Guide](https://support.doofinder.com/plugins/magento/installation-guide/pre-requisites-magento).
+For up-to-date documentation, please, visit: [Doofinder Magento Installation Guide](https://support.doofinder.com/plugins/magento/installation-guide/pre-requisites-magento).
 
 ## Support
 
@@ -42,10 +42,10 @@ If you’re a developer, you can file an issue or contribution request in our pu
 
 # Pre-requisites Magento
 
-* This module is compatible with Magento versions 2.3 through 2.4.7.
-* This module is compatible with Hyvä.
-* This module is heavily based on Cron. Magento 2 requires Cron to work properly, so you must have Cron up and running in your server for the module to work.
-* Activate the following option in your Magento admin: **Stores > Configuration > Services > OAuth > Consumer Settings > Allow OAuth Access Tokens to be used as standalone Bearer tokens: YES** (this option is only available if you have a Magento 2.4.4 or later).
+- This module is compatible with Magento versions 2.3 through 2.4.7.
+- This module is compatible with Hyvä.
+- This module is heavily based on Cron. Magento 2 requires Cron to work properly, so you must have Cron up and running in your server for the module to work.
+- Activate the following option in your Magento admin: **Stores > Configuration > Services > OAuth > Consumer Settings > Allow OAuth Access Tokens to be used as standalone Bearer tokens: YES** (this option is only available if you have a Magento 2.4.4 or later).
 
 ![Allow OAuth Access Tokens in Magento](https://support.doofinder.com/images/magento-token.png)
 
@@ -93,7 +93,7 @@ Click on the Doofinder icon under Stores to display the option's menu and select
 
    Simply click on the corresponding button and fill in the pop-up form. Once submitted, the pop-up window will close and the initial setup flow will be finished.
 
-   ![Magento linkink website](<https://support.doofinder.com/images/Magento 2_3.png>)
+   ![Magento link website](<https://support.doofinder.com/images/Magento 2_3.png>)
 
 ::: note
    If you are creating a new account, be sure to use an email address that you have not used before. This is a unique field. Also, make sure that your website has not been previously linked to a Doofinder account. You can only link your website to one account.
@@ -127,13 +127,13 @@ Click on the Doofinder icon under Stores to display the option's menu and select
 
 ## Module Configuration Fields
 
-* **Account**: In here you will find your API KEY.
-* **Doofinder Layer**: You can activate or deactivate the search layer by selecting YES or NO.
-* **Image Configuration**: Select the size of the image to display on the layer. Once the size has been chosen, you must reindex the products in Doofinder.
-* **Automatic Indexing**: you can configure when registered product changes are sent to Doofinder and whether to export only categories present in navigation menus.
-* **Manual Indexing**: Advanced option for indexing.
-* **Custom Attributes**: Attributes selected as 'Enabled' will be included in the feed indexation.
-* **Doofinder Integration Configuration (Advanced)**: you will be able to reset the integration, in order to re-launch the setup wizard if necessary.
+- **Account**: In here you will find your API KEY.
+- **Doofinder Layer**: You can activate or deactivate the search layer by selecting YES or NO.
+- **Image Configuration**: Select the size of the image to display on the layer. Once the size has been chosen, you must reindex the products in Doofinder.
+- **Automatic Indexing**: you can configure when registered product changes are sent to Doofinder and whether to export only categories present in navigation menus.
+- **Manual Indexing**: Advanced option for indexing.
+- **Custom Attributes**: Attributes selected as 'Enabled' will be included in the feed indexation.
+- **Doofinder Integration Configuration (Advanced)**: you will be able to reset the integration, in order to re-launch the setup wizard if necessary.
 
 ## Layer
 
@@ -169,8 +169,8 @@ To uninstall the module, execute the following command on the root folder where 
 
 If there is any problem with the uninstalling process of the plugin, you need to make sure that:
 
-* The composer tool is accessible by Magento (type down composer in your terminal and see if there is any response)
-* The established memory limit for your PHP is equal or higher than 4 GB (this is configured in your php.ini file)
+- The composer tool is accessible by Magento (type down composer in your terminal and see if there is any response)
+- The established memory limit for your PHP is equal or higher than 4 GB (this is configured in your php.ini file)
 
 Verify this module is no longer in your installed modules list. To check this out, run:
 
@@ -196,7 +196,7 @@ If you are using Magento 2, the Recommendations Script for required JS is differ
 
 ### New Script Line
 
-```javascript
+```html
 <script>
   var dfUrl = 'https://cdn.doofinder.com/recommendations/js/doofinderRecommendation.min.js';
   (function(c,o,k,e){var r,t,i=setInterval(function(){t+=c;r=typeof(require)==='function';
@@ -208,7 +208,7 @@ If you are using Magento 2, the Recommendations Script for required JS is differ
 
 The final script should look like this:
 
-```javascript
+```html
 <script>
   var dfUrl = 'https://cdn.doofinder.com/recommendations/js/doofinderRecommendation.min.js';
   (function(c,o,k,e){var r,t,i=setInterval(function(){t+=c;r=typeof(require)==='function';
@@ -253,13 +253,13 @@ Follow these prerequisites before indexing your catalog.
 
 **For Update on save:**
 
-* This module is heavily based on Cron. Magento 2 requires Cron to work properly, so you must have Cron up and running on your server for the module to work.
+- This module is heavily based on Cron. Magento 2 requires Cron to work properly, so you must have Cron up and running on your server for the module to work.
 
 **Indexing through API catalog:**
 
-* The Setup wizard of the module generates an access token to allow the module to index the catalog using Magento’s API.
+- The Setup wizard of the module generates an access token to allow the module to index the catalog using Magento’s API.
 
-* The access token needs to be valid. Revise it and activate it in your Magento admin. Go to **Stores** > **Configuration** > **Services** > **OAuth** > **Consumer Settings** > Allow OAuth Access Tokens to be used as standalone Bearer tokens: YES (this option is only available if you have a Magento 2.4.4 or later).
+- The access token needs to be valid. Revise it and activate it in your Magento admin. Go to **Stores** > **Configuration** > **Services** > **OAuth** > **Consumer Settings** > Allow OAuth Access Tokens to be used as standalone Bearer tokens: YES (this option is only available if you have a Magento 2.4.4 or later).
 
 ## Catalog Indexing
 
