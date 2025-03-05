@@ -41,19 +41,19 @@ If you’re a developer, you can file an issue or contribution request in our pu
 
 ## Pre-requisites
 
-* This module requires Magento 2.3 or greater.
+- This module requires Magento 2.3 or greater.
 
-* Hardware and software requirements are the same as for Magento 2. Check Magento 2 technical requirements for more information.
+- Hardware and software requirements are the same as for Magento 2. Check Magento 2 technical requirements for more information.
 
-* This module is heavily based on Cron. Magento 2 requires Cron to properly work, so you must have Cron up and running in your server for the module to work.
+- This module is heavily based on Cron. Magento 2 requires Cron to properly work, so you must have Cron up and running in your server for the module to work.
 
-* To use the Doofinder module you need an active Doofinder account. Doofinder is a paid service, but you can try it 30 days for free and benefit from the freemium plan if you have a small store. If you don’t have an account yet you can sign up at: [https://www.doofinder.com/signup](https://www.doofinder.com/signup)
+- To use the Doofinder module you need an active Doofinder account. Doofinder is a paid service, but you can try it 30 days for free and benefit from the freemium plan if you have a small store. If you don’t have an account yet you can sign up at: [https://www.doofinder.com/signup](https://www.doofinder.com/signup)
 
 Plans and pricing are available at:
 
 [https://www.doofinder.com/price](https://www.doofinder.com/price)
 
-* Doofinder module is a free purchase, so you have to pay nothing to use it. The only cost for you is the price of the Doofinder service once the trial period has ended.
+- Doofinder module is a free purchase, so you have to pay nothing to use it. The only cost for you is the price of the Doofinder service once the trial period has ended.
 
 # Installation
 
@@ -106,7 +106,9 @@ This module makes use of that conﬁguration scheme but not all settings are ava
 
 Before conﬁguring the module we should clarify some concepts:
 
-* In Dooﬁnder’s slang a search engine is a single container where you can put documents you want to search. You can have multiple search engines in the same account, each with a different unique ID which is called a Hash ID. When you set up search in Magento 2 with the Dooﬁnder module, you associate each store view with its own search engine by using different Hash ID values.
+::: tip
+In Dooﬁnder’s slang a search engine is a single container where you can put documents you want to search. You can have multiple search engines in the same account, each with a different unique ID which is called a Hash ID. When you set up search in Magento 2 with the Dooﬁnder module, you associate each store view with its own search engine by using different Hash ID values.
+:::
 
 Module conﬁguration is structured in two submenus:
 
@@ -122,11 +124,11 @@ Almost all module configuration will take place inside the Initial Setup step so
 
 The initial configuration of the module is easy and almost unattended. The whole process happens in the Initial Setup section of the menu, and after going through a couple of steps you'll have Doofinder up and running in no time. In summary:
 
-1. Go into the Initial Setup: clicking in this menu option.
+1. Click on the Initial Setup menu option.
 
 2. Create the system integration: simply by clicking the “Create integration” button.
 
-3. Your website to a Doofinder account: you can log in using an existing account or   register a new one in a very simple way.
+3. Link your website to a Doofinder account: you can log in using an existing account or   register a new one in a very simple way.
 
 4. Make sure all settings have been set correctly
 
