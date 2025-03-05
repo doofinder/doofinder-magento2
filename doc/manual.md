@@ -32,6 +32,7 @@ This module provides integration between Magento 2.3+ and the Doofinder search s
 
 To do that, your product data is indexed in Doofinder servers and updated whenever a product is changed. When a search occurs, our front-end Javascript layers enhances the user search experience with faster results.
 
+For an up to date documentation, please, visit: [Doofinder Magento Installation Guide](https://support.doofinder.com/plugins/magento/installation-guide/pre-requisites-magento).
 
 ## Support
 
@@ -39,146 +40,258 @@ For technical support, get in touch from your [Doofinder Account](https://admin.
 
 If you’re a developer, you can file an issue or contribution request in our public code repository at Github: [https://github.com/doofinder/doofinder-magento2](https://github.com/doofinder/doofinder-magento2).
 
-## Pre-requisites
+# Pre-requisites Magento
 
-- This module requires Magento 2.3 or greater.
+* This module is compatible with Magento versions 2.3 through 2.4.7.
+* This module is compatible with Hyvä.
+* This module is heavily based on Cron. Magento 2 requires Cron to work properly, so you must have Cron up and running in your server for the module to work.
+* Activate the following option in your Magento admin: **Stores > Configuration > Services > OAuth > Consumer Settings > Allow OAuth Access Tokens to be used as standalone Bearer tokens: YES** (this option is only available if you have a Magento 2.4.4 or later).
 
-- Hardware and software requirements are the same as for Magento 2. Check Magento 2 technical requirements for more information.
+![Allow OAuth Access Tokens in Magento](https://support.doofinder.com/images/magento-token.png)
 
-- This module is heavily based on Cron. Magento 2 requires Cron to properly work, so you must have Cron up and running in your server for the module to work.
+# Installation Steps Magento
 
-- To use the Doofinder module you need an active Doofinder account. Doofinder is a paid service, but you can try it 30 days for free and benefit from the freemium plan if you have a small store. If you don’t have an account yet you can sign up at: [https://www.doofinder.com/signup](https://www.doofinder.com/signup)
-
-Plans and pricing are available at:
-
-[https://www.doofinder.com/price](https://www.doofinder.com/price)
-
-- Doofinder module is a free purchase, so you have to pay nothing to use it. The only cost for you is the price of the Doofinder service once the trial period has ended.
-
-# Installation
-
-Doofinder can be installed via Component Manager as a free purchase done in Magento Marketplace, or via Composer, the de facto PHP package manager, if you feel at home working from the command line directly in your server.
+Doofinder can be installed via Component Manager as a free purchase done in [Magento Marketplace ](https://marketplace.magento.com/doofinder-doofinder-magento2.html), once downloaded you need to follow these steps in composer.
 
 ::: warning
 Do not install this module via FTP or direct upload to your server’s filesystem. This module has external software dependencies that Component Manager and Composer know how to deal with. If you try to install the module by any other way than recommended you may experience errors in your system.
 :::
 
-From the official Magento documentation:
+## Installation Via Composer
 
-Installing an extension from the Admin is a three-step process that should take place during off-peak hours. Before the extension is installed, your store is put into maintenance mode, checked for readiness, and backed up. After the extension is installed, it must be configured for your store according to the developer’s instructions.
+To install the module through composer:
 
-As a best practice, an extension should be installed and tested in a development environment before it is pushed to production.
+`composer require doofinder/doofinder-magento2`
 
-## Installation via Magento Marketplace
+The module should now be installed and working on the platform.
 
-For up-to-date instructions, refer to the [official Magento documentation](https://experienceleague.adobe.com/en/docs/commerce-operations/installation-guide/tutorials/extensions).
+To activate it, run the following command in the Magento root folder:
 
-Installation via Composer
+`bin/magento setup:upgrade`
 
-1. Log into your Magento 2 server via SSH.
+A new "Doofinder" menu should have been added to your Magento Admin Panel.
 
-2. Go to Magento 2 installation path, for instance:
+## Initial Setup
 
-```
-$ cd /var/www/domains/shop.example.com
-```
+Click on the Doofinder icon under Stores to display the option's menu and select 'Initial Setup'.
 
-3. Execute:
+![Magento initial setup](https://support.doofinder.com/images/magento-1.png)
 
-```
-$ composer require doofinder/doofinder-magento2
-$ php bin/magento setup:upgrade
-```
+1. Select your Store's sector.
 
-## Post-Installation
+   Click on dropdown menu to select your store's sector.
 
-After installing the module, a new "Doofinder" section should have been added to the main menu.
+   After a few seconds, the integration will be ready and the next step of the configuration flow will be activated.
 
-There you will find all the module configuration options.
+2. ![Magento initial setup](https://support.doofinder.com/images/magento-new.png)
 
-# Module Configuration
+   Link your website to a Doofinder Account.
 
-**Read First**
+   To link your website to a Doofinder account, you can log in with an existing account or register for a new free trial very easily.
 
-As you will probably know, Magento 2 can be conﬁgured at different levels; you can set up default values and be more speciﬁc for each store view.
+   ![Magento link website](https://support.doofinder.com/images/magento-4.png)
 
-This module makes use of that conﬁguration scheme but not all settings are available at all levels, some will be at the default level and some others will be speciﬁc for each store view. You must pay attention, so the module is properly conﬁgured.
+   Simply click on the corresponding button and fill in the pop-up form. Once submitted, the pop-up window will close and the initial setup flow will be finished.
 
-Before conﬁguring the module we should clarify some concepts:
-
-::: tip
-In Dooﬁnder’s slang a search engine is a single container where you can put documents you want to search. You can have multiple search engines in the same account, each with a different unique ID which is called a Hash ID. When you set up search in Magento 2 with the Dooﬁnder module, you associate each store view with its own search engine by using different Hash ID values.
-:::
-
-Module conﬁguration is structured in two submenus:
-
-1. Conﬁguration: General conﬁguration of the module, like authentication, search engine identiﬁcators or whether to use the Dooﬁnder Layer in the frontend or not.
-
-2. Initial Setup: from where the initial configuration flow will proceed.
-
-3. Indexes Processing Status: In where you'll find the status of the indexes synchronization.
-
-Almost all module configuration will take place inside the Initial Setup step so please read the next section.
-
-## Configuration Flow
-
-The initial configuration of the module is easy and almost unattended. The whole process happens in the Initial Setup section of the menu, and after going through a couple of steps you'll have Doofinder up and running in no time. In summary:
-
-1. Click on the Initial Setup menu option.
-
-2. Create the system integration: simply by clicking the “Create integration” button.
-
-3. Link your website to a Doofinder account: you can log in using an existing account or   register a new one in a very simple way.
-
-4. Make sure all settings have been set correctly
-
-### Go into the Initial Setup
-
-After clicking in the Initial Setup menu option, you will access to an almost unattended configuration process. Only two simple steps are required.
-
-
-### Create the system integration
-
-Just click on the "Create integration" button to create the system integration necessary to configure our Doofinder module. After a few seconds, the integration will be ready and the next step in the setup flow will be activated.
-
-### Link your website to a Doofinder account
-
-To link your website to a Doofinder account, you can either log in using an existing account or register a new free trial in a very simple way. Just click the appropriate button and fill out the popup form. After submitting this form with the corresponding information, the popup will be closed and the initial setup flow will have ended.
+   ![Magento linkink website](<https://support.doofinder.com/images/Magento 2_3.png>)
 
 ::: note
-If you are creating a new account, be sure to use an email that you have not used before. It is a unique field. Also, make sure your website has not previously been linked to a Doofinder account. You can only link your website to one account.
+   If you are creating a new account, be sure to use an email address that you have not used before. This is a unique field. Also, make sure that your website has not been previously linked to a Doofinder account. You can only link your website to one account.
 :::
 
-### Make sure all settings have been set correctly
+   ![Magento acocunt linked](https://support.doofinder.com/images/magento-5.png)
 
-Once you've linked your website to a Doofinder account, the setup process will automatically create search engines, indexes, and all other settings. Finally, the last step is to check if all the configurations were created correctly. You can access these settings by clicking the "Go to Settings" button that appears after you have completed the linking account step above. It is very important that you verify that the Doofinder Layer field is set to "Yes" (default is "Yes"). It is also recommended to clear the system cache to ensure that the module is rendered correctly on the front-end side.
+   Once you have linked your website to a Doofinder account, the configuration process will automatically create the Search Engines, indexes and all other settings.
 
-## Configuration
+   ![Magento initial setup](https://support.doofinder.com/images/magento-6.png)
 
-### Account
+   On the following screen, you will have two options:
 
-| API Key Global | We will need an API Key to properly authenticate requests done from your server against Doofinder servers. If you don’t have an API Key: Go to the Doofinder options menu "Initial Configuration" and follow the steps described in the Configuration Flow section of this manual. |
-| :---- | :---- |
+3. ![Magento indexing](https://support.doofinder.com/images/magento-7.png)
 
-### Update on save
+   Check Index processing status
 
-| Enabled Global | If "Update on save" is enabled when a product is created / updated / deleted this change is sent to Doofinder. |
-| :---- | :---- |
-| Process changed products Global | If “Update on save” in enabled, with this parameter we configure when registered product changes are sent to Doofinder. Options are: each 5, 10, 15, 30, or 60 minutes. |
+   Here you will find the current status of the indexing process, whether it is OK or there is an error (and the corresponding message), and the date and time of the last synchronization.
 
-### Doofinder Layer
+   Check the following example of a successful indexing process:
 
-Doofinder provides some Javascript layers to easily integrate search with any website. Those layers will be automatically created in your Magento 2 website. In this section you will have access to the following configuration parameters.
+4. ![Magento indexing status](https://support.doofinder.com/images/magento-8.png)
 
-| Enabled Global, Store View | Enable or disable the layer globally or per store view (default: Yes).  |
-| :---- | :---- |
-| Hash Id Store View | Every store view will have its own Hash Id in order to synchronize data with our servers (Do not modify this unless you are an advanced user). If you don’t have Hash Id: Go to the Doofinder options menu "Initial Configuration" and follow the steps described in the Configuration Flow section of this manual. |
-| Installation Id Website | We need an installation ID for every website (Do not modify this unless you are an advanced user). If you don’t have Installation Id: Go to the Doofinder options menu "Initial Configuration" and follow the steps described in the Configuration Flow section of this manual. |
-| Script Website | This is the place where you can edit the layer script (Do not modify this unless you are an advanced user). If you don’t have any script: Go to the Doofinder options menu "Initial Configuration" and follow the steps described in the Configuration Flow section of this manual.  |
+   Go to Configuration
 
-### Indexes Processing Status
+   In this section, you can check if all settings have been created correctly.
 
-In the main menu section of Doofinder, we have an option called: "Index Processing Status". If we enter this screen we will see a summary with the information of the indexing process for each store view. We will see the current status, if there were any errors (and the error message), and the date and time of the last synchronization.
+   Once all the products are indexed the doofinder layer option will be set to yes.
+
+![Magento module](https://support.doofinder.com/images/magento-config.png)
+
+## Module Configuration Fields
+
+* **Account**: In here you will find your API KEY.
+* **Doofinder Layer**: You can activate or deactivate the search layer by selecting YES or NO.
+* **Image Configuration**: Select the size of the image to display on the layer. Once the size has been chosen, you must reindex the products in Doofinder.
+* **Automatic Indexing**: you can configure when registered product changes are sent to Doofinder and whether to export only categories present in navigation menus.
+* **Manual Indexing**: Advanced option for indexing.
+* **Custom Attributes**: Attributes selected as 'Enabled' will be included in the feed indexation.
+* **Doofinder Integration Configuration (Advanced)**: you will be able to reset the integration, in order to re-launch the setup wizard if necessary.
+
+## Layer
+
+The layer will be automatically created in your Magento 2 website.
+
+Magento 2 works with our Live Layer and Fullscreen layer by default.
+
+Once the indexing is finished, the layer will be enabled. You can enable or disable the layer in your **Magento Store > Doofinder > Configuration > Account > Doofinder Layer**.
+
+![Magento enable layer](https://support.doofinder.com/images/magento-10.png)
+
+::: warning
+This module no longer works with V7 and Embedded Layer.
+:::
+
+## Installation ID And Script
+
+The Installation ID and the Script are generated automatically during the installation process.
+
+# Uninstallation Magento
+
+## Version from 0.5.0
+
+You can remove the Doofinder module using this straightforward method:
+
+`www-data@...:/app# bin/magento module:uninstall Doofinder_Feed --remove-data`
+
+## Version up to 0.4.14 (included)
+
+To uninstall the module, execute the following command on the root folder where your Magento is installed:
+
+`bin/magento module:uninstall Doofinder_Feed Doofinder_FeedCompatibility`
+
+If there is any problem with the uninstalling process of the plugin, you need to make sure that:
+
+* The composer tool is accessible by Magento (type down composer in your terminal and see if there is any response)
+* The established memory limit for your PHP is equal or higher than 4 GB (this is configured in your php.ini file)
+
+Verify this module is no longer in your installed modules list. To check this out, run:
+
+`bin/magento module:status Doofinder_Feed Doofinder_FeedCompatibility`
+
+and check the response.
+
+# Custom Fields - Magento
+
+You can configure the custom attributes you want to display by enabling them in your plugin under **Doofinder > Configuration > Custom Attributes:**
+
+![enable magento attributes](https://support.doofinder.com/images/magento-ca.png)
+
+# Recommendations - Magento 2
+
+## Magento 2 - Recommendations Script
+
+If you are using Magento 2, the Recommendations Script for required JS is different. You need to replace the first line in the default script found in the recommendations section with the following:
+
+### Default Script
+
+![default recommendations script](https://support.doofinder.com/images/recom-magento.png)
+
+### New Script Line
+
+```
+<script>
+  var dfUrl = 'https://cdn.doofinder.com/recommendations/js/doofinderRecommendation.min.js';
+  (function(c,o,k,e){var r,t,i=setInterval(function(){t+=c;r=typeof(require)==='function';
+  if(t>=o||r)clearInterval(i);if(r)require([k],e)},c)})(100, 10000, dfUrl);
+</script>
+```
+
+### Final Script
+
+The final script should look like this:
+
+```
+<script>
+  var dfUrl = 'https://cdn.doofinder.com/recommendations/js/doofinderRecommendation.min.js';
+  (function(c,o,k,e){var r,t,i=setInterval(function(){t+=c;r=typeof(require)==='function';
+  if(t>=o||r)clearInterval(i);if(r)require([k],e)},c)})(100, 10000, dfUrl);
+</script>
+<df-recommendations
+  hashid="5bdf17409acaa64fd36fc4fcf7c25820"
+  total-products="10">
+</df-recommendations>
+```
+
+## How to add the Recommendation widget to a Magento page
+
+::: note
+Deprecated feature. Refer to the following [documentation](https://support.doofinder.com/pages/recommendations.html) for updated information on the Recommendations product.
+:::
+
+1. Login into your Magento Admin Panel.
+2. On the left side menu, look for **Content > Pages**.
+3. ![recommendations magento 2](https://support.doofinder.com/images/recomm-magento2.png)
+
+   Locate the Page you want to add the widget to, go to **Action > Select > click on Edit**. Make sure to check if the page is _Enabled_.
+4. ![recommendations magento 2](https://support.doofinder.com/images/recomm-magento2-2.png)
+
+   Open the **Content** section, and click on **Edit with Page Builder**.
+5. On the left side menu, search for the element **Elements**. Select and drag the **HTML Code** block to the page section you desire.
+6. Once placed, click on the wheel icon to Edit the HTML Code.
+7. Copy and Paste the **Final Code** you see on this article above. Remember **you must replace the Hash ID with the Hash ID from your website**.
+8. Remember to save the changes.
+
+![recommendations magento 2](https://support.doofinder.com/images/recomm-magento2-3.gif)
+
+::: note
+Please note that in order to work properly, the Recommendations must also be activated in your [Doofinder Admin Panel.](https://support.doofinder.com/recommendations/recommendations-deprecated.html)
+:::
+
+# How To Index Your Catalog With Magento
+
+There are two options to index your catalog with Magento: Update on save, or API.
+
+Follow these prerequisites before indexing your catalog.
+
+**For Update on save:**
+
+* This module is heavily based on Cron. Magento 2 requires Cron to work properly, so you must have Cron up and running on your server for the module to work.
+
+**Indexing through API catalog:**
+
+* The Setup wizard of the module generates an access token to allow the module to index the catalog using Magento’s API.
+
+* The access token needs to be valid. Revise it and activate it in your Magento admin. Go to **Stores** > **Configuration** > **Services** > **OAuth** > **Consumer Settings** > Allow OAuth Access Tokens to be used as standalone Bearer tokens: YES (this option is only available if you have a Magento 2.4.4 or later).
+
+## Catalog Indexing
+
+Your Catalog will be automatically indexed once a day with Doofinder. By default, Doofinder indexes product data daily when the [automatic option is enabled.](https://support.doofinder.com/managing-data/indexing-options)
+
+However, this feature allows you to schedule the index tasks as a CRON. **The system utility Cron can be used to schedule programs to run automatically at predetermined intervals**. In this case, you can choose between indexing your Catalog once a day, periodically, configuring a time interval between indexes, or scheduling specific timing (maximum six times a day).
+
+In case of another preferred indexing option, like indexing every two hours or five minutes, it is necessary to configure Automatic Indexing (Update on save).
+
+## 1. Update on save
+
+The _Update on save_ option sends only the modifications made to the catalog via the API, ensuring that the indexed data in Doofinder is updated accordingly.
+
+_Automatic Indexing (Update on save)_ is **disabled by default**. To enable the Update on save function go to your **Magento module** > click on the **Store** tab > open **Configuration**. You will find all sections related to settings. Unfold **Doofinder’s tab** > click on **Configuration**.
+
+Once there, go to the **Automatic Indexing** section > **Automatically process modified products** > choose how many times a day you would like your changes to be sent to Doofinder for indexation > _Save Config_.
+
+Notice that with Magento automatic indexation will only occur if changes have been made. Magento’s Automatic Indexing is compatible with Doofinder’s regular indexation if enabled.
+
+![Allow OAuth Access Tokens in Magento](https://support.doofinder.com/images/update-onsave-magento.png)
+
+## 2. Manual Indexing
+
+If preferred, you can always update your changes manually within Magento using _Manual Indexing (advanced)_ instead of configuring automatic indexing. Just click on Manual Indexing and accept. As with automatic indexing, manual indexation will only occur if changes have been made.
+
+::: note
+Manual Indexing and Update on save options are compatible and available to use simultaneously with Doofinder indexing.
+:::
+
+## Indexation of Custom Attributes
+
+You can configure the custom attributes you want to display. Find [_this_](https://support.doofinder.com/plugins/magento/installation-guide/custom-fields-magento.html) helpful documentation about Custom Fields on Magento and how to manage them.
 
 # Troubleshooting
 
@@ -190,3 +303,6 @@ In the main menu section of Doofinder, we have an option called: "Index Processi
 
 **A:** Go to the Doofinder options menu "Initial Configuration" and follow the steps described in the Configuration Flow section of this manual.
 
+**Q: I Can't See My Layer**
+
+**A:** If you can't see the Layer in your store, you probably need to clean the cache after installing the module. Go to your Admin Panel > System > Cache Management and choose Flush Magento Cache.
