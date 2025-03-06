@@ -18,12 +18,12 @@ Notice that you'll need to specify the 9012 port when executing ngrok.
 
 ### Get composer credentials
 > [!IMPORTANT]
-> It is mandatory to obtain credentials for composer usage. These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and create an access key. The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD` environment variables (see [Environment Variables](#environment-variables)).
+> It is mandatory to obtain credentials for composer usage. These fields can be obtained by going to [Your Magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and create an access key. The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD` environment variables (see [Environment Variables](#environment-variables)).
 
 ### Environment variables
 
 > [!TIP]
-> You can create an `.env.local` file to override the environment variables defined in `.env` such as composer credentials or magento installation data to fit your needs.
+> You can create an `.env.local` file to override the environment variables defined in `.env` such as composer credentials or Magento installation data to fit your needs.
 
 For example, below is a base `.env.local` file:
 
@@ -44,12 +44,12 @@ The `Makefile` automatically overrides `.env` vars with the ones found in `.env.
 
 ### Initial setup
 
-You can set up a fresh magento installation using the provided `Makefile` targets `init` or `init-with-data`. This command will:
+You can set up a fresh Magento installation using the provided `Makefile` targets `init` or `init-with-data`. This command will:
 - Pulls and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
-- Runs a magento `create-project` command inside a bind mount into `./app`.
+- Runs a Magento `create-project` command inside a bind mount into `./app`.
 - Starts the containers
-- Runs a magento installation with variables defined in the environment through `.env` or `.env.local` file.
-- Optionally: Loads sample data into magento
+- Runs a Magento installation with variables defined in the environment through `.env` or `.env.local` file.
+- Optionally: Loads sample data into Magento
 
 Finally, Magento 2 with the module installed will be running at `http://MAGENTO_BASE_URL`.
 
@@ -123,7 +123,7 @@ MAGENTO_VERSION=2.3.1
 **Redirect issues**
 If after the setup process has finished the website doesn't load you may need to change the urls in the database.
 Connect to the database in `localhost:3312` using the mysql user and password defined in the `.env` (`magentobase`).
-In the table `core_config_data` there are two configs for the base urls that magento will redirect to, with paths:
+In the table `core_config_data` there are two configs for the base urls that Magento will redirect to, with paths:
 - `web/unsecure/base_url`
 - `web/secure/base_url`
-Make sure that those urls are the ones you'll be using to connect to your site or magento will always redirect to them.
+Make sure that those urls are the ones you'll be using to connect to your site or Magento will always redirect to them.
