@@ -100,7 +100,7 @@ During development, it is sometimes useful to create a data snapshot before perf
 
 ## Last notes
 
-Please take care when you change the environment variables`MAGENTO_VERSION`, since you will have to change probably the `PHP_VERSION` and the `COMPOSER_VERSION` ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:
+Please take care when you change the environment variable `MAGENTO_VERSION`, since you will have to change probably the `PHP_VERSION` and the `COMPOSER_VERSION` ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:
 
 ```sh
 PHP_VERSION=7.4
