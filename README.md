@@ -100,7 +100,7 @@ During development, it is sometimes useful to create a data snapshot before perf
 
 ## Last notes
 
-Please take care when you change in `.env` the MAGENTO_VERSION parameter since you'll have to change probably the PHP_VERSION & COMPOSER_VERSION ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:
+Please take care when you change the environment variables`MAGENTO_VERSION`, since you will have to change probably the `PHP_VERSION` and the `COMPOSER_VERSION` ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:
 
 ```sh
 PHP_VERSION=7.4
@@ -108,6 +108,7 @@ COMPOSER_VERSION=2.0.14
 MAGENTO_EDITION=community
 MAGENTO_VERSION=2.4.3
 ```
+
 but if you want to test, let's say, the 2.3.1 version you should have something like this:
 
 ```sh
@@ -115,12 +116,6 @@ PHP_VERSION=7.2
 COMPOSER_VERSION=1.4.3
 MAGENTO_EDITION=community
 MAGENTO_VERSION=2.3.1
-```
-
-And please, don't forget to copy in `.env` your Magento repository tokens filling the parameters:
-```sh
-COMPOSER_AUTH_USERNAME=
-COMPOSER_AUTH_PASSWORD=
 ```
 
 ## Troubleshooting
