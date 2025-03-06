@@ -18,7 +18,7 @@ Notice that you'll need to specify the 9012 port when executing ngrok.
 
 ### Get composer credentials
 > [!IMPORTANT]
-> It is mandatory to obtain credentials for composer usage. These fields can be obtained by going to [Your Magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and create an access key. The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD` environment variables (see [Environment Variables](#environment-variables)).
+> It is mandatory to obtain credentials for composer usage. These fields can be obtained by creating an access key into [your Magento marketplace account](https://marketplace.magento.com/customer/accessKeys/). The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD` environment variables (see [Environment Variables](#environment-variables)).
 
 ### Environment variables
 
