@@ -9,16 +9,16 @@
 ### Configure NGROK
 In order to be able to create an account or login to an existing Doofinder account during the module initial setup, you will have to expose your local webserver to internet (to receive a callback).
 
-To do so, you can use, for example; the utility Ngrok: https://dashboard.ngrok.com/get-started/setup
+To do so, you can use, for example, the utility Ngrok: https://dashboard.ngrok.com/get-started/setup
 
-And once you have the external url created, simply set the `MAGENTO_BASE_URL` (for example: `MAGENTO_BASE_URL=forcibly-ethical-apple.ngrok-free.app`).
+Once the external URL is created, simply set the `MAGENTO_BASE_URL` environment variable (see [Environment Variables](#environment-variables)).
 
-So, when the installation process finished, instead of accessing to `http://localhost:9012` you will use your url (for example: `http://forcibly-ethical-apple.ngrok-free.app`).
+So, when the installation process finished, instead of accessing to `http://localhost:9012` you will use your url, for example, `http://forcibly-ethical-apple.ngrok-free.app`).
 Notice that you'll need to specify the 9012 port when executing ngrok.
 
 ### Get composer credentials
 > [!IMPORTANT]
-> It is mandatory to obtain credentials for composer usage. These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and creating an access key. The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD`.
+> It is mandatory to obtain credentials for composer usage. These fields can be obtained by going to [Your magento marketplace account](https://marketplace.magento.com/customer/accessKeys/) and create an access key. The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD` environment variables (see [Environment Variables](#environment-variables)).
 
 ### Environment variables
 
