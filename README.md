@@ -6,10 +6,10 @@
 
 ## Docker Environment
 
-### Configure NGROK
-In order to be able to create an account or login to an existing Doofinder account during the module initial setup, you will have to expose your local webserver to internet (to receive a callback).
+### Configure ngrok
+In order to be able to create an account or login to an existing Doofinder account during the module initial setup, you will have to expose your local webserver to the internet (to receive a callback).
 
-To do so, you can use, for example, the utility Ngrok: https://dashboard.ngrok.com/get-started/setup
+To do so, you can use, for example, the utility ngrok: https://dashboard.ngrok.com/get-started/setup
 
 Once the external URL is created, simply set the `MAGENTO_BASE_URL` environment variable (see [Environment Variables](#environment-variables)).
 
