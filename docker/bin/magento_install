@@ -75,7 +75,7 @@ if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
   sed -i 's/xdebug_disable();/ /g' /app/vendor/magento/magento2-functional-testing-framework/src/Magento/FunctionalTestingFramework/_bootstrap.php
 fi
 
-COMPOSER_HOME=/app/var/composer_home composer config --global http-basic.repo.magento.com \
+composer config --global http-basic.repo.magento.com \
 	$(< $COMPOSER_AUTH_USERNAME_SECRET) $(< $COMPOSER_AUTH_PASSWORD_SECRET)
 
 echo "Magento installation complete!"
