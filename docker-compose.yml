@@ -54,8 +54,10 @@ services:
       - "9012:80"
       - "4012:443"
     secrets:
-      - composer_auth_username
-      - composer_auth_password
+      - source: composer_auth_username
+        mode: 0444
+      - source: composer_auth_password
+        mode: 0444
 
   setup:
     image: doofinder-magento2:php-${PHP_VERSION}-composer-${COMPOSER_VERSION}
