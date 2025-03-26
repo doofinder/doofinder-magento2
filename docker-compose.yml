@@ -40,6 +40,7 @@ services:
       WEB_ALIAS_DOMAIN: ${MAGENTO_BASE_URL}
       WEB_DOCUMENT_ROOT: /app/pub
       PHP_MAX_EXECUTION_TIME: 300
+      COMPOSER_HOME: /app/var/composer_home
       DOOFINDER_ADMIN_URL: ${DOOFINDER_ADMIN_URL}
       DOOFINDER_PLUGINS_URL_FORMAT: ${DOOFINDER_PLUGINS_URL_FORMAT}
       DOOFINDER_SEARCH_URL_FORMAT: ${DOOFINDER_SEARCH_URL_FORMAT}
@@ -53,8 +54,10 @@ services:
       - "9012:80"
       - "4012:443"
     secrets:
-      - composer_auth_username
-      - composer_auth_password
+      - source: composer_auth_username
+        mode: 0444
+      - source: composer_auth_password
+        mode: 0444
 
   setup:
     image: doofinder-magento2:php-${PHP_VERSION}-composer-${COMPOSER_VERSION}
