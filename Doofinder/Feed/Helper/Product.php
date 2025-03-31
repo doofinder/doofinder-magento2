@@ -120,7 +120,7 @@ class Product extends AbstractHelper
         $this->eavConfig = $eavConfig;
         $this->configurable = $configurable;
         $this->inventoryHelper = $inventoryHelper;
-        $this->visibilityAllowed = [Visibility::VISIBILITY_IN_SEARCH, visibility::VISIBILITY_BOTH];
+        $this->visibilityAllowed = [Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH];
         parent::__construct($context);
     }
 
