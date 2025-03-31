@@ -8,6 +8,7 @@ use Doofinder\Feed\Helper\Inventory as InventoryHelper;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Model\Category as CategoryModel;
 use Magento\Catalog\Model\Product as ProductModel;
+use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator;
 use Magento\Eav\Model\Config as EavConfig;
@@ -79,6 +80,13 @@ class Product extends AbstractHelper
     protected $configurable;
 
     /**
+     * @see /Doofinder/Feed/Observer/Product/AbstractChangedProductObserver.php
+     * 
+     * @var []
+     */
+    private $visibilityAllowed;
+
+    /**
      * @param CategoryCollectionFactory $categoryCollectionFactory
      * @param ImageHelper $imageHelper
      * @param Context $context
@@ -112,6 +120,7 @@ class Product extends AbstractHelper
         $this->eavConfig = $eavConfig;
         $this->configurable = $configurable;
         $this->inventoryHelper = $inventoryHelper;
+        $this->visibilityAllowed = [Visibility::VISIBILITY_IN_SEARCH, visibility::VISIBILITY_BOTH];
         parent::__construct($context);
     }
 
@@ -141,8 +150,17 @@ class Product extends AbstractHelper
         $storeId = $product->getStoreId();
         $routePath = '';
         $requestPath = $product->getRequestPath();
+        $productId = $product->getId();
+        $parents = $this->configurable->getParentIdsByChild($product->getId());
+        if ($product->getTypeId() === ProductType::TYPE_SIMPLE
+                && count($parents) > 0
+                && !in_array($product->getVisibility(), $this->visibilityAllowed)
+            ) {
+                $productId = $parents[0];
+            }
+        $parents = $this->configurable->getParentIdsByChild($product->getId());
         $filterData = [
-            UrlRewrite::ENTITY_ID => $product->getId(),
+            UrlRewrite::ENTITY_ID => $productId,
             UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,
             UrlRewrite::STORE_ID => $storeId,
         ];
@@ -155,8 +173,8 @@ class Product extends AbstractHelper
         } else {
             $routePath = 'catalog/product/view';
             // In case the product is a variant we need the ID of the configurable
-            if ($product->getTypeId() == ProductType::TYPE_SIMPLE
-                && count($parents = $this->configurable->getParentIdsByChild($product->getId())) > 0
+            if ($product->getTypeId() === ProductType::TYPE_SIMPLE
+                && count($parents) > 0
             ) {
                 $routeParams['id'] = $parents[0];
                 $routeParams['s'] = $product->getUrlKey();
