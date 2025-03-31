@@ -158,7 +158,6 @@ class Product extends AbstractHelper
             ) {
                 $productId = $parents[0];
             }
-        $parents = $this->configurable->getParentIdsByChild($product->getId());
         $filterData = [
             UrlRewrite::ENTITY_ID => $productId,
             UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,
