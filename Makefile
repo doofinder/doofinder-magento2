@@ -36,12 +36,12 @@ all:
 
 # Backup the MySQL database from the 'db' container and compress the output
 db-backup:
-	$(docker_compose) exec db /usr/bin/mysqldump -u root -pmagentobase magentobase | gzip > backup_$(shell date +%Y%m%d%H%M%S)$(prefix).sql.gz
+	$(docker_compose) exec db /usr/bin/mysqldump -u root -p$(MYSQL_PASSWORD)  $(MYSQL_DATABASE) | gzip > backup_$(shell date +%Y%m%d%H%M%S)$(prefix).sql.gz
 
 # Restore the MySQL database using a provided backup file (pass file=<backupfile> as argument)
 db-restore:
 	@[ -e "$(file)" ] || (echo "Error: 'file' variable not provided. Use file=<backupfile>" && exit 1)
-	gunzip < $(file) | $(docker_compose) exec -T db /usr/bin/mysql -u root -pmagentobase magentobase
+	gunzip < $(file) | $(docker_compose) exec -T db /usr/bin/mysql -u root -p$(MYSQL_PASSWORD)  $(MYSQL_DATABASE)
 
 # Configures extension static files
 doofinder-configure:
@@ -49,15 +49,16 @@ doofinder-configure:
 
 # Enable the Doofinder module, upgrade Magento, and clean the cache
 doofinder-upgrade: doofinder-configure
-	$(docker_exec_web) php bin/magento module:enable Doofinder_Feed --clear-static-content
+	$(docker_exec_web) php bin/magento module:enable Doofinder_Feed
 	$(docker_exec_web) php bin/magento setup:upgrade
-	$(docker_exec_web) php bin/magento cache:clean
 
 # Disable the Doofinder module, upgrade Magento, and clean the cache
 doofinder-uninstall: doofinder-configure
 	$(docker_exec_web) php bin/magento module:disable Doofinder_Feed --clear-static-content
+	$(docker_compose) exec db /usr/bin/mysql -u root -p$(MYSQL_PASSWORD) $(MYSQL_DATABASE) -e "DELETE FROM setup_module WHERE module = 'Doofinder_Feed';"
+	$(docker_compose) exec db /usr/bin/mysql -u root -p$(MYSQL_PASSWORD) $(MYSQL_DATABASE) -e "DELETE FROM core_config_data WHERE path LIKE 'doofinder_config_config%';"
+	$(docker_compose) exec db /usr/bin/mysql -u root -p$(MYSQL_PASSWORD) $(MYSQL_DATABASE) -e "DELETE FROM integration WHERE name = 'Doofinder Integration';"
 	$(docker_exec_web) php bin/magento setup:upgrade
-	$(docker_exec_web) php bin/magento cache:clean
 
 # Reinstall Doofinder: disable then re-enable the module
 doofinder-reinstall: doofinder-uninstall doofinder-upgrade
