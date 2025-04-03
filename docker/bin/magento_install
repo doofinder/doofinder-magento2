@@ -34,6 +34,7 @@ if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
 	--language="$MAGENTO_LOCALE" \
 	--currency="$MAGENTO_CURRENCY" \
 	--timezone="$MAGENTO_TIMEZONE" \
+	--enable-syslog-logging \
 	--use-secure-admin=0
 fi
 
@@ -44,20 +45,30 @@ if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
 	--admin-email="$MAGENTO_ADMIN_EMAIL" \
 	--admin-user="$MAGENTO_ADMIN_USER" \
 	--admin-password="$MAGENTO_ADMIN_PASSWORD" \
-	--base-url=http://"$MAGENTO_BASE_URL" \
-	--base-url-secure=https://"$MAGENTO_BASE_URL" \
 	--backend-frontname="$MAGENTO_ADMIN_FRONTNAME" \
 	--db-host="$MYSQL_HOST" \
 	--db-name="$MYSQL_DATABASE" \
 	--db-user="$MYSQL_USER" \
 	--db-password="$MYSQL_PASSWORD" \
-	--use-rewrites=1 \
-	--language="$MAGENTO_LOCALE" \
-	--currency="$MAGENTO_CURRENCY" \
-	--timezone="$MAGENTO_TIMEZONE" \
-	--use-secure-admin=0 \
 	--search-engine=elasticsearch7 \
-	--elasticsearch-host="$ELASTICSEARCH_HOST"
+	--elasticsearch-host="$ELASTICSEARCH_HOST" \
+	--enable-syslog-logging=1 \
+	--cleanup-database \
+	--disable-modules Magento_AdminAdobeImsTwoFactorAuth,Magento_TwoFactorAuth
+
+	${MAGENTO_BIN} config:set web/unsecure/base_url  "http://${MAGENTO_BASE_URL}/" > /dev/null && echo "Config set \`web/unsecure/base_url\` to \`http://${MAGENTO_BASE_URL}/\`"
+	${MAGENTO_BIN} config:set web/secure/base_url  "https://${MAGENTO_BASE_URL}/" > /dev/null && echo "Config set \`web/secure/base_url\` to \`https://${MAGENTO_BASE_URL}/\`"
+	${MAGENTO_BIN} config:set web/seo/use_rewrites  1 > /dev/null && echo "Enabled seo rewrites"
+	${MAGENTO_BIN} config:set general/locale/code  "${MAGENTO_LOCALE}" > /dev/null && echo "Set locale to \`${MAGENTO_LOCALE}\`"
+	${MAGENTO_BIN} config:set currency/options/base  "${MAGENTO_CURRENCY}" > /dev/null && echo "Set base currency to \`${MAGENTO_CURRENCY}\`"
+	${MAGENTO_BIN} config:set currency/options/default  "${MAGENTO_CURRENCY}" > /dev/null && echo "Set default currenty to \`${MAGENTO_CURRENCY}\`"
+	${MAGENTO_BIN} config:set currency/options/allow  "${MAGENTO_CURRENCY}" > /dev/null && echo "Set allow currency to \`${MAGENTO_CURRENCY}\`"
+	${MAGENTO_BIN} config:set general/locale/timezone  "${MAGENTO_TIMEZONE}" > /dev/null && echo "Set timezone to \`${MAGENTO_TIMEZONE}\`"
+
+	# Enable ssl
+	${MAGENTO_BIN} config:set web/secure/use_in_frontend  1 > /dev/null && echo "Enabled ssl in frontend"
+	${MAGENTO_BIN} config:set web/secure/use_in_adminhtml  1 > /dev/null && echo "Enabled ssl in adminhtml"
+
 fi
 
 # Required for index with doofinder
@@ -66,10 +77,10 @@ ${MAGENTO_BIN} config:set oauth/consumer/enable_integration_as_bearer 1 > /dev/n
 ${MAGENTO_BIN} deploy:mode:set developer
 ${MAGENTO_BIN} indexer:reindex
 
-if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
-  ${MAGENTO_BIN} module:disable Magento_AdminAdobeImsTwoFactorAuth --clear-static-content
-  ${MAGENTO_BIN} module:disable Magento_TwoFactorAuth --clear-static-content
-fi
+# if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
+#   ${MAGENTO_BIN} module:disable Magento_AdminAdobeImsTwoFactorAuth --clear-static-content
+#   ${MAGENTO_BIN} module:disable Magento_TwoFactorAuth --clear-static-content
+# fi
 
 if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
   sed -i 's/xdebug_disable();/ /g' /app/vendor/magento/magento2-functional-testing-framework/src/Magento/FunctionalTestingFramework/_bootstrap.php
