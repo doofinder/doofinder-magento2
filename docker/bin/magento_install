@@ -77,11 +77,6 @@ ${MAGENTO_BIN} config:set oauth/consumer/enable_integration_as_bearer 1 > /dev/n
 ${MAGENTO_BIN} deploy:mode:set developer
 ${MAGENTO_BIN} indexer:reindex
 
-# if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
-#   ${MAGENTO_BIN} module:disable Magento_AdminAdobeImsTwoFactorAuth --clear-static-content
-#   ${MAGENTO_BIN} module:disable Magento_TwoFactorAuth --clear-static-content
-# fi
-
 if [[ "$MAGENTO_VERSION" == *"2.3."* ]]; then
   sed -i 's/xdebug_disable();/ /g' /app/vendor/magento/magento2-functional-testing-framework/src/Magento/FunctionalTestingFramework/_bootstrap.php
 fi
