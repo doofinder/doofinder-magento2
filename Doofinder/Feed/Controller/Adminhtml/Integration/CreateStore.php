@@ -89,6 +89,7 @@ class CreateStore extends Action implements HttpGetActionInterface
         if ($this->generateDoofinderStores() == true) {
             $resultJson->setData(true);
         } else {
+            # TODO Should we delete integration data?
             $resultJson->setHttpResponseCode(WebapiException::HTTP_INTERNAL_ERROR);
             $resultJson->setData(false);
         }
@@ -99,37 +100,44 @@ class CreateStore extends Action implements HttpGetActionInterface
     {
         $success = true;
         foreach ($this->storeConfig->getAllGroups() as $storeGroup) {
-            try {
-                $storeGroupId = (int)$storeGroup->getId();
-                $websiteId = (int)$storeGroup->getWebsiteId();
-                $searchEngineData = $this->generateSearchEngineData($storeGroupId);
-                $storeOptions = $this->generateStoreOptions($websiteId);
-                $primary_language = $this->storeConfig->getLanguageFromStore($storeGroup->getDefaultStore());
-
-                $storeGroupConfig = [
-                    "name" => $storeGroup->getName(),
-                    "platform" => "magento2",
-                    "primary_language" => $primary_language,
-                    "skip_indexation" => false,
-                    "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
-                    "site_url" => $this->get_primary_site_url_in_se($searchEngineData["searchEngineConfig"], $primary_language),
-                    "search_engines" => $searchEngineData["searchEngineConfig"],
-                    "options" => $storeOptions,
-                    "query_input" => "#search",
-                    "plugin_version" => $this->getModuleVersion()
-                ];
-                $response = $this->storeConfig->createStore($storeGroupConfig);
-                $this->saveInstallationConfig((int)$storeGroupId, $response["installation_id"], $response["script"]);
-                $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["config"]["search_engines"]);
-            } catch (Exception $e) {
-                $success = false;
-                $this->logger->error('Error creating store for store group "' . $storeGroup->getName() .
-                    '". ' . $e->getMessage());
-            }
+            $success &= $this->generateDoofinderStore($storeGroup);
         }
         $this->setCustomAttributes();
         $this->cleanCache();
 
+        return $success;
+    }
+
+    public function generateDoofinderStore($storeGroup)
+    {
+        $success = true;
+        try {
+            $storeGroupId = (int)$storeGroup->getId();
+            $websiteId = (int)$storeGroup->getWebsiteId();
+            $searchEngineData = $this->generateSearchEngineData($storeGroupId);
+            $storeOptions = $this->generateStoreOptions($websiteId);
+            $primary_language = $this->storeConfig->getLanguageFromStore($storeGroup->getWebsite()->getDefaultStore());
+
+            $storeGroupConfig = [
+                "name" => $storeGroup->getName(),
+                "platform" => "magento2",
+                "primary_language" => $primary_language,
+                "skip_indexation" => false,
+                "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
+                "site_url" => $this->get_primary_site_url_in_se($searchEngineData["searchEngineConfig"], $primary_language),
+                "search_engines" => $searchEngineData["searchEngineConfig"],
+                "options" => $storeOptions,
+                "query_input" => "#search",
+                "plugin_version" => $this->getModuleVersion()
+            ];
+            $response = $this->storeConfig->createStore($storeGroupConfig);
+            $this->saveInstallationConfig((int)$storeGroupId, $response["installation_id"], $response["script"]);
+            $this->saveSearchEngineConfig($searchEngineData["storesConfig"], $response["config"]["search_engines"]);
+        } catch (Exception $e) {
+            $success = false;
+            $this->logger->error('Error creating store for store group "' . $storeGroup->getName() .
+                '". ' . $e->getMessage());
+        }
         return $success;
     }
 
@@ -139,14 +147,20 @@ class CreateStore extends Action implements HttpGetActionInterface
         $storesConfig = [];
 
         foreach ($this->storeConfig->getStoreGroupStores($storeGroupId) as $store) {
+
             $language = $this->storeConfig->getLanguageFromStore($store);
             $currency = strtoupper($store->getCurrentCurrency()->getCode());
+
+            // Only generate config for a unique pair. The rest of Store Views must be
+            // created explicitly
+            if (isset($storesConfig[$language][$currency])) continue;
+
             $store_id = $store->getId();
             $base_url = $store->getBaseUrl();
 
             // store_id field refers to store_view's id.
             $searchEngineConfig[] = [
-                "name" => $store->getName(),
+                "name" => $store->getGroup()->getName() . ' - ' . $store->getName(),
                 "language" => $language,
                 "currency" => $currency,
                 "site_url" => $base_url,
