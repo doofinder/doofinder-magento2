@@ -61,21 +61,6 @@
                         <![CDATA[ Activating this option you are inserting the script into your store code. You can manage product visibility in Doofinder. ]]>
                     </comment>
                 </field>
-                <field id="installation_id"
-                       translate="label"
-                       type="text"
-                       sortOrder="200"
-                       showInDefault="0"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <depends>
-                        <field id="doofinder_layer_enabled">1</field>
-                    </depends>
-                    <label>Installation Id</label>
-                    <comment>
-                        <![CDATA[ You need an installation ID for every website. ]]>
-                    </comment>
-                </field>
                 <field id="script"
                        translate="label"
                        type="textarea"
