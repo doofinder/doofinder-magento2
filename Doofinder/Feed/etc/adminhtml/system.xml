@@ -76,6 +76,35 @@
                         <![CDATA[ Do not modify this unless you are an advanced user. ]]>
                     </comment>
                 </field>
+                <field id="installation_id"
+                       translate="label"
+                       type="text"
+                       sortOrder="200"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Installation Id</label>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\ScopeGroupValue</backend_model>
+                    <comment>
+                        <![CDATA[ You need an installation ID for eachmake  Store. This value is shared among all store views under the same Store. ]]>
+                    </comment>
+                </field>
+                <field id="sync_store"
+                       translate="label"
+                       type="button"
+                       sortOrder="400"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <frontend_model>Doofinder\Feed\Block\System\Config\CreateSearchEngine</frontend_model>
+                    <depends>
+                        <field id="hash_id"></field>
+                    </depends>
+                    <label>Create Doofinder Search Engine</label>
+                    <comment>
+                        <![CDATA[ This Store View is not related to any Search Engine in Doofinder. You can create a new Search Engine or use an existing hashid from Doofinder. ]]>
+                    </comment>
+                </field>
                 <field id="hash_id"
                        translate="label"
                        type="text"

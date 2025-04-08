@@ -1,0 +1,17 @@
+<script>
+    require([
+        'jquery',
+        'mage/translate'
+    ], function($, _t) {
+        $('#create-search-engine').click(_ => {
+            if (confirm(_t("Are you sure? This action will create a search engine within your store."))) {
+                new Ajax.Request('<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>', {
+                    loaderArea: true,
+                    asynchronous: true,
+                });
+            }
+        });
+    });
+</script>
+
+<?= $block->getButtonHtml(); ?>
