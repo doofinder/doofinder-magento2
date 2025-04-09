@@ -1,5 +1,9 @@
 <?php
-    $_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
+if (!isset($escaper)) {
+    $escaper = method_exists($block, 'escapeHtml') ? $block : \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Framework\Escaper::class);
+}
+
+$_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
 ?>
 <style>
     /* To make custom attributes table scrollable */
@@ -51,7 +55,7 @@
                 customFieldsToggler.checked = false;
                 customFieldsToggler.addEventListener('change', toggleCustomAttributesCheckboxes);
             }
-            
+
             // create row creator
             window.arrayAttributes<?= $escaper->escapeJs($_htmlId) ?> = {
                 // define row prototypeJS template

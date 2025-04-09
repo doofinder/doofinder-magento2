@@ -4,6 +4,10 @@
  * @var \Magento\Framework\Escaper $escaper
  */
 $statuses =  $block->getSearchEnginesProcessStatus();
+
+if (!isset($escaper)) {
+    $escaper = method_exists($block, 'escapeHtml') ? $block : \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Framework\Escaper::class);
+}
 ?>
 <?php if (isset($statuses['error'])): ?>
     <p><?= $escaper->escapeHtml(__(sprintf('There was an error while requesting search engines process task status: %s', $statuses['error']))) ?></p>

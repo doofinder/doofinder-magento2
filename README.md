@@ -115,6 +115,16 @@ This plugin has been thoroughly tested and confirmed to be compatible with the f
 - PHP 8.0 is not supported by Magento 2.
 - Future PHP versions may require additional testing to ensure full compatibility.
 
+## Tested compatibility with the following M2 versions
+
+- Magento 2.3.5-p3
+- Magento 2.4.2
+- Magento 2.4.3
+- Magento 2.4.4
+- Magento 2.4.5
+- Magento 2.4.6
+- Magento 2.4.7
+
 ## Last notes
 
 Please take care when you change the environment variable `MAGENTO_VERSION`, since you will have to change probably the `PHP_VERSION` and the `COMPOSER_VERSION` ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:

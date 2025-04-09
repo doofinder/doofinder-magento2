@@ -1,3 +1,8 @@
+<?php
+if (!isset($escaper)) {
+    $escaper = method_exists($block, 'escapeHtml') ? $block : \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Framework\Escaper::class);
+}
+?>
 <script>
     require([
         'jquery',
