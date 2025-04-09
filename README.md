@@ -104,6 +104,7 @@ This plugin has been thoroughly tested and confirmed to be compatible with the f
 
 ✅ Supported PHP Versions:
 
+- PHP 7.3
 - PHP 7.4
 - PHP 8.1
 - PHP 8.2
@@ -111,9 +112,8 @@ This plugin has been thoroughly tested and confirmed to be compatible with the f
 
 ⚠️ Note:
 
-- PHP versions below 7.4 are not supported.
+- PHP versions below 7.4 are not recommended.
 - PHP 8.0 is not supported by Magento 2.
-- Future PHP versions may require additional testing to ensure full compatibility.
 
 ## Tested compatibility with the following M2 versions
 
