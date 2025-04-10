@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -91,7 +92,7 @@ class ManagementClient
      */
     public function createSearchEngine(array $searchEngine): array
     {
-        $response = $this->client->post(self::ENDPOINT_SEARCH_ENGINES, $searchEngine);
+        $response = $this->client->post("/search-engines", $searchEngine);
 
         return json_decode($response, true);
     }
