@@ -21,6 +21,7 @@ use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Block\Adminhtml\Integration\Tokens;
 use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Api\Data\GroupInterface;
 use Psr\Log\LoggerInterface;
 
 class CreateStore extends Action implements HttpGetActionInterface
@@ -114,7 +115,7 @@ class CreateStore extends Action implements HttpGetActionInterface
         try {
             $storeGroupId = (int)$storeGroup->getId();
             $websiteId = (int)$storeGroup->getWebsiteId();
-            $searchEngineData = $this->generateSearchEngineData($storeGroupId);
+            $searchEngineData = $this->generateAllSearchEngineData($storeGroup);
             $storeOptions = $this->generateStoreOptions($websiteId);
             $primary_language = $this->storeConfig->getLanguageFromStore($storeGroup->getWebsite()->getDefaultStore());
 
@@ -141,12 +142,18 @@ class CreateStore extends Action implements HttpGetActionInterface
         return $success;
     }
 
-    public function generateSearchEngineData($storeGroupId)
+    /**
+     * Generates all search engine data for a store group.
+     *
+     * @param GroupInterface $storeGroup
+     * @return array
+     */
+    public function generateAllSearchEngineData($storeGroup)
     {
         $searchEngineConfig = [];
         $storesConfig = [];
 
-        foreach ($this->storeConfig->getStoreGroupStores($storeGroupId) as $store) {
+        foreach ($storeGroup->getStores() as $store) {
 
             $language = $this->storeConfig->getLanguageFromStore($store);
             $currency = strtoupper($store->getCurrentCurrency()->getCode());
