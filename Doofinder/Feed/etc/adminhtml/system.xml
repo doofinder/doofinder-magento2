@@ -84,12 +84,27 @@
                        showInWebsite="0"
                        showInStore="1">
                     <label>Installation Id</label>
+                    <frontend_model>Doofinder\Feed\Block\System\Config\Disabled</frontend_model>
                     <backend_model>Doofinder\Feed\Model\Config\Backend\ScopeGroupValue</backend_model>
                     <comment>
-                        <![CDATA[ You need an installation ID for eachmake  Store. This value is shared among all store views under the same Store. ]]>
+                        <![CDATA[ This corresponds with the Store Id in Doofinder.]]>
                     </comment>
                 </field>
-                <field id="sync_store"
+                <field id="hash_id"
+                       translate="label"
+                       type="text"
+                       sortOrder="400"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Search Engine Hash Id</label>
+                    <frontend_model>Doofinder\Feed\Block\System\Config\Disabled</frontend_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\HashIdValidation</backend_model>
+                    <comment>
+                        <![CDATA[ If empty you must create a Search Engine with the button below. ]]>
+                    </comment>
+                </field>
+                <field id="create_search_engine"
                        translate="label"
                        type="button"
                        sortOrder="400"
@@ -102,20 +117,7 @@
                     </depends>
                     <label>Create Doofinder Search Engine</label>
                     <comment>
-                        <![CDATA[ This Store View is not related to any Search Engine in Doofinder. You can create a new Search Engine or use an existing hashid from Doofinder. ]]>
-                    </comment>
-                </field>
-                <field id="hash_id"
-                       translate="label"
-                       type="text"
-                       sortOrder="400"
-                       showInDefault="0"
-                       showInWebsite="0"
-                       showInStore="1">
-                    <label>Hash Id</label>
-                    <backend_model>Doofinder\Feed\Model\Config\Backend\HashIdValidation</backend_model>
-                    <comment>
-                        <![CDATA[ You must configure a "hashid" for each store view. ]]>
+                        <![CDATA[ This Store View is not related to any Search Engine in Doofinder. You can create it now! ]]>
                     </comment>
                 </field>
             </group>

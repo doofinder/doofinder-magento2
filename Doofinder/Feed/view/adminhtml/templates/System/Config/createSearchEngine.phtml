@@ -1,15 +1,37 @@
 <script>
     require([
         'jquery',
-        'mage/translate'
-    ], function($, _t) {
-        $('#create-search-engine').click(_ => {
-            if (confirm(_t("Are you sure? This action will create a search engine within your store."))) {
-                new Ajax.Request('<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>', {
-                    loaderArea: true,
-                    asynchronous: true,
-                });
-            }
+        'mage/translate',
+        'Magento_Ui/js/modal/confirm',
+        'Magento_Ui/js/modal/alert',
+    ], function($, _t, confirmation, alert) {
+        $('#create_search_engine').click(_ => {
+            confirmation({
+                title: _t("Create Search Engine"),
+                content: _t("Are you sure? This action will create a search engine within your store."),
+                actions: {
+                    confirm: function() {
+                        new Ajax.Request('<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>', {
+                            loaderArea: true,
+                            asynchronous: true,
+                            onSuccess: function(transport) {
+                                var hashidElementId = '#doofinder_config_config_doofinder_layer_hash_id'
+                                var hashid = transport?.responseJSON?.result?.hashid || ""
+
+                                $(hashidElementId).val(hashid)
+
+                                var event = new Event('change');
+                                $(hashidElementId).get()[0].dispatchEvent(event);
+                            },
+                            onFailure: function(transport) {
+                                alert({
+                                    content: _t(transport?.resultJson?.error || "An unknown error has occurred while generating the search")
+                                })
+                            }
+                        });
+                    }
+                }
+            });
         });
     });
 </script>

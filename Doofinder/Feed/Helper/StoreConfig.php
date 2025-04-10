@@ -228,6 +228,18 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
+     * Creates the store in doofinder's structure
+     * @param array $searchEngineData
+     * @return array
+     */
+    public function createSearchEngine(array $searchEngineData): array
+    {
+        $managementClient = $this->managementClientFactory->create(['apiType' => 'dooplugins']);
+        return $managementClient->createSearchEngine($searchEngineData);
+    }
+
+
+    /**
      * Get store code.
      *
      * @param string|null $store

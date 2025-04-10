@@ -32,7 +32,7 @@ class CreateSearchEngine extends Field
     public function getButtonHtml()
     {
         $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')->setData([
-            'id' => 'create-search-engine',
+            'id' => 'create_search_engine',
             'label' => __('Create Search Engine'),
         ]);
         return $button->toHtml();
