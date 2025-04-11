@@ -81,7 +81,7 @@ class Product extends AbstractHelper
 
     /**
      * @see /Doofinder/Feed/Observer/Product/AbstractChangedProductObserver.php
-     * 
+     *
      * @var []
      */
     private $visibilityAllowed;
@@ -157,7 +157,7 @@ class Product extends AbstractHelper
                 && !in_array($product->getVisibility(), $this->visibilityAllowed)
             ) {
                 $productId = $parents[0];
-            }
+        }
         $filterData = [
             UrlRewrite::ENTITY_ID => $productId,
             UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,
