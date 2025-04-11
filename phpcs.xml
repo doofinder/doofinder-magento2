@@ -4,6 +4,7 @@
 
     <!-- Inherit the Magento 2 coding standard -->
     <rule ref="Magento2">
+        <!-- Required exclusion until we solve the getenv() issue -->
         <exclude name="Magento2.Functions.DiscouragedFunction.Discouraged" />
     </rule>
 
