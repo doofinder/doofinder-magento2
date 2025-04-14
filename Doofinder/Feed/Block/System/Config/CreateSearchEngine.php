@@ -12,7 +12,7 @@ class CreateSearchEngine extends Field
 
 
     protected $_template = 'Doofinder_Feed::System/Config/createSearchEngine.phtml';
-    public function __construct(Context $context, array $data = [],)
+    public function __construct(Context $context, array $data = [])
     {
         parent::__construct($context, $data);
     }
