@@ -1,3 +1,4 @@
 .env.local
 app/
 vendor
+composer.lock
