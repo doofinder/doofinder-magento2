@@ -66,7 +66,7 @@ class ManagementClient
      * @param array $storeData
      * @return array
      */
-    public function createStore(mixed $storeData): array
+    public function createStore($storeData): array
     {
         $response = $this->client->post('/install', $storeData);
 
