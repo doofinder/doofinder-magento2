@@ -6,7 +6,7 @@ use JsonSerializable;
 
 class SearchEngineOptionsStruct  implements JsonSerializable
 {
-    private string $store_id;
+    private string $storeId;
     private string $base_url;
 
     public function __construct(
