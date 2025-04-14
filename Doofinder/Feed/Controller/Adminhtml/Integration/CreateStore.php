@@ -64,7 +64,7 @@ class CreateStore extends Action implements HttpGetActionInterface
 
             $message = 'Doofinder stores generated successfully.';
             foreach ($installationResults as $result) {
-                if ($result !== true) {
+                if (true !== $result) {
                     $message = 'The installation was not being fully successful. Please check the logs for further information.';
                     $installationFailed &= true;
                 } else {
