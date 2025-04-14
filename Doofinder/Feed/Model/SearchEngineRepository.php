@@ -12,8 +12,6 @@ class SearchEngineRepository
 {
 
     private const PROCESS_CALLBACK_PATH = 'doofinderfeed/setup/processCallback';
-    private const REST_API_PATH = 'rest/%s/V1/';
-
     /**
      * @var StoreConfig
      */
@@ -62,7 +60,7 @@ class SearchEngineRepository
                 $baseUrl . self::PROCESS_CALLBACK_PATH . '?storeId=' . $storeId,
                 new SearchEngineOptionsStruct(
                     (string)$storeId,
-                    $baseUrl . sprintf(self::REST_API_PATH, $store->getCode())
+                    $baseUrl
                 )
             );
             $languagesCurrencies[$language][$currency] = true;

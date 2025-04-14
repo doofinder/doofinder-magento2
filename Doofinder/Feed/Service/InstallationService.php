@@ -13,7 +13,6 @@ use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as Attrib
 use Magento\Integration\Block\Adminhtml\Integration\Tokens as IntegrationTokens;
 use Magento\Integration\Model\IntegrationService;
 use Magento\Store\Api\Data\GroupInterface;
-use Magento\Store\Model\StoreManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Escaper;
 use Psr\Log\LoggerInterface;

@@ -6,8 +6,7 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\Data\InstallationOptionsStruct;
 use Doofinder\Feed\Model\Data\InstallationStruct;
 use Doofinder\Feed\Model\Data\SearchEngineStruct;
-use Magento\Framework\Component\ComponentRegistrar;
-use Magento\Framework\Component\ComponentRegistrarInterface;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Filesystem\Directory\ReadFactory;
 use Magento\Store\Model\Group;
 
@@ -24,11 +23,6 @@ class InstallationRepository
     private SearchEngineRepository $searchEngineRepository;
 
     /**
-     * @var ComponentRegistrarInterface
-     */
-    private ComponentRegistrarInterface $componentRegistrar;
-
-    /**
      * @var ReadFactory
      */
     private ReadFactory $readFactory;
@@ -36,12 +30,10 @@ class InstallationRepository
     public function __construct(
         StoreConfig $storeConfig,
         SearchEngineRepository $searchEngineRepository,
-        ComponentRegistrarInterface $componentRegistrar,
         ReadFactory $readFactory
     ) {
         $this->storeConfig = $storeConfig;
         $this->searchEngineRepository = $searchEngineRepository;
-        $this->componentRegistrar = $componentRegistrar;
         $this->readFactory = $readFactory;
     }
 
@@ -90,17 +82,9 @@ class InstallationRepository
 
     private function getModuleVersion(): string
     {
-        $path = $this->componentRegistrar->getPath(
-            ComponentRegistrar::MODULE,
-            'Doofinder_Feed'
-        );
-        $directoryRead = $this->readFactory->create($path);
-        $composerJsonData = '';
-        if ($directoryRead->isFile('composer.json')) {
-            $composerJsonData = $directoryRead->readFile('composer.json');
-        }
-        $data = json_decode($composerJsonData);
+        $objectManager = ObjectManager::getInstance();
+        $moduleInfo =  $objectManager->get('Magento\Framework\Module\ModuleList')->getOne('Doofinder_Feed');
 
-        return !empty($data->version) ? $data->version : '';
+        return $moduleInfo['setup_version'];
     }
 }
