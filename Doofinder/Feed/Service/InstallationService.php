@@ -157,7 +157,7 @@ class InstallationService
         $attributeCollection = $this->attributeCollectionFactory->create();
         $attributeCollection->addFieldToFilter('is_user_defined', ['eq' => 1]);
         $attributeCollection->addFieldToFilter('attribute_code', ['in' => self::CUSTOM_ATTRIBUTES_ENABLED_DEFAULT]);
-        $attributes     = [];
+        $attributes = [];
         foreach ($attributeCollection as $attribute) {
             $attribute_id = $attribute->getAttributeId();
             $attributes[$attribute_id] = [
