@@ -110,7 +110,7 @@ class Client
      * Request with POST verb
      *
      * @param string $path
-     * @param array $body
+     * @param mixed $body
      * @return string
      * @throws BadRequest
      * @throws IndexingInProgress
@@ -121,7 +121,7 @@ class Client
      * @throws TypeAlreadyExists
      * @throws WrongResponse
      */
-    public function post(string $path, array $body): string
+    public function post(string $path, mixed $body): string
     {
         try {
             $this->response = $this->guzzleClient->post(

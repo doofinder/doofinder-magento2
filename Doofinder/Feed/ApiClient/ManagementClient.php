@@ -66,7 +66,7 @@ class ManagementClient
      * @param array $storeData
      * @return array
      */
-    public function createStore(array $storeData): array
+    public function createStore(mixed $storeData): array
     {
         $response = $this->client->post('/install', $storeData);
 
@@ -92,7 +92,7 @@ class ManagementClient
      */
     public function createSearchEngine(array $searchEngine): array
     {
-        $response = $this->client->post("/search-engines", $searchEngine);
+        $response = $this->client->post("/install/search-engines", $searchEngine);
 
         return json_decode($response, true);
     }
