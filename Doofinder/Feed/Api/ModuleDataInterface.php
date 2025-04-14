@@ -8,7 +8,9 @@ namespace Doofinder\Feed\Api;
 interface ModuleDataInterface
 {
     /**
-     * Obtains the data from the Doofinder module. This data contains module's version, M2's version and the store structure.
+     * Obtains the data from the Doofinder module.
+     *
+     * This data contains module's version, M2's version and the store structure.
      *
      * @return array
      */
