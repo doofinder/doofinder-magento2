@@ -6,20 +6,27 @@ use JsonSerializable;
 
 class SearchEngineOptionsStruct  implements JsonSerializable
 {
+    /**
+     * @var string Store ID associated with the search engine options.
+     */
     private string $storeId;
+
+    /**
+     * @var string Base URL for the search engine options.
+     */
     private string $base_url;
 
     public function __construct(
         string $store_id,
         string $base_url
     ) {
-        $this->store_id = $store_id;
+        $this->storeId = $store_id;
         $this->base_url = $base_url;
     }
 
     public function getStoreId(): string
     {
-        return $this->store_id;
+        return $this->storeId;
     }
 
     public function getBaseUrl(): string
@@ -29,7 +36,7 @@ class SearchEngineOptionsStruct  implements JsonSerializable
 
     public function getIndexUrl(): string
     {
-        return $this->base_url . 'rest/' . $this->store_id . '/V1/';
+        return $this->base_url . 'rest/' . $this->storeId . '/V1/';
     }
 
     /**
@@ -38,7 +45,7 @@ class SearchEngineOptionsStruct  implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            "store_id" => $this->store_id,
+            "store_id" => $this->storeId,
             "index_url" => $this->getIndexUrl()
         ];
     }

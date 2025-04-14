@@ -6,19 +6,54 @@ use JsonSerializable;
 
 class InstallationStruct implements JsonSerializable
 {
+    /**
+     * @var string Name of the installation.
+     */
     private $name;
+
+    /**
+     * @var string Platform of the installation.
+     */
     private $platform;
+
+    /**
+     * @var string Primary language of the installation.
+     */
     private $primaryLanguage;
+
+    /**
+     * @var bool Whether to skip indexation.
+     */
     private $skipIndexation;
+
+    /**
+     * @var string Sector of the installation.
+     */
     private $sector;
+
+    /**
+     * @var string Site URL of the installation.
+     */
     private $siteUrl;
+
+    /**
+     * @var array Search engines associated with the installation.
+     */
     private $searchEngines;
 
     /**
-     * @var InstallationOptionsStruct
+     * @var InstallationOptionsStruct Options for the installation.
      */
     private $options;
+
+    /**
+     * @var string Query input for the installation.
+     */
     private $queryInput;
+
+    /**
+     * @var string Plugin version of the installation.
+     */
     private $pluginVersion;
 
     public function __construct(

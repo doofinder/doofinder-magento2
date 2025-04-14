@@ -8,13 +8,12 @@ class InstallationOptionsStruct implements JsonSerializable
 {
 
     /**
-     * @var int
+     * @var int Website ID associated with the installation options.
      */
     private $websiteId;
 
-
     /**
-     * @var string
+     * @var string Token used for authentication in the installation options.
      */
     private $token;
 

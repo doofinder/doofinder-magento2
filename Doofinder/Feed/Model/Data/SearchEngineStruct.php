@@ -6,12 +6,40 @@ use JsonSerializable;
 
 class SearchEngineStruct implements JsonSerializable
 {
+    /**
+     * @var string Name of the search engine.
+     */
     private $name;
+
+    /**
+     * @var string Language of the search engine.
+     */
     private $language;
+
+    /**
+     * @var string Currency used by the search engine.
+     */
     private $currency;
+
+    /**
+     * @var string URL of the site associated with the search engine.
+     */
     private $siteUrl;
+
+    /**
+     * @var string Callback URL for the search engine.
+     */
     private $callbackUrl;
+
+    /**
+     * @var SearchEngineOptionsStruct Options for the search engine.
+     */
     private $options;
+
+    /**
+     * @var string|null Store ID associated with the search engine.
+     */
+    private $storeId;
 
     public function __construct(
         string $name,
@@ -19,7 +47,8 @@ class SearchEngineStruct implements JsonSerializable
         string $currency,
         string $siteUrl,
         string $callbackUrl,
-        SearchEngineOptionsStruct $options
+        SearchEngineOptionsStruct $options,
+        ?string $storeId = null
     ) {
         $this->name = $name;
         $this->language = $language;
@@ -27,6 +56,7 @@ class SearchEngineStruct implements JsonSerializable
         $this->siteUrl = $siteUrl;
         $this->callbackUrl = $callbackUrl;
         $this->options = $options;
+        $this->storeId = $storeId;
     }
 
     public function getName(): string
@@ -64,13 +94,18 @@ class SearchEngineStruct implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return [
+        $data = [
             'name' => $this->name,
             'language' => $this->language,
             'currency' => $this->currency,
-            'siteUrl' => $this->siteUrl,
-            'callbackUrl' => $this->callbackUrl,
+            'site_url' => $this->siteUrl,
+            'callback_url' => $this->callbackUrl,
             'options' => $this->options,
         ];
+
+        if ($this->storeId) {
+            $data['store_id'] = $this->storeId;
+        }
+        return $data;
     }
 }
