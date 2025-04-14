@@ -121,7 +121,7 @@ class Client
      * @throws TypeAlreadyExists
      * @throws WrongResponse
      */
-    public function post(string $path, mixed $body): string
+    public function post(string $path, $body): string
     {
         try {
             $this->response = $this->guzzleClient->post(
