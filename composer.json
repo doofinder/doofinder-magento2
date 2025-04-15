@@ -30,7 +30,7 @@
       "Doofinder/Feed/registration.php"
     ],
     "psr-4": {
-      "Doofinder\\Feed\\": ""
+      "Doofinder\\Feed\\": "Doofinder/Feed/"
     }
   },
   "repositories": [
@@ -46,5 +46,5 @@
     "post-update-cmd": [
       "([ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/,../../phpcompatibility/php-compatibility)"
     ]
-}
+  }
 }
