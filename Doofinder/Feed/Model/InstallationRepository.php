@@ -47,7 +47,7 @@ class InstallationRepository
         $primaryLanguage = $this->storeConfig->getLanguageFromStore($storeGroup->getDefaultStore());
         $searchEngines = $this->searchEngineRepository->getByStoreGroup($storeGroup);
 
-        $siteUrl = $this->getPrimarySiteUrlInSe($searchEngines, $primaryLanguage);
+        $siteUrl = $this->getPrimaryLanguageSiteUrl($primaryLanguage, $searchEngines);
 
         $pluginVersion = $this->getModuleVersion();
 
@@ -68,7 +68,7 @@ class InstallationRepository
     /**
      * We obtain the url associated with the main language search_engine
      */
-    private function getPrimarySiteUrlInSe(array $searchEngines, string $primaryLanguage): string
+    private function getPrimaryLanguageSiteUrl(string $primaryLanguage, array $searchEngines): string
     {
         foreach ($searchEngines as $searchEngine) {
             /** @var SearchEngineStruct $searchEngine */
