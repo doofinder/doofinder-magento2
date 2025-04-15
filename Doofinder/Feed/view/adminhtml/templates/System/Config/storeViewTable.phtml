@@ -11,8 +11,8 @@ $groups = $block->getGroups();
 <table class="data-grid store-table">
     <thead>
         <tr>
-            <th class="data-grid-th no-link col-name"><?php echo __('Store Name'); ?></th>
-            <th class="data-grid-th last no-link col-action"><?php echo __('Action'); ?></th>
+            <th class="data-grid-th no-link col-name"><?= $escaper->escapeHtml(__('Store Name')) ?></th>
+            <th class="data-grid-th last no-link col-action"><?= $escaper->escapeHtml(__('Action')) ?></th>
         </tr>
     </thead>
     <tbody>
@@ -22,19 +22,19 @@ $groups = $block->getGroups();
             // Retrieve the installation id for the store configuration
             $installationId = $block->getInstallationId($group);
             ?>
-            <tr class="<?php echo ($evenStyle = !$evenStyle) ? "even" : "" ?>" id="store-view-installation-<?php echo $group->getId(); ?>">
+            <tr class="<?php echo ($evenStyle = !$evenStyle) ? "even" : "" ?>" id="store-view-installation-<?= $escaper->escapeHtml($group->getId()) ?>">
                 <td>
-                    <?php echo $block->escapeHtml($group->getName()); ?><br />
-                    <span class="installation-id"> <?php echo $block->escapeHtml($installationId  ?: 'Not installed'); ?><span>
+                    <?php echo $escaper->escapeHtml($group->getName()); ?><br />
+                    <span class="installation-id"> <?= $escaper->escapeHtml($installationId  ?: __('Not installed')) ?><span>
                 </td>
                 <td style=" text-align:center;">
                     <?php if ($installationId === null) : ?>
-                        <button name="doofinder-create-store" type="button" onclick="doofinderSyncStore(<?php echo $group->getId(); ?>)">
-                            <?php echo __('Create'); ?>
+                        <button name="doofinder-create-store" type="button" onclick="doofinderSyncStore(<?= $escaper->escapeHtml($group->getId()) ?>)">
+                            <?= $escaper->escapeHtml(__('Create')) ?>
                         </button>
                     <?php else: ?>
                         <button name="doofinder-create-store" type="button" disabled="disabled">
-                            <?php echo __('Created'); ?>
+                            <?= $escaper->escapeHtml(__('Created')) ?>
                         </button>
                     <?php endif; ?>
                 </td>
