@@ -19,7 +19,7 @@ define([
                 signupEndpoint: '${ $.signupEndpoint }',
                 loginEndpoint: '${ $.loginEndpoint }',
                 checkAPIKeyUrl: '${ $.checkAPIKeyUrl }',
-                createStoreUrl: '${ $.createStoreUrl }',
+                setupUrl: '${ $.setupUrl }',
                 doofinderConnectUrl: '${ $.doofinderConnectUrl}'
             },
             paramsPopup: '${ $.paramsPopup }'
@@ -98,7 +98,7 @@ define([
                 }
                 // create store
                 $.ajax({
-                    url: self.urls.createStoreUrl,
+                    url: self.urls.setupUrl,
                     method: 'GET',
                     cache: false,
                     data: {

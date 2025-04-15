@@ -15,7 +15,7 @@ use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Psr\Log\LoggerInterface;
 
-class CreateStore extends Action implements HttpGetActionInterface
+class Setup extends Action implements HttpGetActionInterface
 {
     /** @var InstallationService */
     private $installationService;
