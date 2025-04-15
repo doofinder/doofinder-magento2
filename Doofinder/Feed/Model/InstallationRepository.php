@@ -47,7 +47,7 @@ class InstallationRepository
         $primaryLanguage = $this->storeConfig->getLanguageFromStore($storeGroup->getDefaultStore());
         $searchEngines = $this->searchEngineRepository->getByStoreGroup($storeGroup);
 
-        $siteUrl = $this->getPrimaryLanguageSiteUrl($primaryLanguage, $searchEngines);
+        $siteUrl = $storeGroup->getDefaultStore()->getBaseUrl();
 
         $pluginVersion = $this->getModuleVersion();
 
@@ -63,21 +63,6 @@ class InstallationRepository
             "#search",
             $pluginVersion
         );
-    }
-
-    /**
-     * We obtain the url associated with the main language search_engine
-     */
-    private function getPrimaryLanguageSiteUrl(string $primaryLanguage, array $searchEngines): string
-    {
-        foreach ($searchEngines as $searchEngine) {
-            /** @var SearchEngineStruct $searchEngine */
-            if ($searchEngine->getLanguage() === $primaryLanguage) {
-                return $searchEngine->getSiteurl();
-            }
-        }
-
-        throw new \RuntimeException('No primary search engine found for the given language.');
     }
 
     private function getModuleVersion(): string
