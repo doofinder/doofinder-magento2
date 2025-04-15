@@ -349,7 +349,6 @@ class Product extends AbstractHelper
      *
      * @param ProductModel $product
      * @param string|null $size
-     * @param string|null $field
      *
      * @return string|null
      */
@@ -365,7 +364,7 @@ class Product extends AbstractHelper
         */
         $imageRole = $this->findRoleToUse($product);
 
-        if (is_null($imageRole)) {
+        if (null === $imageRole) {
             return null;
         }
 

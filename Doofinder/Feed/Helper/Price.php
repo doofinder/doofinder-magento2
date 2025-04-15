@@ -14,6 +14,9 @@ use Magento\Tax\Model\Config as TaxConfig;
 
 class Price extends AbstractHelper
 {
+    /**
+     * @var TaxConfig
+     */
     private $taxConfig;
 
     /**
@@ -33,8 +36,8 @@ class Price extends AbstractHelper
     /**
      * Gets product price by product's id
      *
-     * @param $product
-     * @param $type
+     * @param Magento\Catalog\Model\Product $product
+     * @param string $type
      */
     public function getProductPrice($product, $type = 'final_price')
     {
@@ -47,7 +50,7 @@ class Price extends AbstractHelper
     /**
      * Returns the price type transformed to one of the types we use
      *
-     * @param $type
+     * @param string $type
      * @return string
      */
     private function getPriceType($type)
@@ -65,8 +68,8 @@ class Price extends AbstractHelper
     /**
      * Gets the flat price of the product based on it's type
      *
-     * @param $product
-     * @param $type
+     * @param Magento\Catalog\Model\Product $product
+     * @param string $type
      * @return int
      */
     private function getProductFlatPrice($product, $type)
@@ -94,9 +97,9 @@ class Price extends AbstractHelper
     /**
      * Gets the price applying the taxes in case it's necessary
      *
-     * @param $product
-     * @param $price
-     * @return int
+     * @param Magento\Catalog\Model\Product $product
+     * @param mixed $price
+     * @return int|float
      */
     private function getPriceApplyingCorrespondingTaxes($product, $price)
     {
@@ -117,8 +120,8 @@ class Price extends AbstractHelper
      * The first case contemplates the scenario of the tax already applied to the price
      * The second scenario needs this adjustment to be applied.
      *
-     * @param $product
-     * @param $amount
+     * @param Magento\Catalog\Model\Product $product
+     * @param Magento\Framework\Pricing\Amount\AmountInterface $amount
      */
     private function getPriceWithTaxes($product, $amount)
     {
@@ -145,8 +148,8 @@ class Price extends AbstractHelper
     /**
      * Applies the pricing strategy for bundle-type products and returns the corresponding value
      *
-     * @param $product
-     * @param $type
+     * @param Magento\Catalog\Model\Product $product
+     * @param string $type
      */
     private function getBundleProductPrice($product, $type)
     {
@@ -159,8 +162,8 @@ class Price extends AbstractHelper
     /**
      * Applies the pricing strategy for grouped-type products and returns the corresponding value
      *
-     * @param $product
-     * @param $type
+     * @param Magento\Catalog\Model\Product $product
+     * @param string $type
      */
     private function getGroupedProductPrice($product, $type)
     {
@@ -175,8 +178,8 @@ class Price extends AbstractHelper
     /**
      * Applies the pricing strategy for configurable-type products and returns the corresponding value
      *
-     * @param $product
-     * @param $type
+     * @param Magento\Catalog\Model\Product $product
+     * @param string $type
      */
     private function getConfigurableProductPrice($product, $type)
     {
@@ -187,9 +190,9 @@ class Price extends AbstractHelper
     /**
      * Gets calculated minimum price for a product
      *
-     * @param $product
-     * @param $usedProds
-     * @param $type
+     * @param Magento\Catalog\Model\Product $product
+     * @param array $usedProds
+     * @param string $type
      */
     private function getMinimumComplexProductPrice($product, $usedProds, $type)
     {
@@ -210,7 +213,7 @@ class Price extends AbstractHelper
             if ($child->getId() != $product->getId()) {
                 $variant_minimum_price = $this->getMinimumVariantPrice($child);
 
-                if (is_null($minimum_price)) {
+                if (null === $minimum_price) {
                     $minimum_price = $variant_minimum_price;
                     $minimum_variant = $child;
                 } elseif ($variant_minimum_price < $minimum_price) {
@@ -220,7 +223,7 @@ class Price extends AbstractHelper
             }
         }
 
-        if (is_null($minimum_variant)) {
+        if (null === $minimum_variant) {
             return null;
         }
 
@@ -230,14 +233,14 @@ class Price extends AbstractHelper
     /**
      * Gets the minimum price of the variant
      *
-     * @param $variant
+     * @param Magento\Catalog\Model\Product $variant
      */
     private function getMinimumVariantPrice($variant)
     {
         $regular_price = $variant->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
         $final_price = $variant->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
 
-        if (!is_null($final_price)) {
+        if (null !== ($final_price)) {
             return $final_price;
         } else {
             return $regular_price;

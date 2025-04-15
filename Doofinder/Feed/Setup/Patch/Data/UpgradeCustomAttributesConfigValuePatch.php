@@ -99,14 +99,19 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
             $configuredScopes = $connection->fetchAll($select);
             $this->_logger->info('Found ' . count($configuredScopes) . ' scopes with custom attributes configuration');
             foreach ($configuredScopes as $scope) {
-                $customAttributes = $this->_scopeConfig->getValue(StoreConfig::CUSTOM_ATTRIBUTES, $scope['scope'], $scope['scope_id']);
+                $customAttributes = $this->_scopeConfig->getValue(
+                    StoreConfig::CUSTOM_ATTRIBUTES,
+                    $scope['scope'],
+                    $scope['scope_id']
+                );
                 $this->_configWriter->save(
                     StoreConfig::CUSTOM_ATTRIBUTES,
                     $this->_serializer->serialize($customAttributes),
                     $scope['scope'],
                     $scope['scope_id']
                 );
-                $this->_logger->info('Successfully upgraded custom attributes for scope: ' . $scope['scope'] . ', scope_id: ' . $scope['scope_id']);
+                $this->_logger->info('Successfully upgraded custom attributes for scope: ' .
+                $scope['scope'] . ', scope_id: ' . $scope['scope_id']);
             }
             $connection->commit();
         } catch (Exception $e) {
@@ -121,7 +126,7 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function getDependencies(): array
     {
@@ -129,7 +134,7 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAliases(): array
     {
@@ -137,7 +142,7 @@ class UpgradeCustomAttributesConfigValuePatch implements DataPatchInterface, Pat
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function getVersion(): string
     {

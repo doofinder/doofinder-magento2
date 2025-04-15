@@ -18,8 +18,23 @@ class Cron extends ConfigValue
 {
     public const CRON_STRING_PATH = 'doofinder_config_config/update_on_save/cron_expression';
 
+    /**
+     * @var StoreConfigFactory
+     */
     protected $storeConfigFactory;
 
+    /**
+     * Cron constructor.
+     *
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param StoreConfigFactory $storeConfigFactory
+     * @param TypeListInterface $cacheTypeList
+     * @param AbstractResource $resource
+     * @param AbstractDb $resourceCollection
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         Registry $registry,

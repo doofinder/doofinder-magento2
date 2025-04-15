@@ -15,47 +15,65 @@ use Magento\Framework\Filesystem\Directory\ReadFactory;
 use Magento\Store\Model\ScopeInterface;
 
 /**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * Class ModuleData
+ *
+ * Provides metadata and configuration information related to the Doofinder module and the Magento installation.
  */
 class ModuleData
 {
-
     private const MODULE_PACKAGE_NAME = 'Doofinder_Feed';
 
     /**
+     * Magento deployment configuration.
+     *
      * @var DeploymentConfig
      */
     protected $deploymentConfig;
 
     /**
+     * Magento component registrar.
+     *
      * @var ComponentRegistrarInterface
      */
     protected $componentRegistrar;
-    
+
     /**
+     * Store configuration helper.
+     *
      * @var StoreConfig
      */
     protected $storeConfig;
-    
+
     /**
+     * Product metadata instance.
+     *
      * @var ProductMetadataInterface
      */
     protected $productMetadata;
 
     /**
+     * Filesystem read factory.
+     *
      * @var ReadFactory
      */
     protected $readFactory;
 
     /**
+     * Magento scope config interface.
+     *
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
 
     /**
+     * ModuleData constructor.
+     *
      * @param DeploymentConfig $deploymentConfig
      * @param ComponentRegistrarInterface $componentRegistrar
+     * @param StoreConfig $storeConfig
+     * @param ProductMetadataInterface $productMetadata
      * @param ReadFactory $readFactory
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         DeploymentConfig $deploymentConfig,
@@ -72,9 +90,11 @@ class ModuleData
         $this->readFactory = $readFactory;
         $this->scopeConfig = $scopeConfig;
     }
-    
+
     /**
-     * @inheritDoc
+     * Returns an array containing serialized metadata about the Doofinder module.
+     *
+     * @return array
      */
     public function get()
     {
@@ -86,6 +106,11 @@ class ModuleData
         return [$moduleStruct->jsonSerialize()];
     }
 
+    /**
+     * Retrieves the module version from the composer.json file.
+     *
+     * @return string|null
+     */
     private function getModuleVersion()
     {
         $path = $this->componentRegistrar->getPath(
@@ -97,11 +122,21 @@ class ModuleData
         return json_decode($composerJsonData)->version;
     }
 
+    /**
+     * Retrieves the Magento edition and version (e.g., Community: 2.4.6).
+     *
+     * @return string
+     */
     private function getMagentoVersion()
     {
         return $this->productMetadata->getEdition() . ': ' . $this->productMetadata->getVersion();
     }
-    
+
+    /**
+     * Builds a list of website structures containing store information.
+     *
+     * @return array
+     */
     private function getWebsiteStructures()
     {
         $websiteStructs = [];
@@ -128,6 +163,12 @@ class ModuleData
         return $websiteStructs;
     }
 
+    /**
+     * Retrieves the Doofinder installation ID for a given store.
+     *
+     * @param \Magento\Store\Api\Data\StoreInterface|\Magento\Store\Model\Store $store
+     * @return string|null
+     */
     private function getInstallationId($store)
     {
         $storeGroupId = $store->getStoreGroupId();
