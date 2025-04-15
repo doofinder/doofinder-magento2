@@ -35,18 +35,18 @@ class CustomAttributes extends ArraySerialized implements ProcessorInterface
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
+     * @param ManagerInterface $messageManager
      * @param AbstractResource $resource
      * @param AbstractDb $resourceCollection
-     * @param ManagerInterface $messageManager
      */
     public function __construct(
         Context $context,
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        ManagerInterface $messageManager
+        ManagerInterface $messageManager,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null
     ) {
         $this->messageManager = $messageManager;
         $this->serializer = new Base64GzJson();
