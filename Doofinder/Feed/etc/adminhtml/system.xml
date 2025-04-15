@@ -76,6 +76,18 @@
                         <![CDATA[ Do not modify this unless you are an advanced user. ]]>
                     </comment>
                 </field>
+                <field id="store_view_table"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="50"
+                       showInDefault="0"
+                       showInWebsite="1"
+                       showInStore="0">
+                    <label>Store Group Configuration</label>
+                    <!-- This custom field uses a frontend model to render a table -->
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\StoreViewTable</frontend_model>
+                    <comment>Manage Doofinder Store installations.</comment>
+                </field>
                 <field id="installation_id"
                        translate="label"
                        type="text"

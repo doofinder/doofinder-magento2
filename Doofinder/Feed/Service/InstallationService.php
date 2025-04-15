@@ -88,9 +88,8 @@ class InstallationService
         return $installationResults;
     }
 
-    public function generateDoofinderStore(GroupInterface $storeGroup)
+    public function generateDoofinderStore(GroupInterface $storeGroup): array
     {
-        $success = true;
         try {
 
             $websiteId = (int)$storeGroup->getWebsiteId();
@@ -127,8 +126,9 @@ class InstallationService
                 $this->storeConfig->setHashId($hashid, $storeId);
                 $this->storeConfig->setIndexationStatus(["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED], $storeId);
             }
+            return $response;
         } catch (Exception $e) {
-            $message = 'Error creating store for store group "' . $storeGroup->getName() . '". ' . $e->getMessage();
+            $message = 'Error creating Doofinder store for store group "' . $storeGroup->getName() . '". ' . $e->getMessage();
             $this->logger->error($message);
             throw new Exception($message);
         }

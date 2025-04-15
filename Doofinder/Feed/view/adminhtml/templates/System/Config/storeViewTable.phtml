@@ -1,0 +1,115 @@
+<?php
+
+use Doofinder\Feed\Block\Adminhtml\System\Config\StoreViewTable;
+use Magento\Store\Api\Data\GroupInterface;
+
+/** @var StoreViewTable $block*/
+/** @var GroupInterface $group*/
+
+$groups = $block->getGroups();
+?>
+<table class="data-grid store-table">
+    <thead>
+        <tr>
+            <th class="data-grid-th no-link col-name"><?php echo __('Store Name'); ?></th>
+            <th class="data-grid-th last no-link col-action"><?php echo __('Action'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php $evenStyle = true; ?>
+        <?php foreach ($groups as $group): ?>
+            <?php
+            // Retrieve the installation id for the store configuration
+            $installationId = $block->getInstallationId($group);
+            ?>
+            <tr class="<?php echo ($evenStyle = !$evenStyle) ? "even" : "" ?>" id="store-view-installation-<?php echo $group->getId(); ?>">
+                <td>
+                    <?php echo $block->escapeHtml($group->getName()); ?><br />
+                    <span class="installation-id"> <?php echo $block->escapeHtml($installationId  ?: 'Not installed'); ?><span>
+                </td>
+                <td style=" text-align:center;">
+                    <?php if ($installationId === null) : ?>
+                        <button name="doofinder-create-store" type="button" onclick="doofinderSyncStore(<?php echo $group->getId(); ?>)">
+                            <?php echo __('Create'); ?>
+                        </button>
+                    <?php else: ?>
+                        <button name="doofinder-create-store" type="button" disabled="disabled">
+                            <?php echo __('Created'); ?>
+                        </button>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    require(['jquery', 'mage/translate'], function($, _t) {
+
+        window.doofinderSyncStore = function(groupId) {
+            new Ajax.Request('<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>', {
+                parameters: {
+                    group: groupId
+                },
+                loaderArea: true,
+                asynchronous: true,
+                onSuccess: function(transport) {
+                    if (transport?.responseJSON?.success) {
+                        console.debug(transport.responseJSON)
+                        console.debug(groupId)
+                        $('#store-view-installation-' + groupId + ' .installation-id').html(transport.responseJSON?.data.id);
+                        $('#store-view-installation-' + groupId + ' button[name="doofinder-create-store"]').attr('disabled', 'disabled');
+                        $('#store-view-installation-' + groupId + ' button[name="doofinder-create-store"]').html(_t('Created'));
+                        $('body').notification('clear')
+                        $('body').notification('add', {
+                            message: _t("Doofinder Store created successfully!"),
+                            error: false,
+
+                            /**
+                             * @param {String} message
+                             */
+                            insertMethod: function(message) {
+                                var $wrapper = $('<div></div>').html(message);
+
+                                $('.page-main-actions').after($wrapper);
+                            }
+                        });
+                    } else {
+                        $('body').notification('clear')
+                        $('body').notification('add', {
+                            error: true,
+                            message: _t(transport?.responseJSON?.message || "An unknown error has occurred while creating the store. Please take a look into the logs for more information."),
+
+                            /**
+                             * @param {String} message
+                             */
+                            insertMethod: function(message) {
+                                var $wrapper = $('<div></div>').html(message);
+
+                                $('.page-main-actions').after($wrapper);
+                            }
+                        });
+                        return;
+                    }
+
+                },
+                onFailure: function(transport) {
+                    $('body').notification('clear')
+                    $('body').notification('add', {
+                        error: true,
+                        message: _t(transport?.responseJSON?.message || "An unknown error has occurred while creating the search engine. Please take a look into the logs for more information."),
+
+                        /**
+                         * @param {String} message
+                         */
+                        insertMethod: function(message) {
+                            var $wrapper = $('<div></div>').html(message);
+
+                            $('.page-main-actions').after($wrapper);
+                        }
+                    });
+                }
+            });
+        }
+    });
+</script>

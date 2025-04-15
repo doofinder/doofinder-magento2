@@ -995,8 +995,8 @@ class StoreConfig extends AbstractHelper
     private function getStoreByGroupId($storeGroupId)
     {
         $connection = $this->resource->getConnection();
-        $storeTable = $this->resource->getTableName('store');
-        $storeSelect = $connection->select()->from($storeTable, ['store_id'])->where(
+        $storeViewTable = $this->resource->getTableName('store');
+        $storeSelect = $connection->select()->from($storeViewTable, ['store_id'])->where(
             'group_id = ?',
             $storeGroupId
         );

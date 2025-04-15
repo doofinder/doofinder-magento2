@@ -23,18 +23,54 @@
 
                                     var event = new Event('change');
                                     $(hashidElementId).get()[0].dispatchEvent(event);
+                                    $('body').notification('clear')
+                                    $('body').notification('add', {
+                                        message: _t("Doofinder Search Engine created successfully!"),
+                                        error: false,
+
+                                        /**
+                                         * @param {String} message
+                                         */
+                                        insertMethod: function(message) {
+                                            var $wrapper = $('<div></div>').html(message);
+
+                                            $('.page-main-actions').after($wrapper);
+                                        }
+                                    });
                                 } else {
-                                    alert({
-                                        content: _t(transport?.responseJSON?.message || "An unknown error has occurred while creating the search engine" + " Please take a look into the logs for more information.")
-                                    })
+                                    $('body').notification('clear')
+                                    $('body').notification('add', {
+                                        error: true,
+                                        message: _t(transport?.responseJSON?.message || "An unknown error has occurred while creating the search engine. Please take a look into the logs for more information."),
+
+                                        /**
+                                         * @param {String} message
+                                         */
+                                        insertMethod: function(message) {
+                                            var $wrapper = $('<div></div>').html(message);
+
+                                            $('.page-main-actions').after($wrapper);
+                                        }
+                                    });
                                     return;
                                 }
 
                             },
                             onFailure: function(transport) {
-                                alert({
-                                    content: _t(transport?.resultJson?.message || "An unknown error has occurred while creating the search engine" + " Please take a look into the logs for more information.")
-                                })
+                                $('body').notification('clear')
+                                $('body').notification('add', {
+                                    error: true,
+                                    message: _t(transport?.responseJSON?.message || "An unknown error has occurred while creating the search engine. Please take a look into the logs for more information."),
+
+                                    /**
+                                     * @param {String} message
+                                     */
+                                    insertMethod: function(message) {
+                                        var $wrapper = $('<div></div>').html(message);
+
+                                        $('.page-main-actions').after($wrapper);
+                                    }
+                                });
                             }
                         });
                     }
