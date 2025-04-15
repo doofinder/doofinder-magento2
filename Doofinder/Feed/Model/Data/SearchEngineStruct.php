@@ -3,6 +3,7 @@
 namespace Doofinder\Feed\Model\Data;
 
 use JsonSerializable;
+use SpomkyLabs\Pki\CryptoTypes\Asymmetric\PublicKeyInfo;
 
 class SearchEngineStruct implements JsonSerializable
 {
@@ -20,11 +21,6 @@ class SearchEngineStruct implements JsonSerializable
      * @var string Currency used by the search engine.
      */
     private $currency;
-
-    /**
-     * @var string URL of the site associated with the search engine.
-     */
-    private $siteUrl;
 
     /**
      * @var string Callback URL for the search engine.
@@ -45,7 +41,6 @@ class SearchEngineStruct implements JsonSerializable
         string $name,
         string $language,
         string $currency,
-        string $siteUrl,
         string $callbackUrl,
         SearchEngineOptionsStruct $options,
         ?string $storeId = null
@@ -53,7 +48,6 @@ class SearchEngineStruct implements JsonSerializable
         $this->name = $name;
         $this->language = $language;
         $this->currency = $currency;
-        $this->siteUrl = $siteUrl;
         $this->callbackUrl = $callbackUrl;
         $this->options = $options;
         $this->storeId = $storeId;
@@ -72,11 +66,6 @@ class SearchEngineStruct implements JsonSerializable
     public function getCurrency(): string
     {
         return $this->currency;
-    }
-
-    public function getSiteUrl(): string
-    {
-        return $this->siteUrl;
     }
 
     public function getCallbackUrl(): string
@@ -98,7 +87,6 @@ class SearchEngineStruct implements JsonSerializable
             'name' => $this->name,
             'language' => $this->language,
             'currency' => $this->currency,
-            'site_url' => $this->siteUrl,
             'callback_url' => $this->callbackUrl,
             'options' => $this->options,
         ];

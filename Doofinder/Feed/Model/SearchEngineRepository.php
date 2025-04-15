@@ -70,7 +70,6 @@ class SearchEngineRepository
             $store->getGroup()->getName() . ' - ' . $store->getName(),
             $language,
             $currency,
-            $baseUrl,
             $baseUrl . self::PROCESS_CALLBACK_PATH . '?storeId=' . $storeId,
             new SearchEngineOptionsStruct(
                 (string)$storeId,
