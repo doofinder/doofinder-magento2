@@ -55,6 +55,10 @@ class SearchEngineService
 
             $searchEngineData = $this->searchEngineRepository->getByStore($store);
 
+            if (null === $searchEngineData->getStoreId()) {
+                throw new Exception('The Doofinder Store has not been created yet.');
+            }
+
             $managementClient = $this->managementClientFactory->create(['apiType' => 'dooplugins']);
 
             $response = $managementClient->createSearchEngine($searchEngineData);

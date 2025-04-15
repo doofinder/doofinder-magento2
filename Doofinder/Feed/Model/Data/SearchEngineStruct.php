@@ -78,6 +78,11 @@ class SearchEngineStruct implements JsonSerializable
         return $this->options;
     }
 
+    public function getStoreId(): ?string
+    {
+        return $this->storeId;
+    }
+
     /**
      * @inheritDoc
      */
