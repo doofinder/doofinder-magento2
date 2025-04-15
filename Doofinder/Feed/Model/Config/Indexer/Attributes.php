@@ -57,6 +57,8 @@ class Attributes
     }
 
     /**
+     *  Gets the default attributes
+     *
      * @return array
      */
     public function getDefaultAttributes(): array

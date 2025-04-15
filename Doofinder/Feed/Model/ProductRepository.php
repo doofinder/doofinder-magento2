@@ -28,31 +28,81 @@ use Doofinder\Feed\Helper\PriceFactory as PriceHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterface
 {
+    /** @var \Doofinder\Feed\Helper\ImageFactory */
     protected $imageHelperFactory;
+
+    /** @var \Magento\Store\Model\App\Emulation */
     protected $appEmulation;
+
+    /** @var \Magento\Catalog\Api\CategoryListInterface */
     protected $categoryListInterface;
+
+    /** @var \Doofinder\Feed\Helper\ProductFactory */
     protected $productHelperFactory;
+
+    /** @var \Doofinder\Feed\Helper\PriceFactory */
     protected $priceHelperFactory;
+
+    /** @var \Doofinder\Feed\Helper\InventoryFactory */
     protected $inventoryHelperFactory;
+
+    /** @var \Doofinder\Feed\Model\Store\Config */
     protected $storeConfig;
+
+    /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $magentoStoreConfig;
+
+    /** @var \Magento\Catalog\Model\ProductFactory */
     protected $productFactory;
+
+    /** @var \Magento\Framework\Api\SearchCriteriaBuilder */
     protected $searchCriteriaBuilder;
+
+    /** @var \Magento\Catalog\Model\ResourceModel\Product */
     protected $resourceModel;
+
+    /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $storeManager;
+
+    /** @var \Magento\Catalog\Model\ProductRepository */
     protected $productRepositoryBase;
+
+    /** @var int */
     protected $cacheLimit;
-    protected $instances;
-    protected $instancesById;
-    protected $excludedCustomAttributes;
+
+    /** @var array */
+    protected $instances = [];
+
+    /** @var array */
+    protected $instancesById = [];
+
+    /** @var string[] */
+    protected $excludedCustomAttributes = [];
+
+    /** @var \Magento\Framework\Serialize\Serializer\Json|null */
     private $serializer;
 
-
+    /**
+     * ProductRepository constructor.
+     *
+     * @param ImageFactory $imageHelperFactory Factory for creating image helper instances.
+     * @param Emulation $appEmulation Application emulation for store context.
+     * @param CategoryListInterface $categoryListInterface Category list interface.
+     * @param ProductHelperFactory $productHelperFactory Factory for product helper instances.
+     * @param PriceHelperFactory $priceHelperFactory Factory for price helper instances.
+     * @param InventoryHelperFactory $inventoryHelperFactory Factory for inventory helper instances.
+     * @param StoreConfig $storeConfig Custom module store config.
+     * @param MagentoStoreConfig $magentoStoreConfig Magento core store config.
+     * @param ProductFactory $productFactory Product factory instance.
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder Search criteria builder.
+     * @param ProductResourceModel $resourceModel Product resource model.
+     * @param StoreManagerInterface $storeManager Store manager interface.
+     * @param ProductRepositoryBase $productRepositoryBase Base product repository.
+     * @param int $cacheLimit Product cache size limit (default: 1000).
+     * @param Json|null $serializer JSON serializer (optional).
+     */
     public function __construct(
         ImageFactory $imageHelperFactory,
         Emulation $appEmulation,
@@ -152,7 +202,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function save(ProductInterface $product, $saveOptions = false)
     {
@@ -160,7 +210,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete(ProductInterface $product)
     {
@@ -168,7 +218,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getById($productId, $editMode = false, $storeId = null, $forceReload = false)
     {
@@ -176,7 +226,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteById($sku)
     {
@@ -204,6 +254,14 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         return sha1($serializeData);
     }
 
+    /**
+     * Resets the cached product instances and their indexed IDs.
+     *
+     * This method clears both $instances and $instancesById arrays,
+     * ensuring a fresh state for product processing.
+     *
+     * @return void
+     */
     public function _resetState()
     {
         $this->instances = [];
@@ -339,7 +397,6 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $inventoryHelper = $this->inventoryHelperFactory->create();
         $storeCode = $this->storeManager->getStore($storeId)->getCode();
 
-        /** @var ProductExtension $extensionAttributes */
         $extensionAttributes = $product->getExtensionAttributes();
 
         $stockId = (int)$inventoryHelper->getStockIdByStore((int)$storeId);
@@ -350,7 +407,6 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $extensionAttributes->setBaseUrl($this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseUrl());
         $enabledCfgLinks = $this->getEnabledConfigurableLinks($extensionAttributes->getConfigurableProductLinks());
         $extensionAttributes->setConfigurableProductLinks($enabledCfgLinks);
-        // $extensionAttributes->setConfigurableProductLinks();
         $extensionAttributes->setBaseMediaUrl(
             $this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseMediaUrl()
         );
@@ -374,16 +430,27 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             ));
 
         $configurableProductsOptions = $extensionAttributes->getConfigurableProductOptions();
-        $extensionAttributes->setConfigurableProductOptions($this->updateConfigurableProductOptions($configurableProductsOptions));
+        $extensionAttributes->setConfigurableProductOptions(
+            $this->updateConfigurableProductOptions($configurableProductsOptions)
+        );
 
         $product->setExtensionAttributes($extensionAttributes);
     }
 
+    /**
+     * Filters a list of configurable product link IDs to return only those that are enabled.
+     *
+     * Loads each product by ID and checks its status. Only products with status `STATUS_ENABLED`
+     * are included in the returned array.
+     *
+     * @param int[]|null $configurableLinksIds Array of product IDs or null.
+     * @return int[] Array of enabled product IDs.
+     */
     private function getEnabledConfigurableLinks($configurableLinksIds)
     {
         $enabledProductIds = [];
 
-        if (is_null($configurableLinksIds)) {
+        if (null === $configurableLinksIds) {
             return $enabledProductIds;
         }
 
@@ -414,6 +481,16 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         }
     }
 
+    /**
+     * Retrieves relevant category information for a set of categories, including their parent categories.
+     *
+     * This method processes a list of categories (either arrays or objects), extracts their IDs,
+     * finds their full paths to include parent categories, and then retrieves a filtered and
+     * reduced set of category data (only id, name, and parent id) to minimize payload size.
+     *
+     * @param array $categories List of categories as arrays or objects implementing getCategoryId().
+     * @return array[] Array of simplified category data with keys: category_id, entity_id, name, parent_id.
+     */
     private function getCategoriesInformation($categories)
     {
         $categoryIds = [];
@@ -468,9 +545,24 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         return $categoryResults;
     }
 
+    /**
+     * Formats and enriches configurable product options with attribute codes.
+     *
+     * This method uses the EAV config to retrieve attribute codes based on attribute IDs
+     * and assembles a simplified array of options containing only relevant information.
+     *
+     * @param \Magento\ConfigurableProduct\Model\Product\Type\Configurable\Attribute[]|null $configurableProductsOptions
+     *        Array of configurable product option objects or null.
+     *
+     * @return array[] Each array contains:
+     *                 - attribute_id: int
+     *                 - label: string
+     *                 - code: string (attribute code)
+     *                 - product_id: int
+     */
     private function updateConfigurableProductOptions($configurableProductsOptions)
     {
-        $eavConfig  = ObjectManager::getInstance()->get('\Magento\Eav\Model\Config');
+        $eavConfig  = ObjectManager::getInstance()->get(\Magento\Eav\Model\Config::class);
         $configurableProductsOptionsResult = [];
 
         if ($configurableProductsOptions != null) {
