@@ -109,6 +109,7 @@ This plugin has been thoroughly tested and confirmed to be compatible with the f
 - PHP 8.1
 - PHP 8.2
 - PHP 8.3
+- PHP 8.4
 
 ⚠️ Note:
 
@@ -124,6 +125,7 @@ This plugin has been thoroughly tested and confirmed to be compatible with the f
 - Magento 2.4.5
 - Magento 2.4.6
 - Magento 2.4.7
+- Magento 2.4.8
 
 ## Last notes
 
