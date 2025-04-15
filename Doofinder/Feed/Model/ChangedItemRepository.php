@@ -46,6 +46,18 @@ class ChangedItemRepository implements ChangedItemRepositoryInterface
      */
     private $searchCriteriaBuilderFactory;
 
+    /**
+     * ChangedItemRepository constructor.
+     *
+     * Initializes dependencies for handling ChangedItem entities.
+     *
+     * @param ChangedItemResourceModel         $resourceModel
+     * @param ChangedItemFactory               $entityFactory
+     * @param CollectionFactory                $collectionFactory
+     * @param CollectionProcessorInterface     $collectionProcessor
+     * @param SearchCriteriaBuilderFactory     $searchCriteriaBuilderFactory
+     * @param ChangedItemSearchResultsFactory  $searchResultsFactory
+     */
     public function __construct(
         ChangedItemResourceModel $resourceModel,
         ChangedItemFactory $entityFactory,
@@ -102,6 +114,9 @@ class ChangedItemRepository implements ChangedItemRepositoryInterface
         return $searchResults;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function exists($changedItem): bool
     {
         $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
