@@ -17,13 +17,17 @@ ifeq ($(origin COMPOSER_AUTH_PASSWORD), undefined)
   $(error COMPOSER_AUTH_PASSWORD is undefined.)
 endif
 
-docker_compose ?= docker compose
+get_search_compose_file = $(shell ./scripts/select-search-engine.sh $(MAGENTO_VERSION))
+docker_compose = docker compose
+env_local_flag =
+
 ifneq ("$(wildcard .env.local)","")
 	include .env.local
 	export
-	docker_compose = docker compose --env-file .env --env-file .env.local
+	env_local_flag = --env-file .env.local
 endif
 
+docker_compose := $(docker_compose) -f docker-compose.yml -f $(call get_search_compose_file) --env-file .env $(env_local_flag)
 docker_exec_web = $(docker_compose) exec -u application web
 
 # Default target: list available tasks
@@ -89,9 +93,11 @@ dev-console:
 
 # Start the Magento Docker containers
 start: doofinder-configure
-	@echo "(Magento) Starting"
 	@$(docker_compose) up -d
 	@echo "(Magento) Started"
+
+logs:
+	@$(docker_compose) logs -f web
 
 # Stop the Magento Docker containers
 stop:
