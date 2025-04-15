@@ -33,9 +33,9 @@ class ApiKeyValidation extends Value
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
+     * @param array $data
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
-     * @param array $data
      */
     public function __construct(
         SearchEngineFactory $searchEngineFactory,
@@ -43,9 +43,9 @@ class ApiKeyValidation extends Value
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null
     ) {
         $this->searchEngineFactory = $searchEngineFactory;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);

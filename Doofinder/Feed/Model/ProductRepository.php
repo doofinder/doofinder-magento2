@@ -68,7 +68,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         StoreManagerInterface $storeManager,
         ProductRepositoryBase $productRepositoryBase,
         $cacheLimit = 1000,
-        Json $serializer = null
+        ?Json $serializer = null
     ) {
         $this->imageHelperFactory = $imageHelperFactory;
         $this->appEmulation = $appEmulation;

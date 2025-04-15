@@ -63,8 +63,8 @@ class Client
     public function __construct(
         StoreConfig $storeConfig,
         GuzzleClient $guzzleClient,
-        string $apiKey = null,
-        string $apiType = self::MANAGEMENT_API
+        string $apiType = self::MANAGEMENT_API,
+        ?string $apiKey = null
     ) {
         $this->storeConfig  = $storeConfig;
         $this->guzzleClient = $guzzleClient;

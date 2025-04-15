@@ -38,7 +38,7 @@ class Index extends AbstractDb
         MetadataPool $metadataPool,
         TableResolver $tableResolver,
         DimensionCollectionFactory $dimensionCollectionFactory,
-        string $connectionName = null
+        ?string $connectionName = null
     ) {
         parent::__construct($context, $connectionName);
         $this->storeManager = $storeManager;

@@ -26,9 +26,9 @@ class Cron extends ConfigValue
         ScopeConfigInterface $config,
         StoreConfigFactory $storeConfigFactory,
         TypeListInterface $cacheTypeList,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null
     ) {
         $this->storeConfigFactory = $storeConfigFactory;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
