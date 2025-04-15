@@ -50,7 +50,16 @@ class CustomAttributes extends ArraySerialized implements ProcessorInterface
     ) {
         $this->messageManager = $messageManager;
         $this->serializer = new Base64GzJson();
-        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, [], $this->serializer);
+        parent::__construct(
+            $context,
+            $registry,
+            $config,
+            $cacheTypeList,
+            $resource,
+            $resourceCollection,
+            [],
+            $this->serializer
+        );
     }
 
     /**
