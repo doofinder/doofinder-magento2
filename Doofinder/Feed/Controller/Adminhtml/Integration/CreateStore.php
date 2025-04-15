@@ -10,6 +10,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Escaper;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Psr\Log\LoggerInterface;
@@ -24,6 +25,9 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /** @var ManagerInterface */
     protected $messageManager;
+
+    /** @var Escaper */
+    protected $escaper;
 
     /** @var LoggerInterface */
     private $logger;
@@ -40,12 +44,14 @@ class CreateStore extends Action implements HttpGetActionInterface
         InstallationService $installationService,
         JsonFactory $resultJsonFactory,
         ManagerInterface $messageManager,
+        Escaper $escaper,
         LoggerInterface $logger,
         Context $context
     ) {
         $this->installationService = $installationService;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->messageManager = $messageManager;
+        $this->escaper = $escaper;
         $this->logger = $logger;
         parent::__construct($context);
     }
@@ -65,7 +71,7 @@ class CreateStore extends Action implements HttpGetActionInterface
             $message = 'Doofinder stores generated successfully.';
             foreach ($installationResults as $result) {
                 if (true !== $result) {
-                    $message = __('The installation was not fully successful. Please check the logs for further information.');
+                    $message = __('Doofinder was succesfully installed. However, not all store views were succesfully installed. Please check the logs for further information.');
                     $installationFailed &= true;
                 } else {
                     $installationFailed = false;
@@ -76,14 +82,21 @@ class CreateStore extends Action implements HttpGetActionInterface
                 $resultJson->setHttpResponseCode(WebapiException::HTTP_INTERNAL_ERROR);
                 $resultJson->setData(['success' => false, 'message' => 'Failed to generate Doofinder stores.']);
             } else {
-                $resultJson->setData(['success' => true, 'message' => $message]);
+                $resultJson->setData(['success' => true, 'message' => $this->escaper->escapeHtml($message)]);
             }
         } catch (Exception $e) {
-            $this->logger->error('Error during Doofinder store creation: ' . $e->getMessage());
             $resultJson->setHttpResponseCode(WebapiException::HTTP_INTERNAL_ERROR);
-            $resultJson->setData(['success' => false, 'message' => 'An unexpected error occurred.']);
+            $resultJson->setData(['success' => false, 'message' => $this->escaper->escapeHtml($e->getMessage())]);
         }
 
         return $resultJson;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed('Doofinder_Feed::config');
     }
 }
