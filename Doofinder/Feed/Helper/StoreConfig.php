@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
-use Doofinder\Feed\ApiClient\ManagementClientFactory;
 use Doofinder\Feed\Helper\Indexation;
 use Magento\Config\Model\Config\Backend\Admin\Custom;
 use Magento\Catalog\Model\Product;
@@ -136,8 +135,6 @@ class StoreConfig extends AbstractHelper
      */
     public const DOOFINDER_CONNECTION = 'doofinderfeed/setup/config';
 
-    /** @var ManagementClientFactory  */
-    private $managementClientFactory;
 
     /** @var StoreManagerInterface */
     private $storeManager;
@@ -171,8 +168,6 @@ class StoreConfig extends AbstractHelper
 
     /**
      * StoreConfig constructor.
-     *
-     * @param ManagementClientFactory $managementClientFactory
      * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param StoreWebsiteRelationInterface $storeWebsiteRelation
@@ -186,7 +181,6 @@ class StoreConfig extends AbstractHelper
      * @param ResourceConnection $resource
      */
     public function __construct(
-        ManagementClientFactory $managementClientFactory,
         Context $context,
         StoreManagerInterface $storeManager,
         StoreWebsiteRelationInterface $storeWebsiteRelation,
@@ -199,7 +193,6 @@ class StoreConfig extends AbstractHelper
         Data $backendHelper,
         ResourceConnection $resource
     ) {
-        $this->managementClientFactory = $managementClientFactory;
         $this->storeManager = $storeManager;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
         $this->configWriter = $configWriter;
@@ -213,31 +206,6 @@ class StoreConfig extends AbstractHelper
 
         parent::__construct($context);
     }
-
-    /**
-     * Creates the store in doofinder's structure
-     *
-     * @param array $storeData
-     * @return array
-     */
-    public function createStore(array $storeData): array
-    {
-        $managementClient = $this->managementClientFactory->create(['apiType' => 'dooplugins']);
-
-        return $managementClient->createStore($storeData);
-    }
-
-    /**
-     * Creates the store in doofinder's structure
-     * @param array $searchEngineData
-     * @return array
-     */
-    public function createSearchEngine(array $searchEngineData): array
-    {
-        $managementClient = $this->managementClientFactory->create(['apiType' => 'dooplugins']);
-        return $managementClient->createSearchEngine($searchEngineData);
-    }
-
 
     /**
      * Get store code.
