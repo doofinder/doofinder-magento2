@@ -15,17 +15,25 @@
                             loaderArea: true,
                             asynchronous: true,
                             onSuccess: function(transport) {
-                                var hashidElementId = '#doofinder_config_config_doofinder_layer_hash_id'
-                                var hashid = transport?.responseJSON?.result?.hashid || ""
+                                if (transport?.responseJSON?.success) {
+                                    var hashidElementId = '#doofinder_config_config_doofinder_layer_hash_id'
+                                    var hashid = transport?.responseJSON?.data?.hashid || ""
 
-                                $(hashidElementId).val(hashid)
+                                    $(hashidElementId).val(hashid)
 
-                                var event = new Event('change');
-                                $(hashidElementId).get()[0].dispatchEvent(event);
+                                    var event = new Event('change');
+                                    $(hashidElementId).get()[0].dispatchEvent(event);
+                                } else {
+                                    alert({
+                                        content: _t(transport?.responseJSON?.message || "An unknown error has occurred while creating the search engine" + " Please take a look into the logs for more information.")
+                                    })
+                                    return;
+                                }
+
                             },
                             onFailure: function(transport) {
                                 alert({
-                                    content: _t(transport?.resultJson?.error || "An unknown error has occurred while generating the search")
+                                    content: _t(transport?.resultJson?.message || "An unknown error has occurred while creating the search engine" + " Please take a look into the logs for more information.")
                                 })
                             }
                         });

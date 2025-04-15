@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Controller\Adminhtml\Integration;
 
-use Doofinder\Feed\Helper\Indexation;
 use Doofinder\Feed\Helper\StoreConfig;
+use Doofinder\Feed\Service\SearchEngineService;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
-use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\Webapi\Exception as WebapiException;
+
 
 class CreateSearchEngine extends Action
 {
@@ -21,9 +22,11 @@ class CreateSearchEngine extends Action
     /** @var StoreConfig */
     protected $storeConfig;
 
+    /** @var SearchEngineService */
+    protected $searchEngineService;
+
     /** @var Escaper */
     protected $escaper;
-
 
     /**
      * CleanIntegration constructor.
@@ -35,11 +38,13 @@ class CreateSearchEngine extends Action
     public function __construct(
         JsonFactory $resultJsonFactory,
         StoreConfig $storeConfig,
+        SearchEngineService $searchEngineService,
         Escaper $escaper,
         Context $context
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->storeConfig = $storeConfig;
+        $this->searchEngineService = $searchEngineService;
         $this->escaper = $escaper;
 
         parent::__construct($context);
@@ -52,44 +57,18 @@ class CreateSearchEngine extends Action
     {
         $resultJson = $this->resultJsonFactory->create();
 
-        $store = $this->storeConfig->getCurrentStore();
-
-        $storeGroupId = (int)$store->getStoreGroupId();
-        $installationId = $this->storeConfig->getValueFromConfig(StoreConfig::DISPLAY_LAYER_INSTALLATION_ID, ScopeInterface::SCOPE_GROUP, $storeGroupId);
-
-        $language = $this->storeConfig->getLanguageFromStore($store);
-        $currency = strtoupper($store->getCurrentCurrency()->getCode());
-
-        $storeId = (int)$store->getId();
-        $baseUrl = $store->getBaseUrl();
-
-        // store_id field refers to store_view's id.
-        $searchEngineConfig = [
-            "name" => $store->getGroup()->getName() . ' - ' . $store->getName(),
-            "language" => $language,
-            "currency" => $currency,
-            "site_url" => $baseUrl,
-            "callback_url" => $baseUrl . 'doofinderfeed/setup/processCallback?storeId=' . $storeId,
-            "options" => [
-                "store_id" => $storeId,
-                "index_url" => $baseUrl . 'rest/' . $store->getCode() . '/V1/'
-            ],
-            "store_id" => $installationId
-        ];
         try {
-            $response =  $this->storeConfig->createSearchEngine($searchEngineConfig);
 
-            $this->storeConfig->setHashId($response["hashid"], $storeId);
+            $store = $this->storeConfig->getCurrentStore();
 
-            $status = ["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED];
-            $this->storeConfig->setIndexationStatus($status, $storeId);
-            $resultJson->setData(['result' => $response]);
+            $result = $this->searchEngineService->createSearchEngine($store);
+
+            $resultJson->setData(['success' => true, 'data' => $result]);
         } catch (Exception $e) {
-
             $resultJson->setData([
-                'result' => false,
-                'error' => $this->escaper->escapeHtml("Error creating search engine in Doofinder: " . $e->getMessage()),
-            ])->setHttpResponseCode(400);
+                'success' => false,
+                'message' => $this->escaper->escapeHtml($e->getMessage()),
+            ])->setHttpResponseCode(WebapiException::HTTP_INTERNAL_ERROR);
         }
 
         return $resultJson;

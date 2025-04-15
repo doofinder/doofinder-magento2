@@ -41,31 +41,42 @@ class SearchEngineRepository
 
         /** @var Store $store */
         foreach ($stores as $store) {
-            $language = $this->storeConfig->getLanguageFromStore($store);
-            $currency = strtoupper($store->getCurrentCurrency()->getCode());
+            $newSearchEngine = $this->getByStore($store);
 
             // Only generate config for a unique pair. The rest of Store Views must be created explicitly
-            if (isset($languagesCurrencies[$language][$currency])) {
+            if (isset($languagesCurrencies[$newSearchEngine->getLanguage()][$newSearchEngine->getCurrency()])) {
                 continue;
             }
 
-            $storeId = $store->getId();
-            $baseUrl = $store->getBaseUrl();
+            $searchEngines[] = $newSearchEngine;
 
-            $searchEngines[] = new SearchEngineStruct(
-                $store->getGroup()->getName() . ' - ' . $store->getName(),
-                $language,
-                $currency,
-                $baseUrl,
-                $baseUrl . self::PROCESS_CALLBACK_PATH . '?storeId=' . $storeId,
-                new SearchEngineOptionsStruct(
-                    (string)$storeId,
-                    $baseUrl
-                )
-            );
-            $languagesCurrencies[$language][$currency] = true;
+            $languagesCurrencies[] =
+                $languagesCurrencies[$newSearchEngine->getLanguage()][$newSearchEngine->getCurrency()] = true;
         }
 
         return $searchEngines;
+    }
+
+    public function getByStore(Store $store): SearchEngineStruct
+    {
+        $language = $this->storeConfig->getLanguageFromStore($store);
+        $currency = strtoupper($store->getCurrentCurrency()->getCode());
+        $storeId = $store->getId();
+        $baseUrl = $store->getBaseUrl();
+
+        $installationId = $this->storeConfig->getInstallationId($store->getStoreGroupId());
+
+        return  new SearchEngineStruct(
+            $store->getGroup()->getName() . ' - ' . $store->getName(),
+            $language,
+            $currency,
+            $baseUrl,
+            $baseUrl . self::PROCESS_CALLBACK_PATH . '?storeId=' . $storeId,
+            new SearchEngineOptionsStruct(
+                (string)$storeId,
+                $baseUrl
+            ),
+            $installationId
+        );
     }
 }

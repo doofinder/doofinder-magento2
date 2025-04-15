@@ -522,6 +522,17 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
+     * Retrieve the installation ID for a given store group.
+     *
+     * @param int $storeGroupId
+     * @return string|null
+     */
+    public function getInstallationId(int $storeGroupId): ?string
+    {
+        return $this->getValueFromConfig(StoreConfig::DISPLAY_LAYER_INSTALLATION_ID, ScopeInterface::SCOPE_GROUP, $storeGroupId);
+    }
+
+    /**
      * Get display layer.
      *
      * @return string|null

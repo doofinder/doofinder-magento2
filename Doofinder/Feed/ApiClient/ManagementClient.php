@@ -63,7 +63,7 @@ class ManagementClient
     /**
      * Creates the store structure in Doofinder
      *
-     * @param array $storeData
+     * @param mixed $storeData
      * @return array
      */
     public function createStore($storeData): array
@@ -78,7 +78,7 @@ class ManagementClient
      *
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_create
      *
-     * @param array $searchEngine
+     * @param mixed $searchEngine
      * @return array
      * @throws BadRequest
      * @throws IndexingInProgress
@@ -90,9 +90,9 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Exception
      */
-    public function createSearchEngine(array $searchEngine): array
+    public function createSearchEngine(mixed $searchEngine): array
     {
-        $response = $this->client->post("/install/search-engines", $searchEngine);
+        $response = $this->client->post("/install/search-engine", $searchEngine);
 
         return json_decode($response, true);
     }

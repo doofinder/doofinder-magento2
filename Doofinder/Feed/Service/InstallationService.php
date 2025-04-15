@@ -125,7 +125,7 @@ class InstallationService
                 $hashid = $response["config"]["search_engines"][$language][$currency];
 
                 $this->storeConfig->setHashId($hashid, $storeId);
-                $this->setIndexationStatus($storeId);
+                $this->storeConfig->setIndexationStatus(["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED], $storeId);
             }
         } catch (Exception $e) {
             $message = 'Error creating store for store group "' . $storeGroup->getName() . '". ' . $e->getMessage();
@@ -134,19 +134,6 @@ class InstallationService
         }
     }
 
-
-    /**
-     * Function to store the status of the SE indexation.
-     *
-     * By default we set this value to "STARTED" and will be updated when we receive the callback from doofinder
-     *
-     * @param $storeId
-     */
-    private function setIndexationStatus($storeId)
-    {
-        $status = ["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED];
-        $this->storeConfig->setIndexationStatus($status, $storeId);
-    }
 
     /**
      * Function to set some custom attributes to enabled by default
