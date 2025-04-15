@@ -140,9 +140,9 @@ class Setup extends Template
      *
      * @return string
      */
-    public function getCreateStoreUrl(): string
+    public function getSetupUrl(): string
     {
-        return $this->getUrl('*/integration/createStore');
+        return $this->getUrl('*/integration/setup');
     }
 
     /**

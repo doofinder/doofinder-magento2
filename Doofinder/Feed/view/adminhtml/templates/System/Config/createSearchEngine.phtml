@@ -1,0 +1,83 @@
+<script>
+    require([
+        'jquery',
+        'mage/translate',
+        'Magento_Ui/js/modal/confirm',
+        'Magento_Ui/js/modal/alert',
+    ], function($, _t, confirmation, alert) {
+        $('#create_search_engine').click(_ => {
+            confirmation({
+                title: _t("Create Search Engine"),
+                content: _t("Are you sure? This action will create a search engine within your store."),
+                actions: {
+                    confirm: function() {
+                        new Ajax.Request('<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>', {
+                            loaderArea: true,
+                            asynchronous: true,
+                            onSuccess: function(transport) {
+                                if (transport?.responseJSON?.success) {
+                                    var hashidElementId = '#doofinder_config_config_doofinder_layer_hash_id'
+                                    var hashid = transport?.responseJSON?.data?.hashid || ""
+
+                                    $(hashidElementId).val(hashid)
+
+                                    var event = new Event('change');
+                                    $(hashidElementId).get()[0].dispatchEvent(event);
+                                    $('body').notification('clear')
+                                    $('body').notification('add', {
+                                        message: _t("Doofinder Search Engine created successfully!"),
+                                        error: false,
+
+                                        /**
+                                         * @param {String} message
+                                         */
+                                        insertMethod: function(message) {
+                                            var $wrapper = $('<div></div>').html(message);
+
+                                            $('.page-main-actions').after($wrapper);
+                                        }
+                                    });
+                                } else {
+                                    $('body').notification('clear')
+                                    $('body').notification('add', {
+                                        error: true,
+                                        message: _t(transport?.responseJSON?.message || "An unknown error has occurred while creating the search engine. Please take a look into the logs for more information."),
+
+                                        /**
+                                         * @param {String} message
+                                         */
+                                        insertMethod: function(message) {
+                                            var $wrapper = $('<div></div>').html(message);
+
+                                            $('.page-main-actions').after($wrapper);
+                                        }
+                                    });
+                                    return;
+                                }
+
+                            },
+                            onFailure: function(transport) {
+                                $('body').notification('clear')
+                                $('body').notification('add', {
+                                    error: true,
+                                    message: _t(transport?.responseJSON?.message || "An unknown error has occurred while creating the search engine. Please take a look into the logs for more information."),
+
+                                    /**
+                                     * @param {String} message
+                                     */
+                                    insertMethod: function(message) {
+                                        var $wrapper = $('<div></div>').html(message);
+
+                                        $('.page-main-actions').after($wrapper);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<?= $block->getButtonHtml(); ?>

@@ -61,21 +61,6 @@
                         <![CDATA[ Activating this option you are inserting the script into your store code. You can manage product visibility in Doofinder. ]]>
                     </comment>
                 </field>
-                <field id="installation_id"
-                       translate="label"
-                       type="text"
-                       sortOrder="200"
-                       showInDefault="0"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <depends>
-                        <field id="doofinder_layer_enabled">1</field>
-                    </depends>
-                    <label>Installation Id</label>
-                    <comment>
-                        <![CDATA[ You need an installation ID for every website. ]]>
-                    </comment>
-                </field>
                 <field id="script"
                        translate="label"
                        type="textarea"
@@ -91,6 +76,32 @@
                         <![CDATA[ Do not modify this unless you are an advanced user. ]]>
                     </comment>
                 </field>
+                <field id="store_view_table"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="50"
+                       showInDefault="0"
+                       showInWebsite="1"
+                       showInStore="0">
+                    <label>Store Group Configuration</label>
+                    <!-- This custom field uses a frontend model to render a table -->
+                    <frontend_model>Doofinder\Feed\Block\Adminhtml\System\Config\StoreViewTable</frontend_model>
+                    <comment>Manage Doofinder Store installations.</comment>
+                </field>
+                <field id="installation_id"
+                       translate="label"
+                       type="text"
+                       sortOrder="200"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <label>Installation Id</label>
+                    <frontend_model>Doofinder\Feed\Block\System\Config\Disabled</frontend_model>
+                    <backend_model>Doofinder\Feed\Model\Config\Backend\ScopeGroupValue</backend_model>
+                    <comment>
+                        <![CDATA[ This corresponds with the Store Id in Doofinder.]]>
+                    </comment>
+                </field>
                 <field id="hash_id"
                        translate="label"
                        type="text"
@@ -98,10 +109,27 @@
                        showInDefault="0"
                        showInWebsite="0"
                        showInStore="1">
-                    <label>Hash Id</label>
+                    <label>Search Engine Hash Id</label>
+                    <frontend_model>Doofinder\Feed\Block\System\Config\Disabled</frontend_model>
                     <backend_model>Doofinder\Feed\Model\Config\Backend\HashIdValidation</backend_model>
                     <comment>
-                        <![CDATA[ You must configure a "hashid" for each store view. ]]>
+                        <![CDATA[ If empty you must create a Search Engine with the button below. ]]>
+                    </comment>
+                </field>
+                <field id="create_search_engine"
+                       translate="label"
+                       type="button"
+                       sortOrder="400"
+                       showInDefault="0"
+                       showInWebsite="0"
+                       showInStore="1">
+                    <frontend_model>Doofinder\Feed\Block\System\Config\CreateSearchEngine</frontend_model>
+                    <depends>
+                        <field id="hash_id"></field>
+                    </depends>
+                    <label>Create Doofinder Search Engine</label>
+                    <comment>
+                        <![CDATA[ This Store View is not related to any Search Engine in Doofinder. You can create it now! ]]>
                     </comment>
                 </field>
             </group>
