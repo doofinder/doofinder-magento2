@@ -54,7 +54,7 @@ class CustomAttributes extends AbstractFieldArray
      *
      * Each row will be instance of \Magento\Framework\DataObject
      *
-     * @return array
+     * @return mixed[]
      */
     public function getArrayRows()
     {

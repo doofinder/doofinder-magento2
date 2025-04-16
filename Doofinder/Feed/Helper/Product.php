@@ -293,7 +293,7 @@ class Product extends AbstractHelper
      * @param array $catTree
      * @param boolean $fromNavigation
      *
-     * @return array
+     * @return mixed[]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function filterCategories(array $catTree, ?bool $fromNavigation = false): array
@@ -469,7 +469,7 @@ class Product extends AbstractHelper
      *
      * @param ProductModel $product
      * @param string $attributeCode
-     * @return array|null
+     * @return mixed[]|null
      */
     public function getAttributeArray(ProductModel $product, string $attributeCode): ?array
     {

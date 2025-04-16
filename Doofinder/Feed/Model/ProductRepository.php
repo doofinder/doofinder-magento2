@@ -489,7 +489,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * reduced set of category data (only id, name, and parent id) to minimize payload size.
      *
      * @param array $categories List of categories as arrays or objects implementing getCategoryId().
-     * @return array[] Array of simplified category data with keys: category_id, entity_id, name, parent_id.
+     * @return mixed[] Array of simplified category data with keys: category_id, entity_id, name, parent_id.
      */
     private function getCategoriesInformation($categories)
     {
@@ -554,7 +554,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * @param \Magento\ConfigurableProduct\Model\Product\Type\Configurable\Attribute[]|null $configurableProductsOptions
      *        Array of configurable product option objects or null.
      *
-     * @return array[] Each array contains:
+     * @return mixed[] Each array contains:
      *                 - attribute_id: int
      *                 - label: string
      *                 - code: string (attribute code)

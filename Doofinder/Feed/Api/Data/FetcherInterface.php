@@ -19,7 +19,7 @@ interface FetcherInterface
      * Obtains the fetched result
      *
      * @param integer $productId
-     * @return array
+     * @return mixed[]
      */
     public function get(int $productId): array;
 

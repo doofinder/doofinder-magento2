@@ -106,7 +106,7 @@ class ProcessCallback extends Action implements CsrfAwareActionInterface, HttpPo
      *
      * @param array $processCallbackStatus
      *
-     * @return array
+     * @return mixed[]
      */
     private function sanitizeResponse(array $processCallbackStatus): array
     {

@@ -46,7 +46,7 @@ class Attributes
      * Gets the result of merging every type of attribute
      *
      * @param integer $storeId
-     * @return array
+     * @return mixed[]
      */
     public function get(int $storeId): array
     {
@@ -59,7 +59,7 @@ class Attributes
     /**
      *  Gets the default attributes
      *
-     * @return array
+     * @return mixed[]
      */
     public function getDefaultAttributes(): array
     {
@@ -70,7 +70,7 @@ class Attributes
      * Obtains Doofinder attributes
      *
      * @param int|null $storeId
-     * @return array
+     * @return mixed[]
      */
     private function getDoofinderAttributes(?int $storeId = null): array
     {
@@ -81,7 +81,7 @@ class Attributes
      * Obtains the custom attributes wanted to be synchronized
      *
      * @param int|null $storeId
-     * @return array
+     * @return mixed[]
      */
     private function getCustomAttributes(?int $storeId = null): array
     {

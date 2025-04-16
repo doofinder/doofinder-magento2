@@ -10,7 +10,7 @@ interface SingleScriptInterface
     /**
      * Replaces the current script by the new single script.
      *
-     * @return array
+     * @return string[]
      */
     public function replace();
 }

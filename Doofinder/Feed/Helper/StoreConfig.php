@@ -218,7 +218,7 @@ class StoreConfig extends AbstractHelper
      * Creates the store in doofinder's structure
      *
      * @param array $storeData
-     * @return array
+     * @return mixed[]
      */
     public function createStore(array $storeData): array
     {
@@ -277,7 +277,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Function to get the actual scope based on the request parameter
      *
-     * @return array
+     * @return mixed[]
      */
     public function getCurrentScope(): array
     {
@@ -819,7 +819,7 @@ class StoreConfig extends AbstractHelper
      * Gets Doofinder attributes to be merged later
      *
      * @param int|null $storeId
-     * @return array
+     * @return mixed[]
      */
     public function getDoofinderAttributes(?int $storeId = null): array
     {
@@ -861,7 +861,7 @@ class StoreConfig extends AbstractHelper
      *
      * @param int|null $id
      * @param string|null $scope
-     * @return Array
+     * @return mixed[]
      */
     public function getCustomAttributes(?int $id = null, ?string $scope = ScopeInterface::SCOPE_STORES): array
     {
@@ -999,7 +999,7 @@ class StoreConfig extends AbstractHelper
      * Get stores by store_group id
      *
      * @param int $storeGroupId
-     * @return array
+     * @return mixed[]
      */
     private function getStoreByGroupId($storeGroupId)
     {

@@ -17,7 +17,7 @@ abstract class ItemType
     /**
      * Gets an associative array for using multiindexes' indices
      *
-     * @return array
+     * @return string[]
      */
     public static function getList()
     {

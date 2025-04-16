@@ -301,7 +301,7 @@ class Client
 
     /**
      * @param array $ids
-     * @return array
+     * @return mixed[]
      */
     private function flattenArray(array $ids): array
     {
