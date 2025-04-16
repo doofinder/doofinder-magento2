@@ -41,7 +41,7 @@ class ManagementClient
      *
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_list
      *
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -63,7 +63,7 @@ class ManagementClient
      * Creates the store structure in Doofinder
      *
      * @param array $storeData
-     * @return array
+     * @return mixed[]
      */
     public function createStore(array $storeData): array
     {
@@ -78,7 +78,7 @@ class ManagementClient
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_create
      *
      * @param array $searchEngine
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -103,7 +103,7 @@ class ManagementClient
      *
      * @param string $hashId
      * @param string|null $callbackUrl
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -128,7 +128,7 @@ class ManagementClient
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_show
      *
      * @param string $hashId
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
