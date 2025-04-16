@@ -63,7 +63,7 @@ class SearchEngine extends AbstractHelper
         StoreManagerInterface $storeManager,
         StoreConfig $storeConfig,
         Context $context,
-        string $apiKey = null
+        ?string $apiKey = null
     ) {
         $this->managementClientFactory = $managementClientFactory;
         $this->throttleFactory  = $throttleFactory;
@@ -144,7 +144,7 @@ class SearchEngine extends AbstractHelper
      * @throws WrongResponse
      * @throws \Exception
      */
-    public function processSearchEngine(string $hashId, string $callbackUrl = null): array
+    public function processSearchEngine(string $hashId, ?string $callbackUrl = null): array
     {
         /** @var ManagementClient $managementClient */
         $managementClient = $this->throttleFactory->create([

@@ -51,9 +51,9 @@ class HashIdValidation extends Value
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null
     ) {
         $this->storeConfig = $storeConfig;
         $this->searchEngine = $searchEngine;

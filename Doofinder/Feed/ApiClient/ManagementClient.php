@@ -25,13 +25,13 @@ class ManagementClient
      * ManagementClient constructor.
      *
      * @param ClientFactory $clientFactory
-     * @param string $apiKey
      * @param string $apiType
+     * @param string $apiKey
      */
     public function __construct(
         ClientFactory $clientFactory,
-        string $apiKey = null,
-        string $apiType = Client::MANAGEMENT_API
+        string $apiType = Client::MANAGEMENT_API,
+        ?string $apiKey = null
     ) {
         $this->client = $clientFactory->create(['apiKey' => $apiKey, 'apiType' => $apiType]);
     }
@@ -114,7 +114,7 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Exception
      */
-    public function processSearchEngine(string $hashId, string $callbackUrl = null): array
+    public function processSearchEngine(string $hashId, ?string $callbackUrl = null): array
     {
         $path = $this->getProcessSearchEnginePath($hashId);
         $response = $this->client->post($path, ['callback_url' => $callbackUrl]);

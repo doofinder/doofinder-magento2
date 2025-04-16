@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Observer\Page;
 
 use Doofinder\Feed\Api\Data\ChangedItemInterface;
+use Magento\Cms\Api\Data\PageInterface;
 use Magento\Framework\Event\Observer;
 
 class CmsPageSaveAfterObserver extends AbstractChangedCmsPageObserver
@@ -20,7 +21,7 @@ class CmsPageSaveAfterObserver extends AbstractChangedCmsPageObserver
                 $page = $observer->getEvent()->getObject();
                 $operationType = $this->getOperationType($page);
                 $storeIds = [];
-                
+
                 foreach ($page->getStores() as $store) {
                     if ($store == 0) {
                         $storeIds = [];
@@ -50,7 +51,7 @@ class CmsPageSaveAfterObserver extends AbstractChangedCmsPageObserver
     /**
      * @inheritDoc
      */
-    protected function getOperationType($page): string
+    protected function getOperationType(PageInterface $page): string
     {
         return $page->isActive() ?
             ChangedItemInterface::OPERATION_TYPE_UPDATE:

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Observer\Category;
 
 use Doofinder\Feed\Api\Data\ChangedItemInterface;
+use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Framework\Event\Observer;
 
 class CategoryDeleteAfterObserver extends AbstractChangedCategoryObserver
@@ -31,7 +32,7 @@ class CategoryDeleteAfterObserver extends AbstractChangedCategoryObserver
     /**
      * @inheritDoc
      */
-    protected function getOperationType($category): string
+    protected function getOperationType(CategoryInterface $category): string
     {
         return ChangedItemInterface::OPERATION_TYPE_DELETE;
     }
