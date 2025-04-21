@@ -46,4 +46,14 @@ class Index extends AbstractDb
         $this->tableResolver = $tableResolver;
         $this->dimensionCollectionFactory = $dimensionCollectionFactory;
     }
+
+    /**
+     * Implementation of abstract construct.
+     *
+     * DO NOT REMOVE since it's required
+     */
+    protected function _construct()
+    {
+        return true;
+    }
 }
