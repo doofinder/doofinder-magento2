@@ -128,7 +128,7 @@ class Item extends AbstractHelper
      * Get search engine from store
      *
      * @param StoreInterface $store
-     * @return array
+     * @return mixed[]
      * @throws NoSuchEntityException
      * @throws NotFound
      */

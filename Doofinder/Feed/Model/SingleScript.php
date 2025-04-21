@@ -87,7 +87,7 @@ class SingleScript
     /**
      * Replaces the existing script tag with the updated Doofinder script tag.
      *
-     * @return array Returns an array containing the updated script tag as a JSON-encoded string.
+     * @return string[] Returns an array containing the updated script tag as a JSON-encoded string.
      */
     public function replace()
     {
