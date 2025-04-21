@@ -25,7 +25,7 @@ class ProcessStatus extends Template
     /**
      * Get Search Engines Process Task Status
      *
-     * @return array
+     * @return mixed[]
      */
     public function getSearchEnginesProcessStatus(): array
     {

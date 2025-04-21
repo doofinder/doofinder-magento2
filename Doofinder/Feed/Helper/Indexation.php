@@ -27,7 +27,7 @@ class Indexation extends AbstractHelper
      * Sanitize and prevent undefined index errors
      *
      * @param array $processTaskStatus
-     * @return array
+     * @return mixed[]
      */
     public function sanitizeProcessTaskStatus(array $processTaskStatus): array
     {
