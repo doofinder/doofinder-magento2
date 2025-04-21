@@ -94,7 +94,7 @@ class ModuleData
     /**
      * Returns an array containing serialized metadata about the Doofinder module.
      *
-     * @return array
+     * @return mixed[]
      */
     public function get()
     {
@@ -135,7 +135,7 @@ class ModuleData
     /**
      * Builds a list of website structures containing store information.
      *
-     * @return array
+     * @return mixed[]
      */
     private function getWebsiteStructures()
     {

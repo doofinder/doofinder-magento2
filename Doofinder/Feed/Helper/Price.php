@@ -191,7 +191,7 @@ class Price extends AbstractHelper
      * Gets calculated minimum price for a product
      *
      * @param Magento\Catalog\Model\Product $product
-     * @param array $usedProds
+     * @param Magento\Catalog\Model\Product[] $usedProds
      * @param string $type
      */
     private function getMinimumComplexProductPrice($product, $usedProds, $type)

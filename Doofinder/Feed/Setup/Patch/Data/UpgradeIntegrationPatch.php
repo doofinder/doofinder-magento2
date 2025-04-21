@@ -100,7 +100,7 @@ class UpgradeIntegrationPatch implements DataPatchInterface
     /**
      * Returns the list of dependencies for this data patch.
      *
-     * @return array
+     * @return mixed[]
      */
     public static function getDependencies()
     {
@@ -110,7 +110,7 @@ class UpgradeIntegrationPatch implements DataPatchInterface
     /**
      * Returns the list of aliases for this data patch.
      *
-     * @return array
+     * @return mixed[]
      */
     public function getAliases()
     {
