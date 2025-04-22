@@ -106,7 +106,7 @@ class Inventory extends AbstractHelper
      * @param ProductModel $product
      * @param int|null $stockId
      *
-     * @return array
+     * @return mixed[]
      */
     private function getQuantityAndStockStatusWithMSI(ProductModel $product, ?int $stockId = null)
     {
@@ -179,7 +179,7 @@ class Inventory extends AbstractHelper
      * @param string $sku
      * @param int|null $stockId
      *
-     * @return array
+     * @return mixed[]
      */
     private function getStockItemData(string $sku, ?int $stockId = null)
     {
@@ -199,7 +199,7 @@ class Inventory extends AbstractHelper
      *
      * @param ProductModel $product
      *
-     * @return array
+     * @return mixed[]
      */
     private function getQuantityAndStockStatusWithoutMSI(ProductModel $product)
     {
