@@ -90,7 +90,7 @@ class ManagementClient
      * @throws WrongResponse
      * @throws \Exception
      */
-    public function createSearchEngine(mixed $searchEngine): array
+    public function createSearchEngine(array $searchEngine): array
     {
         $response = $this->client->post("/install/search-engine", $searchEngine);
 

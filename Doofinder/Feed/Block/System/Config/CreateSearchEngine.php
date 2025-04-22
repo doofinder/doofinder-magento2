@@ -10,7 +10,9 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 class CreateSearchEngine extends Field
 {
 
-
+    /**
+     * @var string
+     */
     protected $_template = 'Doofinder_Feed::System/Config/createSearchEngine.phtml';
     public function __construct(Context $context, array $data = [])
     {
