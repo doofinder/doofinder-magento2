@@ -12,6 +12,13 @@ class Layer extends Template
     /** @var StoreConfig */
     private $storeConfig;
 
+    /**
+     * Layer constructor.
+     *
+     * @param StoreConfig $storeConfig
+     * @param Template\Context $context
+     * @param mixed[] $data
+     */
     public function __construct(
         StoreConfig $storeConfig,
         Template\Context $context,
