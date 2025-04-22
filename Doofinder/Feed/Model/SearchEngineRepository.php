@@ -10,6 +10,7 @@ use Magento\Store\Model\Store;
 
 class SearchEngineRepository
 {
+    private const INDEX_URL_FORMAT = 'rest/%s/V1/';
 
     private const PROCESS_CALLBACK_PATH = 'doofinderfeed/setup/processCallback';
     /**
@@ -62,6 +63,7 @@ class SearchEngineRepository
         $language = $this->storeConfig->getLanguageFromStore($store);
         $currency = strtoupper($store->getCurrentCurrency()->getCode());
         $storeId = $store->getId();
+        $storeCode = $store->getCode();
         $baseUrl = $store->getBaseUrl();
 
         $installationId = $this->storeConfig->getInstallationId($store->getStoreGroupId());
@@ -73,7 +75,7 @@ class SearchEngineRepository
             $baseUrl . self::PROCESS_CALLBACK_PATH . '?storeId=' . $storeId,
             new SearchEngineOptionsStruct(
                 (string)$storeId,
-                $baseUrl
+                $baseUrl . sprintf(self::INDEX_URL_FORMAT, $storeCode),
             ),
             $installationId
         );

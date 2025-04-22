@@ -12,16 +12,16 @@ class SearchEngineOptionsStruct  implements JsonSerializable
     private string $storeId;
 
     /**
-     * @var string Base URL for the search engine options.
+     * @var string Index URL for the search engine options.
      */
-    private string $base_url;
+    private string $indexUrl;
 
     public function __construct(
         string $store_id,
-        string $base_url
+        string $indexUrl
     ) {
         $this->storeId = $store_id;
-        $this->base_url = $base_url;
+        $this->indexUrl = $indexUrl;
     }
 
     public function getStoreId(): string
@@ -29,14 +29,9 @@ class SearchEngineOptionsStruct  implements JsonSerializable
         return $this->storeId;
     }
 
-    public function getBaseUrl(): string
-    {
-        return $this->base_url;
-    }
-
     public function getIndexUrl(): string
     {
-        return $this->base_url . 'rest/' . $this->storeId . '/V1/';
+        return $this->indexUrl;
     }
 
     /**
