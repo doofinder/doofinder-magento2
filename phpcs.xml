@@ -4,6 +4,7 @@
 
     <!-- Inherit the Magento 2 coding standard -->
     <rule ref="Magento2">
+        <exclude name="Magento2.Functions.StaticFunction" />
         <!-- Required exclusion until we solve the getenv() issue -->
         <exclude name="Magento2.Functions.DiscouragedFunction.Discouraged" />
     </rule>
@@ -17,9 +18,7 @@
     <exclude-pattern>vendor/*</exclude-pattern>
     <exclude-pattern>Doofinder/Feed/vendor/*</exclude-pattern>
     <exclude-pattern>app/*</exclude-pattern>
-
-    <!-- Set the minimum severity level, to be removed after having resolved all the warnings -->
-    <arg value="-severity=10"/>
+    <exclude-pattern>*.less</exclude-pattern>
 
     <!-- Specify additional settings -->
     <arg value="-colors"/>

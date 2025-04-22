@@ -110,14 +110,14 @@ interface ChangedItemInterface
     public function setItemType(int $type): ChangedItemInterface;
 
     /**
-     * Get store id
+     * Gets the operation type
      *
      * @return string|null
      */
     public function getOperationType(): ?string;
 
     /**
-     * Set store id
+     * Sets the operation type
      *
      * @param string $operationType
      * @return $this
