@@ -38,6 +38,7 @@ class CreateStore extends Action
      *
      * @param Context $context
      * @param JsonFactory $jsonFactory
+     * @param Escaper $escaper
      * @param InstallationService $installationService
      * @param StoreManagerInterface $storeManager
      */
