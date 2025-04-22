@@ -104,7 +104,8 @@ class AddToCart extends Action implements HttpPostActionInterface
 
     /**
      * Get all the selection products used in bundle product
-     * @param $product
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
      * @return mixed
      */
     private function getBundleOptions($product)

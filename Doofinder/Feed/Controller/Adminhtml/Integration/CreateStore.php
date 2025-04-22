@@ -55,6 +55,19 @@ class CreateStore extends Action implements HttpGetActionInterface
     /** @var Pool */
     protected $cacheFrontendPool;
 
+    /**
+     * CreateStore constructor.
+     *
+     * @param StoreConfig $storeConfig
+     * @param JsonFactory $resultJsonFactory
+     * @param Escaper $escaper
+     * @param UrlInterface $urlInterface
+     * @param LoggerInterface $logger
+     * @param IntegrationServiceInterface $integrationService
+     * @param Context $context
+     * @param AttributeCollectionFactory $attributeCollectionFactory
+     * @param Pool $cacheFrontendPool
+     */
     public function __construct(
         StoreConfig $storeConfig,
         JsonFactory $resultJsonFactory,
@@ -95,6 +108,26 @@ class CreateStore extends Action implements HttpGetActionInterface
         return $resultJson;
     }
 
+    /**
+     * Generates and registers Doofinder stores for all Magento store groups.
+     *
+     * This method iterates through all available store groups and attempts to create
+     * a corresponding store configuration on the Doofinder platform. It gathers necessary
+     * configuration data including search engine information, store options, site URLs,
+     * and language settings.
+     *
+     * For each store group:
+     * - It builds a complete store configuration array required by Doofinder.
+     * - Sends the configuration to Doofinder via the helper method `createStore`.
+     * - On success, stores the returned installation ID and script into Magento's config.
+     * - Maps and saves the returned search engine config for the related stores.
+     *
+     * If any exception occurs during the process for a specific store group, the method logs
+     * the error with the group’s name and continues processing the next group. After processing
+     * all groups, it ensures that Doofinder custom attributes are set and the Magento cache is cleaned.
+     *
+     * @return bool Returns true if all store groups were processed successfully; false if any errors occurred.
+     */
     public function generateDoofinderStores()
     {
         $success = true;
@@ -112,7 +145,10 @@ class CreateStore extends Action implements HttpGetActionInterface
                     "primary_language" => $primary_language,
                     "skip_indexation" => false,
                     "sector" => $this->storeConfig->getValueFromConfig(StoreConfig::SECTOR_VALUE_CONFIG),
-                    "site_url" => $this->get_primary_site_url_in_se($searchEngineData["searchEngineConfig"], $primary_language),
+                    "site_url" => $this->getPrimarySiteUrlInSe(
+                        $searchEngineData["searchEngineConfig"],
+                        $primary_language
+                    ),
                     "search_engines" => $searchEngineData["searchEngineConfig"],
                     "options" => $storeOptions,
                     "query_input" => "#search",
@@ -133,6 +169,37 @@ class CreateStore extends Action implements HttpGetActionInterface
         return $success;
     }
 
+    /**
+     * Generates configuration data for Doofinder search engines based on store group stores.
+     *
+     * This method gathers the necessary configuration for each store view within a given
+     * store group to be used for setting up Doofinder search engines.
+     *
+     * For each store in the specified store group:
+     * - Retrieves the store's language, currency, ID, and base URL.
+     * - Builds a configuration array with store metadata including:
+     *   - Store name
+     *   - Language and currency
+     *   - Site URL
+     *   - Callback URL for Doofinder indexing
+     *   - Indexing options including the REST API endpoint
+     * - Populates a second structure mapping languages and currencies to store IDs.
+     *
+     * The resulting data structure is split into:
+     * - `searchEngineConfig`: an array with complete config entries per store.
+     * - `storesConfig`: a simplified mapping of [language][currency] to store IDs.
+     *
+     * This data is typically passed to Doofinder during the creation or update of
+     * search engine configurations to enable multi-language/multi-currency support.
+     *
+     * returns array {
+     *    array $searchEngineConfig Array of search engine configuration data per store.
+     *    array $storesConfig Language-currency mapped store ID reference.
+     * }
+     *
+     * @param int $storeGroupId The ID of the store group whose stores will be used to generate the configuration.
+     * @return mixed[]
+     */
     public function generateSearchEngineData($storeGroupId)
     {
         $searchEngineConfig = [];
@@ -168,7 +235,7 @@ class CreateStore extends Action implements HttpGetActionInterface
     /**
      * Generates the additional options required for retrieving later the required items
      *
-     * @param $websiteId
+     * @param int $websiteId
      */
     public function generateStoreOptions($websiteId)
     {
@@ -184,9 +251,9 @@ class CreateStore extends Action implements HttpGetActionInterface
     /**
      * Function to store into the data base the installation id as well as the layer script
      *
-     * @param $storeGroupId
-     * @param $installationId
-     * @param $script
+     * @param int $storeGroupId
+     * @param string $installationId
+     * @param string $script
      */
     private function saveInstallationConfig($storeGroupId, $installationId, $script)
     {
@@ -200,11 +267,12 @@ class CreateStore extends Action implements HttpGetActionInterface
      * {"en":{"USD":"1"},"de":{"USD":"2"}}
      * The searchEngines variable has the following format:
      * "search_engines":{"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},"en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
-     * We're going to iterate over the search_engines because there is the data created in doofinder. May occour that some
-     * of the data that we've in storeConfig has some invalid parameter and will be bypass during the creation.
+     * We're going to iterate over the search_engines because there is the data created in doofinder.
+     * May occour that some of the data that we've in storeConfig has some invalid parameter and will
+     * be bypass during the creation.
      *
-     * @param $storesConfig
-     * @param $searchEngines
+     * @param mixed[] $storesConfig
+     * @param mixed[] $searchEngines
      */
     private function saveSearchEngineConfig($storesConfig, $searchEngines)
     {
@@ -222,7 +290,7 @@ class CreateStore extends Action implements HttpGetActionInterface
      *
      * By default we set this value to "STARTED" and will be updated when we receive the callback from doofinder
      *
-     * @param $storeId
+     * @param int $storeId
      */
     private function setIndexationStatus($storeId)
     {
@@ -264,21 +332,48 @@ class CreateStore extends Action implements HttpGetActionInterface
 
     /**
      * We obtain the url associated with the main language search_engine
+     *
+     * @param mixed[] $searchEngines
+     * @param string $primaryLanguage
      */
-    private function get_primary_site_url_in_se($search_engines, $primary_language)
+    private function getPrimarySiteUrlInSe($searchEngines, $primaryLanguage)
     {
-        $primary_search_engine = array_values(array_filter($search_engines, function ($search_engine) use ($primary_language) {
-            return $search_engine["language"] == $primary_language;
-        }))[0];
+        $primarySearchEngine = array_values(
+            array_filter(
+                $searchEngines,
+                function ($searchEngine) use ($primaryLanguage) {
+                    return $searchEngine["language"] == $primaryLanguage;
+                }
+            )
+        )[0];
 
-        return $primary_search_engine["site_url"];
+        return $primarySearchEngine["site_url"];
     }
 
+    /**
+     * Retrieves the current version of the Doofinder_Feed module.
+     *
+     * This method locates the module's path using the ComponentRegistrar, then reads
+     * the `composer.json` file within that path to extract the version defined for
+     * the module.
+     *
+     * Steps:
+     * - Uses Magento's ObjectManager to retrieve the `ComponentRegistrarInterface`
+     *   and `ReadFactory` to interact with the file system.
+     * - Resolves the absolute path to the module using its name.
+     * - Verifies the existence of `composer.json` within that module directory.
+     * - Parses the JSON content and extracts the `version` property.
+     *
+     * If the version is defined in the composer file, it is returned. Otherwise,
+     * an empty string is returned.
+     *
+     * @return string The module version as defined in composer.json, or an empty string if not found.
+     */
     private function getModuleVersion(): string
     {
         $objectManager = ObjectManager::getInstance();
-        $componentReg = $objectManager->get('\Magento\Framework\Component\ComponentRegistrarInterface');
-        $register = $objectManager->get('\Magento\Framework\Filesystem\Directory\ReadFactory');
+        $componentReg = $objectManager->get(\Magento\Framework\Component\ComponentRegistrarInterface::class);
+        $register = $objectManager->get(\Magento\Framework\Filesystem\Directory\ReadFactory::class);
         $path = $componentReg->getPath(
             ComponentRegistrar::MODULE,
             'Doofinder_Feed'
