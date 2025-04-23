@@ -57,8 +57,6 @@ class Check extends Action implements HttpGetActionInterface
 
     /**
      * Test if the API KEY is set and not empty
-     *
-     * @inheritDoc
      */
     public function execute()
     {
