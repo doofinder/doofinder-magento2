@@ -36,7 +36,7 @@ class Price extends AbstractHelper
     /**
      * Gets product price by product's id
      *
-     * @param Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product $product
      * @param string $type
      */
     public function getProductPrice($product, $type = 'final_price')
@@ -68,7 +68,7 @@ class Price extends AbstractHelper
     /**
      * Gets the flat price of the product based on it's type
      *
-     * @param Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product $product
      * @param string $type
      * @return int
      */
@@ -97,7 +97,7 @@ class Price extends AbstractHelper
     /**
      * Gets the price applying the taxes in case it's necessary
      *
-     * @param Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product $product
      * @param mixed $price
      * @return int|float
      */
@@ -120,8 +120,8 @@ class Price extends AbstractHelper
      * The first case contemplates the scenario of the tax already applied to the price
      * The second scenario needs this adjustment to be applied.
      *
-     * @param Magento\Catalog\Model\Product $product
-     * @param Magento\Framework\Pricing\Amount\AmountInterface $amount
+     * @param \Magento\Catalog\Model\Product $product
+     * @param \Magento\Framework\Pricing\Amount\AmountInterface $amount
      */
     private function getPriceWithTaxes($product, $amount)
     {
@@ -148,7 +148,7 @@ class Price extends AbstractHelper
     /**
      * Applies the pricing strategy for bundle-type products and returns the corresponding value
      *
-     * @param Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product $product
      * @param string $type
      */
     private function getBundleProductPrice($product, $type)
@@ -162,7 +162,7 @@ class Price extends AbstractHelper
     /**
      * Applies the pricing strategy for grouped-type products and returns the corresponding value
      *
-     * @param Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product $product
      * @param string $type
      */
     private function getGroupedProductPrice($product, $type)
@@ -178,7 +178,7 @@ class Price extends AbstractHelper
     /**
      * Applies the pricing strategy for configurable-type products and returns the corresponding value
      *
-     * @param Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product $product
      * @param string $type
      */
     private function getConfigurableProductPrice($product, $type)
@@ -190,8 +190,8 @@ class Price extends AbstractHelper
     /**
      * Gets calculated minimum price for a product
      *
-     * @param Magento\Catalog\Model\Product $product
-     * @param Magento\Catalog\Model\Product[] $usedProds
+     * @param \Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product[] $usedProds
      * @param string $type
      */
     private function getMinimumComplexProductPrice($product, $usedProds, $type)
@@ -233,7 +233,7 @@ class Price extends AbstractHelper
     /**
      * Gets the minimum price of the variant
      *
-     * @param Magento\Catalog\Model\Product $variant
+     * @param \Magento\Catalog\Model\Product $variant
      */
     private function getMinimumVariantPrice($variant)
     {
