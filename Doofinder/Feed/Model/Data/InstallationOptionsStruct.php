@@ -13,6 +13,11 @@ class InstallationOptionsStruct implements JsonSerializable
     private $websiteId;
 
     /**
+     * @var int Store Group ID associated with the installation options.
+     */
+    private $storeGroupId;
+
+    /**
      * @var string Token used for authentication in the installation options.
      */
     private $token;
@@ -23,9 +28,10 @@ class InstallationOptionsStruct implements JsonSerializable
      * @param int $websiteId
      * @param string $token
      */
-    public function __construct(int $websiteId, string $token,)
+    public function __construct(int $websiteId, int $storeGroupId, string $token)
     {
         $this->websiteId = $websiteId;
+        $this->storeGroupId = $storeGroupId;
         $this->token = $token;
     }
 
@@ -37,6 +43,16 @@ class InstallationOptionsStruct implements JsonSerializable
     public function getWebsiteId(): int
     {
         return $this->websiteId;
+    }
+
+    /**
+     * Get the store group ID.
+     *
+     * @return int
+     */
+    public function getStoreGroupId(): int
+    {
+        return $this->storeGroupId;
     }
 
     /**
@@ -58,6 +74,7 @@ class InstallationOptionsStruct implements JsonSerializable
     {
         return [
             'website_id' => $this->getWebsiteId(),
+            'store_group_id' => $this->getStoreGroupId(),
             'token' => $this->getToken()
         ];
     }

@@ -93,11 +93,13 @@ class InstallationService
         try {
 
             $websiteId = (int)$storeGroup->getWebsiteId();
+            $storeGroupId = (int)$storeGroup->getId();
             $integrationId = $this->storeConfig->getIntegrationId();
             $integrationToken = $this->integrationService->get($integrationId)->getData(IntegrationTokens::DATA_TOKEN);
 
             $installationOptions = new InstallationOptionsStruct(
                 $websiteId,
+                $storeGroupId,
                 $integrationToken
             );
 
