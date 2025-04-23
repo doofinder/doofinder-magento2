@@ -76,8 +76,8 @@ init: doofinder-configure
 	$(docker_exec_web) magento_install
 
 init-with-data: init
-	$(docker_exec_web) php bin/magento sampledata:deploy
-	$(docker_exec_web) php bin/magento setup:upgrade
+	$(docker_exec_web) php -d memory_limit=-1 bin/magento sampledata:deploy
+	$(docker_exec_web) php -d memory_limit=-1 bin/magento setup:upgrade
 
 # Check code consitency for the Doofinder Feed module using PHP Code Sniffer
 consistency:
