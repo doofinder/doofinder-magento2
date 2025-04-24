@@ -88,6 +88,28 @@ class InstallationService
         return $installationResults;
     }
 
+    /**
+     * Creates and configures a Doofinder store for a given Magento store group.
+     *
+     * This method handles the integration of a Magento store group with the Doofinder platform.
+     * It retrieves necessary configuration data, sends it to Doofinder, and processes the response
+     * to store the resulting configuration in Magento's system.
+     *
+     * Workflow:
+     * - Retrieves the website ID, integration ID, and integration token for the store group.
+     * - Prepares installation options and fetches installation data for the store group.
+     * - Sends the installation data to Doofinder's management client to create the store.
+     * - Saves the installation ID and display layer script returned by Doofinder.
+     * - Maps and stores the search engine configuration for each store view within the group.
+     * - Updates the indexation status for each store view.
+     *
+     * If an error occurs during the process, it logs the error with the store group's name
+     * and rethrows the exception.
+     *
+     * @param GroupInterface $storeGroup The Magento store group to configure with Doofinder.
+     * @return array The response from Doofinder containing installation details.
+     * @throws Exception If an error occurs during the store creation process.
+     */
     public function generateDoofinderStore(GroupInterface $storeGroup): array
     {
         try {

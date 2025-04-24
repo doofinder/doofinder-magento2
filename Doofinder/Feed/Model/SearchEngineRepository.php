@@ -25,10 +25,22 @@ class SearchEngineRepository
     }
 
     /**
-     * Get search engines for a store group unique by language and currency
+     * Retrieves unique search engine configurations for a store group based on language and currency.
      *
-     * @param Group $storeGroup
-     * @return SearchEngineStruct[]
+     * This method processes all stores within the provided store group to generate a list of
+     * search engine configurations. Each configuration is unique to a specific language and
+     * currency combination, ensuring no duplicates are created.
+     *
+     * For each store in the store group:
+     * - Retrieves the search engine configuration for the store.
+     * - Checks if the language-currency pair is already processed.
+     * - If not, adds the configuration to the result and marks the pair as processed.
+     *
+     * Returns an array of search engine configurations, where each entry corresponds to a
+     * unique language-currency combination.
+     *
+     * @param Group $storeGroup The store group containing the stores to process.
+     * @return SearchEngineStruct[] An array of unique search engine configurations.
      */
     public function getByStoreGroup(Group $storeGroup): array
     {
