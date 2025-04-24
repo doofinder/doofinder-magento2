@@ -13,10 +13,13 @@ use Psr\Log\LoggerInterface;
 class CleanIntegration extends Action
 {
 
+    /** @var string[] */
     private $integration_table_column = ['integration' => 'name', 'core_config_data' => 'path'];
 
+    /** @var ResourceConnection */
     private $resourceConnection;
 
+    /** @var LoggerInterface */
     private $logger;
 
     /**
@@ -47,7 +50,8 @@ class CleanIntegration extends Action
                 $this->deleteIntegrationEntries($connection, $table, $column);
             }
         } catch (Exception $e) {
-            $this->logger->error('There was a problem cleaning the database from Doofinder entries: ' . $e->getMessage());
+            $this->logger->error('There was a problem cleaning the database from Doofinder entries: ' .
+                $e->getMessage());
         }
     }
 
@@ -62,9 +66,9 @@ class CleanIntegration extends Action
     /**
      * Deletes any entry of Doofinder from Magento's database
      *
-     * @param $connection
-     * @param $table
-     * @param $column
+     * @param \Magento\Framework\DB\Adapter\AdapterInterface $connection
+     * @param string $table
+     * @param string $column
      */
     private function deleteIntegrationEntries($connection, $table, $column)
     {

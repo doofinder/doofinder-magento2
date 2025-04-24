@@ -10,8 +10,17 @@ use Magento\Backend\App\Action\Context;
 
 class UpdateOnClick extends Action
 {
+    /**
+     * @var Processor
+     */
     private $processor;
 
+    /**
+     * UpdateOnClick constructor.
+     *
+     * @param Processor $processor
+     * @param Context $context
+     */
     public function __construct(
         Processor $processor,
         Context $context

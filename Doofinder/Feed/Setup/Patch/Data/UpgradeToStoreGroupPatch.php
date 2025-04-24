@@ -11,11 +11,34 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 
 class UpgradeToStoreGroupPatch implements DataPatchInterface
 {
+    /**
+     * @var ModuleDataSetupInterface
+     */
     private $moduleDataSetup;
+
+    /**
+     * @var WriterInterface
+     */
     private $configWriter;
+
+    /**
+     * @var ScopeConfigInterface
+     */
     private $scopeConfig;
+
+    /**
+     * @var GroupCollectionFactory
+     */
     private $groupCollectionFactory;
 
+    /**
+     * UpgradeToStoreGroupPatch constructor.
+     *
+     * @param ModuleDataSetupInterface $moduleDataSetup
+     * @param WriterInterface $configWriter
+     * @param ScopeConfigInterface $scopeConfig
+     * @param GroupCollectionFactory $groupCollectionFactory
+     */
     public function __construct(
         ModuleDataSetupInterface $moduleDataSetup,
         WriterInterface $configWriter,
@@ -28,6 +51,11 @@ class UpgradeToStoreGroupPatch implements DataPatchInterface
         $this->groupCollectionFactory = $groupCollectionFactory;
     }
 
+    /**
+     * Applies the patch: migrates script and installation ID config values from website to store group scope.
+     *
+     * @return void
+     */
     public function apply()
     {
         $this->moduleDataSetup->startSetup();
@@ -44,20 +72,35 @@ class UpgradeToStoreGroupPatch implements DataPatchInterface
                 $this->configWriter->delete($scriptIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
             }
 
-            $installationId = $this->scopeConfig->getValue($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
+            $installationId = $this->scopeConfig->getValue(
+                $installationIdPath,
+                ScopeInterface::SCOPE_WEBSITES,
+                $websiteId
+            );
             if (!empty($installationId)) {
-                $this->configWriter->save($installationIdPath, $installationId, ScopeInterface::SCOPE_GROUP, $group->getId());
+                $this->configWriter->save(
+                    $installationIdPath,
+                    $installationId,
+                    ScopeInterface::SCOPE_GROUP,
+                    $group->getId()
+                );
                 $this->configWriter->delete($installationIdPath, ScopeInterface::SCOPE_WEBSITES, $websiteId);
             }
         }
         $this->moduleDataSetup->endSetup();
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function getDependencies()
     {
         return [];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getAliases()
     {
         return [];

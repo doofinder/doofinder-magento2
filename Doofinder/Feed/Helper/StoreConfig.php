@@ -98,7 +98,8 @@ class StoreConfig extends AbstractHelper
     /**
      * Export only categories present in navigation menus
      */
-    public const UPDATE_ON_SAVE_CATEGORIES_IN_NAVIGATION = 'doofinder_config_config/update_on_save/categories_in_navigation';
+    public const UPDATE_ON_SAVE_CATEGORIES_IN_NAVIGATION =
+        'doofinder_config_config/update_on_save/categories_in_navigation';
 
     /**
      * Path to catalog search engine setting
@@ -223,7 +224,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Function to get a store by id
      *
-     * @param $storeId
+     * @param int|null $storeId
      */
     public function getStoreById($storeId)
     {
@@ -439,7 +440,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Set API key.
      *
-     * @param $value
+     * @param string $value
      */
     public function setApiKey($value)
     {
@@ -515,7 +516,8 @@ class StoreConfig extends AbstractHelper
                 (int)$storeGroupId
             );
 
-            if (!empty($displayLayerScript) && 1 !== preg_match('/dfLayerOptions/', $displayLayerScript) && 1 !== preg_match('/doofinderApp/', $displayLayerScript)) {
+            if (!empty($displayLayerScript) && 1 !== preg_match('/dfLayerOptions/', $displayLayerScript) &&
+            1 !== preg_match('/doofinderApp/', $displayLayerScript)) {
                 $store = $this->getCurrentStore();
                 $currency = $store->getCurrentCurrency()->getCode();
                 $language_country = $this->getLanguageFromStore($store);
@@ -524,7 +526,8 @@ class StoreConfig extends AbstractHelper
 
                 $singleScriptAdditionalConfig = <<<EOT
                     <script>
-                        (function(w, k) {w[k] = window[k] || function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
+                        (function(w, k) {w[k] = window[k] || 
+                        function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
 
                         doofinderApp("config", "language", "$language")
                         doofinderApp("config", "currency", "$currency")
@@ -798,7 +801,11 @@ class StoreConfig extends AbstractHelper
         $this->configWriter->save(self::INDICE_CALLBACK, ($callback ? 1 : 0), ScopeInterface::SCOPE_STORES, $storeId);
         $enabled = 1;
         foreach ($this->getAllStores() as $store) {
-            if ($this->getValueFromConfig(self::INDICE_CALLBACK, ScopeInterface::SCOPE_STORES, (int)$store->getId()) == 0) {
+            if ($this->getValueFromConfig(
+                self::INDICE_CALLBACK,
+                ScopeInterface::SCOPE_STORES,
+                (int)$store->getId()
+            ) == 0) {
                 $enabled = 0;
                 break;
             }
@@ -959,6 +966,10 @@ class StoreConfig extends AbstractHelper
      *      zone: 'eu1'
      *    };
      *
+     * @param string $liveLayerScript
+     * @param string $locale
+     * @param string $currency
+     *
      * @return string
      *    const dfLayerOptions = {
      *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
@@ -977,7 +988,11 @@ class StoreConfig extends AbstractHelper
         }
 
         if (strpos($liveLayerScript, 'currency:') !== false) {
-            $liveLayerScript = preg_replace("/(\/\/\s*)?(currency:)(.*?)(\n|,)/m", "$2 '$currency'$4", $liveLayerScript);
+            $liveLayerScript = preg_replace(
+                "/(\/\/\s*)?(currency:)(.*?)(\n|,)/m",
+                "$2 '$currency'$4",
+                $liveLayerScript
+            );
         } else {
             $pos = strpos($liveLayerScript, "{");
             $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tcurrency: '$currency',", $pos + 1, 0);

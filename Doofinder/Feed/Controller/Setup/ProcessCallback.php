@@ -87,7 +87,8 @@ class ProcessCallback extends Action implements CsrfAwareActionInterface, HttpPo
                 throw new \Exception('There is no store view matching URL: '. $this->url->getCurrentUrl());
             }
             $response = $this->sanitizeResponse($response);
-            $this->logger->debug('[ProcessCallback] Status: ' . $response['status'] . ' - Message: ' . $response['result']);
+            $this->logger->debug('[ProcessCallback] Status: ' . $response['status'] .
+                ' - Message: ' . $response['result']);
             $this->logger->debug('[ProcessCallback] Display layer enabled: ' . ($response['error'] ? 0 : 1));
             $this->storeConfig->setIndexationStatus($response, (int)$store->getId());
             $this->storeConfig->setGlobalDisplayLayerEnabled(!$response['error'], (int)$store->getId());
@@ -113,7 +114,8 @@ class ProcessCallback extends Action implements CsrfAwareActionInterface, HttpPo
         $status_boolean = $this->validateProcessMessage($processCallbackStatus['message']);
         $date = new \DateTime();
         return [
-            'status' => $status_boolean ? Indexation::DOOFINDER_INDEX_PROCESS_STATUS_SUCCESS : Indexation::DOOFINDER_INDEX_PROCESS_STATUS_FAILURE,
+            'status' => $status_boolean ? Indexation::DOOFINDER_INDEX_PROCESS_STATUS_SUCCESS :
+                Indexation::DOOFINDER_INDEX_PROCESS_STATUS_FAILURE,
             'result' => strtolower(trim($processCallbackStatus['message'] ?? '', ' .')),
             'finished_at' => $date->format('M j, Y, g:i A'),
             'error' => !$status_boolean,
