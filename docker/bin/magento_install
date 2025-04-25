@@ -54,7 +54,7 @@ if [[ "$MAGENTO_VERSION" == *"2.4."* ]]; then
 	--elasticsearch-host="$ELASTICSEARCH_HOST" \
 	--enable-syslog-logging=1 \
 	--cleanup-database \
-	--disable-modules Magento_AdminAdobeImsTwoFactorAuth,Magento_TwoFactorAuth
+	--disable-modules Magento_TwoFactorAuth
 
 	${MAGENTO_BIN} config:set web/unsecure/base_url  "http://${MAGENTO_BASE_URL}/" > /dev/null && echo "Config set \`web/unsecure/base_url\` to \`http://${MAGENTO_BASE_URL}/\`"
 	${MAGENTO_BIN} config:set web/secure/base_url  "https://${MAGENTO_BASE_URL}/" > /dev/null && echo "Config set \`web/secure/base_url\` to \`https://${MAGENTO_BASE_URL}/\`"

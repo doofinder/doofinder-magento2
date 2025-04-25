@@ -22,7 +22,7 @@ composer config --global http-basic.repo.magento.com \
 php -d memory_limit=-1 /usr/local/bin/composer create-project \
     --repository=https://repo.magento.com/ magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION /app
 
-composer update
+php -d memory_limit=-1 /usr/local/bin/composer update
 
 find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
 
