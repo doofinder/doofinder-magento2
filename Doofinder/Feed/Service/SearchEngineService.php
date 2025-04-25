@@ -3,16 +3,16 @@
 namespace Doofinder\Feed\Service;
 
 use Doofinder\Feed\ApiClient\ManagementClientFactory;
+use Doofinder\Feed\Errors\SearchEngineCreationException;
 use Doofinder\Feed\Helper\Indexation;
 use Doofinder\Feed\Helper\StoreConfig;
-use Doofinder\Feed\Model\Data\SearchEngineOptionsStruct;
-use Doofinder\Feed\Model\Data\SearchEngineStruct;
 use Doofinder\Feed\Model\SearchEngineRepository;
 use Exception;
 use Magento\Store\Api\Data\StoreInterface;
-use Magento\Store\Model\Group;
-use Magento\Store\Model\Store;
 
+/**
+ * Service for managing Doofinder search engines.
+ */
 class SearchEngineService
 {
     /**
@@ -30,7 +30,13 @@ class SearchEngineService
      */
     private $managementClientFactory;
 
-
+    /**
+     * Constructor.
+     *
+     * @param StoreConfig $storeConfig
+     * @param SearchEngineRepository $searchEngineRepository
+     * @param ManagementClientFactory $managementClientFactory
+     */
     public function __construct(
         StoreConfig $storeConfig,
         SearchEngineRepository $searchEngineRepository,
@@ -41,35 +47,34 @@ class SearchEngineService
         $this->managementClientFactory = $managementClientFactory;
     }
 
-
     /**
-     * Get search engines for a store group unique by language and currency
-     * The store_id field refers to store_view's id.
+     * Creates a search engine for a given store.
      *
-     * @param Group $storeGroup
-     * @return bool
+     * @param StoreInterface $store The store for which the search engine is created.
+     * @return array The response from the Doofinder API.
+     * @throws Exception If the search engine creation fails.
      */
     public function createSearchEngine(StoreInterface $store): array
     {
-        try {
+        $searchEngineData = $this->searchEngineRepository->getByStore($store);
 
-            $searchEngineData = $this->searchEngineRepository->getByStore($store);
-
-            if (null === $searchEngineData->getStoreId()) {
-                throw new Exception('The Doofinder Store has not been created yet.');
-            }
-
-            $managementClient = $this->managementClientFactory->create(['apiType' => 'dooplugins']);
-
-            $response = $managementClient->createSearchEngine($searchEngineData);
-
-            $storeId = (int)$store->getId();
-
-            $this->storeConfig->setHashId($response["hashid"], $storeId);
-            $this->storeConfig->setIndexationStatus(["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED], $storeId);
-            return $response;
-        } catch (Exception $e) {
-            throw new Exception('Error creating search engine: ' . $e->getMessage());
+        if (null === $searchEngineData->getStoreId()) {
+            throw new Exception('The Doofinder Store has not been created yet.');
         }
+
+        $managementClient =
+            $this->managementClientFactory->create(['apiType' => 'dooplugins']);
+
+        $response =
+            $managementClient->createSearchEngine($searchEngineData->jsonSerialize());
+
+        $storeId = (int)$store->getId();
+
+        $this->storeConfig->setHashId($response["hashid"], $storeId);
+        $this->storeConfig->setIndexationStatus(
+            ["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED],
+            $storeId
+        );
+        return $response;
     }
 }

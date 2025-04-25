@@ -37,6 +37,8 @@ class Setup extends Action implements HttpGetActionInterface
      *
      * @param InstallationService $installationService
      * @param JsonFactory $resultJsonFactory
+     * @param ManagerInterface $messageManager
+     * @param Escaper $escaper
      * @param LoggerInterface $logger
      * @param Context $context
      */
@@ -71,7 +73,9 @@ class Setup extends Action implements HttpGetActionInterface
             $message = 'Doofinder stores generated successfully.';
             foreach ($installationResults as $result) {
                 if (true !== $result) {
-                    $message = __('Doofinder was succesfully installed. However, not all store views were succesfully installed. Please check the logs for further information.');
+                    $message = __('Doofinder was successfully installed. However, ' .
+                        'not all store views were successfully installed. Please check ' .
+                        'the logs for further information.');
                     $installationFailed &= true;
                 } else {
                     $installationFailed = false;

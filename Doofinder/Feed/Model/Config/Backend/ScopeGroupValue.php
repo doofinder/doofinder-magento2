@@ -31,10 +31,11 @@ class ScopeGroupValue extends Value
      */
     protected $_storeConfig;
 
-
-
     /**
+     * ScopeGroupValue constructor.
+     *
      * @param StoreConfig $storeConfig
+     * @param StoreManager $storeManager
      * @param Context $context
      * @param Registry $registry
      * @param ScopeConfigInterface $config

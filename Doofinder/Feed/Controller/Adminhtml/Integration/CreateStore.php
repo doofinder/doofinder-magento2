@@ -85,8 +85,6 @@ class CreateStore extends Action
         return $resultJson;
     }
 
-
-
     /**
      * Check ACL permissions
      */

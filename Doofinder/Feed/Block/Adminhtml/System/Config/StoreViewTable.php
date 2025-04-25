@@ -3,7 +3,7 @@
 namespace Doofinder\Feed\Block\Adminhtml\System\Config;
 
 use Doofinder\Feed\Helper\StoreConfig;
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Store\Model\Group;
@@ -30,14 +30,15 @@ class StoreViewTable extends Field
     protected $storeConfig;
 
     /**
-     * Constructor
+     * StoreViewTable constructor.
      *
-     * @param \Magento\Backend\Block\Template\Context $context
+     * @param Context $context
      * @param Website $website
+     * @param StoreConfig $storeConfig
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
+        Context $context,
         Website $website,
         StoreConfig $storeConfig,
         array $data = []
@@ -70,9 +71,19 @@ class StoreViewTable extends Field
         return $this->website->load($websiteId)->getGroupCollection()->setOrder('group_id', 'ASC');
     }
 
+    /**
+     * Retrieve the installation ID for a given store group.
+     *
+     * @param Group $group
+     * @return string|null
+     */
     public function getInstallationId(Group $group)
     {
-        return $this->storeConfig->getValueFromConfig(StoreConfig::DISPLAY_LAYER_INSTALLATION_ID, ScopeInterface::SCOPE_GROUP, (int)$group->getId());
+        return $this->storeConfig->getValueFromConfig(
+            StoreConfig::DISPLAY_LAYER_INSTALLATION_ID,
+            ScopeInterface::SCOPE_GROUP,
+            (int)$group->getId()
+        );
     }
 
     /**
