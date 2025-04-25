@@ -52,7 +52,7 @@ class SearchEngineService
      * Creates a search engine for a given store.
      *
      * @param StoreInterface $store The store for which the search engine is created.
-     * @return array The response from the Doofinder API.
+     * @return mixed[] The response from the Doofinder API.
      * @throws SearchEngineCreationException If the search engine creation fails.
      */
     public function createSearchEngine(StoreInterface $store): array
