@@ -39,7 +39,8 @@
             'prototype'
         ], function (mageTemplate) {
             function toggleCustomAttributesCheckboxes(event) {
-                const checkboxes = document.querySelectorAll('.admin__df-custom-attributes-wrapper input[type="checkbox"]:not(#toggle-custom-fields)');
+                const checkboxes = document.querySelectorAll('.admin__df-custom-attributes-wrapper ' + 
+                    'input[type="checkbox"]:not(#toggle-custom-fields)');
                 const checkboxStatus = event.target.checked;
                 checkboxes.forEach(function(checkbox) {
                     checkbox.checked = checkboxStatus;
@@ -73,7 +74,10 @@
                     if (insertAfterId) {
                         Element.insert($(insertAfterId), {after: this.template(templateValues)});
                     } else {
-                        Element.insert($('addRow<?= $escaper->escapeHtml($_htmlId) ?>'), {bottom: this.template(templateValues)});
+                        Element.insert(
+                            $('addRow<?= $escaper->escapeHtml($_htmlId) ?>'), 
+                            {bottom: this.template(templateValues)}
+                        );
                     }
                 },
             }
@@ -82,7 +86,10 @@
             <?php
             foreach ($block->getArrayRows() as $_rowId => $_row) {
                 if ($_row->getAttrId()) {
-                    $_row->setAction($block->getUrl('catalog/product_attribute/edit/attribute_id/', ['attribute_id' => $_row->getAttrId()]));
+                    $_row->setAction($block->getUrl(
+                        'catalog/product_attribute/edit/attribute_id/',
+                        ['attribute_id' => $_row->getAttrId()]
+                    ));
                     $_row->setActionClass('viewed');
                 } else {
                     $_row->setAction('');
