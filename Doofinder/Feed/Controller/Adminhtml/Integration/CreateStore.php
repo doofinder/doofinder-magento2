@@ -10,7 +10,6 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Webapi\Exception as WebapiException;
-use Psr\Log\LoggerInterface;
 
 class CreateStore extends Action
 {
@@ -35,11 +34,6 @@ class CreateStore extends Action
     protected $escaper;
 
     /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * CreateStore constructor.
      *
      * @param Context $context
@@ -47,7 +41,6 @@ class CreateStore extends Action
      * @param Escaper $escaper
      * @param InstallationService $installationService
      * @param StoreManagerInterface $storeManager
-     * @param LoggerInterface $logger
      */
 
     public function __construct(
@@ -55,15 +48,13 @@ class CreateStore extends Action
         JsonFactory $jsonFactory,
         Escaper $escaper,
         InstallationService $installationService,
-        StoreManagerInterface $storeManager,
-        LoggerInterface $logger
+        StoreManagerInterface $storeManager
     ) {
         parent::__construct($context);
         $this->jsonFactory = $jsonFactory;
         $this->storeManager = $storeManager;
         $this->escaper = $escaper;
         $this->installationService = $installationService;
-        $this->logger = $logger;
     }
 
     /**
@@ -85,12 +76,9 @@ class CreateStore extends Action
                 'message' => __('Store sync initiated for group id: %1', $groupId)
             ]);
         } catch (Exception $e) {
-            $message = 'Error creating Doofinder store for store group "' .
-                $group->getName() . '". ' . $e->getMessage();
-            $this->logger->error($message);
             $resultJson->setData([
                 'success' => false,
-                'message' => $message,
+                'message' => $e->getMessage(),
             ])->setHttpResponseCode(WebapiException::HTTP_INTERNAL_ERROR);
         }
 

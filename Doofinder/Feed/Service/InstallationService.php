@@ -3,6 +3,7 @@
 namespace Doofinder\Feed\Service;
 
 use Doofinder\Feed\ApiClient\ManagementClientFactory;
+use Doofinder\Feed\Errors\StoreCreationException;
 use Doofinder\Feed\Helper\Indexation;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\Data\InstallationOptionsStruct;
@@ -15,6 +16,7 @@ use Magento\Integration\Model\IntegrationService;
 use Magento\Store\Api\Data\GroupInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Escaper;
+use Psr\Log\LoggerInterface;
 
 use Magento\Framework\App\Cache\Frontend\Pool as CacheFrontendPool;
 
@@ -43,6 +45,9 @@ class InstallationService
     /** @var Escaper */
     private Escaper $escaper;
 
+    /** @var LoggerInterface */
+    private LoggerInterface $logger;
+
     /** @var CacheFrontendPool */
     private CacheFrontendPool $cacheFrontendPool;
 
@@ -56,6 +61,7 @@ class InstallationService
      * @param IntegrationService $integrationService
      * @param AttributeCollectionFactory $attributeCollectionFactory
      * @param Escaper $escaper
+     * @param LoggerInterface $logger
      * @param CacheFrontendPool $cacheFrontendPool
      */
     public function __construct(
@@ -66,6 +72,7 @@ class InstallationService
         IntegrationService $integrationService,
         AttributeCollectionFactory $attributeCollectionFactory,
         Escaper $escaper,
+        LoggerInterface $logger,
         CacheFrontendPool $cacheFrontendPool
     ) {
         $this->managementClientFactory = $managementClientFactory;
@@ -75,6 +82,7 @@ class InstallationService
         $this->integrationService = $integrationService;
         $this->attributeCollectionFactory = $attributeCollectionFactory;
         $this->escaper = $escaper;
+        $this->logger = $logger;
         $this->cacheFrontendPool = $cacheFrontendPool;
     }
 
@@ -85,7 +93,7 @@ class InstallationService
      * generating a Doofinder store for each group. It handles exceptions for each
      * group individually, allowing the process to continue even if one group fails.
      *
-     * @return mixed[] An associative array where the keys are store group IDs and the values are either
+     * @return array An associative array where the keys are store group IDs and the values are either
      *               true (if the store was successfully created) or an error message (if an exception occurred).
      */
     public function generateDoofinderStores()
@@ -124,61 +132,69 @@ class InstallationService
      * and rethrows the exception.
      *
      * @param GroupInterface $storeGroup The Magento store group to configure with Doofinder.
-     * @return mixed[] The response from Doofinder containing installation details.
+     * @return array The response from Doofinder containing installation details.
      * @throws Exception If an error occurs during the store creation process.
      */
     public function generateDoofinderStore(GroupInterface $storeGroup): array
     {
-        $websiteId = (int)$storeGroup->getWebsiteId();
-        $integrationId = $this->storeConfig->getIntegrationId();
-        $integrationToken =
-            $this->integrationService->get($integrationId)
-            ->getData(IntegrationTokens::DATA_TOKEN);
+        try {
 
-        $installationOptions = new InstallationOptionsStruct(
-            $websiteId,
-            $integrationToken
-        );
+            $websiteId = (int)$storeGroup->getWebsiteId();
+            $integrationId = $this->storeConfig->getIntegrationId();
+            $integrationToken =
+                $this->integrationService->get($integrationId)
+                ->getData(IntegrationTokens::DATA_TOKEN);
 
-        $installationData =
-            $this->installationRepository
-            ->getByStoreGroup(
-                $storeGroup,
-                $installationOptions
+            $installationOptions = new InstallationOptionsStruct(
+                $websiteId,
+                $integrationToken
             );
-        $managementClient =
-            $this->managementClientFactory
-            ->create(['apiType' => 'dooplugins']);
 
-        $response = $managementClient->createStore($installationData);
+            $installationData =
+                $this->installationRepository
+                ->getByStoreGroup(
+                    $storeGroup,
+                    $installationOptions
+                );
+            $managementClient =
+                $this->managementClientFactory
+                ->create(['apiType' => 'dooplugins']);
 
-        $storeGroupId = (int)$storeGroup->getId();
+            $response = $managementClient->createStore($installationData);
 
-        $this->storeConfig->setInstallation($response["installation_id"], $storeGroupId);
-        $this->storeConfig->setDisplayLayer($response["script"], $storeGroupId);
+            $storeGroupId = (int)$storeGroup->getId();
 
-        // Need to store into database the relation of each store view its related search engine hashid.
-        // The response config has the following format:
-        // "search_engines":
-        //   {"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},
-        //    "en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
-        // We're going to iterate over the sent search engines and get the
-        // response based on on language and currency.
+            $this->storeConfig->setInstallation($response["installation_id"], $storeGroupId);
+            $this->storeConfig->setDisplayLayer($response["script"], $storeGroupId);
 
-        /** @var SearchEngineStruct $searchEngine */
-        foreach ($installationData->getSearchEngines() as $searchEngine) {
-            $storeId = (int)$searchEngine->getOptions()->getStoreId();
-            $currency = $searchEngine->getCurrency();
-            $language = $searchEngine->getLanguage();
-            $hashid = $response["config"]["search_engines"][$language][$currency];
+            // Need to store into database the relation of each store view its related search engine hashid.
+            // The response config has the following format:
+            // "search_engines":
+            //   {"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},
+            //    "en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
+            // We're going to iterate over the sent search engines and get the
+            // response based on on language and currency.
 
-            $this->storeConfig->setHashId($hashid, $storeId);
-            $this->storeConfig->setIndexationStatus(
-                ["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED],
-                $storeId
-            );
+            /** @var SearchEngineStruct $searchEngine */
+            foreach ($installationData->getSearchEngines() as $searchEngine) {
+                $storeId = (int)$searchEngine->getOptions()->getStoreId();
+                $currency = $searchEngine->getCurrency();
+                $language = $searchEngine->getLanguage();
+                $hashid = $response["config"]["search_engines"][$language][$currency];
+
+                $this->storeConfig->setHashId($hashid, $storeId);
+                $this->storeConfig->setIndexationStatus(
+                    ["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED],
+                    $storeId
+                );
+            }
+            return $response;
+        } catch (Exception $e) {
+            $message = 'Error creating Doofinder store for store group "' .
+                $storeGroup->getName() . '". ' . $e->getMessage();
+            $this->logger->error($message);
+            throw new StoreCreationException($message);
         }
-        return $response;
     }
 
     /**
