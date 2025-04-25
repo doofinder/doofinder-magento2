@@ -3,6 +3,7 @@
 namespace Doofinder\Feed\Service;
 
 use Doofinder\Feed\ApiClient\ManagementClientFactory;
+use Doofinder\Feed\Errors\DoofinderFeedException;
 use Doofinder\Feed\Errors\SearchEngineCreationException;
 use Doofinder\Feed\Helper\Indexation;
 use Doofinder\Feed\Helper\StoreConfig;
@@ -52,14 +53,14 @@ class SearchEngineService
      *
      * @param StoreInterface $store The store for which the search engine is created.
      * @return array The response from the Doofinder API.
-     * @throws Exception If the search engine creation fails.
+     * @throws SearchEngineCreationException If the search engine creation fails.
      */
     public function createSearchEngine(StoreInterface $store): array
     {
         $searchEngineData = $this->searchEngineRepository->getByStore($store);
 
         if (null === $searchEngineData->getStoreId()) {
-            throw new Exception('The Doofinder Store has not been created yet.');
+            throw new SearchEngineCreationException('The Doofinder Store has not been created yet.');
         }
 
         $managementClient =

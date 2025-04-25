@@ -15,7 +15,6 @@ use Magento\Integration\Model\IntegrationService;
 use Magento\Store\Api\Data\GroupInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Escaper;
-use Psr\Log\LoggerInterface;
 
 use Magento\Framework\App\Cache\Frontend\Pool as CacheFrontendPool;
 
@@ -44,9 +43,6 @@ class InstallationService
     /** @var Escaper */
     private Escaper $escaper;
 
-    /** @var LoggerInterface */
-    private LoggerInterface $logger;
-
     /** @var CacheFrontendPool */
     private CacheFrontendPool $cacheFrontendPool;
 
@@ -60,7 +56,6 @@ class InstallationService
      * @param IntegrationService $integrationService
      * @param AttributeCollectionFactory $attributeCollectionFactory
      * @param Escaper $escaper
-     * @param LoggerInterface $logger
      * @param CacheFrontendPool $cacheFrontendPool
      */
     public function __construct(
@@ -71,7 +66,6 @@ class InstallationService
         IntegrationService $integrationService,
         AttributeCollectionFactory $attributeCollectionFactory,
         Escaper $escaper,
-        LoggerInterface $logger,
         CacheFrontendPool $cacheFrontendPool
     ) {
         $this->managementClientFactory = $managementClientFactory;
@@ -81,7 +75,6 @@ class InstallationService
         $this->integrationService = $integrationService;
         $this->attributeCollectionFactory = $attributeCollectionFactory;
         $this->escaper = $escaper;
-        $this->logger = $logger;
         $this->cacheFrontendPool = $cacheFrontendPool;
     }
 
@@ -136,64 +129,56 @@ class InstallationService
      */
     public function generateDoofinderStore(GroupInterface $storeGroup): array
     {
-        try {
+        $websiteId = (int)$storeGroup->getWebsiteId();
+        $integrationId = $this->storeConfig->getIntegrationId();
+        $integrationToken =
+            $this->integrationService->get($integrationId)
+            ->getData(IntegrationTokens::DATA_TOKEN);
 
-            $websiteId = (int)$storeGroup->getWebsiteId();
-            $integrationId = $this->storeConfig->getIntegrationId();
-            $integrationToken =
-                $this->integrationService->get($integrationId)
-                ->getData(IntegrationTokens::DATA_TOKEN);
+        $installationOptions = new InstallationOptionsStruct(
+            $websiteId,
+            $integrationToken
+        );
 
-            $installationOptions = new InstallationOptionsStruct(
-                $websiteId,
-                $integrationToken
+        $installationData =
+            $this->installationRepository
+            ->getByStoreGroup(
+                $storeGroup,
+                $installationOptions
             );
+        $managementClient =
+            $this->managementClientFactory
+            ->create(['apiType' => 'dooplugins']);
 
-            $installationData =
-                $this->installationRepository
-                ->getByStoreGroup(
-                    $storeGroup,
-                    $installationOptions
-                );
-            $managementClient =
-                $this->managementClientFactory
-                ->create(['apiType' => 'dooplugins']);
+        $response = $managementClient->createStore($installationData);
 
-            $response = $managementClient->createStore($installationData);
+        $storeGroupId = (int)$storeGroup->getId();
 
-            $storeGroupId = (int)$storeGroup->getId();
+        $this->storeConfig->setInstallation($response["installation_id"], $storeGroupId);
+        $this->storeConfig->setDisplayLayer($response["script"], $storeGroupId);
 
-            $this->storeConfig->setInstallation($response["installation_id"], $storeGroupId);
-            $this->storeConfig->setDisplayLayer($response["script"], $storeGroupId);
+        // Need to store into database the relation of each store view its related search engine hashid.
+        // The response config has the following format:
+        // "search_engines":
+        //   {"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},
+        //    "en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
+        // We're going to iterate over the sent search engines and get the
+        // response based on on language and currency.
 
-            // Need to store into database the relation of each store view its related search engine hashid.
-            // The response config has the following format:
-            // "search_engines":
-            //   {"de":{"USD":"024d8eb1caa649775d08f3f69ddf333a"},
-            //    "en":{"USD":"c3981a773ac987e5828c94677cda237f"}}
-            // We're going to iterate over the sent search engines and get the
-            // response based on on language and currency.
+        /** @var SearchEngineStruct $searchEngine */
+        foreach ($installationData->getSearchEngines() as $searchEngine) {
+            $storeId = (int)$searchEngine->getOptions()->getStoreId();
+            $currency = $searchEngine->getCurrency();
+            $language = $searchEngine->getLanguage();
+            $hashid = $response["config"]["search_engines"][$language][$currency];
 
-            /** @var SearchEngineStruct $searchEngine */
-            foreach ($installationData->getSearchEngines() as $searchEngine) {
-                $storeId = (int)$searchEngine->getOptions()->getStoreId();
-                $currency = $searchEngine->getCurrency();
-                $language = $searchEngine->getLanguage();
-                $hashid = $response["config"]["search_engines"][$language][$currency];
-
-                $this->storeConfig->setHashId($hashid, $storeId);
-                $this->storeConfig->setIndexationStatus(
-                    ["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED],
-                    $storeId
-                );
-            }
-            return $response;
-        } catch (Exception $e) {
-            $message = 'Error creating Doofinder store for store group "' .
-                $storeGroup->getName() . '". ' . $e->getMessage();
-            $this->logger->error($message);
-            throw new Exception($message);
+            $this->storeConfig->setHashId($hashid, $storeId);
+            $this->storeConfig->setIndexationStatus(
+                ["status" => Indexation::DOOFINDER_INDEX_PROCESS_STATUS_STARTED],
+                $storeId
+            );
         }
+        return $response;
     }
 
     /**
@@ -214,6 +199,7 @@ class InstallationService
             ];
         }
 
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
         $customAttributes = base64_encode(gzcompress(json_encode($attributes)));
         $this->storeConfig->setCustomAttributes($customAttributes);
     }
