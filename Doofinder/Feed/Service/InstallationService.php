@@ -85,7 +85,7 @@ class InstallationService
      * generating a Doofinder store for each group. It handles exceptions for each
      * group individually, allowing the process to continue even if one group fails.
      *
-     * @return array An associative array where the keys are store group IDs and the values are either
+     * @return mixed[] An associative array where the keys are store group IDs and the values are either
      *               true (if the store was successfully created) or an error message (if an exception occurred).
      */
     public function generateDoofinderStores()
@@ -124,7 +124,7 @@ class InstallationService
      * and rethrows the exception.
      *
      * @param GroupInterface $storeGroup The Magento store group to configure with Doofinder.
-     * @return array The response from Doofinder containing installation details.
+     * @return mixed[] The response from Doofinder containing installation details.
      * @throws Exception If an error occurs during the store creation process.
      */
     public function generateDoofinderStore(GroupInterface $storeGroup): array
