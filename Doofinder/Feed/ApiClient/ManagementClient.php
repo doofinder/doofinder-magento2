@@ -13,7 +13,7 @@ use Doofinder\Feed\Errors\QuotaExhausted;
 use Doofinder\Feed\Errors\ThrottledResponse;
 use Doofinder\Feed\Errors\TypeAlreadyExists;
 use Doofinder\Feed\Errors\WrongResponse;
-use Magento\Framework\HTTP\ClientFactory;
+use Doofinder\Feed\ApiClient\ClientFactory;
 
 class ManagementClient
 {
