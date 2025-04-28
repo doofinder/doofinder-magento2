@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -12,7 +13,7 @@ use Doofinder\Feed\Errors\QuotaExhausted;
 use Doofinder\Feed\Errors\ThrottledResponse;
 use Doofinder\Feed\Errors\TypeAlreadyExists;
 use Doofinder\Feed\Errors\WrongResponse;
-use Magento\Framework\HTTP\ClientFactory;
+use Doofinder\Feed\ApiClient\ClientFactory;
 
 class ManagementClient
 {
@@ -66,7 +67,7 @@ class ManagementClient
      * @param array $storeData
      * @return mixed[]
      */
-    public function createStore(array $storeData): array
+    public function createStore($storeData): array
     {
         $response = $this->client->post('/install', $storeData);
 
@@ -92,7 +93,7 @@ class ManagementClient
      */
     public function createSearchEngine(array $searchEngine): array
     {
-        $response = $this->client->post(self::ENDPOINT_SEARCH_ENGINES, $searchEngine);
+        $response = $this->client->post("/install/search-engine", $searchEngine);
 
         return json_decode($response, true);
     }

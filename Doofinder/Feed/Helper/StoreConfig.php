@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
-use Doofinder\Feed\ApiClient\ManagementClientFactory;
 use Doofinder\Feed\Helper\Indexation;
 use Magento\Config\Model\Config\Backend\Admin\Custom;
 use Magento\Catalog\Model\Product;
@@ -100,7 +99,7 @@ class StoreConfig extends AbstractHelper
      * Export only categories present in navigation menus
      */
     public const UPDATE_ON_SAVE_CATEGORIES_IN_NAVIGATION =
-        'doofinder_config_config/update_on_save/categories_in_navigation';
+    'doofinder_config_config/update_on_save/categories_in_navigation';
 
     /**
      * Path to catalog search engine setting
@@ -137,9 +136,6 @@ class StoreConfig extends AbstractHelper
      */
     public const DOOFINDER_CONNECTION = 'doofinderfeed/setup/config';
 
-    /** @var ManagementClientFactory  */
-    private $managementClientFactory;
-
     /** @var StoreManagerInterface */
     private $storeManager;
 
@@ -172,8 +168,6 @@ class StoreConfig extends AbstractHelper
 
     /**
      * StoreConfig constructor.
-     *
-     * @param ManagementClientFactory $managementClientFactory
      * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param StoreWebsiteRelationInterface $storeWebsiteRelation
@@ -187,7 +181,6 @@ class StoreConfig extends AbstractHelper
      * @param ResourceConnection $resource
      */
     public function __construct(
-        ManagementClientFactory $managementClientFactory,
         Context $context,
         StoreManagerInterface $storeManager,
         StoreWebsiteRelationInterface $storeWebsiteRelation,
@@ -200,7 +193,6 @@ class StoreConfig extends AbstractHelper
         Data $backendHelper,
         ResourceConnection $resource
     ) {
-        $this->managementClientFactory = $managementClientFactory;
         $this->storeManager = $storeManager;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
         $this->configWriter = $configWriter;
@@ -213,19 +205,6 @@ class StoreConfig extends AbstractHelper
         $this->resource = $resource;
 
         parent::__construct($context);
-    }
-
-    /**
-     * Creates the store in doofinder's structure
-     *
-     * @param array $storeData
-     * @return mixed[]
-     */
-    public function createStore(array $storeData): array
-    {
-        $managementClient = $this->managementClientFactory->create(['apiType' => 'dooplugins']);
-
-        return $managementClient->createStore($storeData);
     }
 
     /**
@@ -505,6 +484,21 @@ class StoreConfig extends AbstractHelper
         $this->configWriter->save(
             self::DISPLAY_LAYER_INSTALLATION_ID,
             $installationId,
+            ScopeInterface::SCOPE_GROUP,
+            $storeGroupId
+        );
+    }
+
+    /**
+     * Retrieve the installation ID for a given store group.
+     *
+     * @param int $storeGroupId
+     * @return string|null
+     */
+    public function getInstallationId(int $storeGroupId): ?string
+    {
+        return $this->getValueFromConfig(
+            StoreConfig::DISPLAY_LAYER_INSTALLATION_ID,
             ScopeInterface::SCOPE_GROUP,
             $storeGroupId
         );
@@ -1019,8 +1013,8 @@ class StoreConfig extends AbstractHelper
     private function getStoreByGroupId($storeGroupId)
     {
         $connection = $this->resource->getConnection();
-        $storeTable = $this->resource->getTableName('store');
-        $storeSelect = $connection->select()->from($storeTable, ['store_id'])->where(
+        $storeViewTable = $this->resource->getTableName('store');
+        $storeSelect = $connection->select()->from($storeViewTable, ['store_id'])->where(
             'group_id = ?',
             $storeGroupId
         );
