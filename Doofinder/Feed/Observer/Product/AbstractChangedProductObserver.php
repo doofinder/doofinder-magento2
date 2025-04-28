@@ -87,7 +87,8 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
                 
                 if ($product->getStatus() == Status::STATUS_DISABLED) {
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_DELETE);
-                } elseif (!in_array($product->getVisibility(), $this->visibilityAllowed) && count($parentProducts) == 0) {
+                } elseif (!in_array($product->getVisibility(), $this->visibilityAllowed)
+                    && count($parentProducts) == 0) {
                     $this->setOperationType(ChangedItemInterface::OPERATION_TYPE_DELETE);
                 } elseif ($product->getUpdatedAt() == $product->getCreatedAt() &&
                     $operationType == ChangedItemInterface::OPERATION_TYPE_UPDATE
@@ -128,7 +129,8 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         $itemsToInsert = [$itemId];
         $parentProducts = $this->configurableProductType->getParentIdsByChild($itemId);
         if (count($parentProducts) > 0 && $this->getOperationType() != ChangedItemInterface::OPERATION_TYPE_DELETE) {
-            /* When updating a product it's children are also updated, so in this case we include the parentId but don't need to specify the itemId */
+            /* When updating a product it's children are also updated, so in this case
+            we include the parentId but don't need to specify the itemId */
             $itemsToInsert = $parentProducts;
         }
         
@@ -143,7 +145,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
     /**
      * Create changed product
      *
-     * @param ProductInterface $product
+     * @param int $itemId
      * @param int $storeId
      *
      * @return ChangedItem
@@ -160,6 +162,13 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         return $changedItem;
     }
 
+    /**
+     * @inheritdoc
+     */
     abstract protected function getOperationType(): string;
+
+    /**
+     * @inheritdoc
+     */
     abstract protected function setOperationType(string $operationType);
 }

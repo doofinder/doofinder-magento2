@@ -10,6 +10,7 @@ use Doofinder\Feed\Model\ChangedItem\DocumentsProvider;
 use Doofinder\Feed\Model\ChangedItem\ItemType;
 use Doofinder\Feed\Model\ResourceModel\ChangedItem\CollectionFactory as ChangedItemCollectionFactory;
 use Magento\Framework\Indexer\SaveHandler\Batch;
+use Magento\Store\Api\Data\StoreInterface;
 use Psr\Log\LoggerInterface;
 
 class Processor
@@ -99,9 +100,9 @@ class Processor
     /**
      * Function to manage the products that have been stored into the data base
      *
-     * @param $store
-     * @param $itemType
-     * @param $indice
+     * @param StoreInterface $store
+     * @param string $itemType
+     * @param string $indice
      */
     private function manageItems($store, $itemType, $indice)
     {
@@ -113,9 +114,9 @@ class Processor
     /**
      * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
      *
-     * @param $store
-     * @param $itemType
-     * @param $indice
+     * @param StoreInterface $store
+     * @param string $itemType
+     * @param string $indice
      */
     private function createItems($store, $itemType, $indice)
     {
@@ -146,9 +147,9 @@ class Processor
     /**
      * Executes the UPDATE for items stored with this action in doofinder_feed_changed_items table
      *
-     * @param $store
-     * @param $itemType
-     * @param $indice
+     * @param StoreInterface $store
+     * @param string $itemType
+     * @param string $indice
      */
     private function updateItems($store, $itemType, $indice)
     {
@@ -179,9 +180,9 @@ class Processor
     /**
      * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
      *
-     * @param $store
-     * @param $itemType
-     * @param $indice
+     * @param StoreInterface $store
+     * @param string $itemType
+     * @param string $indice
      */
     private function deleteItems($store, $itemType, $indice)
     {
@@ -212,7 +213,7 @@ class Processor
     /**
      * Creates an array with the id of the item
      *
-     * @param $documents
+     * @param int[] $documents
      */
     private function mapItems($documents)
     {
