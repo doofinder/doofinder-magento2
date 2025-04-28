@@ -99,7 +99,7 @@ class StoreConfig extends AbstractHelper
      * Export only categories present in navigation menus
      */
     public const UPDATE_ON_SAVE_CATEGORIES_IN_NAVIGATION =
-        'doofinder_config_config/update_on_save/categories_in_navigation';
+    'doofinder_config_config/update_on_save/categories_in_navigation';
 
     /**
      * Path to catalog search engine setting
@@ -135,7 +135,6 @@ class StoreConfig extends AbstractHelper
      * Path to endpoint to store doofinder connection data (API key, endpoint api, etc.)
      */
     public const DOOFINDER_CONNECTION = 'doofinderfeed/setup/config';
-
 
     /** @var StoreManagerInterface */
     private $storeManager;
@@ -498,7 +497,11 @@ class StoreConfig extends AbstractHelper
      */
     public function getInstallationId(int $storeGroupId): ?string
     {
-        return $this->getValueFromConfig(StoreConfig::DISPLAY_LAYER_INSTALLATION_ID, ScopeInterface::SCOPE_GROUP, $storeGroupId);
+        return $this->getValueFromConfig(
+            StoreConfig::DISPLAY_LAYER_INSTALLATION_ID,
+            ScopeInterface::SCOPE_GROUP,
+            $storeGroupId
+        );
     }
 
     /**
