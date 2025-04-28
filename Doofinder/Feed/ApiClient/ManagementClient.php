@@ -12,6 +12,7 @@ use Doofinder\Feed\Errors\QuotaExhausted;
 use Doofinder\Feed\Errors\ThrottledResponse;
 use Doofinder\Feed\Errors\TypeAlreadyExists;
 use Doofinder\Feed\Errors\WrongResponse;
+use Magento\Framework\HTTP\ClientFactory;
 
 class ManagementClient
 {
@@ -127,7 +128,7 @@ class ManagementClient
      *
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_show
      *
-     * @param string $hashId
+     * @param string $hashid
      * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
@@ -179,6 +180,7 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
+     * @param string $indice
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed

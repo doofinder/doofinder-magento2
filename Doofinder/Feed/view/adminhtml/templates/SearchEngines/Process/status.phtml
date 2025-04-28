@@ -6,16 +6,28 @@
 $statuses =  $block->getSearchEnginesProcessStatus();
 ?>
 <?php if (isset($statuses['error'])): ?>
-    <p><?= $escaper->escapeHtml(__(sprintf('There was an error while requesting search engines process task status: %s', $statuses['error']))) ?></p>
+    <p><?= $escaper->escapeHtml(__(
+        sprintf('There was an error while requesting search engines process task status: %s', $statuses['error'])
+    )) ?></p>
 <?php elseif (isset($statuses['warning'])): ?>
     <?php if ($statuses['warning'] == 'not_found'): ?>
-        <p><?= $escaper->escapeHtml(__('The search engines process task statuses are not ready yet. Please, try again later.')) ?></p>
+        <p>
+            <?= $escaper->escapeHtml(
+                __('The search engines process task statuses are not ready yet. Please, try again later.')
+            ) ?>
+        </p>
     <?php else: ?>
-        <p><?= $escaper->escapeHtml(__(sprintf('There was a warning while requesting search engines process task status: %s', $statuses['warning']))) ?></p>
+        <p><?= $escaper->escapeHtml(__(
+            sprintf('There was a warning while requesting search engines process task status: %s', $statuses['warning'])
+        )) ?></p>
     <?php endif; ?>
 <?php else: ?>
     <div class="admin__data-grid-wrap admin__data-grid-wrap-static">
-        <h2><?= $escaper->escapeHtml(__('Please note that this information refers only to the first indexing process')) ?></h2>
+        <h2>
+            <?= $escaper->escapeHtml(
+                __('Please note that this information refers only to the first indexing process')
+            ) ?>
+        </h2>
         <table class="data-grid" id="gridIndexer_table">
             <thead>
                 <tr>

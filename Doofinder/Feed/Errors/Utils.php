@@ -8,8 +8,8 @@ class Utils
     /**
      * Function for handling errors by it's code
      *
-     * @param $statusCode
-     * @param $response
+     * @param int $statusCode
+     * @param string $response
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -64,7 +64,7 @@ class Utils
     /**
      * Reads the error for it's later processing
      *
-     * @param $response
+     * @param string $response
      * @return string
      */
     private static function readError($response): string

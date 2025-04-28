@@ -26,6 +26,7 @@ class Enable extends AbstractBlock
         $class = isset($column['class']) ? $column['class'] : 'input-text';
         $style = isset($column['style']) ? $column['style'] : '';
 
-        return "<input type=\"checkbox\" id=\"$id\" name=\"$iName\" <%- $cName %> size=\"$size\" class=\"$class\" style=\"$style\" />";
+        return "<input type=\"checkbox\" id=\"$id\" name=\"$iName\" <%- $cName %> size=\"$size\" " .
+            "class=\"$class\" style=\"$style\" />";
     }
 }

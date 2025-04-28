@@ -70,7 +70,7 @@ abstract class AbstractChangedCmsPageObserver implements ObserverInterface
     /**
      * Saves the page into changed item table if necessary
      *
-     * @param CategoryInterface $category
+     * @param PageInterface $page
      * @param int $storeId
      */
     protected function registerChangedItemStore(PageInterface $page, int $storeId)
