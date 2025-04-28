@@ -2,6 +2,8 @@
 
 namespace Doofinder\Feed\ApiClient;
 
+use Magento\Framework\ObjectManagerInterface;
+
 /**
  * Factory class for @see \Doofinder\Feed\ApiClient\Client
  */
@@ -10,7 +12,7 @@ class ClientFactory
     /**
      * Object Manager instance
      *
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager = null;
 
@@ -24,10 +26,10 @@ class ClientFactory
     /**
      * Factory constructor
      *
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param ObjectManagerInterface $objectManager
      * @param string $instanceName
      */
-    public function __construct(\Magento\Framework\ObjectManagerInterface $objectManager, $instanceName = '\\Doofinder\\Feed\\ApiClient\\Client')
+    public function __construct(ObjectManagerInterface $objectManager, $instanceName = Client::class)
     {
         $this->_objectManager = $objectManager;
         $this->_instanceName = $instanceName;
@@ -37,7 +39,7 @@ class ClientFactory
      * Create class instance with specified parameters
      *
      * @param array $data
-     * @return \Doofinder\Feed\ApiClient\Client
+     * @return Client
      */
     public function create(array $data = [])
     {
