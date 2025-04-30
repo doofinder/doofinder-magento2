@@ -5,7 +5,11 @@
         'mage/translate'
     ], function($, _t){
         $('#manual-indexing').click(_ => {
-            if (confirm(_t("This action will update directly the products waiting to be updated in Doofinder. Do you want to proceed?"))) {
+            const message = _t(
+                "This action will update directly the products waiting to be updated in Doofinder. " +
+                "Do you want to proceed?"
+            );
+            if (confirm(message)) {
                 new Ajax.Request('<?= $escaper->escapeUrl($block->updateOnClick()); ?>', {
                     loaderArea:     true,
                     asynchronous:   true,
