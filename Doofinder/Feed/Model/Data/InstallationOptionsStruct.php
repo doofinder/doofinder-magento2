@@ -23,16 +23,34 @@ class InstallationOptionsStruct implements JsonSerializable
     private $token;
 
     /**
+     * @var string Url identifier
+     */
+    private $url;
+
+    /**
      * InstallationOptionsStruct constructor.
      *
+     * @param string $url
      * @param int $websiteId
+     * @param int $storeGroupId
      * @param string $token
      */
-    public function __construct(int $websiteId, int $storeGroupId, string $token)
+    public function __construct(string $url, int $websiteId, int $storeGroupId, string $token)
     {
+        $this->url = $url;
         $this->websiteId = $websiteId;
         $this->storeGroupId = $storeGroupId;
         $this->token = $token;
+    }
+
+    /**
+     * Get the URL.
+     *
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
     }
 
     /**
@@ -73,6 +91,7 @@ class InstallationOptionsStruct implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
+            'url' => $this->getUrl(),
             'website_id' => $this->getWebsiteId(),
             'store_group_id' => $this->getStoreGroupId(),
             'token' => $this->getToken()
