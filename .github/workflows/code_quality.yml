@@ -31,6 +31,10 @@ jobs:
       - name: Install dependencies for CI
         run: |
           COMPOSER=composer-ci.json composer install --no-interaction --prefer-dist
+      - name: Set PHPCS Magento2 Standard
+        run: |
+          vendor/bin/phpcs --config-set installed_paths vendor/magento/magento-coding-standard
+          vendor/bin/phpcs -i
 
       - name: Run PHP Code Sniffer (phpcs)
         id: phpcs
