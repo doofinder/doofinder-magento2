@@ -118,6 +118,13 @@ This plugin has been thoroughly tested and confirmed to be compatible with the f
 
 ## Tested compatibility with the following M2 versions
 
+- Magento 2.3.0
+- Magento 2.3.5-p3
+- Magento 2.3.7-p4
+- Magento 2.4.0
+- Magento 2.4.1
+- Magento 2.4.2
+- Magento 2.4.3
 - Magento 2.4.4
 - Magento 2.4.5
 - Magento 2.4.6
