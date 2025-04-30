@@ -74,12 +74,23 @@ class CustomAttributes extends ArraySerialized implements ProcessorInterface
             __('To apply the changes in the custom attributes to your feed, it will be necessary to reindex it')
         );
 
-        // For value validations
-        $exceptions = $this->getValue();
-
-        $this->setValue($exceptions);
-
         return parent::beforeSave();
+    }
+
+    /**
+     * Get old value from existing config
+     *
+     * @return string
+     */
+    public function getOldValue()
+    {
+        return (string)$this->serializer->serialize(
+            $this->_config->getValue(
+                $this->getPath(),
+                $this->getScope() ?: ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+                $this->getScopeCode()
+            )
+        );
     }
 
     /**
