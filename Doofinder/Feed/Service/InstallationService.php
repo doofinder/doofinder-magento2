@@ -13,7 +13,7 @@ use Exception;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Integration\Block\Adminhtml\Integration\Tokens as IntegrationTokens;
 use Magento\Integration\Model\IntegrationService;
-use Magento\Store\Api\Data\GroupInterface;
+use Magento\Store\Model\Group;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Escaper;
 use Psr\Log\LoggerInterface;
@@ -131,22 +131,27 @@ class InstallationService
      * If an error occurs during the process, it logs the error with the store group's name
      * and rethrows the exception.
      *
-     * @param GroupInterface $storeGroup The Magento store group to configure with Doofinder.
+     * @param Group $storeGroup The Magento store group to configure with Doofinder.
      * @return array The response from Doofinder containing installation details.
      * @throws Exception If an error occurs during the store creation process.
      */
-    public function generateDoofinderStore(GroupInterface $storeGroup): array
+    public function generateDoofinderStore(Group $storeGroup): array
     {
         try {
 
             $websiteId = (int)$storeGroup->getWebsiteId();
+            $storeGroupId = (int)$storeGroup->getId();
             $integrationId = $this->storeConfig->getIntegrationId();
             $integrationToken =
                 $this->integrationService->get($integrationId)
                 ->getData(IntegrationTokens::DATA_TOKEN);
+            $storeViewBaseUrl = $storeGroup->getDefaultStore()->getBaseUrl();
+            $schemaLessBaseUrl = preg_replace('#^https?://#', '', $storeViewBaseUrl);
 
             $installationOptions = new InstallationOptionsStruct(
+                $schemaLessBaseUrl,
                 $websiteId,
+                $storeGroupId,
                 $integrationToken
             );
 
