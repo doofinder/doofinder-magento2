@@ -15,6 +15,11 @@ class Integration implements OptionSourceInterface
      */
     private $collection;
 
+    /**
+     * Integration constructor.
+     *
+     * @param CollectionFactory $collectionFactory Factory for creating collection instances.
+     */
     public function __construct(
         CollectionFactory $collectionFactory
     ) {

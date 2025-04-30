@@ -70,7 +70,7 @@ if [[ "$MAGENTO_VERSION" =~ ^2\.4\. ]]; then
 	--db-password="$MYSQL_PASSWORD" \
 	--enable-syslog-logging=1 \
 	--cleanup-database \
-	--disable-modules Magento_AdminAdobeImsTwoFactorAuth,Magento_TwoFactorAuth \
+	--disable-modules Magento_TwoFactorAuth \
   $SEARCH_PARAMS
 
 	${MAGENTO_BIN} config:set web/unsecure/base_url  "http://${MAGENTO_BASE_URL}/" > /dev/null && echo "Config set \`web/unsecure/base_url\` to \`http://${MAGENTO_BASE_URL}/\`"

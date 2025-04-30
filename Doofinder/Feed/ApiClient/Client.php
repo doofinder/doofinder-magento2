@@ -56,8 +56,8 @@ class Client
     /**
      * @param StoreConfig $storeConfig
      * @param GuzzleClient $guzzleClient
-     * @param string $apiType
      * @param string|null $apiKey
+     * @param string $apiType
      * @throws InvalidApiKey
      */
     public function __construct(
@@ -110,7 +110,7 @@ class Client
      * Request with POST verb
      *
      * @param string $path
-     * @param array $body
+     * @param mixed $body
      * @return string
      * @throws BadRequest
      * @throws IndexingInProgress
@@ -121,7 +121,7 @@ class Client
      * @throws TypeAlreadyExists
      * @throws WrongResponse
      */
-    public function post(string $path, array $body): string
+    public function post(string $path, $body): string
     {
         try {
             $this->response = $this->guzzleClient->post(
@@ -269,6 +269,8 @@ class Client
     }
 
     /**
+     * Gets the base URL to make request to Doofinder depending on the service.
+     *
      * @return string
      */
     private function getApiBaseURL(): string
@@ -276,19 +278,24 @@ class Client
         $url = getenv("DOOFINDER_ADMIN_URL") ?: "https://admin.doofinder.com";
         switch ($this->apiType) {
             case self::DOOPLUGINS:
-                $url = sprintf(getenv("DOOFINDER_PLUGINS_URL_FORMAT") ?: "https://%s-plugins.doofinder.com", $this->clusterRegion);
+                $url = sprintf(getenv("DOOFINDER_PLUGINS_URL_FORMAT") ?:
+                    "https://%s-plugins.doofinder.com", $this->clusterRegion);
                 break;
             case self::SEARCH_API:
-                $url = sprintf(getenv("DOOFINDER_SEARCH_URL_FORMAT") ?: "https://%s-search.doofinder.com", $this->clusterRegion);
+                $url = sprintf(getenv("DOOFINDER_SEARCH_URL_FORMAT") ?:
+                    "https://%s-search.doofinder.com", $this->clusterRegion);
                 break;
             case self::MANAGEMENT_API:
-                $url = sprintf(getenv("DOOFINDER_API_URL_FORMAT") ?: "https://%s-api.doofinder.com", $this->clusterRegion);
+                $url = sprintf(getenv("DOOFINDER_API_URL_FORMAT") ?:
+                    "https://%s-api.doofinder.com", $this->clusterRegion);
                 break;
         }
         return $url;
     }
 
     /**
+     * Parses error response taking into account line breaks
+     *
      * @param string $message
      * @return string
      */
@@ -300,8 +307,17 @@ class Client
     }
 
     /**
-     * @param array $ids
-     * @return array
+     * Flattens a multidimensional array of IDs into a single-level array.
+     *
+     * This utility method takes an array that may contain nested arrays of IDs
+     * and flattens it into a single, one-dimensional array.
+     *
+     * Example:
+     * Input: [1, [2, 3], [[4], 5]]
+     * Output: [1, 2, 3, 4, 5]
+     *
+     * @param mixed[] $ids A multidimensional array potentially containing nested arrays of IDs.
+     * @return int[] A flat array containing all IDs from the input array.
      */
     private function flattenArray(array $ids): array
     {

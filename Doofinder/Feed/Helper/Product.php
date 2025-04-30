@@ -81,7 +81,7 @@ class Product extends AbstractHelper
 
     /**
      * @see /Doofinder/Feed/Observer/Product/AbstractChangedProductObserver.php
-     * 
+     *
      * @var []
      */
     private $visibilityAllowed;
@@ -157,7 +157,7 @@ class Product extends AbstractHelper
                 && !in_array($product->getVisibility(), $this->visibilityAllowed)
             ) {
                 $productId = $parents[0];
-            }
+        }
         $filterData = [
             UrlRewrite::ENTITY_ID => $productId,
             UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,
@@ -293,7 +293,7 @@ class Product extends AbstractHelper
      * @param array $catTree
      * @param boolean $fromNavigation
      *
-     * @return array
+     * @return mixed[]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function filterCategories(array $catTree, ?bool $fromNavigation = false): array
@@ -349,7 +349,6 @@ class Product extends AbstractHelper
      *
      * @param ProductModel $product
      * @param string|null $size
-     * @param string|null $field
      *
      * @return string|null
      */
@@ -365,7 +364,7 @@ class Product extends AbstractHelper
         */
         $imageRole = $this->findRoleToUse($product);
 
-        if (is_null($imageRole)) {
+        if (null === $imageRole) {
             return null;
         }
 
@@ -469,7 +468,7 @@ class Product extends AbstractHelper
      *
      * @param ProductModel $product
      * @param string $attributeCode
-     * @return array|null
+     * @return mixed[]|null
      */
     public function getAttributeArray(ProductModel $product, string $attributeCode): ?array
     {

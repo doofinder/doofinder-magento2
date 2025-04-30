@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
-use Doofinder\Feed\ApiClient\ManagementClientFactory;
 use Doofinder\Feed\Helper\Indexation;
 use Magento\Config\Model\Config\Backend\Admin\Custom;
 use Magento\Catalog\Model\Product;
@@ -99,7 +98,8 @@ class StoreConfig extends AbstractHelper
     /**
      * Export only categories present in navigation menus
      */
-    public const UPDATE_ON_SAVE_CATEGORIES_IN_NAVIGATION = 'doofinder_config_config/update_on_save/categories_in_navigation';
+    public const UPDATE_ON_SAVE_CATEGORIES_IN_NAVIGATION =
+    'doofinder_config_config/update_on_save/categories_in_navigation';
 
     /**
      * Path to catalog search engine setting
@@ -136,9 +136,6 @@ class StoreConfig extends AbstractHelper
      */
     public const DOOFINDER_CONNECTION = 'doofinderfeed/setup/config';
 
-    /** @var ManagementClientFactory  */
-    private $managementClientFactory;
-
     /** @var StoreManagerInterface */
     private $storeManager;
 
@@ -171,8 +168,6 @@ class StoreConfig extends AbstractHelper
 
     /**
      * StoreConfig constructor.
-     *
-     * @param ManagementClientFactory $managementClientFactory
      * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param StoreWebsiteRelationInterface $storeWebsiteRelation
@@ -186,7 +181,6 @@ class StoreConfig extends AbstractHelper
      * @param ResourceConnection $resource
      */
     public function __construct(
-        ManagementClientFactory $managementClientFactory,
         Context $context,
         StoreManagerInterface $storeManager,
         StoreWebsiteRelationInterface $storeWebsiteRelation,
@@ -199,7 +193,6 @@ class StoreConfig extends AbstractHelper
         Data $backendHelper,
         ResourceConnection $resource
     ) {
-        $this->managementClientFactory = $managementClientFactory;
         $this->storeManager = $storeManager;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
         $this->configWriter = $configWriter;
@@ -212,19 +205,6 @@ class StoreConfig extends AbstractHelper
         $this->resource = $resource;
 
         parent::__construct($context);
-    }
-
-    /**
-     * Creates the store in doofinder's structure
-     *
-     * @param array $storeData
-     * @return array
-     */
-    public function createStore(array $storeData): array
-    {
-        $managementClient = $this->managementClientFactory->create(['apiType' => 'dooplugins']);
-
-        return $managementClient->createStore($storeData);
     }
 
     /**
@@ -243,7 +223,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Function to get a store by id
      *
-     * @param $storeId
+     * @param int|null $storeId
      */
     public function getStoreById($storeId)
     {
@@ -277,7 +257,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Function to get the actual scope based on the request parameter
      *
-     * @return array
+     * @return mixed[]
      */
     public function getCurrentScope(): array
     {
@@ -459,7 +439,7 @@ class StoreConfig extends AbstractHelper
     /**
      * Set API key.
      *
-     * @param $value
+     * @param string $value
      */
     public function setApiKey($value)
     {
@@ -510,6 +490,21 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
+     * Retrieve the installation ID for a given store group.
+     *
+     * @param int $storeGroupId
+     * @return string|null
+     */
+    public function getInstallationId(int $storeGroupId): ?string
+    {
+        return $this->getValueFromConfig(
+            StoreConfig::DISPLAY_LAYER_INSTALLATION_ID,
+            ScopeInterface::SCOPE_GROUP,
+            $storeGroupId
+        );
+    }
+
+    /**
      * Get display layer.
      *
      * @return string|null
@@ -524,7 +519,8 @@ class StoreConfig extends AbstractHelper
                 (int)$storeGroupId
             );
 
-            if (!empty($displayLayerScript) && 1 !== preg_match('/dfLayerOptions/', $displayLayerScript) && 1 !== preg_match('/doofinderApp/', $displayLayerScript)) {
+            if (!empty($displayLayerScript) && 1 !== preg_match('/dfLayerOptions/', $displayLayerScript) &&
+            1 !== preg_match('/doofinderApp/', $displayLayerScript)) {
                 $store = $this->getCurrentStore();
                 $currency = $store->getCurrentCurrency()->getCode();
                 $language_country = $this->getLanguageFromStore($store);
@@ -533,7 +529,8 @@ class StoreConfig extends AbstractHelper
 
                 $singleScriptAdditionalConfig = <<<EOT
                     <script>
-                        (function(w, k) {w[k] = window[k] || function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
+                        (function(w, k) {w[k] = window[k] || 
+                        function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
 
                         doofinderApp("config", "language", "$language")
                         doofinderApp("config", "currency", "$currency")
@@ -807,7 +804,11 @@ class StoreConfig extends AbstractHelper
         $this->configWriter->save(self::INDICE_CALLBACK, ($callback ? 1 : 0), ScopeInterface::SCOPE_STORES, $storeId);
         $enabled = 1;
         foreach ($this->getAllStores() as $store) {
-            if ($this->getValueFromConfig(self::INDICE_CALLBACK, ScopeInterface::SCOPE_STORES, (int)$store->getId()) == 0) {
+            if ($this->getValueFromConfig(
+                self::INDICE_CALLBACK,
+                ScopeInterface::SCOPE_STORES,
+                (int)$store->getId()
+            ) == 0) {
                 $enabled = 0;
                 break;
             }
@@ -819,7 +820,7 @@ class StoreConfig extends AbstractHelper
      * Gets Doofinder attributes to be merged later
      *
      * @param int|null $storeId
-     * @return array
+     * @return mixed[]
      */
     public function getDoofinderAttributes(?int $storeId = null): array
     {
@@ -861,7 +862,7 @@ class StoreConfig extends AbstractHelper
      *
      * @param int|null $id
      * @param string|null $scope
-     * @return Array
+     * @return mixed[]
      */
     public function getCustomAttributes(?int $id = null, ?string $scope = ScopeInterface::SCOPE_STORES): array
     {
@@ -968,6 +969,10 @@ class StoreConfig extends AbstractHelper
      *      zone: 'eu1'
      *    };
      *
+     * @param string $liveLayerScript
+     * @param string $locale
+     * @param string $currency
+     *
      * @return string
      *    const dfLayerOptions = {
      *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
@@ -986,7 +991,11 @@ class StoreConfig extends AbstractHelper
         }
 
         if (strpos($liveLayerScript, 'currency:') !== false) {
-            $liveLayerScript = preg_replace("/(\/\/\s*)?(currency:)(.*?)(\n|,)/m", "$2 '$currency'$4", $liveLayerScript);
+            $liveLayerScript = preg_replace(
+                "/(\/\/\s*)?(currency:)(.*?)(\n|,)/m",
+                "$2 '$currency'$4",
+                $liveLayerScript
+            );
         } else {
             $pos = strpos($liveLayerScript, "{");
             $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tcurrency: '$currency',", $pos + 1, 0);
@@ -999,13 +1008,13 @@ class StoreConfig extends AbstractHelper
      * Get stores by store_group id
      *
      * @param int $storeGroupId
-     * @return array
+     * @return mixed[]
      */
     private function getStoreByGroupId($storeGroupId)
     {
         $connection = $this->resource->getConnection();
-        $storeTable = $this->resource->getTableName('store');
-        $storeSelect = $connection->select()->from($storeTable, ['store_id'])->where(
+        $storeViewTable = $this->resource->getTableName('store');
+        $storeSelect = $connection->select()->from($storeViewTable, ['store_id'])->where(
             'group_id = ?',
             $storeGroupId
         );

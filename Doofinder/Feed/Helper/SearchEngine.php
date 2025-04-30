@@ -78,7 +78,7 @@ class SearchEngine extends AbstractHelper
      *
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_list
      *
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -105,7 +105,7 @@ class SearchEngine extends AbstractHelper
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_list
      *
      * @param array $searchEngine
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -133,7 +133,7 @@ class SearchEngine extends AbstractHelper
      *
      * @param string $hashId
      * @param string|null $callbackUrl
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -158,7 +158,7 @@ class SearchEngine extends AbstractHelper
      * Get search engine by hashid
      *
      * @param string|null $hashId
-     * @return array|null
+     * @return mixed[]|null
      * @throws NoSuchEntityException
      */
     public function getSearchEngine(string $hashId): ?array
@@ -174,7 +174,7 @@ class SearchEngine extends AbstractHelper
      * Get search engine by store code
      *
      * @param StoreInterface $store
-     * @return array|null
+     * @return mixed[]|null
      * @throws NoSuchEntityException
      */
     public function getSearchEngineByStore(StoreInterface $store): ?array

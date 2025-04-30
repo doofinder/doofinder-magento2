@@ -24,7 +24,7 @@ interface ChangedItemRepositoryInterface
     /**
      * Retrieve entity by attribute
      *
-     * @param $value
+     * @param mixed $value
      * @param string|null $field
      * @return ChangedItemInterface
      * @throws NoSuchEntityException

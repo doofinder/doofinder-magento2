@@ -19,7 +19,7 @@ define([
                 signupEndpoint: '${ $.signupEndpoint }',
                 loginEndpoint: '${ $.loginEndpoint }',
                 checkAPIKeyUrl: '${ $.checkAPIKeyUrl }',
-                createStoreUrl: '${ $.createStoreUrl }',
+                setupUrl: '${ $.setupUrl }',
                 doofinderConnectUrl: '${ $.doofinderConnectUrl}'
             },
             paramsPopup: '${ $.paramsPopup }'
@@ -98,7 +98,7 @@ define([
                 }
                 // create store
                 $.ajax({
-                    url: self.urls.createStoreUrl,
+                    url: self.urls.setupUrl,
                     method: 'GET',
                     cache: false,
                     data: {
@@ -107,7 +107,11 @@ define([
                     beforeSend: function () {
                         addAjaxMessage($.mage.__('Creating doofinder stores ...'));
                     }
-                }).done(function () {
+                }).done(function (result) {
+                    alert({
+                        title: $.mage.__('Notice'),
+                        content: $.mage.__(result['message']),
+                    });
                     addAjaxMessage($.mage.__(
                         'The setup wizard has successfully finished but search engine cannot be used until ' +
                         'index processing has completed.<br>Now, you can check process task status or go ' +
@@ -159,11 +163,11 @@ define([
 
     function ajaxRequestFail(jqXHR, status, error) {
         $('body').trigger('processStop');
+        var message = 'Installation has failed. Please take a look into the logs for more information. ' +
+              'Maybe you need uninstall and install again the extension following documentation instructions. ';
+        addAjaxMessage($.mage.__(message));
         alert({
-            content: $.mage.__(
-              'Installation has failed. Please take a look into the logs for more information. ' +
-              'Maybe you need uninstall and install again the extension following documentation instructions. '
-            )
+            content: $.mage.__(message)
         });
         window.console && console.log(status + ': ' + error + '\nResponse text:\n' + jqXHR.responseText);
     }

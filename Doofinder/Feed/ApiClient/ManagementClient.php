@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -12,6 +13,7 @@ use Doofinder\Feed\Errors\QuotaExhausted;
 use Doofinder\Feed\Errors\ThrottledResponse;
 use Doofinder\Feed\Errors\TypeAlreadyExists;
 use Doofinder\Feed\Errors\WrongResponse;
+use Doofinder\Feed\ApiClient\ClientFactory;
 
 class ManagementClient
 {
@@ -41,7 +43,7 @@ class ManagementClient
      *
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_list
      *
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -63,9 +65,9 @@ class ManagementClient
      * Creates the store structure in Doofinder
      *
      * @param array $storeData
-     * @return array
+     * @return mixed[]
      */
-    public function createStore(array $storeData): array
+    public function createStore($storeData): array
     {
         $response = $this->client->post('/install', $storeData);
 
@@ -78,7 +80,7 @@ class ManagementClient
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_create
      *
      * @param array $searchEngine
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -91,7 +93,7 @@ class ManagementClient
      */
     public function createSearchEngine(array $searchEngine): array
     {
-        $response = $this->client->post(self::ENDPOINT_SEARCH_ENGINES, $searchEngine);
+        $response = $this->client->post("/install/search-engine", $searchEngine);
 
         return json_decode($response, true);
     }
@@ -103,7 +105,7 @@ class ManagementClient
      *
      * @param string $hashId
      * @param string|null $callbackUrl
-     * @return array
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -127,8 +129,8 @@ class ManagementClient
      *
      * @see https://docs.doofinder.com/api/management/v2/#operation/search_engine_show
      *
-     * @param string $hashId
-     * @return array
+     * @param string $hashid
+     * @return mixed[]
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed
@@ -179,6 +181,7 @@ class ManagementClient
      *
      * @param array $items
      * @param string $hashId
+     * @param string $indice
      * @throws BadRequest
      * @throws IndexingInProgress
      * @throws NotAllowed

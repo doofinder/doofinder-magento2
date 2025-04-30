@@ -3,20 +3,26 @@
     <description>Custom PHPCS rules for Magento 2 Module</description>
 
     <!-- Inherit the Magento 2 coding standard -->
-    <rule ref="Magento2"/>
+    <rule ref="Magento2">
+        <exclude name="Magento2.Functions.StaticFunction" />
+        <!-- Required exclusion until we solve the getenv() issue -->
+        <exclude name="Magento2.Functions.DiscouragedFunction.Discouraged" />
+    </rule>
 
     <!-- Define directories to be checked -->
-    <file>.</file>
+    <file>Doofinder/Feed</file>
 
-    <!-- Set the minimum severity level -->
-    <arg value="-severity=10"/>
+    <ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
 
     <!-- Exclude the vendor directory -->
     <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>Doofinder/Feed/vendor/*</exclude-pattern>
+    <exclude-pattern>app/*</exclude-pattern>
+    <exclude-pattern>*.less</exclude-pattern>
 
     <!-- Specify additional settings -->
     <arg value="-colors"/>
-    <arg value="-report=summary"/>
+    <arg value="-report=full,summary"/>
     <arg value="-extensions=php,phtml"/>
 
     <!-- Add other custom rules or exclusions as needed -->

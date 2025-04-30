@@ -106,7 +106,7 @@ class Inventory extends AbstractHelper
      * @param ProductModel $product
      * @param int|null $stockId
      *
-     * @return array
+     * @return mixed[]
      */
     private function getQuantityAndStockStatusWithMSI(ProductModel $product, ?int $stockId = null)
     {
@@ -179,7 +179,7 @@ class Inventory extends AbstractHelper
      * @param string $sku
      * @param int|null $stockId
      *
-     * @return array
+     * @return mixed[]
      */
     private function getStockItemData(string $sku, ?int $stockId = null)
     {
@@ -190,7 +190,7 @@ class Inventory extends AbstractHelper
 
         return [
             GetStockItemDataInterface::QUANTITY => $stockItemData[GetStockItemDataInterface::QUANTITY] ?? 0,
-            GetStockItemDataInterface::IS_SALABLE => (bool)($stockItemData[GetStockItemDataInterface::IS_SALABLE] ?? false)
+            GetStockItemDataInterface::IS_SALABLE => (bool)$stockItemData[GetStockItemDataInterface::IS_SALABLE]
         ];
     }
 
@@ -199,7 +199,7 @@ class Inventory extends AbstractHelper
      *
      * @param ProductModel $product
      *
-     * @return array
+     * @return mixed[]
      */
     private function getQuantityAndStockStatusWithoutMSI(ProductModel $product)
     {
@@ -272,7 +272,9 @@ class Inventory extends AbstractHelper
 
     /**
      * Function to detect if MSI module is active or not.
-     * For the moment is enough checking those two dependencies because we're working only with those.
+     *
+     * For the moment is enough checking those two dependencies
+     * because we're working only with those.
      *
      * @return bool
      */

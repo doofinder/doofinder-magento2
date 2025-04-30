@@ -48,9 +48,12 @@ class Index extends AbstractDb
     }
 
     /**
-     * Implementation of abstract construct
+     * Implementation of abstract construct.
+     *
+     * DO NOT REMOVE since it's required
      */
     protected function _construct()
     {
+        return true;
     }
 }

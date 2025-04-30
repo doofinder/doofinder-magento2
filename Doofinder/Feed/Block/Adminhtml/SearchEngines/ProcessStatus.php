@@ -13,6 +13,11 @@ class ProcessStatus extends Template
     /** @var StoreConfig */
     private $storeConfig;
 
+    /**
+     * @param StoreConfig $storeConfig
+     * @param Template\Context $context
+     * @param array $data
+     */
     public function __construct(
         StoreConfig $storeConfig,
         Template\Context $context,
@@ -25,7 +30,7 @@ class ProcessStatus extends Template
     /**
      * Get Search Engines Process Task Status
      *
-     * @return array
+     * @return mixed[]
      */
     public function getSearchEnginesProcessStatus(): array
     {
