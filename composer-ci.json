@@ -1,27 +1,24 @@
 {
-    "license": [
-        "OSL-3.0",
-        "AFL-3.0"
-    ],
-    "authors": [
-        {
-            "name": "Doofinder",
-            "email": "developers@doofinder.com",
-            "role": "Developer"
-        }
-    ],
-    "require-dev": {
-        "magento/magento-coding-standard": "*"
-    },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://repo.magento.com/"
-        }
-    ],
-    "config": {
-        "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
-        }
+  "license": ["OSL-3.0", "AFL-3.0"],
+  "authors": [
+    {
+      "name": "Doofinder",
+      "email": "developers@doofinder.com",
+      "role": "Developer"
     }
+  ],
+  "require-dev": {
+    "magento/magento-coding-standard": "^23.0"
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://repo.magento.com/"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
 }
