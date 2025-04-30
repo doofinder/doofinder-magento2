@@ -1,9 +1,4 @@
-<?php
-// Workaround that adds compatibility for Magento versions < 2.4.0
-if (!isset($escaper)) {
-    $escaper = method_exists($block, 'escapeHtml') ? $block : \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Framework\Escaper::class);
-}
-?>
+<?php $escaper = $block->getEscaper(); ?>
 <script>
     require([
         'jquery',

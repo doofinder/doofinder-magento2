@@ -42,7 +42,7 @@ class Throttle
     public function __call(string $name, ?array $args = null)
     {
         if (method_exists($this->obj, $name)) {
-            return $this->throttle($name, 1,$args);
+            return $this->throttle($name, 1, $args);
         }
 
         throw new \BadMethodCallException('Unknown method: ' . $name);

@@ -31,9 +31,9 @@ class Cron extends ConfigValue
      * @param ScopeConfigInterface $config
      * @param StoreConfigFactory $storeConfigFactory
      * @param TypeListInterface $cacheTypeList
+     * @param array $data
      * @param AbstractResource $resource
      * @param AbstractDb $resourceCollection
-     * @param array $data
      */
     public function __construct(
         Context $context,

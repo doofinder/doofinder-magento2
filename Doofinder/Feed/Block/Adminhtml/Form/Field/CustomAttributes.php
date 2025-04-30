@@ -8,6 +8,7 @@ use Magento\Framework\DataObject;
 use Doofinder\Feed\Block\Adminhtml\Form\Field\CustomAttributes\Enable;
 use Doofinder\Feed\Block\Adminhtml\Form\Field\CustomAttributes\Code;
 use Doofinder\Feed\Helper\StoreConfig;
+use Magento\Framework\Escaper;
 
 /**
  * Class to manage custom attributes in the config section
@@ -18,36 +19,57 @@ class CustomAttributes extends AbstractFieldArray
      * @var string
      */
     protected $_template = 'Doofinder_Feed::System/Config/customAttributes.phtml';
+
     /**
      * @var Code
      */
     protected $codeRenderer;
+
     /**
      * @var Enable
      */
     protected $enableRenderer;
+
     /**
      * @var StoreConfig
      */
     protected $helper;
 
     /**
+     * @var Escaper
+     */
+    protected $escaper;
+
+    /**
      * @param Context $context
      * @param Code $codeRenderer
      * @param Enable $enableRenderer
      * @param StoreConfig $helper
+     * @param Escaper $escaper
      */
     public function __construct(
         Context $context,
         Code $codeRenderer,
         Enable $enableRenderer,
-        StoreConfig $helper
+        StoreConfig $helper,
+        Escaper $escaper
     ) {
-        $this->codeRenderer   = $codeRenderer;
+        $this->codeRenderer = $codeRenderer;
         $this->enableRenderer = $enableRenderer;
         $this->helper = $helper;
+        $this->escaper = $escaper;
 
         parent::__construct($context);
+    }
+
+    /**
+     * Make Escaper available to the template
+     *
+     * @return Escaper
+     */
+    public function getEscaper()
+    {
+        return $this->escaper;
     }
 
     /**
@@ -63,7 +85,7 @@ class CustomAttributes extends AbstractFieldArray
 
         parent::_construct();
     }
-    
+
     /**
      * Obtain existing data from form element
      *

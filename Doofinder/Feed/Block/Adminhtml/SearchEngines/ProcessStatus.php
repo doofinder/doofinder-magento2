@@ -7,24 +7,41 @@ namespace Doofinder\Feed\Block\Adminhtml\SearchEngines;
 use Doofinder\Feed\Helper\StoreConfig;
 use Exception;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
 
 class ProcessStatus extends Template
 {
     /** @var StoreConfig */
     private $storeConfig;
 
+    /** @var Escaper */
+    private $escaper;
+
     /**
      * @param StoreConfig $storeConfig
      * @param Template\Context $context
+     * @param Escaper $escaper
      * @param array $data
      */
     public function __construct(
         StoreConfig $storeConfig,
         Template\Context $context,
+        Escaper $escaper,
         array $data = []
     ) {
         $this->storeConfig = $storeConfig;
+        $this->escaper = $escaper;
         parent::__construct($context, $data);
+    }
+
+    /**
+     * Make Escaper available to the template
+     *
+     * @return Escaper
+     */
+    public function getEscaper()
+    {
+        return $this->escaper;
     }
 
     /**

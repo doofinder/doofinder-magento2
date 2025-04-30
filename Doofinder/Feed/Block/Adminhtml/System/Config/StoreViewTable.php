@@ -6,6 +6,7 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Magento\Framework\Escaper;
 use Magento\Store\Model\Group;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Website;
@@ -30,21 +31,29 @@ class StoreViewTable extends Field
     protected $storeConfig;
 
     /**
+     * @var Escaper
+     */
+    protected $escaper;
+
+    /**
      * StoreViewTable constructor.
      *
      * @param Context $context
      * @param Website $website
      * @param StoreConfig $storeConfig
+     * @param Escaper $escaper
      * @param array $data
      */
     public function __construct(
         Context $context,
         Website $website,
         StoreConfig $storeConfig,
+        Escaper $escaper,
         array $data = []
     ) {
         $this->website = $website;
         $this->storeConfig = $storeConfig;
+        $this->escaper = $escaper;
         parent::__construct($context, $data);
     }
 

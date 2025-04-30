@@ -36,9 +36,9 @@ class Updateonsave extends ConfigValue
      * @param StoreConfigFactory $storeConfigFactory
      * @param TypeListInterface $cacheTypeList
      * @param ValueFactory $configValueFactory
+     * @param array $data
      * @param AbstractResource $resource
      * @param AbstractDb $resourceCollection
-     * @param array $data
      */
     public function __construct(
         Context $context,
