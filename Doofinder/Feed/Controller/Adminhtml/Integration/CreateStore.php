@@ -34,7 +34,7 @@ class CreateStore extends Action
     protected $escaper;
 
     /**
-     * Constructor
+     * CreateStore constructor.
      *
      * @param Context $context
      * @param JsonFactory $jsonFactory
@@ -42,6 +42,7 @@ class CreateStore extends Action
      * @param InstallationService $installationService
      * @param StoreManagerInterface $storeManager
      */
+
     public function __construct(
         Context $context,
         JsonFactory $jsonFactory,

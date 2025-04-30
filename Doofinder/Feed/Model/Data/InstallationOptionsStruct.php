@@ -68,7 +68,7 @@ class InstallationOptionsStruct implements JsonSerializable
     /**
      * Specify data which should be serialized to JSON.
      *
-     * @return array
+     * @return mixed[]
      */
     public function jsonSerialize(): array
     {

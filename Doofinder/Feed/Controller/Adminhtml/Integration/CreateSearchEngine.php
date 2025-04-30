@@ -13,7 +13,6 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Escaper;
 use Magento\Framework\Webapi\Exception as WebapiException;
 
-
 class CreateSearchEngine extends Action
 {
     /** @var JsonFactory */
@@ -33,6 +32,8 @@ class CreateSearchEngine extends Action
      *
      * @param JsonFactory $resultJsonFactory
      * @param StoreConfig $storeConfig
+     * @param SearchEngineService $searchEngineService
+     * @param Escaper $escaper
      * @param Context $context
      */
     public function __construct(
@@ -67,7 +68,7 @@ class CreateSearchEngine extends Action
         } catch (Exception $e) {
             $resultJson->setData([
                 'success' => false,
-                'message' => $this->escaper->escapeHtml($e->getMessage()),
+                'message' => $this->escaper->escapeHtml('Error creating search engine:' . $e->getMessage()),
             ])->setHttpResponseCode(WebapiException::HTTP_INTERNAL_ERROR);
         }
 

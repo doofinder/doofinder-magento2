@@ -48,7 +48,21 @@ class Config extends Action implements HttpPostActionInterface
     }
 
     /**
-     * Store the info related with doofinder platform
+     * Store the info related with Doofinder platform.
+     *
+     * This method handles the automatic setup process by verifying a hashed installer token
+     * received as a request parameter. If the token is valid (i.e., matches the hash of the
+     * expected redirect URL), it checks if an API token is also provided and stores it using
+     * a region prefix (extracted from the API endpoint) into the Doofinder configuration.
+     *
+     * This process is intended to securely link the Magento store to the Doofinder platform
+     * during installation or onboarding, and store essential connection credentials like the
+     * API key for future use. If the token validation fails, an error message is returned,
+     * preventing unauthorized access to the configuration logic.
+     *
+     * The method always returns a JSON response indicating the result of the operation,
+     * including error details if applicable.
+     *
      * @inheritDoc
      */
     public function execute()

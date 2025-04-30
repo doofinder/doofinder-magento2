@@ -18,10 +18,25 @@ class CustomAttributes extends AbstractFieldArray
      * @var string
      */
     protected $_template = 'Doofinder_Feed::System/Config/customAttributes.phtml';
+    /**
+     * @var Code
+     */
     protected $codeRenderer;
+    /**
+     * @var Enable
+     */
     protected $enableRenderer;
+    /**
+     * @var StoreConfig
+     */
     protected $helper;
 
+    /**
+     * @param Context $context
+     * @param Code $codeRenderer
+     * @param Enable $enableRenderer
+     * @param StoreConfig $helper
+     */
     public function __construct(
         Context $context,
         Code $codeRenderer,

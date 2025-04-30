@@ -37,6 +37,8 @@ class Setup extends Action implements HttpGetActionInterface
      *
      * @param InstallationService $installationService
      * @param JsonFactory $resultJsonFactory
+     * @param ManagerInterface $messageManager
+     * @param Escaper $escaper
      * @param LoggerInterface $logger
      * @param Context $context
      */
@@ -66,19 +68,18 @@ class Setup extends Action implements HttpGetActionInterface
         try {
             $installationResults = $this->installationService->generateDoofinderStores();
 
-            $installationFailed = true;
-
+            $failedInstallations = 0;
             $message = 'Doofinder stores generated successfully.';
             foreach ($installationResults as $result) {
                 if (true !== $result) {
-                    $message = __('Doofinder was succesfully installed. However, not all store views were succesfully installed. Please check the logs for further information.');
-                    $installationFailed &= true;
-                } else {
-                    $installationFailed = false;
+                    $message = __('Doofinder was successfully installed. However, ' .
+                        'not all store views were successfully installed. Please check ' .
+                        'the logs for further information.');
+                    $failedInstallations++;
                 }
             }
 
-            if ($installationFailed) {
+            if ($failedInstallations == count($installationResults)) {
                 $resultJson->setHttpResponseCode(WebapiException::HTTP_INTERNAL_ERROR);
                 $resultJson->setData(['success' => false, 'message' => 'Failed to generate Doofinder stores.']);
             } else {

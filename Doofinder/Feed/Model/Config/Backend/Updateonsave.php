@@ -22,8 +22,24 @@ class Updateonsave extends ConfigValue
      */
     protected $configValueFactory;
 
+    /**
+     * @var StoreConfigFactory
+     */
     protected $storeConfigFactory;
 
+    /**
+     * Updateonsave constructor.
+     *
+     * @param Context $context
+     * @param Registry $registry
+     * @param ScopeConfigInterface $config
+     * @param StoreConfigFactory $storeConfigFactory
+     * @param TypeListInterface $cacheTypeList
+     * @param ValueFactory $configValueFactory
+     * @param AbstractResource $resource
+     * @param AbstractDb $resourceCollection
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         Registry $registry,
@@ -41,6 +57,8 @@ class Updateonsave extends ConfigValue
     }
 
     /**
+     * @inheritDoc
+     *
      * @return Updateonsave
      * @throws DoofinderFeedException
      */

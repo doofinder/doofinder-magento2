@@ -27,6 +27,7 @@ class Base64GzJson extends Json
 
     /**
      * Unserialize the given string with base64 and json.
+     *
      * Falls back to the json-only decoding on failure.
      *
      * @param string $string
