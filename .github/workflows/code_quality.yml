@@ -35,11 +35,17 @@ jobs:
         run: |
           vendor/bin/phpcs --config-set installed_paths vendor/magento/magento-coding-standard
           vendor/bin/phpcs -i
+      - name: Debug PHP and PHPCS Versions
+        run: |
+          php -v
+          composer show squizlabs/php_codesniffer || echo "phpcs not installed"
+          composer show magento/magento-coding-standard || echo "Magento CS not installed"
+
 
       - name: Run PHP Code Sniffer (phpcs)
         id: phpcs
         run: |
-          vendor/bin/phpcs
+          vendor/bin/phpcs -vvv
         continue-on-error: false
 
       - name: Run PHP Code Beautifier and Fixer (phpcbf) in Report-Only Mode
