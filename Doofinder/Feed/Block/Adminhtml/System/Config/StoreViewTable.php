@@ -58,6 +58,16 @@ class StoreViewTable extends Field
     }
 
     /**
+     * Make Escaper available to the template
+     *
+     * @return Escaper
+     */
+    public function getEscaper()
+    {
+        return $this->escaper;
+    }
+
+    /**
      * Render block using template file.
      *
      * @param AbstractElement $element
