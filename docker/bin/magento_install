@@ -5,15 +5,7 @@ COMPOSER_AUTH_USERNAME_SECRET=/var/run/secrets/composer_auth_username
 COMPOSER_AUTH_PASSWORD_SECRET=/var/run/secrets/composer_auth_password
 
 version_ge() {
-  # Eliminar cualquier sufijo de la versión (por ejemplo, '-p3')
-  version1=$(echo "$1" | sed 's/-.*//')
-  version2=$(echo "$2" | sed 's/-.*//')
-
-  if [[ "$(echo -e "$version1\n$version2" | sort -V | head -n 1)" == "$version2" ]]; then
-    return 0
-  else
-    return 1
-  fi
+  echo -e "${2%-*}\n${1%-*}" | sort -cV &> /dev/null
 }
 
 if [ ! -e $COMPOSER_AUTH_USERNAME_SECRET ] || [ ! -s $COMPOSER_AUTH_USERNAME_SECRET ]; then

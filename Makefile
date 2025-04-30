@@ -17,7 +17,15 @@ ifeq ($(origin COMPOSER_AUTH_PASSWORD), undefined)
   $(error COMPOSER_AUTH_PASSWORD is undefined.)
 endif
 
-get_search_compose_file = $(shell ./scripts/select-search-engine.sh $(MAGENTO_VERSION))
+search_compose_file = $(shell \
+	bash -c 'v1="$$(echo "$(MAGENTO_VERSION)" | sed "s/-p[0-9]\+//")"; \
+	v2="2.4.8"; \
+	if [ "$$(printf "%s\n%s" "$$v1" "$$v2" | sort -V | head -n1)" = "$$v2" ]; then \
+		echo docker-compose.opensearch.yml; \
+	else \
+		echo docker-compose.elasticsearch.yml; \
+	fi')
+
 docker_compose = docker compose
 env_local_flag =
 
@@ -27,7 +35,7 @@ ifneq ("$(wildcard .env.local)","")
 	env_local_flag = --env-file .env.local
 endif
 
-docker_compose := $(docker_compose) -f docker-compose.yml -f $(call get_search_compose_file) --env-file .env $(env_local_flag)
+docker_compose := $(docker_compose) -f docker-compose.yml -f $(search_compose_file) --env-file .env $(env_local_flag)
 docker_exec_web = $(docker_compose) exec -u application web
 
 # Default target: list available tasks
