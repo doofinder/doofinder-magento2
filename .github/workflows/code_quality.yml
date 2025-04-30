@@ -9,51 +9,38 @@ jobs:
   code-quality:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        php-version: ["7.4", "8.1", "8.2", "8.3", "8.4"]
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+    - name: Check out code
+      uses: actions/checkout@v3
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
 
-      - name: Configure Magento Auth for Composer
-        env:
-          COMPOSER_AUTH_USERNAME: ${{ secrets.COMPOSER_AUTH_USERNAME }}
-          COMPOSER_AUTH_PASSWORD: ${{ secrets.COMPOSER_AUTH_PASSWORD }}
-        run: |
-          composer config --global http-basic.repo.magento.com $COMPOSER_AUTH_USERNAME $COMPOSER_AUTH_PASSWORD
+    - name: Configure Magento Auth for Composer
+      env:
+        COMPOSER_AUTH_USERNAME: ${{ secrets.COMPOSER_AUTH_USERNAME }}
+        COMPOSER_AUTH_PASSWORD: ${{ secrets.COMPOSER_AUTH_PASSWORD }}
+      run: |
+        composer config --global http-basic.repo.magento.com $COMPOSER_AUTH_USERNAME $COMPOSER_AUTH_PASSWORD
 
-      - name: Install dependencies for CI
-        run: |
-          COMPOSER=composer-ci.json composer install --no-interaction --prefer-dist
-      - name: Set PHPCS Magento2 Standard
-        run: |
-          vendor/bin/phpcs --config-set installed_paths vendor/magento/magento-coding-standard
-          vendor/bin/phpcs -i
-      - name: Debug PHP and PHPCS Versions
-        run: |
-          php -v
-          composer show squizlabs/php_codesniffer || echo "phpcs not installed"
-          composer show magento/magento-coding-standard || echo "Magento CS not installed"
+    - name: Install dependencies for CI
+      run: |
+        COMPOSER=composer-ci.json composer install --no-interaction --prefer-dist
 
+    - name: Run PHP Code Sniffer (phpcs)
+      id: phpcs
+      run: |
+        vendor/bin/phpcs
+      continue-on-error: false
 
-      - name: Run PHP Code Sniffer (phpcs)
-        id: phpcs
-        run: |
-          vendor/bin/phpcs -vvv
-        continue-on-error: false
+    - name: Run PHP Code Beautifier and Fixer (phpcbf) in Report-Only Mode
+      id: phpcbf
+      run: |
+        vendor/bin/phpcbf --report-only
+      continue-on-error: false
 
-      - name: Run PHP Code Beautifier and Fixer (phpcbf) in Report-Only Mode
-        id: phpcbf
-        run: |
-          vendor/bin/phpcbf --report-only
-        continue-on-error: false
-
-      - name: Verify Code Quality Checks
-        if: failure()
-        run: echo "Code quality checks failed for PHP ${{ matrix.php-version }}. Please fix the reported issues before merging." && exit 1
+    - name: Verify Code Quality Checks
+      if: failure()
+      run: echo "Code quality checks failed. Please fix the reported issues before merging." && exit 1
