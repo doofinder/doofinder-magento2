@@ -18,13 +18,10 @@ ifeq ($(origin COMPOSER_AUTH_PASSWORD), undefined)
 endif
 
 search_compose_file = $(shell \
-	bash -c 'v1="$$(echo "$(MAGENTO_VERSION)" | sed "s/-p[0-9]\+//")"; \
-	v2="2.4.8"; \
-	if [ "$$(printf "%s\n%s" "$$v1" "$$v2" | sort -V | head -n1)" = "$$v2" ]; then \
-		echo docker-compose.opensearch.yml; \
-	else \
-		echo docker-compose.elasticsearch.yml; \
-	fi')
+	bash -c 'MAGENTO_VERSION=$(MAGENTO_VERSION); \
+		echo -e "2.4.8\n$${MAGENTO_VERSION%-*}" | sort -cV &> /dev/null && \
+		echo docker-compose.opensearch.yml || \
+		echo docker-compose.elasticsearch.yml')
 
 docker_compose = docker compose
 env_local_flag =
