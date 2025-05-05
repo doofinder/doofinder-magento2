@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Observer\Category;
 
 use Doofinder\Feed\Api\Data\ChangedItemInterface;
+use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Framework\Event\Observer;
 
 class CategorySaveAfterObserver extends AbstractChangedCategoryObserver
@@ -38,7 +39,7 @@ class CategorySaveAfterObserver extends AbstractChangedCategoryObserver
     /**
      * @inheritDoc
      */
-    protected function getOperationType($category): string
+    protected function getOperationType(CategoryInterface $category): string
     {
         return $category->getIsActive() ?
             ChangedItemInterface::OPERATION_TYPE_UPDATE:

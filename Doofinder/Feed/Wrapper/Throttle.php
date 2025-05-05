@@ -39,10 +39,10 @@ class Throttle
      * @throws NotFound
      * @throws ThrottledResponse
      */
-    public function __call(string $name, array $args = null)
+    public function __call(string $name, ?array $args = null)
     {
         if (method_exists($this->obj, $name)) {
-            return $this->throttle($name, $args);
+            return $this->throttle($name, 1, $args);
         }
 
         throw new \BadMethodCallException('Unknown method: ' . $name);
@@ -65,13 +65,13 @@ class Throttle
      * Throttle requests to search engine in case of ThrottledResponse error
      *
      * @param string $name Method name.
-     * @param array|null $args Method args.
      * @param integer $counter Throttle counter.
+     * @param array|null $args Method args.
      * @return mixed
      * @throws ThrottledResponse Response throttled.
      * @throws NotFound Not found.
      */
-    private function throttle(string $name, array $args = null, int $counter = 1)
+    private function throttle(string $name, int $counter = 1, ?array $args = null)
     {
         try {
             // phpcs:disable
@@ -91,6 +91,6 @@ class Throttle
             throw $e;
         }
 
-        return $this->throttle($name, $args, $counter + 1);
+        return $this->throttle($name, $counter + 1, $args);
     }
 }

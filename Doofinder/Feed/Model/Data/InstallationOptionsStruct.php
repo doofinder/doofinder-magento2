@@ -23,7 +23,7 @@ class InstallationOptionsStruct implements JsonSerializable
      * @param int $websiteId
      * @param string $token
      */
-    public function __construct(int $websiteId, string $token,)
+    public function __construct(int $websiteId, string $token)
     {
         $this->websiteId = $websiteId;
         $this->token = $token;

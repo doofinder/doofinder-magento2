@@ -1,5 +1,6 @@
 <?php
-    $_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
+$escaper = $block->getEscaper();
+$_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
 ?>
 <style>
     /* To make custom attributes table scrollable */
@@ -39,7 +40,7 @@
             'prototype'
         ], function (mageTemplate) {
             function toggleCustomAttributesCheckboxes(event) {
-                const checkboxes = document.querySelectorAll('.admin__df-custom-attributes-wrapper ' + 
+                const checkboxes = document.querySelectorAll('.admin__df-custom-attributes-wrapper ' +
                     'input[type="checkbox"]:not(#toggle-custom-fields)');
                 const checkboxStatus = event.target.checked;
                 checkboxes.forEach(function(checkbox) {
@@ -52,7 +53,7 @@
                 customFieldsToggler.checked = false;
                 customFieldsToggler.addEventListener('change', toggleCustomAttributesCheckboxes);
             }
-            
+
             // create row creator
             window.arrayAttributes<?= $escaper->escapeJs($_htmlId) ?> = {
                 // define row prototypeJS template
@@ -75,7 +76,7 @@
                         Element.insert($(insertAfterId), {after: this.template(templateValues)});
                     } else {
                         Element.insert(
-                            $('addRow<?= $escaper->escapeHtml($_htmlId) ?>'), 
+                            $('addRow<?= $escaper->escapeHtml($_htmlId) ?>'),
                             {bottom: this.template(templateValues)}
                         );
                     }

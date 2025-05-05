@@ -15,11 +15,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      elasticsearch:
+      search:
         condition: service_healthy
     environment:
       MYSQL_HOST: db
-      ELASTICSEARCH_HOST: elasticsearch
       MAGENTO_EDITION: ${MAGENTO_EDITION}
       MAGENTO_VERSION: ${MAGENTO_VERSION}
       MAGENTO_BASE_URL: ${MAGENTO_BASE_URL}
@@ -93,22 +92,6 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
-  # Elasticsearch container
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
-    environment:
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl --silent --fail localhost:9200/_cluster/health || exit 1",
-        ]
-      interval: 30s
-      timeout: 30s
-      retries: 3
 # Varnish container
 # varnish:
 #   image: varnish:stable

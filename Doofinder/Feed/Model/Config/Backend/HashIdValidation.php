@@ -40,9 +40,9 @@ class HashIdValidation extends Value
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
+     * @param array $data
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
-     * @param array $data
      */
     public function __construct(
         StoreConfig $storeConfig,
@@ -51,9 +51,9 @@ class HashIdValidation extends Value
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null
     ) {
         $this->storeConfig = $storeConfig;
         $this->searchEngine = $searchEngine;
