@@ -56,9 +56,7 @@ class Throttle
      */
     private function wait(int $seconds)
     {
-        // phpcs:disable
-        sleep($seconds);
-        // phpcs:enable
+        usleep($seconds * 1000000);
     }
 
     /**
@@ -74,9 +72,10 @@ class Throttle
     private function throttle(string $name, int $counter = 1, ?array $args = null)
     {
         try {
-            // phpcs:disable
-            return call_user_func_array([$this->obj, $name], $args);
-            // phpcs:enable
+            if (!is_array($args)) {
+                $args = [];
+            }
+            return $this->obj->$name(...$args);
         } catch (ThrottledResponse $e) {
             if ($counter >= self::THROTTLE_RETRIES) {
                 throw $e;

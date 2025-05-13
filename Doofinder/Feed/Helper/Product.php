@@ -419,7 +419,7 @@ class Product extends AbstractHelper
             $value = $frontend->getValue($product);
         }
 
-        return gettype($value);
+        return get_debug_type($value);
     }
 
     /**

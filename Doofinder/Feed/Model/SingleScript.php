@@ -2,6 +2,7 @@
 
 namespace Doofinder\Feed\Model;
 
+use Doofinder\Feed\Helper\Constants;
 use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\Data\SingleScriptStruct;
 use Magento\Framework\App\Cache\TypeListInterface;
@@ -114,8 +115,11 @@ class SingleScript
                     continue;
                 }
 
-                $singleScript = '<script src="' . sprintf(getenv("DOOFINDER_SCRIPT_URL_FORMAT") ?:
-                "https://%s-config.doofinder.com/2.x/%s.js", $region, $installationId) . '" async></script>';
+                $singleScript = '<script src="' . sprintf(
+                    Constants::DOOFINDER_SCRIPT_URL_FORMAT,
+                    $region,
+                    $installationId
+                ) . '" async></script>';
 
                 $storeGroupId = $store->getStoreGroupId();
                 $scripts[] = trim($singleScript);

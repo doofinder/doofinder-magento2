@@ -19,7 +19,7 @@ abstract class ItemType
      *
      * @return string[]
      */
-    public static function getList()
+    public function getList()
     {
         return [
             self::PRODUCT => self::PRODUCT_INDICE,

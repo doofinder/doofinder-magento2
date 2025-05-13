@@ -98,6 +98,11 @@ During development, it is sometimes useful to create a data snapshot before perf
   make db-restore file=backup_file.sql.gz
   ```
 
+## Important details before pushing changes to GitHub
+
+In order to be able to merge a PR, the PHP Code Sniffer must pass
+without any warnings. To check the compliance of Magento 2 standards, first check that you have PHP >= 8.3 locally (it might also work with PHP 7.4, but in the Adobe Commerce Marketplace PHP 8.3 is used for the tests) and then execute at the root folder of this project `composer install` command and finally execute `vendor/bin/phpcs`.
+
 ## PHP compatibility
 
 This plugin has been thoroughly tested and confirmed to be compatible with the following PHP versions:
