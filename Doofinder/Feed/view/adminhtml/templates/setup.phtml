@@ -1,72 +1,82 @@
 <?php
 
-// @codingStandardsIgnoreFile
-
-/** @var $block Doofinder\Feed\Block\Adminhtml\Setup */
+/** @var $block \Doofinder\Feed\Block\Adminhtml\Setup */
 
 ?>
 <?php $sector = $block->getSectorValue() ?>
 <div data-role="steps-setup-main" class="steps-setup">
     <div class="steps-col-container">
         <div class="steps-col">
-            <img alt="<?= $block->escapeHtmlAttr(__('Doofinder Feed Setup')) ?>"
+            <img alt="<?= $escaper->escapeHtmlAttr(__('Doofinder Feed Setup')) ?>"
                  src="<?= /* @noEscape */ $block->getViewFileUrl('Doofinder_Feed::images/doofinder-logo.png') ?>" />
             <div class="steps-buttons-col">
                 <div class="steps-button-title">
-                    <h2><?= $block->escapeHtmlAttr(__('Step 1:')) ?></h2>
-                    <h4><?= $block->escapeHtmlAttr(__('We select the sector of our platform')) ?></h4>
+                    <h2><?= $escaper->escapeHtmlAttr(__('Step 1:')) ?></h2>
+                    <h4><?= $escaper->escapeHtmlAttr(__('We select the sector of our platform')) ?></h4>
                     <div class="steps-button-container">
                         <select id="sector-selector">
                             <option value="" disabled<?php if (!$sector): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Choose the sector of your ecommerce')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Choose the sector of your ecommerce')) ?>
                             </option>
                             <option value="fashion" <?php if ($sector === "fashion"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Apparel & Accessories')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Apparel & Accessories')) ?>
                             </option>
                             <option value="autos" <?php if ($sector === "autos"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Auto Parts & Accessories')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Auto Parts & Accessories')) ?>
                             </option>
                             <option value="childcare" <?php if ($sector === "childcare"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Childcare')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Childcare')) ?>
                             </option>
                             <option value="food" <?php if ($sector === "food"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Food & Beverages')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Food & Beverages')) ?>
                             </option>
                             <option value="home" <?php if ($sector === "home"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Home & Garden')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Home & Garden')) ?>
                             </option>
                             <option value="leisure" <?php if ($sector === "leisure"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Leisure & Culture')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Leisure & Culture')) ?>
                             </option>
                             <option value="others" <?php if ($sector === "others"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Others')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Others')) ?>
                             </option>
                             <option value="pets" <?php if ($sector === "pets"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Pets')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Pets')) ?>
                             </option>
-                            <option value="parapharmacy" <?php if ($sector === "parapharmacy"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Pharma & Cosmetics')) ?>
+                            <option 
+                                value="parapharmacy" <?php if ($sector === "parapharmacy"): ?> selected<?php endif; ?>>
+                                <?= $escaper->escapeHtmlAttr(__('Pharma & Cosmetics')) ?>
                             </option>
                             <option value="sport" <?php if ($sector === "sport"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Sport & Fitness')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Sport & Fitness')) ?>
                             </option>
                             <option value="technology" <?php if ($sector === "technology"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Tech Products & Electronics')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Tech Products & Electronics')) ?>
                             </option>
                             <option value="toys" <?php if ($sector === "toys"): ?> selected<?php endif; ?>>
-                                <?= $block->escapeHtmlAttr(__('Toys & Hobbies')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Toys & Hobbies')) ?>
                             </option>
                         </select>
                     </div>
                 </div>
                 <div class="steps-button-title">
-                    <h2><?= $block->escapeHtmlAttr(__('Step 2:')) ?></h2>
-                    <h4><?= $block->escapeHtmlAttr(__('We link to our Doofinder account')) ?></h4>
+                    <h2><?= $escaper->escapeHtmlAttr(__('Step 2:')) ?></h2>
+                    <h4><?= $escaper->escapeHtmlAttr(__('We link to our Doofinder account')) ?></h4>
                     <div class="steps-button-container">
-                        <input class="steps-btn-yellow" id="register-account-btn" disabled type="button" value="<?= $block->escapeHtmlAttr(__('USE YOUR FREE TRIAL NOW!')) ?>" />
+                        <input
+                            class="steps-btn-yellow" 
+                            id="register-account-btn" 
+                            disabled 
+                            type="button" 
+                            value="<?= $escaper->escapeHtmlAttr(__('USE YOUR FREE TRIAL NOW!')) ?>" 
+                        />
                     </div>
                     <div class="steps-button-container">
-                        <input disabled type="button" id="login-btn" value="<?= $block->escapeHtmlAttr(__('I HAVE AN ACCOUNT')) ?>" />
+                        <input
+                            disabled 
+                            type="button" 
+                            id="login-btn" 
+                            value="<?= $escaper->escapeHtmlAttr(__('I HAVE AN ACCOUNT')) ?>" 
+                        />
                     </div>
                 </div>
             </div>
@@ -75,49 +85,62 @@
         <div class="steps-col">
             <div class="steps-description">
                 <h2 class="steps-head">
-                    <?= $block->escapeHtmlAttr(__('Add a smart search engine to your e-commerce in 5 minutes and with no programming')) ?>
+                    <?= $escaper->escapeHtmlAttr(
+                        __('Add a smart search engine to your e-commerce in 5 minutes and with no programming')
+                    ); ?>
                 </h2>
-                <h3 id="steps-about"><?= $block->escapeHtmlAttr(__('ABOUT DOOFINDER:')) ?></h3>
-                <p><?= $block->escapeHtmlAttr(__('Doofinder provides you with an instant search layer to display your products when your visitors use the Doofinder script.')) ?></p>
-                <p><?= $block->escapeHtmlAttr(__('Your customers then have the opportunity to preview your products, filter them and choose the desired product. Upon hitting enter, doofinder will power also the results page.')) ?></p>
-                <p><?= $block->escapeHtmlAttr(__('Among our features are:')) ?></p>
+                <h3 id="steps-about"><?= $escaper->escapeHtmlAttr(__('ABOUT DOOFINDER:')) ?></h3>
+                <p><?= $escaper->escapeHtmlAttr(
+                    __('Doofinder provides you with an instant search layer to display 
+                    your products when your visitors use the Doofinder script.')
+                ); ?></p>
+                <p><?= $escaper->escapeHtmlAttr(
+                    __('Your customers then have the opportunity to preview your products, 
+                    filter them and choose the desired product. 
+                    Upon hitting enter, doofinder will power also the results page.')
+                ); ?></p>
+                <p><?= $escaper->escapeHtmlAttr(__('Among our features are:')) ?></p>
                 <ul>
                     <li>
-                        <?= $block->escapeHtmlAttr(__('Detailed reports on search behaviour.')) ?>
+                        <?= $escaper->escapeHtmlAttr(__('Detailed reports on search behaviour.')) ?>
                     </li>
                     <li>
-                        <?= $block->escapeHtmlAttr(__('Faceted search option.')) ?>
+                        <?= $escaper->escapeHtmlAttr(__('Faceted search option.')) ?>
                     </li>
                     <li>
-                        <?= $block->escapeHtmlAttr(__('Learning behaviour')) ?>
+                        <?= $escaper->escapeHtmlAttr(__('Learning behaviour')) ?>
                     </li>
                     <li>
-                        <?= $block->escapeHtmlAttr(__('Merchandising power to set a products positioning.')) ?>
+                        <?= $escaper->escapeHtmlAttr(__('Merchandising power to set a products positioning.')) ?>
                     </li>
                     <li>
-                        <?= $block->escapeHtmlAttr(__('Banner feature for advertising and promoting products, brands and events.')) ?>
+                        <?= $escaper->escapeHtmlAttr(
+                            __('Banner feature for advertising and promoting products, brands and events.')
+                        ); ?>
                     </li>
                     <li>
-                        <?= $block->escapeHtmlAttr(__('Options to redirect users to content pages.')) ?>
+                        <?= $escaper->escapeHtmlAttr(__('Options to redirect users to content pages.')) ?>
                     </li>
                     <li>
-                        <?= $block->escapeHtmlAttr(__('Held on our servers for a faster page load time.')) ?>
+                        <?= $escaper->escapeHtmlAttr(__('Held on our servers for a faster page load time.')) ?>
                     </li>
                 </ul>
-                <p><?= $block->escapeHtmlAttr(__('More than 5000 e-commerces sites over 35 countries are already using it.')) ?></p>
+                <p><?= $escaper->escapeHtmlAttr(
+                    __('More than 5000 e-commerces sites over 35 countries are already using it.')
+                ); ?></p>
             </div>
         </div>
 
         <div class="ajax-steps-col">
-            <img alt="<?= $block->escapeHtmlAttr(__('Doofinder Feed Setup')) ?>"
+            <img alt="<?= $escaper->escapeHtmlAttr(__('Doofinder Feed Setup')) ?>"
                  src="<?= /* @noEscape */ $block->getViewFileUrl('Doofinder_Feed::images/doofinder.png') ?>" />
             <h3 id="message-ajax-steps"></h3>
             <div class="setup-finish-buttons hidden">
-                <a href="<?= $block->escapeUrl($block->getIndexProcessingStatusUrl()) ?>" class="doofinder-button">
-                    <?= $block->escapeHtml(__('Check index processing status')) ?>
+                <a href="<?= $escaper->escapeUrl($block->getIndexProcessingStatusUrl()) ?>" class="doofinder-button">
+                    <?= $escaper->escapeHtml(__('Check index processing status')) ?>
                 </a>
-                <a href="<?= $block->escapeUrl($block->getDoofinderConfigurationUrl()) ?>" class="doofinder-button">
-                    <?= $block->escapeHtml(__('Go to configuration')) ?>
+                <a href="<?= $escaper->escapeUrl($block->getDoofinderConfigurationUrl()) ?>" class="doofinder-button">
+                    <?= $escaper->escapeHtml(__('Go to configuration')) ?>
                 </a>
             </div>
         </div>
@@ -129,32 +152,40 @@
         "*": {
             "Doofinder_Feed/js/initial": {
                 "component": "Doofinder_Feed/js/initial",
-                "submit_url": "<?= $block->escapeUrl($block->getSaveUrl()) ?>",
-                "save_config_url": "<?= $block->escapeUrl($block->getSaveConfigUrl()) ?>",
-                "permissionsDialogUrl": "<?= $block->escapeUrl($block->getPermissionsDialogUrl()) ?>",
-                "tokensDialogUrl": "<?= $block->escapeUrl($block->getTokensDialogUrl()) ?>",
-                "accessTokenUrl": "<?= $block->escapeUrl($block->getAccessTokenUrl()) ?>",
-                "saveSectorUrl": "<?= $block->escapeUrl($block->getSaveSectorUrl()) ?>",
-                "currentSectorValue": "<?= $block->escapeHtml($block->getSectorValue()) ?>",
+                "submit_url": "<?= $escaper->escapeUrl($block->getSaveUrl()) ?>",
+                "save_config_url": "<?= $escaper->escapeUrl($block->getSaveConfigUrl()) ?>",
+                "permissionsDialogUrl": "<?= $escaper->escapeUrl($block->getPermissionsDialogUrl()) ?>",
+                "tokensDialogUrl": "<?= $escaper->escapeUrl($block->getTokensDialogUrl()) ?>",
+                "accessTokenUrl": "<?= $escaper->escapeUrl($block->getAccessTokenUrl()) ?>",
+                "saveSectorUrl": "<?= $escaper->escapeUrl($block->getSaveSectorUrl()) ?>",
+                "currentSectorValue": "<?= $escaper->escapeHtml($block->getSectorValue()) ?>",
                 "sectorSelector": "#sector-selector",
                 "buttonRegister": "#register-account-btn",
                 "buttonLogin": "#login-btn",
-                "email": "<?= $block->escapeHtml($this->helper(Doofinder\Feed\Helper\StoreConfig::class)->getEmailAdmin()) ?>",
-                "name": "<?= $block->escapeHtml($this->helper(Doofinder\Feed\Helper\StoreConfig::class)->getIntegrationName()) ?>",
-                "isIntegrationCreated": "<?= $block->escapeHtml($block->isIntegrationCreated()) ?>",
-                "hasApiKey": "<?= $block->escapeHtml($block->hasApiKey()) ?>",
-                "installingLoopStatus": "<?= $block->escapeHtml($block->getInstallingLoopStatus()) ?>"
+                "email": "<?= $escaper->escapeHtml(
+                    $block->helper(Doofinder\Feed\Helper\StoreConfig::class)->getEmailAdmin()
+                ); ?>",
+                "name": "<?= $escaper->escapeHtml(
+                    $block->helper(Doofinder\Feed\Helper\StoreConfig::class)->getIntegrationName()
+                ); ?>",
+                "isIntegrationCreated": "<?= $escaper->escapeHtml($block->isIntegrationCreated()) ?>",
+                "hasApiKey": "<?= $escaper->escapeHtml($block->hasApiKey()) ?>",
+                "installingLoopStatus": "<?= $escaper->escapeHtml($block->getInstallingLoopStatus()) ?>"
             },
             "Doofinder_Feed/js/link-account": {
                 "component": "Doofinder_Feed/js/link-account",
                 "buttonRegister": "#register-account-btn",
                 "buttonLogin": "#login-btn",
-                "signupEndpoint": "<?= $block->escapeUrl($this->helper(Doofinder\Feed\Helper\StoreConfig::class)->getSignupEndpoint()) ?>",
-                "loginEndpoint": "<?= $block->escapeUrl($this->helper(Doofinder\Feed\Helper\StoreConfig::class)->getLoginEndpoint()) ?>",
-                "paramsPopup": "<?= $block->getParamsPopup() ?>",
-                "checkAPIKeyUrl": "<?= $block->escapeUrl($block->getCheckAPIKeyUrl()) ?>",
-                "setupUrl": "<?= $block->escapeUrl($block->getSetupUrl()) ?>",
-                "doofinderConnectUrl": "<?= $block->escapeUrl($block->getDoofinderConnectUrl()) ?>"
+                "signupEndpoint": "<?= $escaper->escapeUrl(
+                    $block->helper(Doofinder\Feed\Helper\StoreConfig::class)->getSignupEndpoint()
+                ); ?>",
+                "loginEndpoint": "<?= $escaper->escapeUrl(
+                    $block->helper(Doofinder\Feed\Helper\StoreConfig::class)->getLoginEndpoint()
+                ); ?>",
+                "paramsPopup": "<?= $escaper->escapeHtml($block->getParamsPopup()) ?>",
+                "checkAPIKeyUrl": "<?= $escaper->escapeUrl($block->getCheckAPIKeyUrl()) ?>",
+                "setupUrl": "<?= $escaper->escapeUrl($block->getSetupUrl()) ?>",
+                "doofinderConnectUrl": "<?= $escaper->escapeUrl($block->getDoofinderConnectUrl()) ?>"
             }
         }
     }
