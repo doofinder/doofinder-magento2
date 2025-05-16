@@ -55,7 +55,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $magentoStoreConfig;
 
-    /** @var \Magento\Store\Model\ScopeConfigInterface */
+    /** @var \Magento\Framework\App\Config\ScopeConfigInterface */
     protected $scopeConfig;
 
     /** @var \Magento\Catalog\Model\ProductFactory */
