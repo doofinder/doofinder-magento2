@@ -537,7 +537,10 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             ->create();
 
         $categories = $this->categoryListInterface->getList($searchCriteria)->__toArray();
-        $categoryUrlSuffix = $this->scopeConfig->getValue('catalog/seo/category_url_suffix', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $categoryUrlSuffix = $this->scopeConfig->getValue(
+            'catalog/seo/category_url_suffix',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
 
         // Get just the information needed in order to make the response lighter
         $categoryResults = [];
