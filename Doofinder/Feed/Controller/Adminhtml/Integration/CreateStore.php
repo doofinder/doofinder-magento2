@@ -67,6 +67,10 @@ class CreateStore extends Action
 
         try {
             $groupId = (int)$this->getRequest()->getParam('group');
+            if (!$groupId) {
+                $defaultWebsite = $this->storeManager->getDefaultStoreView()->getWebsite();
+                $groupId = $defaultWebsite->getDefaultGroupId();
+            }
             $group = $this->storeManager->getGroup($groupId);
             $result = $this->installationService->generateDoofinderStore($group);
 
