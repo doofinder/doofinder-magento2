@@ -23,10 +23,6 @@ $integrationId = $block->getIntegrationId();
         <tbody>
             <?php $evenStyle = true; ?>
             <?php foreach ($groups as $group): ?>
-                <button name="doofinder-create-store" type="button"
-                    onclick="doofinderSyncStore(<?= $escaper->escapeHtml($group->getId()) ?>)">
-                    <?= $escaper->escapeHtml(__('Create')) ?>
-                </button>
                 <?php
                 // Retrieve the installation id for the store configuration
                 $installationId = $block->getInstallationId($group);
