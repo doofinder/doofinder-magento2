@@ -11,7 +11,7 @@ $groups = $block->getGroups();
 $integrationId = $block->getIntegrationId();
 ?>
 <?php if ($integrationId === null): ?>
-    <?= __('It seems that you have not configured the Doofinder integration yet. Please <a href="%1"> run the initial setup</a> to configure the integration.', $escaper->escapeUrl($block->getInitialSetupUrl())) ?>
+    <?= $escaper->escapeHtml(__('It seems that you have not configured the Doofinder integration yet. Please <a href="%1"> run the initial setup</a> to configure the integration.', $block->getInitialSetupUrl()), ['a']) ?>
 <?php else: ?>
     <table class="data-grid store-table">
         <thead>
