@@ -698,12 +698,7 @@ class StoreConfig extends AbstractHelper
      */
     public function getDoofinderConnectUrl(): string
     {
-        $baseUriParts = Utils::uriFor($this->backendHelper->getUrl());
-        $host = $baseUriParts->getHost();
-        $scheme = $baseUriParts->getScheme();
-        $port = $baseUriParts->getPort();
-        $port = empty($port) ? '' : ":$port";
-        return sprintf('%1$s://%2$s%3$s/%4$s', $scheme, $host, $port, self::DOOFINDER_CONNECTION);
+        return $this->backendHelper->getUrl(self::DOOFINDER_CONNECTION);
     }
 
     /**

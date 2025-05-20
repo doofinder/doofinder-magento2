@@ -17,6 +17,7 @@ use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\App\Area;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -53,6 +54,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
     /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $magentoStoreConfig;
+
+    /** @var \Magento\Framework\App\Config\ScopeConfigInterface */
+    protected $scopeConfig;
 
     /** @var \Magento\Catalog\Model\ProductFactory */
     protected $productFactory;
@@ -95,6 +99,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * @param InventoryHelperFactory $inventoryHelperFactory Factory for inventory helper instances.
      * @param StoreConfig $storeConfig Custom module store config.
      * @param MagentoStoreConfig $magentoStoreConfig Magento core store config.
+     * @param ScopeConfigInterface $scopeConfig Magento core scope config.
      * @param ProductFactory $productFactory Product factory instance.
      * @param SearchCriteriaBuilder $searchCriteriaBuilder Search criteria builder.
      * @param ProductResourceModel $resourceModel Product resource model.
@@ -112,6 +117,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         InventoryHelperFactory $inventoryHelperFactory,
         StoreConfig $storeConfig,
         MagentoStoreConfig $magentoStoreConfig,
+        ScopeConfigInterface $scopeConfig,
         ProductFactory $productFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductResourceModel $resourceModel,
@@ -128,6 +134,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $this->inventoryHelperFactory = $inventoryHelperFactory;
         $this->storeConfig = $storeConfig;
         $this->magentoStoreConfig = $magentoStoreConfig;
+        $this->scopeConfig = $scopeConfig;
         $this->productFactory = $productFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->resourceModel = $resourceModel;
@@ -287,7 +294,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * @param Product $product
      * @return String
      */
-    private function getProductUrl(Product $product): String
+    private function getProductUrl(Product $product): string
     {
         return $this->productHelperFactory->create()->getProductUrl($product);
     }
@@ -306,8 +313,8 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         if ($this->cacheLimit && count($this->instances) > $this->cacheLimit) {
             $offset = round($this->cacheLimit / -2);
-            $this->instancesById = array_slice($this->instancesById, (int)$offset, null, true);
-            $this->instances = array_slice($this->instances, (int)$offset, null, true);
+            $this->instancesById = array_slice($this->instancesById, (int) $offset, null, true);
+            $this->instances = array_slice($this->instances, (int) $offset, null, true);
         }
     }
 
@@ -367,7 +374,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             if ($customAttribute['enabled'] && isset($product[$code])) {
                 ("array" === $productHelper->getAttributeType($product, $code)) ?
                     $value = $productHelper->getAttributeArray($product, $code) :
-                    $value = $productHelper->getAttributeText($product, $code)  ;
+                    $value = $productHelper->getAttributeText($product, $code);
 
                 $product->setCustomAttribute($code, $value);
             } else {
@@ -399,7 +406,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         $extensionAttributes = $product->getExtensionAttributes();
 
-        $stockId = (int)$inventoryHelper->getStockIdByStore((int)$storeId);
+        $stockId = (int) $inventoryHelper->getStockIdByStore((int) $storeId);
         $stockAndStatus = $inventoryHelper->getQuantityAndAvailability($product, $stockId);
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
@@ -411,7 +418,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             $this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseMediaUrl()
         );
 
-        $categories =  $extensionAttributes->getCategoryLinks();
+        $categories = $extensionAttributes->getCategoryLinks();
         if (is_array($categories)) {
             $extensionAttributes->setCategoryLinks($this->getCategoriesInformation($categories));
         }
@@ -425,8 +432,8 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             ->getProductImageUrl(
                 $product,
                 $this
-                ->storeConfig
-                ->getValueFromConfig("doofinder_config_config/doofinder_image/doofinder_image_size")
+                    ->storeConfig
+                    ->getValueFromConfig("doofinder_config_config/doofinder_image/doofinder_image_size")
             ));
 
         $configurableProductsOptions = $extensionAttributes->getConfigurableProductOptions();
@@ -456,7 +463,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         foreach ($configurableLinksIds as $productId) {
             $product = $this->productFactory->create()->load($productId);
-            if (Status::STATUS_ENABLED !== (int)$product->getStatus()) {
+            if (Status::STATUS_ENABLED !== (int) $product->getStatus()) {
                 continue;
             }
 
@@ -530,15 +537,25 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             ->create();
 
         $categories = $this->categoryListInterface->getList($searchCriteria)->__toArray();
+        $categoryUrlSuffix = $this->scopeConfig->getValue(
+            'catalog/seo/category_url_suffix',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
 
         // Get just the information needed in order to make the response lighter
         $categoryResults = [];
         foreach ($categories["items"] as $category) {
+            $urlPath = $category['url_path'] ?? '';
+            if ($categoryUrlSuffix && substr($urlPath, -strlen($categoryUrlSuffix)) != $categoryUrlSuffix) {
+                $urlPath .= $categoryUrlSuffix;
+            }
+
             $categoryResults[] = [
                 'category_id' => $category['entity_id'],
                 'entity_id' => $category['entity_id'],
                 'name' => $category['name'],
-                'parent_id' => $category['parent_id']
+                'parent_id' => $category['parent_id'],
+                'url_path' => $urlPath
             ];
         }
 
@@ -562,7 +579,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      */
     private function updateConfigurableProductOptions($configurableProductsOptions)
     {
-        $eavConfig  = ObjectManager::getInstance()->get(\Magento\Eav\Model\Config::class);
+        $eavConfig = ObjectManager::getInstance()->get(\Magento\Eav\Model\Config::class);
         $configurableProductsOptionsResult = [];
 
         if ($configurableProductsOptions != null) {
