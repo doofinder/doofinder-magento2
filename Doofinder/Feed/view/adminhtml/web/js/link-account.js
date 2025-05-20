@@ -127,14 +127,15 @@ define([
                 "message",
                 (event) => {
                   const doofinder_regex = /.*\.doofinder\.com/gm;
-                  console.log(event.data)
                   //Check that the sender is doofinder
                   if (!doofinder_regex.test(event.origin)) return;
-                  if (event.data) {
-                    const data_received = event.data.split("|");
-                    const event_name = data_received[0];
-                    const event_data = JSON.parse(atob(data_received[1]));
-                    if (event_name === "set_doofinder_data") self.send_connect_data(event_data);
+                  if (event.data && 'string' === typeof event.data) {
+                    try {
+                        const data_received = event.data.split("|");
+                        const event_name = data_received[0];
+                        const event_data = JSON.parse(atob(data_received[1]));
+                        if (event_name === "set_doofinder_data") self.send_connect_data(event_data);
+                    } catch(e) {}
                   }
                 },
                 false

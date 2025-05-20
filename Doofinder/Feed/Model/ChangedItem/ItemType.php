@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Model\ChangedItem;
 
-abstract class ItemType
+class ItemType
 {
     public const PRODUCT = 0;
     public const PAGE = 1;
@@ -19,7 +19,7 @@ abstract class ItemType
      *
      * @return string[]
      */
-    public static function getList()
+    public function getList()
     {
         return [
             self::PRODUCT => self::PRODUCT_INDICE,

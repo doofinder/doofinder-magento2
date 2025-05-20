@@ -51,6 +51,11 @@ class Processor
     private $logger;
 
     /**
+     * @var ItemType
+     */
+    private $itemType;
+
+    /**
      * Processor constructor.
      *
      * @param StoreConfig $storeConfig
@@ -59,6 +64,7 @@ class Processor
      * @param ItemHelper $itemHelper
      * @param Batch $batch
      * @param LoggerInterface $logger
+     * @param ItemType $itemType
      * @param int $batchSize
      */
     public function __construct(
@@ -68,6 +74,7 @@ class Processor
         ItemHelper $itemHelper,
         Batch $batch,
         LoggerInterface $logger,
+        ItemType $itemType,
         $batchSize = 100
     ) {
         $this->storeConfig = $storeConfig;
@@ -77,6 +84,7 @@ class Processor
         $this->batch = $batch;
         $this->batchSize = $batchSize;
         $this->logger = $logger;
+        $this->itemType = $itemType;
     }
 
     /**
@@ -87,7 +95,7 @@ class Processor
         if ($this->storeConfig->isUpdateOnSave()) {
             try {
                 foreach ($this->storeConfig->getAllStores() as $store) {
-                    foreach (ItemType::getList() as $itemType => $itemIndice) {
+                    foreach ($this->itemType->getList() as $itemType => $itemIndice) {
                         $this->manageItems($store, $itemType, $itemIndice);
                     }
                 }

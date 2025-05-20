@@ -190,7 +190,8 @@ class Inventory extends AbstractHelper
 
         return [
             GetStockItemDataInterface::QUANTITY => $stockItemData[GetStockItemDataInterface::QUANTITY] ?? 0,
-            GetStockItemDataInterface::IS_SALABLE => (bool)$stockItemData[GetStockItemDataInterface::IS_SALABLE]
+            GetStockItemDataInterface::IS_SALABLE =>
+                (bool)($stockItemData[GetStockItemDataInterface::IS_SALABLE] ?? false)
         ];
     }
 

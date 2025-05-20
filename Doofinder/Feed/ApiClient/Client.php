@@ -14,6 +14,7 @@ use Doofinder\Feed\Errors\ThrottledResponse;
 use Doofinder\Feed\Errors\TypeAlreadyExists;
 use Doofinder\Feed\Errors\Utils;
 use Doofinder\Feed\Errors\WrongResponse;
+use Doofinder\Feed\Helper\Constants;
 use Doofinder\Feed\Helper\StoreConfig;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\GuzzleException;
@@ -53,6 +54,9 @@ class Client
     /** @var ResponseInterface  */
     private $response;
 
+    /** @var Utils  */
+    private $utils;
+
     /**
      * @param StoreConfig $storeConfig
      * @param GuzzleClient $guzzleClient
@@ -69,6 +73,7 @@ class Client
         $this->storeConfig  = $storeConfig;
         $this->guzzleClient = $guzzleClient;
         $this->apiType      = $apiType;
+        $this->utils        = new Utils();
         $this->setApiTokenRegion($apiKey);
     }
 
@@ -99,7 +104,7 @@ class Client
             );
         } catch (GuzzleException $e) {
             $errorResponse = $this->parseErrorResponse($e->getMessage());
-            Utils::handleErrors($e->getCode(), $errorResponse);
+            $this->utils->handleErrors($e->getCode(), $errorResponse);
             throw new BadRequest($errorResponse);
         }
 
@@ -135,7 +140,7 @@ class Client
             );
         } catch (GuzzleException $e) {
             $errorResponse = $this->parseErrorResponse($e->getMessage());
-            Utils::handleErrors($e->getCode(), $errorResponse);
+            $this->utils->handleErrors($e->getCode(), $errorResponse);
             throw new BadRequest($errorResponse);
         }
 
@@ -171,7 +176,7 @@ class Client
             );
         } catch (GuzzleException $e) {
             $errorResponse = $this->parseErrorResponse($e->getMessage());
-            Utils::handleErrors($e->getCode(), $errorResponse);
+            $this->utils->handleErrors($e->getCode(), $errorResponse);
             throw new BadRequest($errorResponse);
         }
 
@@ -207,7 +212,7 @@ class Client
             );
         } catch (GuzzleException $e) {
             $errorResponse = $e->getResponse()->getBody()->getContents();
-            Utils::handleErrors($e->getCode(), $errorResponse);
+            $this->utils->handleErrors($e->getCode(), $errorResponse);
             throw new BadRequest($errorResponse);
         }
 
@@ -234,7 +239,7 @@ class Client
         }
         $statusCode      = (int)$this->response->getStatusCode();
         $contentResponse = $this->response->getBody()->getContents();
-        Utils::handleErrors($statusCode, $contentResponse);
+        $this->utils->handleErrors($statusCode, $contentResponse);
 
         return $contentResponse;
     }
@@ -275,19 +280,16 @@ class Client
      */
     private function getApiBaseURL(): string
     {
-        $url = getenv("DOOFINDER_ADMIN_URL") ?: "https://admin.doofinder.com";
+        $url = Constants::DOOFINDER_ADMIN_URL;
         switch ($this->apiType) {
             case self::DOOPLUGINS:
-                $url = sprintf(getenv("DOOFINDER_PLUGINS_URL_FORMAT") ?:
-                    "https://%s-plugins.doofinder.com", $this->clusterRegion);
+                $url = sprintf(Constants::DOOFINDER_PLUGINS_URL_FORMAT, $this->clusterRegion);
                 break;
             case self::SEARCH_API:
-                $url = sprintf(getenv("DOOFINDER_SEARCH_URL_FORMAT") ?:
-                    "https://%s-search.doofinder.com", $this->clusterRegion);
+                $url = sprintf(Constants::DOOFINDER_SEARCH_URL_FORMAT, $this->clusterRegion);
                 break;
             case self::MANAGEMENT_API:
-                $url = sprintf(getenv("DOOFINDER_API_URL_FORMAT") ?:
-                    "https://%s-api.doofinder.com", $this->clusterRegion);
+                $url = sprintf(Constants::DOOFINDER_API_URL_FORMAT, $this->clusterRegion);
                 break;
         }
         return $url;
