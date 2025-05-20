@@ -4,6 +4,7 @@
  * @var \Magento\Framework\Escaper $escaper
  */
 $statuses =  $block->getSearchEnginesProcessStatus();
+$escaper = $block->getEscaper();
 ?>
 <?php if (isset($statuses['error'])): ?>
     <p><?= $escaper->escapeHtml(__(

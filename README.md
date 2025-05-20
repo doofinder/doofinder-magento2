@@ -98,6 +98,39 @@ During development, it is sometimes useful to create a data snapshot before perf
   make db-restore file=backup_file.sql.gz
   ```
 
+## PHP compatibility
+
+This plugin has been thoroughly tested and confirmed to be compatible with the following PHP versions:
+
+✅ Supported PHP Versions:
+
+- PHP 7.3
+- PHP 7.4
+- PHP 8.1
+- PHP 8.2
+- PHP 8.3
+- PHP 8.4
+
+⚠️ Note:
+
+- PHP versions below 7.4 are not recommended.
+- PHP 8.0 is not supported by Magento 2.
+
+## Tested compatibility with the following M2 versions
+
+- Magento 2.3.0
+- Magento 2.3.5-p3
+- Magento 2.3.7-p4
+- Magento 2.4.0
+- Magento 2.4.1
+- Magento 2.4.2
+- Magento 2.4.3
+- Magento 2.4.4
+- Magento 2.4.5
+- Magento 2.4.6
+- Magento 2.4.7
+- Magento 2.4.8
+
 ## Last notes
 
 Please take care when you change the environment variable `MAGENTO_VERSION`, since you will have to change probably the `PHP_VERSION` and the `COMPOSER_VERSION` ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:

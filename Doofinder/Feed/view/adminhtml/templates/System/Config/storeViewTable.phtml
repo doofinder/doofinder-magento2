@@ -6,6 +6,7 @@ use Magento\Store\Api\Data\GroupInterface;
 /** @var StoreViewTable $block*/
 /** @var GroupInterface $group*/
 
+$escaper = $block->getEscaper();
 $groups = $block->getGroups();
 ?>
 <table class="data-grid store-table">

@@ -36,9 +36,9 @@ class Updateonsave extends ConfigValue
      * @param StoreConfigFactory $storeConfigFactory
      * @param TypeListInterface $cacheTypeList
      * @param ValueFactory $configValueFactory
+     * @param array $data
      * @param AbstractResource $resource
      * @param AbstractDb $resourceCollection
-     * @param array $data
      */
     public function __construct(
         Context $context,
@@ -47,9 +47,9 @@ class Updateonsave extends ConfigValue
         StoreConfigFactory $storeConfigFactory,
         TypeListInterface $cacheTypeList,
         ValueFactory $configValueFactory,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null
     ) {
         $this->configValueFactory = $configValueFactory;
         $this->storeConfigFactory = $storeConfigFactory;
