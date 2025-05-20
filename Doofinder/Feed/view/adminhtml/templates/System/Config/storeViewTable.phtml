@@ -39,7 +39,7 @@ $integrationId = $block->getIntegrationId();
                             <?= $escaper->escapeHtml($installationId  ?: __('Not installed')) ?>
                         </span>
                     </td>
-                    <td style=" text-align:center;">
+                    <td style="text-align:center;">
                         <?php if ($installationId === null): ?>
                             <button name="doofinder-create-store" type="button"
                                 onclick="doofinderSyncStore(<?= $escaper->escapeHtml($group->getId()) ?>)">
