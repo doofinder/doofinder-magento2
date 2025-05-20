@@ -7,6 +7,8 @@ namespace Doofinder\Feed\Controller\Adminhtml\Integration;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Cache\Frontend\Pool as CacheFrontendPool;
 use Magento\Framework\App\ResourceConnection;
 use Psr\Log\LoggerInterface;
 
@@ -19,6 +21,12 @@ class CleanIntegration extends Action
     /** @var ResourceConnection */
     private $resourceConnection;
 
+    /** @var TypeListInterface */
+    private $cacheTypeList;
+
+    /** @var CacheFrontendPool */
+    private $cacheFrontendPool;
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -26,15 +34,21 @@ class CleanIntegration extends Action
      * CleanIntegration constructor.
      *
      * @param ClientFactory $resourceConnection
+     * @param TypeListInterface $cacheTypeList
+     * @param CacheFrontendPool $cacheFrontendPool
      * @param LoggerInterface $logger
      * @param Context $context
      */
     public function __construct(
         ResourceConnection $resourceConnection,
+        TypeListInterface $cacheTypeList,
+        CacheFrontendPool $cacheFrontendPool,
         LoggerInterface $logger,
         Context $context
     ) {
         $this->resourceConnection = $resourceConnection;
+        $this->cacheTypeList = $cacheTypeList;
+        $this->cacheFrontendPool = $cacheFrontendPool;
         $this->logger = $logger;
         parent::__construct($context);
     }
@@ -49,6 +63,7 @@ class CleanIntegration extends Action
             foreach ($this->integration_table_column as $table => $column) {
                 $this->deleteIntegrationEntries($connection, $table, $column);
             }
+            $this->cleanConfigCache();
         } catch (Exception $e) {
             $this->logger->error('There was a problem cleaning the database from Doofinder entries: ' .
                 $e->getMessage());
@@ -75,7 +90,18 @@ class CleanIntegration extends Action
         $integrationTable = $this->resourceConnection->getTableName($table);
         $connection->delete(
             $integrationTable,
-            $column.' like "%doofinder%"'
+            $column . ' like "%doofinder%"'
         );
+    }
+
+    /**
+     * Clean the config cache
+     */
+    private function cleanConfigCache()
+    {
+        $this->cacheTypeList->cleanType('config');
+        foreach ($this->cacheFrontendPool as $cacheFrontend) {
+            $cacheFrontend->getBackend()->clean();
+        }
     }
 }
