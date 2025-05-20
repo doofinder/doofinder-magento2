@@ -186,7 +186,10 @@ class Inventory extends AbstractHelper
         $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
         $getStockItemData = $this->_objectManager->create(GetStockItemDataInterface::class);
         $stockId = $stockId ?? $defaultStockProvider->getId();
-        $stockItemData = $getStockItemData->execute($sku, $stockId);
+        $stockItemData = $getStockItemData->execute($sku, $stockId) ?? [
+            GetStockItemDataInterface::QUANTITY => 0,
+            GetStockItemDataInterface::IS_SALABLE => false
+        ];
 
         return [
             GetStockItemDataInterface::QUANTITY => $stockItemData[GetStockItemDataInterface::QUANTITY] ?? 0,
