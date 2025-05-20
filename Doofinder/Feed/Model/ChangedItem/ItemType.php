@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Model\ChangedItem;
 
-abstract class ItemType
+class ItemType
 {
     public const PRODUCT = 0;
     public const PAGE = 1;

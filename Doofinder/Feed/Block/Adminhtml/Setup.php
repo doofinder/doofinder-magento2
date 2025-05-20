@@ -84,6 +84,16 @@ class Setup extends Template
     }
 
     /**
+     * Get the Store Config helper
+     *
+     * @return StoreConfig
+     */
+    public function getStoreConfig(): StoreConfig
+    {
+        return $this->storeConfig;
+    }
+
+    /**
      * Is integration created
      *
      * @return bool

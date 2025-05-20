@@ -163,10 +163,10 @@
                 "buttonRegister": "#register-account-btn",
                 "buttonLogin": "#login-btn",
                 "email": "<?= $escaper->escapeHtml(
-                    $block->helper(Doofinder\Feed\Helper\StoreConfig::class)->getEmailAdmin()
+                    $block->getStoreConfig()->getEmailAdmin()
                 ); ?>",
                 "name": "<?= $escaper->escapeHtml(
-                    $block->helper(Doofinder\Feed\Helper\StoreConfig::class)->getIntegrationName()
+                    $block->getStoreConfig()->getIntegrationName()
                 ); ?>",
                 "isIntegrationCreated": "<?= $escaper->escapeHtml($block->isIntegrationCreated()) ?>",
                 "hasApiKey": "<?= $escaper->escapeHtml($block->hasApiKey()) ?>",
@@ -177,12 +177,12 @@
                 "buttonRegister": "#register-account-btn",
                 "buttonLogin": "#login-btn",
                 "signupEndpoint": "<?= $escaper->escapeUrl(
-                    $block->helper(Doofinder\Feed\Helper\StoreConfig::class)->getSignupEndpoint()
+                    $block->getStoreConfig()->getSignupEndpoint()
                 ); ?>",
                 "loginEndpoint": "<?= $escaper->escapeUrl(
-                    $block->helper(Doofinder\Feed\Helper\StoreConfig::class)->getLoginEndpoint()
+                    $block->getStoreConfig()->getLoginEndpoint()
                 ); ?>",
-                "paramsPopup": "<?= $escaper->escapeHtml($block->getParamsPopup()) ?>",
+                "paramsPopup": "<?= /* @noEscape */ $block->getParamsPopup() ?>",
                 "checkAPIKeyUrl": "<?= $escaper->escapeUrl($block->getCheckAPIKeyUrl()) ?>",
                 "setupUrl": "<?= $escaper->escapeUrl($block->getSetupUrl()) ?>",
                 "doofinderConnectUrl": "<?= $escaper->escapeUrl($block->getDoofinderConnectUrl()) ?>"
