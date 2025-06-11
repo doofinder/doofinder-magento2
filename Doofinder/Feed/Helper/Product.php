@@ -162,6 +162,7 @@ class Product extends AbstractHelper
             UrlRewrite::ENTITY_ID => $productId,
             UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,
             UrlRewrite::STORE_ID => $storeId,
+            UrlRewrite::REDIRECT_TYPE => 0,
         ];
         $rewrite = $this->urlFinder->findOneByData($filterData);
         if ($rewrite) {
