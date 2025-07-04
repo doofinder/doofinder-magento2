@@ -94,6 +94,16 @@ class Setup extends Template
     }
 
     /**
+     * Make Escaper available to the template
+     *
+     * @return \Magento\Framework\Escaper
+     */
+    public function getEscaper()
+    {
+        return $this->_escaper;
+    }
+
+    /**
      * Is integration created
      *
      * @return bool
