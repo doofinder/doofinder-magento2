@@ -295,7 +295,7 @@ class Inventory extends AbstractHelper
             $websiteId = (int)$this->storeManager->getStore($storeId)->getWebsiteId();
             $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
             $stockId = $getAssignedStockIdForWebsite->execute($websiteCode);
-            return $stockId;
+            return (int) $stockId;
         } catch (\Exception $e) {
             $this->_logger->error('Could not get stockId for store', [
                 'storeId' => $storeId,
