@@ -138,7 +138,7 @@ class Inventory extends AbstractHelper
             }
             return false;
         }
-        
+
         return $this->isProductSalable($product, $stockId);
     }
 
@@ -186,7 +186,29 @@ class Inventory extends AbstractHelper
         $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
         $getStockItemData = $this->_objectManager->create(GetStockItemDataInterface::class);
         $stockId = $stockId ?? $defaultStockProvider->getId();
-        $stockItemData = $getStockItemData->execute($sku, $stockId);
+
+        if ($stockId === 0 || $stockId === null) {
+            $errorMsg = 'Invalid stockId detected: The stockId for the selected website is invalid. Please check the stock assignment in MSI.';
+            $this->_logger->error($errorMsg, [
+                'sku' => $sku,
+                'stockId' => $stockId,
+                'isMsiActive' => $this->isMsiActive()
+            ]);
+            throw new \Exception($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
+        }
+
+        try {
+            $stockItemData = $getStockItemData->execute($sku, $stockId);
+        } catch (\Exception $e) {
+            $errorMsg = 'Could not receive Stock Item data: ' . $e->getMessage();
+            $this->_logger->error($errorMsg, [
+                'sku' => $sku,
+                'stockId' => $stockId,
+                'exception' => $e->getMessage(),
+                'isMsiActive' => $this->isMsiActive()
+            ]);
+            throw new \Exception($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
+        }
 
         return [
             GetStockItemDataInterface::QUANTITY => $stockItemData[GetStockItemDataInterface::QUANTITY] ?? 0,
@@ -265,10 +287,34 @@ class Inventory extends AbstractHelper
      */
     private function getStockIdByStoreWithMSI(int $storeId): ?int
     {
-        $getAssignedStockIdForWebsite = $this->_objectManager->create(GetAssignedStockIdForWebsite::class);
-        $websiteId = (int)$this->storeManager->getStore($storeId)->getWebsiteId();
-        $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
-        return $getAssignedStockIdForWebsite->execute($websiteCode);
+        try {
+            $getAssignedStockIdForWebsite = $this->_objectManager->create(GetAssignedStockIdForWebsite::class);
+            $websiteId = (int)$this->storeManager->getStore($storeId)->getWebsiteId();
+            $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
+
+            $this->_logger->info('Getting stockId for store', [
+                'storeId' => $storeId,
+                'websiteId' => $websiteId,
+                'websiteCode' => $websiteCode,
+            ]);
+
+            $stockId = $getAssignedStockIdForWebsite->execute($websiteCode);
+
+            $this->_logger->info('Retrieved stockId for store', [
+                'storeId' => $storeId,
+                'websiteId' => $websiteId,
+                'websiteCode' => $websiteCode,
+                'stockId' => $stockId,
+            ]);
+
+            return $stockId;
+        } catch (\Exception $e) {
+            $this->_logger->error('Could not get stockId for store', [
+                'storeId' => $storeId,
+                'exception' => $e->getMessage(),
+            ]);
+            return null;
+        }
     }
 
     /**
