@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
+use Doofinder\Feed\Errors\DoofinderFeedException;
 use Magento\Catalog\Model\Product as ProductModel;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -188,13 +189,15 @@ class Inventory extends AbstractHelper
         $stockId = $stockId ?? $defaultStockProvider->getId();
 
         if ($stockId === 0 || $stockId === null) {
-            $errorMsg = 'Invalid stockId detected: The stockId for the selected website is invalid. Please check the stock assignment in MSI.';
+            $errorMsg = 'Invalid stockId detected: The stockId for the selected website is invalid. Please check the';
+            $errorMsg .= ' stock assignment in MSI.';
+
             $this->_logger->error($errorMsg, [
                 'sku' => $sku,
                 'stockId' => $stockId,
                 'isMsiActive' => $this->isMsiActive()
             ]);
-            throw new \Exception($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
+            throw new DoofinderFeedException($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
         }
 
         try {
@@ -207,7 +210,7 @@ class Inventory extends AbstractHelper
                 'exception' => $e->getMessage(),
                 'isMsiActive' => $this->isMsiActive()
             ]);
-            throw new \Exception($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
+            throw new DoofinderFeedException($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
         }
 
         return [
