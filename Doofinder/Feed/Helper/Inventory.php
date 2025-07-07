@@ -188,18 +188,6 @@ class Inventory extends AbstractHelper
         $getStockItemData = $this->_objectManager->create(GetStockItemDataInterface::class);
         $stockId = $stockId ?? $defaultStockProvider->getId();
 
-        if (0 === $stockId || null === $stockId) {
-            $errorMsg = 'Invalid stockId detected: The stockId for the selected website is invalid. Please check the';
-            $errorMsg .= ' stock assignment in MSI.';
-
-            $this->_logger->error($errorMsg, [
-                'sku' => $sku,
-                'stockId' => $stockId,
-                'isMsiActive' => $this->isMsiActive()
-            ]);
-            throw new DoofinderFeedException($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
-        }
-
         try {
             $stockItemData = $getStockItemData->execute($sku, $stockId);
         } catch (\Exception $e) {
@@ -295,7 +283,7 @@ class Inventory extends AbstractHelper
             $websiteId = (int)$this->storeManager->getStore($storeId)->getWebsiteId();
             $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
             $stockId = $getAssignedStockIdForWebsite->execute($websiteCode);
-            return (int) $stockId;
+            return is_numeric($stockId) ? (int) $stockId : null;
         } catch (\Exception $e) {
             $this->_logger->error('Could not get stockId for store', [
                 'storeId' => $storeId,
