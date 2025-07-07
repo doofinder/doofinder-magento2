@@ -1,7 +1,10 @@
 <?php
 
-/** @var $block \Doofinder\Feed\Block\Adminhtml\Setup */
-
+/**
+ * @var $block \Doofinder\Feed\Block\Adminhtml\Setup
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$escaper = $block->getEscaper();
 ?>
 <?php $sector = $block->getSectorValue() ?>
 <div data-role="steps-setup-main" class="steps-setup">
@@ -42,7 +45,7 @@
                             <option value="pets" <?php if ($sector === "pets"): ?> selected<?php endif; ?>>
                                 <?= $escaper->escapeHtmlAttr(__('Pets')) ?>
                             </option>
-                            <option 
+                            <option
                                 value="parapharmacy" <?php if ($sector === "parapharmacy"): ?> selected<?php endif; ?>>
                                 <?= $escaper->escapeHtmlAttr(__('Pharma & Cosmetics')) ?>
                             </option>
@@ -63,19 +66,19 @@
                     <h4><?= $escaper->escapeHtmlAttr(__('We link to our Doofinder account')) ?></h4>
                     <div class="steps-button-container">
                         <input
-                            class="steps-btn-yellow" 
-                            id="register-account-btn" 
-                            disabled 
-                            type="button" 
-                            value="<?= $escaper->escapeHtmlAttr(__('USE YOUR FREE TRIAL NOW!')) ?>" 
+                            class="steps-btn-yellow"
+                            id="register-account-btn"
+                            disabled
+                            type="button"
+                            value="<?= $escaper->escapeHtmlAttr(__('USE YOUR FREE TRIAL NOW!')) ?>"
                         />
                     </div>
                     <div class="steps-button-container">
                         <input
-                            disabled 
-                            type="button" 
-                            id="login-btn" 
-                            value="<?= $escaper->escapeHtmlAttr(__('I HAVE AN ACCOUNT')) ?>" 
+                            disabled
+                            type="button"
+                            id="login-btn"
+                            value="<?= $escaper->escapeHtmlAttr(__('I HAVE AN ACCOUNT')) ?>"
                         />
                     </div>
                 </div>
@@ -91,12 +94,12 @@
                 </h2>
                 <h3 id="steps-about"><?= $escaper->escapeHtmlAttr(__('ABOUT DOOFINDER:')) ?></h3>
                 <p><?= $escaper->escapeHtmlAttr(
-                    __('Doofinder provides you with an instant search layer to display 
+                    __('Doofinder provides you with an instant search layer to display
                     your products when your visitors use the Doofinder script.')
                 ); ?></p>
                 <p><?= $escaper->escapeHtmlAttr(
-                    __('Your customers then have the opportunity to preview your products, 
-                    filter them and choose the desired product. 
+                    __('Your customers then have the opportunity to preview your products,
+                    filter them and choose the desired product.
                     Upon hitting enter, doofinder will power also the results page.')
                 ); ?></p>
                 <p><?= $escaper->escapeHtmlAttr(__('Among our features are:')) ?></p>

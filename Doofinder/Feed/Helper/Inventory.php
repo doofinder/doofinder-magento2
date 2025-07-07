@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
+use Doofinder\Feed\Errors\DoofinderFeedException;
 use Magento\Catalog\Model\Product as ProductModel;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -138,7 +139,7 @@ class Inventory extends AbstractHelper
             }
             return false;
         }
-        
+
         return $this->isProductSalable($product, $stockId);
     }
 
@@ -186,7 +187,19 @@ class Inventory extends AbstractHelper
         $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
         $getStockItemData = $this->_objectManager->create(GetStockItemDataInterface::class);
         $stockId = $stockId ?? $defaultStockProvider->getId();
-        $stockItemData = $getStockItemData->execute($sku, $stockId);
+
+        try {
+            $stockItemData = $getStockItemData->execute($sku, $stockId);
+        } catch (\Exception $e) {
+            $errorMsg = 'Could not receive Stock Item data: ' . $e->getMessage();
+            $this->_logger->error($errorMsg, [
+                'sku' => $sku,
+                'stockId' => $stockId,
+                'exception' => $e->getMessage(),
+                'isMsiActive' => $this->isMsiActive()
+            ]);
+            throw new DoofinderFeedException($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
+        }
 
         return [
             GetStockItemDataInterface::QUANTITY => $stockItemData[GetStockItemDataInterface::QUANTITY] ?? 0,
@@ -265,10 +278,19 @@ class Inventory extends AbstractHelper
      */
     private function getStockIdByStoreWithMSI(int $storeId): ?int
     {
-        $getAssignedStockIdForWebsite = $this->_objectManager->create(GetAssignedStockIdForWebsite::class);
-        $websiteId = (int)$this->storeManager->getStore($storeId)->getWebsiteId();
-        $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
-        return $getAssignedStockIdForWebsite->execute($websiteCode);
+        try {
+            $getAssignedStockIdForWebsite = $this->_objectManager->create(GetAssignedStockIdForWebsite::class);
+            $websiteId = (int)$this->storeManager->getStore($storeId)->getWebsiteId();
+            $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
+            $stockId = $getAssignedStockIdForWebsite->execute($websiteCode);
+            return is_numeric($stockId) ? (int) $stockId : null;
+        } catch (\Exception $e) {
+            $this->_logger->error('Could not get stockId for store', [
+                'storeId' => $storeId,
+                'exception' => $e->getMessage(),
+            ]);
+            return null;
+        }
     }
 
     /**
