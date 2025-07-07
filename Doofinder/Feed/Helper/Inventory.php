@@ -188,7 +188,7 @@ class Inventory extends AbstractHelper
         $getStockItemData = $this->_objectManager->create(GetStockItemDataInterface::class);
         $stockId = $stockId ?? $defaultStockProvider->getId();
 
-        if ($stockId === 0 || $stockId === null) {
+        if (0 === $stockId || null === $stockId) {
             $errorMsg = 'Invalid stockId detected: The stockId for the selected website is invalid. Please check the';
             $errorMsg .= ' stock assignment in MSI.';
 
