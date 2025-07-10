@@ -61,7 +61,7 @@ class ApiKeyValidation extends Value
     public function beforeSave(): ApiKeyValidation
     {
         if ($apiKey = $this->getValue()) {
-            if (!preg_match('/^(us1|eu1)-(?:[0-9a-f]{40}|[0-9a-f]{30})$/', $apiKey)) {
+            if (!preg_match('/^([a-z]{2}[0-9])-(?:[0-9a-f]{40}|[0-9a-f]{30})$/', $apiKey)) {
                 throw new ValidatorException(
                     __('API key %1 is in an invalid format.', $apiKey)
                 );
