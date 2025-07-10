@@ -106,6 +106,18 @@ class StoreViewTable extends Field
     }
 
     /**
+     * Retrieve the integration ID.
+     *
+     * @return string|null
+     */
+    public function getIntegrationId()
+    {
+        return $this->storeConfig->getValueFromConfig(
+            StoreConfig::INTEGRATION_ID_CONFIG
+        );
+    }
+
+    /**
      * Generate the AJAX URL for sync/migrate call.
      *
      * @return string
@@ -113,5 +125,15 @@ class StoreViewTable extends Field
     public function getAjaxUrl()
     {
         return $this->getUrl("doofinderfeed/integration/createStore");
+    }
+
+    /**
+     * Generate the initial setup URL.
+     *
+     * @return string
+     */
+    public function getInitialSetupUrl()
+    {
+        return $this->getUrl("doofinderfeed/setup/index");
     }
 }

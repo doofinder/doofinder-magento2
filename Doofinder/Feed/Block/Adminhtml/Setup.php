@@ -84,6 +84,26 @@ class Setup extends Template
     }
 
     /**
+     * Get the Store Config helper
+     *
+     * @return StoreConfig
+     */
+    public function getStoreConfig(): StoreConfig
+    {
+        return $this->storeConfig;
+    }
+
+    /**
+     * Make Escaper available to the template
+     *
+     * @return \Magento\Framework\Escaper
+     */
+    public function getEscaper()
+    {
+        return $this->_escaper;
+    }
+
+    /**
      * Is integration created
      *
      * @return bool

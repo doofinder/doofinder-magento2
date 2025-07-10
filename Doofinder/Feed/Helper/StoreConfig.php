@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
+use Doofinder\Feed\Errors\NotFound;
 use Doofinder\Feed\Helper\Indexation;
+use GuzzleHttp\Psr7\Utils;
 use Magento\Config\Model\Config\Backend\Admin\Custom;
 use Magento\Catalog\Model\Product;
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigCollectionFactory;
@@ -23,7 +25,6 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Framework\Escaper;
 use Magento\Eav\Model\Config;
-use Doofinder\Feed\Errors\NotFound;
 use Magento\Backend\Helper\Data;
 
 /**
@@ -649,7 +650,7 @@ class StoreConfig extends AbstractHelper
             self::LOGIN_ENDPOINT,
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
             null
-        ) ?? (getenv("DOOFINDER_ADMIN_URL") ?: "https://admin.doofinder.com") . '/plugins/login/magento2';
+        ) ?? Constants::DOOFINDER_ADMIN_URL . '/plugins/login/magento2';
     }
 
     /**
@@ -663,7 +664,7 @@ class StoreConfig extends AbstractHelper
             self::SIGNUP_ENDPOINT,
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
             null
-        ) ?? (getenv("DOOFINDER_ADMIN_URL") ?: "https://admin.doofinder.com") . '/plugins/signup/magento2';
+        ) ?? Constants::DOOFINDER_ADMIN_URL . '/plugins/signup/magento2';
     }
 
     /**
@@ -697,11 +698,7 @@ class StoreConfig extends AbstractHelper
      */
     public function getDoofinderConnectUrl(): string
     {
-        $host = parse_url($this->backendHelper->getUrl(), PHP_URL_HOST);
-        $scheme = parse_url($this->backendHelper->getUrl(), PHP_URL_SCHEME);
-        $port = parse_url($this->backendHelper->getUrl(), PHP_URL_PORT);
-        $port = empty($port) ? '' : ":$port";
-        return sprintf('%1$s://%2$s%3$s/%4$s', $scheme, $host, $port, self::DOOFINDER_CONNECTION);
+        return $this->backendHelper->getUrl(self::DOOFINDER_CONNECTION);
     }
 
     /**

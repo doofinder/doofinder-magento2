@@ -8,84 +8,114 @@ use Magento\Store\Api\Data\GroupInterface;
 
 $escaper = $block->getEscaper();
 $groups = $block->getGroups();
+$integrationId = $block->getIntegrationId();
 ?>
-<table class="data-grid store-table">
-    <thead>
-        <tr>
-            <th class="data-grid-th no-link col-name"><?= $escaper->escapeHtml(__('Store Name')) ?></th>
-            <th class="data-grid-th last no-link col-action"><?= $escaper->escapeHtml(__('Action')) ?></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php $evenStyle = true; ?>
-        <?php foreach ($groups as $group): ?>
-            <?php
-            // Retrieve the installation id for the store configuration
-            $installationId = $block->getInstallationId($group);
-            ?>
-            <tr class="<?= ($evenStyle = !$evenStyle) ? "even" : "" ?>"
-                id="store-view-installation-<?= $escaper->escapeHtml($group->getId()) ?>">
-                <td>
-                    <?= $escaper->escapeHtml($group->getName()); ?><br />
-                    <span class="installation-id">
-                        <?= $escaper->escapeHtml($installationId  ?: __('Not installed')) ?>
-                    </span>
-                </td>
-                <td style=" text-align:center;">
-                    <?php if ($installationId === null): ?>
-                        <button name="doofinder-create-store" type="button"
-                            onclick="doofinderSyncStore(<?= $escaper->escapeHtml($group->getId()) ?>)">
-                            <?= $escaper->escapeHtml(__('Create')) ?>
-                        </button>
-                    <?php else: ?>
-                        <button name="doofinder-create-store" type="button" disabled="disabled">
-                            <?= $escaper->escapeHtml(__('Created')) ?>
-                        </button>
-                    <?php endif; ?>
-                </td>
+<?php if ($integrationId === null): ?>
+    <?= $escaper->escapeHtml(__(
+        'It seems that you have not configured the Doofinder integration yet. Please '
+            . ' <a href="%1"> run the initial setup</a> to configure the integration.',
+        $block->getInitialSetupUrl()
+    ), ['a']) ?>
+<?php else: ?>
+    <table class="data-grid store-table">
+        <thead>
+            <tr>
+                <th class="data-grid-th no-link col-name"><?= $escaper->escapeHtml(__('Store Name')) ?></th>
+                <th class="data-grid-th last no-link col-action"><?= $escaper->escapeHtml(__('Action')) ?></th>
             </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <?php $evenStyle = true; ?>
+            <?php foreach ($groups as $group): ?>
+                <?php
+                // Retrieve the installation id for the store configuration
+                $installationId = $block->getInstallationId($group);
+                ?>
+                <tr class="<?= ($evenStyle = !$evenStyle) ? "even" : "" ?>"
+                    id="store-view-installation-<?= $escaper->escapeHtml($group->getId()) ?>">
+                    <td>
+                        <?= $escaper->escapeHtml($group->getName()); ?><br />
+                        <span class="installation-id">
+                            <?= $escaper->escapeHtml($installationId  ?: __('Not installed')) ?>
+                        </span>
+                    </td>
+                    <td style="text-align:center;">
+                        <?php if ($installationId === null): ?>
+                            <button name="doofinder-create-store" type="button"
+                                onclick="doofinderSyncStore(<?= $escaper->escapeHtml($group->getId()) ?>)">
+                                <?= $escaper->escapeHtml(__('Create')) ?>
+                            </button>
+                        <?php else: ?>
+                            <button name="doofinder-create-store" type="button" disabled="disabled">
+                                <?= $escaper->escapeHtml(__('Created')) ?>
+                            </button>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 
-<script>
-    require(['jquery', 'mage/translate'], function($, _t) {
+    <script>
+        require(['jquery', 'mage/translate'], function($, _t) {
 
-        window.doofinderSyncStore = function(groupId) {
-            new Ajax.Request('<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>', {
-                parameters: {
-                    group: groupId
-                },
-                loaderArea: true,
-                asynchronous: true,
-                onSuccess: function(transport) {
-                    if (transport?.responseJSON?.success) {
-                        var groupSelector = '#store-view-installation-' + groupId;
-                        var buttonSelector = groupSelector + ' button[name="doofinder-create-store"]';
-                        $(`${groupSelector} .installation-id`).html(transport.responseJSON?.data.id);
-                        $(`${groupSelector}  button[name="doofinder-create-store"]`).attr('disabled', 'disabled');
-                        $(`${groupSelector} button[name="doofinder-create-store"]`).html(_t('Created'));
-                        $('body').notification('clear')
-                        $('body').notification('add', {
-                            message: _t("Doofinder Store created successfully!"),
-                            error: false,
+            window.doofinderSyncStore = function(groupId) {
+                new Ajax.Request('<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>', {
+                    parameters: {
+                        group: groupId
+                    },
+                    loaderArea: true,
+                    asynchronous: true,
+                    onSuccess: function(transport) {
+                        if (transport?.responseJSON?.success) {
+                            var groupSelector = '#store-view-installation-' + groupId;
+                            var buttonSelector = groupSelector + ' button[name="doofinder-create-store"]';
+                            $(`${groupSelector} .installation-id`).html(transport.responseJSON?.data.id);
+                            $(`${groupSelector}  button[name="doofinder-create-store"]`).attr('disabled', 'disabled');
+                            $(`${groupSelector} button[name="doofinder-create-store"]`).html(_t('Created'));
+                            $('body').notification('clear')
+                            $('body').notification('add', {
+                                message: _t("Doofinder Store created successfully!"),
+                                error: false,
 
-                            /**
-                             * @param {String} message
-                             */
-                            insertMethod: function(message) {
-                                var $wrapper = $('<div></div>').html(message);
+                                /**
+                                 * @param {String} message
+                                 */
+                                insertMethod: function(message) {
+                                    var $wrapper = $('<div></div>').html(message);
 
-                                $('.page-main-actions').after($wrapper);
-                            }
-                        });
-                    } else {
+                                    $('.page-main-actions').after($wrapper);
+                                }
+                            });
+                        } else {
+                            $('body').notification('clear')
+                            $('body').notification('add', {
+                                error: true,
+                                message: _t(transport?.responseJSON?.message ||
+                                    "An unknown error has occurred while creating the store. \
+                                        Please take a look into the logs for more information."),
+
+                                /**
+                                 * @param {String} message
+                                 */
+                                insertMethod: function(message) {
+                                    var $wrapper = $('<div></div>').html(message);
+
+                                    $('.page-main-actions').after($wrapper);
+                                }
+                            });
+                            return;
+                        }
+
+                    },
+                    onFailure: function(transport) {
                         $('body').notification('clear')
                         $('body').notification('add', {
                             error: true,
                             message: _t(transport?.responseJSON?.message ||
-                                "An unknown error has occurred while creating the store. \
-                                    Please take a look into the logs for more information."),
+                                "An unknown error has occurred while creating the \
+                                search engine. Please take a look into the logs for \
+                                more information."),
 
                             /**
                              * @param {String} message
@@ -96,30 +126,9 @@ $groups = $block->getGroups();
                                 $('.page-main-actions').after($wrapper);
                             }
                         });
-                        return;
                     }
-
-                },
-                onFailure: function(transport) {
-                    $('body').notification('clear')
-                    $('body').notification('add', {
-                        error: true,
-                        message: _t(transport?.responseJSON?.message ||
-                            "An unknown error has occurred while creating the \
-                             search engine. Please take a look into the logs for \
-                             more information."),
-
-                        /**
-                         * @param {String} message
-                         */
-                        insertMethod: function(message) {
-                            var $wrapper = $('<div></div>').html(message);
-
-                            $('.page-main-actions').after($wrapper);
-                        }
-                    });
-                }
-            });
-        }
-    });
-</script>
+                });
+            }
+        });
+    </script>
+<?php endif; ?>

@@ -220,7 +220,6 @@ class InstallationService
             ];
         }
 
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
         $customAttributes = base64_encode(gzcompress(json_encode($attributes)));
         $this->storeConfig->setCustomAttributes($customAttributes);
     }

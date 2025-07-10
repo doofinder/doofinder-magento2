@@ -19,32 +19,32 @@ class Utils
      * @throws TypeAlreadyExists
      * @throws WrongResponse
      */
-    public static function handleErrors($statusCode, $response)
+    public function handleErrors($statusCode, $response)
     {
         switch ($statusCode) {
             case 403:
                 throw new NotAllowed(
-                    "The user does not have permissions to perform this operation: " . Utils::readError($response)
+                    "The user does not have permissions to perform this operation: " . $this->readError($response)
                 );
             case 401:
-                throw new NotAllowed("The user hasn't provided valid authorization: " . Utils::readError($response));
+                throw new NotAllowed("The user hasn't provided valid authorization: " . $this->readError($response));
             case 404:
-                throw new NotFound("Not Found: " . Utils::readError($response));
+                throw new NotFound("Not Found: " . $this->readError($response));
             case 409:
                 if (preg_match('/indexing.*progress/i', $response) == 1) {
                     // The search engine is locked
-                    throw new IndexingInProgress(Utils::readError($response));
+                    throw new IndexingInProgress($this->readError($response));
                 } else {
                     if (preg_match('/type.*already created/i', $response) == 1) {
-                        throw new TypeAlreadyExists(Utils::readError($response));
+                        throw new TypeAlreadyExists($this->readError($response));
                     } else {
                         // trying to post with an already used id
-                        throw new BadRequest("Request conflict: " . Utils::readError($response));
+                        throw new BadRequest("Request conflict: " . $this->readError($response));
                     }
                 }
             case 429:
                 if (stripos($response, 'throttled') !== false) {
-                    throw new ThrottledResponse(Utils::readError($response));
+                    throw new ThrottledResponse($this->readError($response));
                 } else {
                     throw new QuotaExhausted(
                         "The query quota has been reached. No more queries can be requested right now"
@@ -53,11 +53,11 @@ class Utils
         }
 
         if ($statusCode >= 500) {
-            throw new WrongResponse("Server error: " . Utils::readError($response));
+            throw new WrongResponse("Server error: " . $this->readError($response));
         }
 
         if ($statusCode >= 400) {
-            throw new BadRequest("The client made a bad request: " . Utils::readError($response));
+            throw new BadRequest("The client made a bad request: " . $this->readError($response));
         }
     }
 
@@ -67,7 +67,7 @@ class Utils
      * @param string $response
      * @return string
      */
-    private static function readError($response): string
+    private function readError($response): string
     {
         $error = json_decode($response, true);
         if ($error === null || !isset($error['error']['message'])) {
