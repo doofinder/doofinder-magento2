@@ -891,10 +891,16 @@ class StoreConfig extends AbstractHelper
             /*
             Only index attributes that are visible and user-defined.
             However, some native attributes (e.g., 'brands') return internal IDs instead of human-readable labels.
-            To fix this, we manually whitelist them via DOOFINDER_FORCED_ATTRIBUTES and treat them as if they were user-defined.
+            To fix this, we manually whitelist them via DOOFINDER_FORCED_ATTRIBUTES and treat them as if they were
+            user-defined.
             */
 
-            if (!$attribute->getIsVisible() || (!$attribute->getIsUserDefined() && !in_array($attribute->getAttributeCode(), self::DOOFINDER_FORCED_ATTRIBUTES))) {
+            if (!$attribute->getIsVisible() ||
+                (
+                    !$attribute->getIsUserDefined() &&
+                    !in_array($attribute->getAttributeCode(), self::DOOFINDER_FORCED_ATTRIBUTES)
+                )
+            ) {
                 continue;
             }
             $attribute_id = $attribute->getAttributeId();
