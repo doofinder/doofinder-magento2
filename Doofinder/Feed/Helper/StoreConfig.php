@@ -893,13 +893,18 @@ class StoreConfig extends AbstractHelper
         $attributeCollection->addFieldToFilter(['is_user_defined', 'attribute_code'], [
             ['eq' => 1],
             ['in' => self::DOOFINDER_FORCED_ATTRIBUTES]
-        ]);
+        ])
+        ->getSelect()
+        ->join(
+            ['cea' => $attributeCollection->getTable('catalog_eav_attribute')],
+            'main_table.attribute_id = cea.attribute_id',
+            ['is_visible']
+        )
+        ->where('cea.is_visible = ?', 1);
+
         $attributes = [];
         foreach ($attributeCollection as $attributeTmp) {
             $attribute = $this->eavConfig->getAttribute(Product::ENTITY, $attributeTmp->getAttributeId());
-            if (!$attribute->getIsVisible()) {
-                continue;
-            }
             $attribute_id = $attribute->getAttributeId();
             $attributes[$attribute_id] = [
                 'code'    => $attribute->getAttributeCode(),
