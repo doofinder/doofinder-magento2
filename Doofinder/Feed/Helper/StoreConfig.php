@@ -884,23 +884,20 @@ class StoreConfig extends AbstractHelper
         }
 
         $attributeCollection = $this->attributeCollectionFactory->create();
-        $attributes = [];
-        foreach ($attributeCollection as $attributeTmp) {
-            $attribute = $this->eavConfig->getAttribute(Product::ENTITY, $attributeTmp->getAttributeId());
-
-            /*
-            Only index attributes that are visible and user-defined.
+        /*
+            Only index user-defined attributes.
             However, some native attributes (e.g., 'brands') return internal IDs instead of human-readable labels.
             To fix this, we manually whitelist them via DOOFINDER_FORCED_ATTRIBUTES and treat them as if they were
             user-defined.
-            */
-
-            if (!$attribute->getIsVisible() ||
-                (
-                    !$attribute->getIsUserDefined() &&
-                    !in_array($attribute->getAttributeCode(), self::DOOFINDER_FORCED_ATTRIBUTES)
-                )
-            ) {
+        */
+        $attributeCollection->addFieldToFilter(['is_user_defined', 'attribute_code'], [
+            ['eq' => 1],
+            ['in' => self::DOOFINDER_FORCED_ATTRIBUTES]
+        ]);
+        $attributes = [];
+        foreach ($attributeCollection as $attributeTmp) {
+            $attribute = $this->eavConfig->getAttribute(Product::ENTITY, $attributeTmp->getAttributeId());
+            if (!$attribute->getIsVisible()) {
                 continue;
             }
             $attribute_id = $attribute->getAttributeId();
