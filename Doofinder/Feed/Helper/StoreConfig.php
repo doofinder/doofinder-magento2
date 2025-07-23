@@ -137,6 +137,11 @@ class StoreConfig extends AbstractHelper
      */
     public const DOOFINDER_CONNECTION = 'doofinderfeed/setup/config';
 
+    /**
+     * Attributes that are forced to be indexed as custom attributes.
+     */
+    public const DOOFINDER_FORCED_ATTRIBUTES = ['brands'];
+
     /** @var StoreManagerInterface */
     private $storeManager;
 
@@ -530,7 +535,7 @@ class StoreConfig extends AbstractHelper
 
                 $singleScriptAdditionalConfig = <<<EOT
                     <script>
-                        (function(w, k) {w[k] = window[k] || 
+                        (function(w, k) {w[k] = window[k] ||
                         function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
 
                         doofinderApp("config", "language", "$language")
@@ -879,13 +884,27 @@ class StoreConfig extends AbstractHelper
         }
 
         $attributeCollection = $this->attributeCollectionFactory->create();
-        $attributeCollection->addFieldToFilter('is_user_defined', ['eq' => 1]);
+        /*
+            Only index user-defined attributes.
+            However, some native attributes (e.g., 'brands') return internal IDs instead of human-readable labels.
+            To fix this, we manually whitelist them via DOOFINDER_FORCED_ATTRIBUTES and treat them as if they were
+            user-defined.
+        */
+        $attributeCollection->addFieldToFilter(['is_user_defined', 'attribute_code'], [
+            ['eq' => 1],
+            ['in' => self::DOOFINDER_FORCED_ATTRIBUTES]
+        ])
+        ->getSelect()
+        ->join(
+            ['cea' => $attributeCollection->getTable('catalog_eav_attribute')],
+            'main_table.attribute_id = cea.attribute_id',
+            ['is_visible']
+        )
+        ->where('cea.is_visible = ?', 1);
+
         $attributes = [];
         foreach ($attributeCollection as $attributeTmp) {
             $attribute = $this->eavConfig->getAttribute(Product::ENTITY, $attributeTmp->getAttributeId());
-            if (!$attribute->getIsVisible()) {
-                continue;
-            }
             $attribute_id = $attribute->getAttributeId();
             $attributes[$attribute_id] = [
                 'code'    => $attribute->getAttributeCode(),
