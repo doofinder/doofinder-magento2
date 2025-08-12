@@ -2,3 +2,5 @@
 app/
 vendor
 composer.lock
+.phpdoc
+build/docs
