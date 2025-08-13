@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - davidmolinacano/pluginrangers/1051/phpdoc_in_github_pages_fix
 
 jobs:
   build:
@@ -30,6 +31,13 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
+      - name: Configure Magento Auth for Composer
+        env:
+          COMPOSER_AUTH_USERNAME: ${{ secrets.COMPOSER_AUTH_USERNAME }}
+          COMPOSER_AUTH_PASSWORD: ${{ secrets.COMPOSER_AUTH_PASSWORD }}
+        run: |
+          composer config --global http-basic.repo.magento.com $COMPOSER_AUTH_USERNAME $COMPOSER_AUTH_PASSWORD
+  
       - name: Install Composer dependencies (including dev)
         run: composer install --no-interaction --prefer-dist
 
