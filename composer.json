@@ -12,7 +12,8 @@
     "magento/magento-coding-standard": ">=31.0",
     "squizlabs/php_codesniffer": ">=3.4",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-    "magento/php-compatibility-fork": "*"
+    "magento/php-compatibility-fork": "*",
+    "phpdocumentor/shim": "^3.8"
   },
   "license": [
     "OSL-3.0",
@@ -46,5 +47,12 @@
     "post-update-cmd": [
       "([ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/,../../magento/php-compatibility-fork)"
     ]
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "magento/composer-dependency-version-audit-plugin": true,
+      "phpdocumentor/shim": true
+    }
   }
 }
