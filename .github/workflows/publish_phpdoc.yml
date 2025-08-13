@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - davidmolinacano/pluginrangers/1051/phpdoc_in_github_pages_fix
 
 jobs:
   build:
