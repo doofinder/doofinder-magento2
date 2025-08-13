@@ -1,6 +1,6 @@
 {
   "name": "doofinder/doofinder-magento2",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Doofinder module for Magento 2",
   "type": "magento2-module",
   "require": {
@@ -54,5 +54,19 @@
       "magento/composer-dependency-version-audit-plugin": true,
       "phpdocumentor/shim": true
     }
+  },
+  "archive": {
+    "exclude": [
+      "docker-compose.elasticsearch.yml",
+      "docker-compose.opensearch.yml",
+      "docker-compose.yml",
+      "docker/",
+      "Makefile",
+      "default.vcl",
+      ".gitignore",
+      ".editorconfig",
+      ".vscode/",
+      ".github/"
+    ]
   }
 }
