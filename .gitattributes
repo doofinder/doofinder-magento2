@@ -1,0 +1,11 @@
+docker-compose.elasticsearch.yml     export-ignore
+docker-compose.opensearch.yml        export-ignore
+docker-compose.yml                   export-ignore
+docker/                              export-ignore
+Makefile                             export-ignore
+default.vcl                          export-ignore
+.gitignore                           export-ignore
+.gitattributes                       export-ignore
+.editorconfig                        export-ignore
+.vscode/                             export-ignore
+.github/                             export-ignore
