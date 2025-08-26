@@ -98,7 +98,7 @@ class Price extends AbstractHelper
      * Gets the price applying the taxes in case it's necessary
      *
      * @param \Magento\Catalog\Model\Product $product
-     * @param mixed $price
+     * @param \Magento\Framework\Pricing\Render\Amount|null $price
      * @return int|float
      */
     private function getPriceApplyingCorrespondingTaxes($product, $price)
@@ -111,6 +111,10 @@ class Price extends AbstractHelper
         $this->getTaxEnabled() ?
             $calculatedPrice = $this->getPriceWithTaxes($product, $amount):
             $calculatedPrice = $amount->getBaseAmount();
+
+        if (0 === (int)$calculatedPrice) {
+            $calculatedPrice = $amount->getValue();
+        }
 
         return (float)$calculatedPrice;
     }
