@@ -33,8 +33,8 @@ if [[ "$MAGENTO_VERSION" =~ ^2\.2\. || "$MAGENTO_VERSION" =~ ^2\.3\. ]]; then
 	--admin-email="$MAGENTO_ADMIN_EMAIL" \
 	--admin-user="$MAGENTO_ADMIN_USER" \
 	--admin-password="$MAGENTO_ADMIN_PASSWORD" \
-	--base-url=http://"$MAGENTO_BASE_URL" \
-	--base-url-secure=https://"$MAGENTO_BASE_URL" \
+	--base-url=http://"$BASE_URL" \
+	--base-url-secure=https://"$BASE_URL" \
 	--backend-frontname="$MAGENTO_ADMIN_FRONTNAME" \
 	--db-host="$MYSQL_HOST" \
 	--db-name="$MYSQL_DATABASE" \
@@ -65,8 +65,8 @@ if [[ "$MAGENTO_VERSION" =~ ^2\.4\. ]]; then
 	--disable-modules Magento_TwoFactorAuth \
   $SEARCH_PARAMS
 
-	${MAGENTO_BIN} config:set web/unsecure/base_url  "http://${MAGENTO_BASE_URL}/" > /dev/null && echo "Config set \`web/unsecure/base_url\` to \`http://${MAGENTO_BASE_URL}/\`"
-	${MAGENTO_BIN} config:set web/secure/base_url  "https://${MAGENTO_BASE_URL}/" > /dev/null && echo "Config set \`web/secure/base_url\` to \`https://${MAGENTO_BASE_URL}/\`"
+	${MAGENTO_BIN} config:set web/unsecure/base_url  "http://${BASE_URL}/" > /dev/null && echo "Config set \`web/unsecure/base_url\` to \`http://${BASE_URL}/\`"
+	${MAGENTO_BIN} config:set web/secure/base_url  "https://${BASE_URL}/" > /dev/null && echo "Config set \`web/secure/base_url\` to \`https://${BASE_URL}/\`"
 	${MAGENTO_BIN} config:set web/seo/use_rewrites  1 > /dev/null && echo "Enabled seo rewrites"
 	${MAGENTO_BIN} config:set general/locale/code  "${MAGENTO_LOCALE}" > /dev/null && echo "Set locale to \`${MAGENTO_LOCALE}\`"
 	${MAGENTO_BIN} config:set currency/options/base  "${MAGENTO_CURRENCY}" > /dev/null && echo "Set base currency to \`${MAGENTO_CURRENCY}\`"
