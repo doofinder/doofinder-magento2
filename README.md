@@ -11,7 +11,7 @@ In order to be able to create an account or login to an existing Doofinder accou
 
 To do so, you can use, for example, the utility ngrok: https://dashboard.ngrok.com/get-started/setup
 
-Once the external URL is created, simply set the `MAGENTO_BASE_URL` environment variable (see [Environment Variables](#environment-variables)).
+Once the external URL is created, simply set the `BASE_URL` environment variable (see [Environment Variables](#environment-variables)).
 
 So, when the installation process finished, instead of accessing to `http://localhost:9012` you will use your url, for example, `http://forcibly-ethical-apple.ngrok-free.app`).
 Notice that you'll need to specify the 9012 port when executing ngrok.
@@ -29,7 +29,7 @@ For example, below is a base `.env.local` file:
 
 ```bash
 #Magento setup configuration data
-MAGENTO_BASE_URL=your-url.ngrok-free.app
+BASE_URL=your-url.ngrok-free.app
 
 #Tokens for the Magento composer repository
 COMPOSER_AUTH_USERNAME=YOUR_COMPOSER_PUBLIC_KEY
@@ -51,9 +51,9 @@ You can set up a fresh Magento installation using the provided `Makefile` target
 - Runs a Magento installation with variables defined in the environment through `.env` or `.env.local` file.
 - Optionally: Loads sample data into Magento
 
-Finally, Magento 2 with the module installed will be running at `http://MAGENTO_BASE_URL`.
+Finally, Magento 2 with the module installed will be running at `http://BASE_URL`.
 
-The admin panel will be available at `http://MAGENTO_BASE_URL/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
+The admin panel will be available at `http://BASE_URL/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
 
 - User: `admin`
 - Pass: `admin123`
