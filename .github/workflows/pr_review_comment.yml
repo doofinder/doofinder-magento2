@@ -1,0 +1,9 @@
+name: PR review guide reminder
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  comment:
+    uses: doofinder/dfcommon/.github/workflows/shared_pr_review_comment.yml@master
