@@ -514,7 +514,7 @@ class Product extends AbstractHelper
     {
         $images = $product->getMediaGalleryEntries();
 
-        if (is_null($images)) {
+        if (null === $images) {
             return null;
         }
 
