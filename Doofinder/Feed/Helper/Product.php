@@ -514,6 +514,10 @@ class Product extends AbstractHelper
     {
         $images = $product->getMediaGalleryEntries();
 
+        if (null === $images) {
+            return null;
+        }
+
         foreach ($images as $image) {
             if ($image->getMediaType() != "image" || $image->isDisabled()) {
                 continue;
