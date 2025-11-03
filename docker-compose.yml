@@ -43,7 +43,7 @@ services:
       DOOFINDER_SEARCH_URL_FORMAT: ${DOOFINDER_SEARCH_URL_FORMAT}
       DOOFINDER_API_URL_FORMAT: ${DOOFINDER_API_URL_FORMAT}
       DOOFINDER_SCRIPT_URL_FORMAT: ${DOOFINDER_SCRIPT_URL_FORMAT}
-      #XDEBUG_CONFIG: "client_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} mode=develop,debug start_with_request=yes"
+      XDEBUG_CONFIG: "client_host=${XDEBUG_HOST} idekey=${XDEBUG_KEY} mode=develop,debug start_with_request=yes"
     volumes:
       - ./app:/app
       - ./Doofinder:/app/app/code/Doofinder
