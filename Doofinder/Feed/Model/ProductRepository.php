@@ -459,13 +459,13 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * Gets multiprice data for a product across all allowed currencies.
      *
      * Returns a map where keys are currency codes and values are arrays with price information.
-     * Example: ['EUR' => ['price' => 26, 'special_price' => 24], 'USD' => ['price' => 24, 'special_price' => 22]]
+     * Example: ['EUR' => ['price' => 26, 'sale_price' => 24], 'USD' => ['price' => 24, 'sale_price' => 22]]
      *
      * @param ProductInterface $product Product to get prices for.
      * @param int $storeId Store ID.
-     * @param float $basePrice Already calculated base price for the product.
-     * @param float $baseSpecialPrice Already calculated special price for the product.
-     * @return array Map of currency codes to price arrays with 'price' and 'special_price' keys.
+     * @param float $basePrice Calculated base price for the product.
+     * @param float $baseSpecialPrice Calculated special price for the product.
+     * @return array Map of currency codes to price arrays with 'price' and 'sale_price' keys.
      */
     private function getProductMultiprice($product, $storeId, $basePrice, $baseSpecialPrice): array
     {
@@ -488,7 +488,8 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             
             $multiprice[$currencyCode] = [
                 'price' => round($convertedPrice, 2),
-                'special_price' => round($convertedSpecialPrice, 2)
+                // 'special_price' gets assigned to 'sale_price' key
+                'sale_price' => round($convertedSpecialPrice, 2)
             ];
         }
         return $multiprice;
