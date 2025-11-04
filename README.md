@@ -62,7 +62,7 @@ The admin panel will be available at `http://BASE_URL/admin`. Admin credentials 
 
 ## Xdebug ready to use
 
-If you wish to debug your new Magento installation, Xdebug is already configured and ready to use through the `XDEBUG_CONFIG` environment variable in `docker-compose.yml` file, simply configure your IDE accordingly and have fun!
+If you wish to debug your new Magento installation, Xdebug is already configured and ready to use through the `XDEBUG_CONFIG` environment variable in the `docker-compose.yml` file, simply configure your IDE accordingly and have fun!
 
 ## Varnish was added to manage cache
 
