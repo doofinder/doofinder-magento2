@@ -430,10 +430,10 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             $extensionAttributes->setCategoryLinks($this->getCategoriesInformation($categories));
         }
 
-        $price = round($priceHelper->getProductPrice($product, 'regular_price'), 2);
-        $specialPrice = round($priceHelper->getProductPrice($product, 'final_price'), 2);
-        $extensionAttributes->setPrice($price);
-        ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
+        $price = $priceHelper->getProductPrice($product, 'regular_price');
+        $specialPrice = $priceHelper->getProductPrice($product, 'final_price');
+        $extensionAttributes->setPrice(round($price, 2));
+        ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice(round($specialPrice, 2));
 
         $dfMultiprice = $this->getProductMultiprice($product, $storeId, $price, $specialPrice);
         $dfMultipriceJson = $this->serializer->serialize($dfMultiprice);
