@@ -24,6 +24,7 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Api\StoreConfigManagerInterface as MagentoStoreConfig;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Directory\Model\CurrencyFactory;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\PriceFactory as PriceHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
@@ -45,6 +46,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
     /** @var \Doofinder\Feed\Helper\PriceFactory */
     protected $priceHelperFactory;
+
+    /** @var \Magento\Directory\Model\CurrencyFactory */
+    protected $currencyFactory;
 
     /** @var \Doofinder\Feed\Helper\InventoryFactory */
     protected $inventoryHelperFactory;
@@ -96,6 +100,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * @param CategoryListInterface $categoryListInterface Category list interface.
      * @param ProductHelperFactory $productHelperFactory Factory for product helper instances.
      * @param PriceHelperFactory $priceHelperFactory Factory for price helper instances.
+     * @param CurrencyFactory $currencyFactory Currency factory instance.
      * @param InventoryHelperFactory $inventoryHelperFactory Factory for inventory helper instances.
      * @param StoreConfig $storeConfig Custom module store config.
      * @param MagentoStoreConfig $magentoStoreConfig Magento core store config.
@@ -114,6 +119,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         CategoryListInterface $categoryListInterface,
         ProductHelperFactory $productHelperFactory,
         PriceHelperFactory $priceHelperFactory,
+        CurrencyFactory $currencyFactory,
         InventoryHelperFactory $inventoryHelperFactory,
         StoreConfig $storeConfig,
         MagentoStoreConfig $magentoStoreConfig,
@@ -140,6 +146,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $this->resourceModel = $resourceModel;
         $this->storeManager = $storeManager;
         $this->productRepositoryBase = $productRepositoryBase;
+        $this->currencyFactory = $currencyFactory;
         $this->cacheLimit = $cacheLimit;
         $this->instances = [];
         $this->instancesById = [];
@@ -423,10 +430,16 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             $extensionAttributes->setCategoryLinks($this->getCategoriesInformation($categories));
         }
 
-        $price = round($priceHelper->getProductPrice($product, 'regular_price'), 2);
-        $specialPrice = round($priceHelper->getProductPrice($product, 'final_price'), 2);
-        $extensionAttributes->setPrice($price);
-        ($price == $specialPrice || $specialPrice == 0) ?: $extensionAttributes->setSpecialPrice($specialPrice, 2);
+        $price = $priceHelper->getProductPrice($product, 'regular_price');
+        $specialPrice = $priceHelper->getProductPrice($product, 'final_price');
+        $extensionAttributes->setPrice(round($price, 2));
+        if ($price != $specialPrice && $specialPrice != 0) {
+            $extensionAttributes->setSpecialPrice(round($specialPrice, 2));
+        }
+
+        $dfMultiprice = $this->getProductMultiprice($product, $storeId, $price, $specialPrice);
+        $dfMultipriceJson = $this->serializer->serialize($dfMultiprice);
+        $extensionAttributes->setDfMultiprice($dfMultipriceJson);
 
         $extensionAttributes->setImage($productHelper
             ->getProductImageUrl(
@@ -442,6 +455,46 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         );
 
         $product->setExtensionAttributes($extensionAttributes);
+    }
+
+    /**
+     * Gets multiprice data for a product across all allowed currencies.
+     *
+     * Returns a map where keys are currency codes and values are arrays with price information.
+     * Example: ['EUR' => ['price' => 26, 'sale_price' => 24], 'USD' => ['price' => 24, 'sale_price' => 22]]
+     *
+     * @param ProductInterface $product Product to get prices for.
+     * @param int $storeId Store ID.
+     * @param float $basePrice Calculated base price for the product.
+     * @param float $baseSpecialPrice Calculated special price for the product.
+     * @return array Map of currency codes to price arrays with 'price' and 'sale_price' keys.
+     */
+    private function getProductMultiprice($product, $storeId, $basePrice, $baseSpecialPrice): array
+    {
+        $store = $this->storeManager->getStore($storeId);
+        $multiprice = [];
+
+        $baseCurrencyCode = $store->getBaseCurrencyCode();
+        $allowedCurrencies = $store->getAvailableCurrencyCodes(true);
+        if (empty($allowedCurrencies)) {
+            return $multiprice;
+        }
+
+        $currency = $this->currencyFactory->create();
+        $rates = $currency->getCurrencyRates($baseCurrencyCode, $allowedCurrencies);
+
+        foreach ($allowedCurrencies as $currencyCode) {
+            $rate = isset($rates[$currencyCode]) ? $rates[$currencyCode] : 1;
+            $convertedPrice = $basePrice * $rate;
+            $convertedSpecialPrice = $baseSpecialPrice * $rate;
+            
+            $multiprice[$currencyCode] = [
+                'price' => round($convertedPrice, 2),
+                // 'special_price' gets assigned to 'sale_price' key
+                'sale_price' => round($convertedSpecialPrice, 2)
+            ];
+        }
+        return $multiprice;
     }
 
     /**

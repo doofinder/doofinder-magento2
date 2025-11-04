@@ -7,6 +7,7 @@
 ## Docker Environment
 
 ### Configure ngrok
+
 In order to be able to create an account or login to an existing Doofinder account during the module initial setup, you will have to expose your local webserver to the internet (to receive a callback).
 
 To do so, you can use, for example, the utility ngrok: https://dashboard.ngrok.com/get-started/setup
@@ -17,6 +18,7 @@ So, when the installation process finished, instead of accessing to `http://loca
 Notice that you'll need to specify the 9012 port when executing ngrok.
 
 ### Get composer credentials
+
 > [!IMPORTANT]
 > It is mandatory to obtain credentials for composer usage. These fields can be obtained by creating an access key into [your Magento marketplace account](https://marketplace.magento.com/customer/accessKeys/). The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD` environment variables (see [Environment Variables](#environment-variables)).
 
@@ -41,27 +43,26 @@ The `Makefile` automatically overrides `.env` vars with the ones found in `.env.
 > [!IMPORTANT]
 > The `Makefile` internally appends `--env-file .env --env-file .env.local` to `docker compose` command for properly configuring container environment. So take it into account when interacting directly with `docker compose`.
 
-
 ### Initial setup
 
 You can set up a fresh Magento installation using the provided `Makefile` targets `init` or `init-with-data`. This command will:
-- Pulls and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
-- Runs a Magento `create-project` command inside a bind mount into `./app`.
-- Starts the containers
-- Runs a Magento installation with variables defined in the environment through `.env` or `.env.local` file.
-- Optionally: Loads sample data into Magento
+
+-   Pulls and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
+-   Runs a Magento `create-project` command inside a bind mount into `./app`.
+-   Starts the containers
+-   Runs a Magento installation with variables defined in the environment through `.env` or `.env.local` file.
+-   Optionally: Loads sample data into Magento
 
 Finally, Magento 2 with the module installed will be running at `http://BASE_URL`.
 
 The admin panel will be available at `http://BASE_URL/admin`. Admin credentials are defined in the `.env`, if you used the `env.example` would be:
 
-- User: `admin`
-- Pass: `admin123`
+-   User: `admin`
+-   Pass: `admin123`
 
 ## Xdebug ready to use
 
-If you wish to debug your new Magento installation, simply uncomment the `XDEBUG_CONFIG` environment variable in `docker-compose.yml` configure your IDE accordingly and have fun!
-
+If you wish to debug your new Magento installation, Xdebug is already configured and ready to use through the `XDEBUG_CONFIG` environment variable in the `docker-compose.yml` file, simply configure your IDE accordingly and have fun!
 
 ## Varnish was added to manage cache
 
@@ -79,6 +80,7 @@ make doofinder-uninstall
 ```
 
 ## Test another versions
+
 Change your branch to the tag that you want inside package directory
 
 ```sh
@@ -89,14 +91,14 @@ make doofinder-upgrade
 
 During development, it is sometimes useful to create a data snapshot before performing an action.
 
-- To create a database dump, use:
-  ```sh
-  make db-backup [prefix=_some_state]
-  ```
-- To restore a previous state, run:
-  ```sh
-  make db-restore file=backup_file.sql.gz
-  ```
+-   To create a database dump, use:
+    ```sh
+    make db-backup [prefix=_some_state]
+    ```
+-   To restore a previous state, run:
+    ```sh
+    make db-restore file=backup_file.sql.gz
+    ```
 
 ## Important details before pushing changes to GitHub
 
@@ -109,32 +111,32 @@ This plugin has been thoroughly tested and confirmed to be compatible with the f
 
 ✅ Supported PHP Versions:
 
-- PHP 7.3
-- PHP 7.4
-- PHP 8.1
-- PHP 8.2
-- PHP 8.3
-- PHP 8.4
+-   PHP 7.3
+-   PHP 7.4
+-   PHP 8.1
+-   PHP 8.2
+-   PHP 8.3
+-   PHP 8.4
 
 ⚠️ Note:
 
-- PHP versions below 7.4 are not recommended.
-- PHP 8.0 is not supported by Magento 2.
+-   PHP versions below 7.4 are not recommended.
+-   PHP 8.0 is not supported by Magento 2.
 
 ## Tested compatibility with the following M2 versions
 
-- Magento 2.3.0
-- Magento 2.3.5-p3
-- Magento 2.3.7-p4
-- Magento 2.4.0
-- Magento 2.4.1
-- Magento 2.4.2
-- Magento 2.4.3
-- Magento 2.4.4
-- Magento 2.4.5
-- Magento 2.4.6
-- Magento 2.4.7
-- Magento 2.4.8
+-   Magento 2.3.0
+-   Magento 2.3.5-p3
+-   Magento 2.3.7-p4
+-   Magento 2.4.0
+-   Magento 2.4.1
+-   Magento 2.4.2
+-   Magento 2.4.3
+-   Magento 2.4.4
+-   Magento 2.4.5
+-   Magento 2.4.6
+-   Magento 2.4.7
+-   Magento 2.4.8
 
 ## Last notes
 
@@ -162,6 +164,7 @@ MAGENTO_VERSION=2.3.1
 If after the setup process has finished the website doesn't load you may need to change the urls in the database.
 Connect to the database in `localhost:3312` using the mysql user and password defined in the `.env` (`magentobase`).
 In the table `core_config_data` there are two configs for the base urls that Magento will redirect to, with paths:
-- `web/unsecure/base_url`
-- `web/secure/base_url`
-Make sure that those urls are the ones you'll be using to connect to your site or Magento will always redirect to them.
+
+-   `web/unsecure/base_url`
+-   `web/secure/base_url`
+    Make sure that those urls are the ones you'll be using to connect to your site or Magento will always redirect to them.

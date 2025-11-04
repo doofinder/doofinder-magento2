@@ -8,6 +8,7 @@
         <attribute code="image" type="string"/>
         <attribute code="price" type="float"/>
         <attribute code="special_price" type="float"/>
+        <attribute code="df_multiprice" type="string"/>
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\CategoryInterface">
         <attribute code="url_full" type="string"/>
