@@ -25,3 +25,4 @@ jobs:
           files: ${{ steps.vars.outputs.zip_path }}
           name: Doofinder for Magento 2 - ${{ steps.vars.outputs.tag }}
           generate_release_notes: true
+          prerelease: true
