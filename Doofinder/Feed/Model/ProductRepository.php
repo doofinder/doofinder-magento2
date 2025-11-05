@@ -441,7 +441,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $dfMultipriceJson = $this->serializer->serialize($dfMultiprice);
         $extensionAttributes->setDfMultiprice($dfMultipriceJson);
 
-        $dfImageSize = $this->storeConfig->getValueFromConfig("doofinder_config_config/doofinder_image/doofinder_image_size");
+        $dfImageSize = $this->storeConfig->getValueFromConfig(
+            "doofinder_config_config/doofinder_image/doofinder_image_size"
+        );
         $extensionAttributes->setImage($productHelper
             ->getProductImageUrl(
                 $product,
@@ -504,7 +506,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      *
      * Returns an array of image URLs as strings, resized according to the configured image size.
      * If no image size is configured (null or empty), returns original image URLs.
-     * Example: ['https://example.com/media/catalog/product/image1.jpg', 'https://example.com/media/catalog/product/image2.jpg']
+     * Example: ['https://example.com/media/catalog/product/1.jpg', 'https://example.com/media/catalog/product/2.jpg']
      *
      * @param ProductInterface $product Product to get images links for.
      * @param string|null $imageSize Image size identifier (e.g., 'df_small', 'df_base') or null for original size.
