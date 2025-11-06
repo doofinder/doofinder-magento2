@@ -525,14 +525,11 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     
         foreach ($mediaGalleryEntries as $entry) {
 
-            // Only include image media types that are enabled
-            if ($entry->getMediaType() !== 'image' || $entry->getDisabled()) {
+            if ($entry->getMediaType() !== 'image' || $entry->isDisabled()) {
                 continue;
             }
     
             $file = $entry->getFile();
-
-            // Skip if path is not set
             if (!$file) {
                 continue;
             }
@@ -543,7 +540,6 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                 ->setImageFile($file)
                 ->getUrl();
         
-            // Skip if placeholder is returned
             if (strpos($imageUrl, '/placeholder/') !== false) {
                 continue;
             }
