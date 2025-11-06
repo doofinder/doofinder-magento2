@@ -151,7 +151,7 @@
                     <label>Resize Image</label>
                     <source_model>Doofinder\Feed\Model\Config\Source\ImageResize</source_model>
                     <comment>
-                        <![CDATA[ Select the size of the image to display on the layer. Once the size has been chosen, you must reindex the products in Doofinder. ]]>
+                        <![CDATA[ Select the size that will be used to index the images. Once selected, you must reindex the products in Doofinder. ]]>
                     </comment>
                 </field>
             </group>

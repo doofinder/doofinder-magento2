@@ -6,6 +6,7 @@
         <attribute code="base_url" type="string"/>
         <attribute code="base_media_url" type="string"/>
         <attribute code="image" type="string"/>
+        <attribute code="images_links" type="string[]"/>
         <attribute code="price" type="float"/>
         <attribute code="special_price" type="float"/>
         <attribute code="df_multiprice" type="string"/>
