@@ -512,7 +512,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * @param string|null $imageSize Image size identifier (e.g., 'df_small', 'df_base') or null for original size.
      * @return array Array of image URLs as strings.
      */
-    private function getProductImagesLinks($product, ?string $imageSize): array
+    private function getProductImagesLinks(ProductInterface $product, ?string $imageSize): array
     {
         $imageLinks = [];
         $mediaGalleryEntries = $product->getMediaGalleryEntries();
