@@ -478,14 +478,14 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $store = $this->storeManager->getStore($storeId);
         $multiprice = [];
 
-        $baseCurrencyCode = $store->getBaseCurrencyCode();
+        $defaultCurrencyCode = $store->getDefaultCurrencyCode();
         $allowedCurrencies = $store->getAvailableCurrencyCodes(true);
         if (empty($allowedCurrencies)) {
             return $multiprice;
         }
 
         $currency = $this->currencyFactory->create();
-        $rates = $currency->getCurrencyRates($baseCurrencyCode, $allowedCurrencies);
+        $rates = $currency->getCurrencyRates($defaultCurrencyCode, $allowedCurrencies);
 
         foreach ($allowedCurrencies as $currencyCode) {
             $rate = isset($rates[$currencyCode]) ? $rates[$currencyCode] : 1;
