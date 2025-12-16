@@ -9,6 +9,8 @@ use Doofinder\Feed\Helper\StoreConfig;
 use Doofinder\Feed\Model\ChangedItem\DocumentsProvider;
 use Doofinder\Feed\Model\ChangedItem\ItemType;
 use Doofinder\Feed\Model\ResourceModel\ChangedItem\CollectionFactory as ChangedItemCollectionFactory;
+use Magento\Catalog\Model\ProductFactory;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Magento\Store\Api\Data\StoreInterface;
 use Psr\Log\LoggerInterface;
@@ -56,6 +58,11 @@ class Processor
     private $itemType;
 
     /**
+     * @var ProductFactory
+     */
+    private $productFactory;
+
+    /**
      * Processor constructor.
      *
      * @param StoreConfig $storeConfig
@@ -65,6 +72,7 @@ class Processor
      * @param Batch $batch
      * @param LoggerInterface $logger
      * @param ItemType $itemType
+     * @param ProductFactory $productFactory
      * @param int $batchSize
      */
     public function __construct(
@@ -75,6 +83,7 @@ class Processor
         Batch $batch,
         LoggerInterface $logger,
         ItemType $itemType,
+        ProductFactory $productFactory,
         $batchSize = 100
     ) {
         $this->storeConfig = $storeConfig;
@@ -85,6 +94,7 @@ class Processor
         $this->batchSize = $batchSize;
         $this->logger = $logger;
         $this->itemType = $itemType;
+        $this->productFactory = $productFactory;
     }
 
     /**
@@ -120,7 +130,7 @@ class Processor
     }
 
     /**
-     * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
+     * Executes the CREATE for items stored with this action in doofinder_feed_changed_items table
      *
      * @param StoreInterface $store
      * @param string $itemType
@@ -199,6 +209,7 @@ class Processor
             $deleted = $this->documentsProvider->getBatched($collection);
             foreach ($this->batch->getItems($deleted, $this->batchSize) as $batchDeleted) {
                 $items = $this->mapItems($batchDeleted);
+                $items = $this->maybeAddVariantsIdsToDelete($items);
                 if (count($items)) {
                     try {
                         $this->logger->debug('[DeleteInBulk]');
@@ -228,5 +239,84 @@ class Processor
         return array_map(function ($productId) {
             return ['id' => $productId];
         }, $documents);
+    }
+
+    /**
+     * Adds variants IDs of parent products to the delete items array
+     *
+     * If a product is a configurable (parent) product, all its child variant IDs are added
+     *
+     * @param array $items Array of items with structure [["id" => "id1"], ["id" => "id2"]]
+     * @return array Array of items including variants IDs to delete
+     */
+    private function maybeAddVariantsIdsToDelete(array $items): array
+    {
+        $itemsToDelete = $items;
+        $processedProductIds = [];
+        $variantIdsToAdd = [];
+
+        foreach ($items as $item) {
+            $productId = $item['id'] ?? null;
+            
+            if (!$productId || isset($processedProductIds[$productId])) {
+                continue;
+            }
+
+            $processedProductIds[$productId] = true;
+
+            try {
+                $product = $this->productFactory->create()->load($productId);
+                
+                if (!$product->getId()) {
+                    continue;
+                }
+
+                if ($product->getTypeId() !== ConfigurableType::TYPE_CODE) {
+                    continue;
+                }
+
+                $typeInstance = $product->getTypeInstance();
+                $childrenIds = $typeInstance->getChildrenIds($productId);
+                
+                // getChildrenIds returns an array with keys, so we have to flatten it to get all variants IDs
+                if (empty($childrenIds)) {
+                    continue;
+                }
+
+                $flattenedChildrenIds = [];
+                foreach ($childrenIds as $childIds) {
+                    if (is_array($childIds)) {
+                        foreach ($childIds as $childId) {
+                            $flattenedChildrenIds[] = $childId;
+                        }
+                    }
+                }
+                
+                // Add variant IDs to the list (avoiding duplicates)
+                foreach ($flattenedChildrenIds as $variantId) {
+                    if (!isset($processedProductIds[$variantId])) {
+                        $variantIdsToAdd[$variantId] = true;
+                    }
+                }
+            } catch (\Exception $e) {
+                $this->logger->error(
+                    sprintf(
+                        '[Doofinder] Error loading product %d to check for variants: %s',
+                        $productId,
+                        $e->getMessage()
+                    )
+                );
+            }
+        }
+
+        /*
+        Add variant IDs as strings to the items array.  It's important
+        to cast them to string because the parents one are also strings.
+        */
+        foreach (array_keys($variantIdsToAdd) as $variantId) {
+            $itemsToDelete[] = ['id' => (string) $variantId];
+        }
+
+        return $itemsToDelete;
     }
 }
