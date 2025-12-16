@@ -254,16 +254,13 @@ class Processor
     private function maybeAddVariantsIdsToDelete(array $items): array
     {
         $itemsToDelete = $items;
-        $processedProductIds = [];
 
         foreach ($items as $item) {
             $productId = $item['id'] ?? null;
-            
-            if (!$productId || isset($processedProductIds[$productId])) {
+
+            if (!$productId) {
                 continue;
             }
-
-            $processedProductIds[$productId] = true;
 
             try {
                 $product = $this->productFactory->create()->load($productId);
