@@ -209,7 +209,9 @@ class Processor
             $deleted = $this->documentsProvider->getBatched($collection);
             foreach ($this->batch->getItems($deleted, $this->batchSize) as $batchDeleted) {
                 $items = $this->mapItems($batchDeleted);
-                $items = $this->maybeAddVariantsIdsToDelete($items);
+                if ((int)$itemType === ItemType::PRODUCT) {
+                    $items = $this->maybeAddVariantsIdsToDelete($items);
+                }
                 if (count($items)) {
                     try {
                         $this->logger->debug('[DeleteInBulk]');
