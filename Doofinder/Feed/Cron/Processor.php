@@ -255,7 +255,6 @@ class Processor
     {
         $itemsToDelete = $items;
         $processedProductIds = [];
-        $variantIdsToAdd = [];
 
         foreach ($items as $item) {
             $productId = $item['id'] ?? null;
@@ -279,25 +278,16 @@ class Processor
 
                 $typeInstance = $product->getTypeInstance();
                 $childrenIds = $typeInstance->getChildrenIds($productId);
-                
-                // getChildrenIds returns an array with keys, so we have to flatten it to get all variants IDs
-                if (empty($childrenIds)) {
-                    continue;
-                }
 
-                $flattenedChildrenIds = [];
+                /*
+                Flatten children IDs and add variant IDs as strings to the items array.
+                It's important to cast them to string because the parents one are also strings.
+                */
                 foreach ($childrenIds as $childIds) {
                     if (is_array($childIds)) {
-                        foreach ($childIds as $childId) {
-                            $flattenedChildrenIds[] = $childId;
+                        foreach ($childIds as $variantId) {
+                            $itemsToDelete[] = ['id' => (string) $variantId];
                         }
-                    }
-                }
-                
-                // Add variant IDs to the list (avoiding duplicates)
-                foreach ($flattenedChildrenIds as $variantId) {
-                    if (!isset($processedProductIds[$variantId])) {
-                        $variantIdsToAdd[$variantId] = true;
                     }
                 }
             } catch (\Exception $e) {
@@ -309,14 +299,6 @@ class Processor
                     )
                 );
             }
-        }
-
-        /*
-        Add variant IDs as strings to the items array.  It's important
-        to cast them to string because the parents one are also strings.
-        */
-        foreach (array_keys($variantIdsToAdd) as $variantId) {
-            $itemsToDelete[] = ['id' => (string) $variantId];
         }
 
         return $itemsToDelete;
