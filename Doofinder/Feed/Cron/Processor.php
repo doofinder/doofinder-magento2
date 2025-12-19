@@ -120,7 +120,7 @@ class Processor
     }
 
     /**
-     * Executes the DELETE for items stored with this action in doofinder_feed_changed_items table
+     * Executes the CREATE for items stored with this action in doofinder_feed_changed_items table
      *
      * @param StoreInterface $store
      * @param string $itemType
