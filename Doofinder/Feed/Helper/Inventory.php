@@ -12,6 +12,7 @@ use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Module\Manager;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface;
+use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySales\Model\ResourceModel\GetAssignedStockIdForWebsite;
 use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -99,6 +100,64 @@ class Inventory extends AbstractHelper
         return $this->isMsiActive() ?
             $this->getStockIdByStoreWithMSI($storeId) :
             null;
+    }
+
+    /**
+     * Get the maximum order quantity for a product.
+     * 
+     * @param ProductModel $product
+     * @param ?int $stokId
+     * 
+     * @return int|null
+     */
+    public function getMaximumOrderQuantity(ProductModel $product, ?int $stockId): int|null
+    {
+        try {
+            if ($this->isMsiActive()) {
+                $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
+                $stockId = $stockId ?? $defaultStockProvider->getId();
+
+                $getConfig = $this->_objectManager->create(GetStockItemConfigurationInterface::class);
+                $config = $getConfig->execute($product->getSku(), $stockId);
+
+                return (int) $config->getMaxSaleQty();
+            }
+
+            $stockItem = $this->getStockItem($product->getId());
+
+            return (int) $stockItem->getMaxSaleQty();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get the minimum order quantity for a product.
+     * 
+     * @param ProductModel $product
+     * @param ?int $stokId
+     * 
+     * @return int|null
+     */
+    public function getMinimumOrderQuantity(ProductModel $product, ?int $stockId): int|null
+    {
+        try {
+            if ($this->isMsiActive()) {
+                $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
+                $stockId = $stockId ?? $defaultStockProvider->getId();
+
+                $getConfig = $this->_objectManager->create(GetStockItemConfigurationInterface::class);
+                $config = $getConfig->execute($product->getSku(), $stockId);
+
+                return (int) $config->getMinSaleQty();
+            }
+
+            $stockItem = $this->getStockItem($product->getId());
+
+            return (int) $stockItem->getMinSaleQty();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**

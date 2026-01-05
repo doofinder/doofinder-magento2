@@ -413,7 +413,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         $extensionAttributes = $product->getExtensionAttributes();
 
-        $stockId = $inventoryHelper->getStockIdByStore((int) $storeId);
+        $stockId = (int) $inventoryHelper->getStockIdByStore((int) $storeId);
         $stockAndStatus = $inventoryHelper->getQuantityAndAvailability($product, $stockId);
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
@@ -457,6 +457,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $extensionAttributes->setConfigurableProductOptions(
             $this->updateConfigurableProductOptions($configurableProductsOptions)
         );
+
+        $extensionAttributes->setMaximumQuantity($inventoryHelper->getMaximumOrderQuantity($product, $stockId));
+        $extensionAttributes->setMinimumQuantity($inventoryHelper->getMinimumOrderQuantity($product, $stockId));
 
         $product->setExtensionAttributes($extensionAttributes);
     }

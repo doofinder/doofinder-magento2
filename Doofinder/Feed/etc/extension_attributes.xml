@@ -10,6 +10,8 @@
         <attribute code="price" type="float"/>
         <attribute code="special_price" type="float"/>
         <attribute code="df_multiprice" type="string"/>
+        <attribute code="minimum_quantity" type="integer" />
+        <attribute code="maximum_quantity" type="integer" />
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\CategoryInterface">
         <attribute code="url_full" type="string"/>
