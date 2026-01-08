@@ -76,8 +76,8 @@ class Inventory extends AbstractHelper
     /**
      * Get product availability
      *
-     * @param  ProductModel $product
-     * @param  int|null $stockId
+     * @param ProductModel $product
+     * @param int|null $stockId
      * @return string
      */
     public function getProductAvailability(ProductModel $product, ?int $stockId = null)
