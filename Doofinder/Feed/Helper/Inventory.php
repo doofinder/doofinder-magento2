@@ -40,10 +40,10 @@ class Inventory extends AbstractHelper
     protected $storeManager;
 
     /**
-     * @param                                          Context                $context
-     * @param                                          ObjectManagerInterface $objectmanager
-     * @param                                          Manager                $moduleManager
-     * @param                                          StoreManagerInterface  $storeManager
+     * @param Context $context
+     * @param ObjectManagerInterface $objectmanager
+     * @param Manager $moduleManager
+     * @param StoreManagerInterface $storeManager
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -62,7 +62,7 @@ class Inventory extends AbstractHelper
      * Get quantity and product availability
      *
      * @param ProductModel $product
-     * @param int|null     $stockId
+     * @param int|null $stockId
      *
      * @return string
      */
@@ -77,7 +77,7 @@ class Inventory extends AbstractHelper
      * Get product availability
      *
      * @param  ProductModel $product
-     * @param  int|null     $stockId
+     * @param  int|null $stockId
      * @return string
      */
     public function getProductAvailability(ProductModel $product, ?int $stockId = null)
@@ -92,7 +92,7 @@ class Inventory extends AbstractHelper
      *
      * Note: Each website is related only with one stock but one stock can be used by several websites.
      *
-     * @param  int|null $storeId
+     * @param int|null $storeId
      * @return string
      */
     public function getStockIdByStore(int $storeId): ?int
@@ -156,7 +156,7 @@ class Inventory extends AbstractHelper
      * Get quantity and stock status for environments with MSI dependency
      *
      * @param ProductModel $product
-     * @param int|null     $stockId
+     * @param int|null $stockId
      *
      * @return mixed[]
      */
@@ -175,7 +175,7 @@ class Inventory extends AbstractHelper
      * if any of its associated products is salable
      *
      * @param ProductModel $product
-     * @param int|null     $stockId
+     * @param int|null $stockId
      *
      * @return boolean
      */
@@ -198,7 +198,7 @@ class Inventory extends AbstractHelper
      * Get info about the salability of any product
      *
      * @param ProductModel $product
-     * @param int|null     $stockId
+     * @param int|null $stockId
      *
      * @return boolean
      */
@@ -212,7 +212,7 @@ class Inventory extends AbstractHelper
      * Get product availability for environments with MSI dependency
      *
      * @param ProductModel $product
-     * @param int|null     $stockId
+     * @param int|null $stockId
      *
      * @return string
      */
@@ -228,7 +228,7 @@ class Inventory extends AbstractHelper
     /**
      * Get the data from a stock item
      *
-     * @param string   $sku
+     * @param string $sku
      * @param int|null $stockId
      *
      * @return mixed[]
@@ -280,7 +280,7 @@ class Inventory extends AbstractHelper
     /**
      * Get product availability for environments without MSI dependency
      *
-     * @param  ProductModel $product
+     * @param ProductModel $product
      * @return string
      */
     private function getProductAvailabilityWithoutMSI(ProductModel $product)
@@ -295,7 +295,7 @@ class Inventory extends AbstractHelper
     /**
      * Get stock item
      *
-     * @param  integer $productId
+     * @param integer $productId
      * @return \Magento\CatalogInventory\Model\Stock\Item
      */
     private function getStockItem($productId)
@@ -327,7 +327,7 @@ class Inventory extends AbstractHelper
     /**
      * Function to get the stockId related with the given store / website
      *
-     * @param  int $storeId
+     * @param int $storeId
      * @return int|null
      */
     private function getStockIdByStoreWithMSI(int $storeId): ?int
