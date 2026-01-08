@@ -243,15 +243,12 @@ class Inventory extends AbstractHelper
             $stockItemData = $getStockItemData->execute($sku, $stockId);
         } catch (\Exception $e) {
             $errorMsg = 'Could not receive Stock Item data: ' . $e->getMessage();
-            $this->_logger->error(
-                $errorMsg,
-                [
+            $this->_logger->error($errorMsg, [
                 'sku' => $sku,
                 'stockId' => $stockId,
                 'exception' => $e->getMessage(),
                 'isMsiActive' => $this->isMsiActive()
-                ]
-            );
+            ]);
             throw new DoofinderFeedException($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
         }
 
@@ -339,13 +336,10 @@ class Inventory extends AbstractHelper
             $stockId = $getAssignedStockIdForWebsite->execute($websiteCode);
             return is_numeric($stockId) ? (int) $stockId : null;
         } catch (\Exception $e) {
-            $this->_logger->error(
-                'Could not get stockId for store',
-                [
+            $this->_logger->error('Could not get stockId for store', [
                 'storeId' => $storeId,
                 'exception' => $e->getMessage(),
-                ]
-            );
+            ]);
             return null;
         }
     }
