@@ -458,6 +458,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             $this->updateConfigurableProductOptions($configurableProductsOptions)
         );
 
+        $extensionAttributes->setMaximumQuantity($inventoryHelper->getMaximumOrderQuantity($product, $stockId));
+        $extensionAttributes->setMinimumQuantity($inventoryHelper->getMinimumOrderQuantity($product, $stockId));
+
         $product->setExtensionAttributes($extensionAttributes);
     }
 

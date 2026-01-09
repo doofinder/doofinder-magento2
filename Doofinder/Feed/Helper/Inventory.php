@@ -12,6 +12,7 @@ use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Module\Manager;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\InventoryCatalogApi\Api\DefaultStockProviderInterface;
+use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\InventorySales\Model\ResourceModel\GetAssignedStockIdForWebsite;
 use Magento\InventorySalesApi\Model\GetStockItemDataInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -92,13 +93,60 @@ class Inventory extends AbstractHelper
      * Note: Each website is related only with one stock but one stock can be used by several websites.
      *
      * @param int|null $storeId
-     * @return string
+     * @return int
      */
     public function getStockIdByStore(int $storeId): ?int
     {
         return $this->isMsiActive() ?
             $this->getStockIdByStoreWithMSI($storeId) :
             null;
+    }
+
+    /**
+     * Get the maximum order quantity for a product.
+     *
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return float
+     */
+    public function getMaximumOrderQuantity(ProductModel $product, ?int $stockId): float
+    {
+        return $this->isMsiActive()
+            ? $this->getStockItemConfiguration($product, $stockId)->getMaxSaleQty()
+            : $this->getStockItem($product->getId())->getMaxSaleQty();
+    }
+
+    /**
+     * Get the minimum order quantity for a product.
+     *
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return float
+     */
+    public function getMinimumOrderQuantity(ProductModel $product, ?int $stockId): float
+    {
+        return $this->isMsiActive()
+            ? $this->getStockItemConfiguration($product, $stockId)->getMinSaleQty()
+            : $this->getStockItem($product->getId())->getMinSaleQty();
+    }
+
+    /**
+     * Get the StockItemConfigurationInterface for a specific product and stock ID.
+     *
+     * @param ProductModel $product
+     * @param int|null $stockId
+     *
+     * @return mixed
+     */
+    private function getStockItemConfiguration(ProductModel $product, ?int $stockId): mixed
+    {
+        $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
+        $stockId = $stockId ?? $defaultStockProvider->getId();
+
+        $getConfig = $this->_objectManager->create(GetStockItemConfigurationInterface::class);
+        return $getConfig->execute($product->getSku(), $stockId);
     }
 
     /**
