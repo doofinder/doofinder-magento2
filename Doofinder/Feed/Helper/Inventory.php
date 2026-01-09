@@ -134,10 +134,10 @@ class Inventory extends AbstractHelper
 
     /**
      * Get the StockItemConfigurationInterface for a specific product and stock ID.
-     * 
+     *
      * @param ProductModel $product
      * @param int|null $stockId
-     * 
+     *
      * @return mixed
      */
     private function getStockItemConfiguration(ProductModel $product, ?int $stockId): mixed
