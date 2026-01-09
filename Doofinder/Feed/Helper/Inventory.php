@@ -108,11 +108,11 @@ class Inventory extends AbstractHelper
      * @param ProductModel $product
      * @param int|null $stockId
      *
-     * @return float|null
+     * @return float
      */
-    public function getMaximumOrderQuantity(ProductModel $product, ?int $stockId): float|null
+    public function getMaximumOrderQuantity(ProductModel $product, ?int $stockId): float
     {
-        return (float) $this->isMsiActive()
+        return $this->isMsiActive()
             ? $this->getStockItemConfiguration($product, $stockId)->getMaxSaleQty()
             : $this->getStockItem($product->getId())->getMaxSaleQty();
     }
@@ -123,11 +123,11 @@ class Inventory extends AbstractHelper
      * @param ProductModel $product
      * @param int|null $stockId
      *
-     * @return float|null
+     * @return float
      */
-    public function getMinimumOrderQuantity(ProductModel $product, ?int $stockId): float|null
+    public function getMinimumOrderQuantity(ProductModel $product, ?int $stockId): float
     {
-        return (float) $this->isMsiActive()
+        return $this->isMsiActive()
             ? $this->getStockItemConfiguration($product, $stockId)->getMinSaleQty()
             : $this->getStockItem($product->getId())->getMinSaleQty();
     }
