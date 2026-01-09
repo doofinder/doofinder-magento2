@@ -106,7 +106,7 @@ class Inventory extends AbstractHelper
      * Get the maximum order quantity for a product.
      *
      * @param ProductModel $product
-     * @param ?int         $stockId
+     * @param int|null $stockId
      *
      * @return float|null
      */
@@ -131,7 +131,7 @@ class Inventory extends AbstractHelper
      * Get the minimum order quantity for a product.
      *
      * @param ProductModel $product
-     * @param ?int         $stockId
+     * @param int|null $stockId
      *
      * @return float|null
      */
