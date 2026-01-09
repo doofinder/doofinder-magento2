@@ -413,7 +413,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         $extensionAttributes = $product->getExtensionAttributes();
 
-        $stockId = (int) $inventoryHelper->getStockIdByStore((int) $storeId);
+        $stockId = $inventoryHelper->getStockIdByStore((int) $storeId);
         $stockAndStatus = $inventoryHelper->getQuantityAndAvailability($product, $stockId);
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));

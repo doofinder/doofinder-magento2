@@ -93,7 +93,7 @@ class Inventory extends AbstractHelper
      * Note: Each website is related only with one stock but one stock can be used by several websites.
      *
      * @param int|null $storeId
-     * @return string
+     * @return int
      */
     public function getStockIdByStore(int $storeId): ?int
     {
