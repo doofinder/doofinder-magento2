@@ -112,19 +112,9 @@ class Inventory extends AbstractHelper
      */
     public function getMaximumOrderQuantity(ProductModel $product, ?int $stockId): float|null
     {
-        if ($this->isMsiActive()) {
-            $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
-            $stockId = $stockId ?? $defaultStockProvider->getId();
-
-            $getConfig = $this->_objectManager->create(GetStockItemConfigurationInterface::class);
-            $config = $getConfig->execute($product->getSku(), $stockId);
-
-            return (float) $config->getMaxSaleQty();
-        }
-
-        $stockItem = $this->getStockItem($product->getId());
-
-        return (float) $stockItem->getMaxSaleQty();
+        return (float) $this->isMsiActive()
+            ? $this->getStockItemConfiguration($product, $stockId)->getMaxSaleQty()
+            : $this->getStockItem($product->getId())->getMaxSaleQty();
     }
 
     /**
@@ -137,19 +127,26 @@ class Inventory extends AbstractHelper
      */
     public function getMinimumOrderQuantity(ProductModel $product, ?int $stockId): float|null
     {
-        if ($this->isMsiActive()) {
-            $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
-            $stockId = $stockId ?? $defaultStockProvider->getId();
+        return (float) $this->isMsiActive()
+            ? $this->getStockItemConfiguration($product, $stockId)->getMinSaleQty()
+            : $this->getStockItem($product->getId())->getMinSaleQty();
+    }
 
-            $getConfig = $this->_objectManager->create(GetStockItemConfigurationInterface::class);
-            $config = $getConfig->execute($product->getSku(), $stockId);
+    /**
+     * Get the StockItemConfigurationInterface for a specific product and stock ID.
+     * 
+     * @param ProductModel $product
+     * @param int|null $stockId
+     * 
+     * @return mixed
+     */
+    private function getStockItemConfiguration(ProductModel $product, ?int $stockId): mixed
+    {
+        $defaultStockProvider = $this->_objectManager->create(DefaultStockProviderInterface::class);
+        $stockId = $stockId ?? $defaultStockProvider->getId();
 
-            return (float) $config->getMinSaleQty();
-        }
-
-        $stockItem = $this->getStockItem($product->getId());
-
-        return (float) $stockItem->getMinSaleQty();
+        $getConfig = $this->_objectManager->create(GetStockItemConfigurationInterface::class);
+        return $getConfig->execute($product->getSku(), $stockId);
     }
 
     /**
