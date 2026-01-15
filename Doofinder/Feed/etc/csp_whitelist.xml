@@ -15,12 +15,12 @@
         </policy>
         <policy id="script-src">
             <values>
-                <value id="doofinder_script" type="host">cdn.doofinder.com</value>
+                <value id="doofinder_script" type="host">*.doofinder.com</value>
             </values>
         </policy>
         <policy id="img-src">
             <values>
-                <value id="doofinder_img" type="host">cdn.doofinder.com</value>
+                <value id="doofinder_img" type="host">*.doofinder.com</value>
             </values>
         </policy>
     </policies>
