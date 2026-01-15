@@ -12,6 +12,7 @@ use Doofinder\Feed\Model\ChangedItem\ItemType;
 use Doofinder\Feed\Model\ChangedItemFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Catalog\Model\Product\Visibility;
 use \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\Event\Observer;
@@ -117,7 +118,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
     }
 
     /**
-     * Registers the item by it's type in the table doofinder_feed_changed_item, with the corresponding store
+     * Registers the item by its type in the table doofinder_feed_changed_item, with the corresponding store
      *
      * @param ProductInterface $product
      * @param int $storeId
@@ -125,15 +126,39 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
     protected function registerChangedItemStore(ProductInterface $product, int $storeId)
     {
         $itemId = $product->getId();
+        $operationType = $this->getOperationType();
+        $isDeleteOperation = $operationType === ChangedItemInterface::OPERATION_TYPE_DELETE;
+        $parentProducts = $this->configurableProductType->getParentIdsByChild($itemId);
+        $isVariant = count($parentProducts) > 0;
+        $isParent = $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE;
+
+        /*
+        If this is a parent product being deleted, verify it's actually disabled.
+        Don't register parent if it's being saved due to a variant change.
+         */
+        if ($isParent && $isDeleteOperation && $product->getStatus() != Status::STATUS_DISABLED) {
+            /*
+            Parent product is not actually disabled, skip registration
+            This prevents registering parent when only a variant was disabled
+            */
+            return;
+        }
 
         $itemsToInsert = [$itemId];
-        $parentProducts = $this->configurableProductType->getParentIdsByChild($itemId);
-        if (count($parentProducts) > 0 && $this->getOperationType() != ChangedItemInterface::OPERATION_TYPE_DELETE) {
-            /* When updating a product it's children are also updated, so in this case
-            we include the parentId but don't need to specify the itemId */
+        
+        /*
+        For non-delete operations: if product is a variant, register parent instead
+        (When updating a variant, its parent is also updated, so we register the parent)
+        */
+        if ($isVariant && !$isDeleteOperation) {
             $itemsToInsert = $parentProducts;
         }
         
+        /*
+        For delete operations: only register the product itself
+        - If variant is deleted: register only the variant (not the parent)
+        - If parent is deleted: register only the parent (not variants, handled in Dooplugins)
+        */
         foreach ($itemsToInsert as $itemToInsert) {
             $changedItem = $this->createChangedItem((int)$itemToInsert, $storeId);
             if (!$this->changedItemRepository->exists($changedItem)) {
