@@ -130,17 +130,23 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         $isDeleteOperation = $operationType === ChangedItemInterface::OPERATION_TYPE_DELETE;
         $parentProducts = $this->configurableProductType->getParentIdsByChild($itemId);
         $isVariant = count($parentProducts) > 0;
-        $isParent = $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE;
+        $isParent = !$isVariant;
+        $areAnyVariantAlreadyInDatabase = false;
+        if ($isParent && $isDeleteOperation) {
+            $variantsIds = $this->configurableProductType->getChildrenIds($itemId);
+            if (!empty($variantsIds[0])) {
+                $variantsIds = $variantsIds[0];
+                foreach ($variantsIds as $variantId) {
+                    $changedItem = $this->createChangedItem((int)$variantId, $storeId);
+                    if ($this->changedItemRepository->exists($changedItem)) {
+                        $areAnyVariantAlreadyInDatabase = true;
+                        break;
+                    }
+                }
+            }
+        }
 
-        /*
-        If this is a parent product being deleted, verify it's actually disabled.
-        Don't register parent if it's being saved due to a variant change.
-         */
-        if ($isParent && $isDeleteOperation && $product->getStatus() != Status::STATUS_DISABLED) {
-            /*
-            Parent product is not actually disabled, skip registration
-            This prevents registering parent when only a variant was disabled
-            */
+        if ($areAnyVariantAlreadyInDatabase) {
             return;
         }
 
