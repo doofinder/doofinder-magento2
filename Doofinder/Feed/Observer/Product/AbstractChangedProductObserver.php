@@ -12,7 +12,6 @@ use Doofinder\Feed\Model\ChangedItem\ItemType;
 use Doofinder\Feed\Model\ChangedItemFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
-use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Catalog\Model\Product\Visibility;
 use \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Framework\Event\Observer;
