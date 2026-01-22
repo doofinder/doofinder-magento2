@@ -151,19 +151,12 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
 
         $itemsToInsert = [$itemId];
         
-        /*
-        For non-delete operations: if product is a variant, register parent instead
-        (When updating a variant, its parent is also updated, so we register the parent)
-        */
         if ($isVariant && !$isDeleteOperation) {
+            /* When updating a product it's children are also updated, so in this case
+            we include the parentId but don't need to specify the itemId */
             $itemsToInsert = $parentProducts;
         }
         
-        /*
-        For delete operations: only register the product itself
-        - If variant is deleted: register only the variant (not the parent)
-        - If parent is deleted: register only the parent (not variants, handled in Dooplugins)
-        */
         foreach ($itemsToInsert as $itemToInsert) {
             $changedItem = $this->createChangedItem((int)$itemToInsert, $storeId);
             if (!$this->changedItemRepository->exists($changedItem)) {
