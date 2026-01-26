@@ -418,6 +418,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
         $extensionAttributes->setIsInStock($stockAndStatus[1]);
+        $extensionAttributes->setStockQuantity((float) $stockAndStatus[0]);
         $extensionAttributes->setBaseUrl($this->magentoStoreConfig->getStoreConfigs([$storeCode])[0]->getBaseUrl());
         $enabledCfgLinks = $this->getEnabledConfigurableLinks($extensionAttributes->getConfigurableProductLinks());
         $extensionAttributes->setConfigurableProductLinks($enabledCfgLinks);

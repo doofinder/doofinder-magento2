@@ -10,6 +10,7 @@
         <attribute code="price" type="float"/>
         <attribute code="special_price" type="float"/>
         <attribute code="df_multiprice" type="string"/>
+        <attribute code="stock_quantity" type="float" />
         <attribute code="minimum_quantity" type="float" />
         <attribute code="maximum_quantity" type="float" />
     </extension_attributes>
