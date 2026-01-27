@@ -15,10 +15,7 @@
     "magento/php-compatibility-fork": "*",
     "phpdocumentor/shim": "^3.8"
   },
-  "license": [
-    "OSL-3.0",
-    "AFL-3.0"
-  ],
+  "license": "MIT",
   "authors": [
     {
       "name": "Doofinder",
