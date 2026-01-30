@@ -438,6 +438,10 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             $extensionAttributes->setSpecialPrice(round($specialPrice, 2));
         }
 
+        $cost = $product->getData('cost');
+        $cost = is_numeric($cost) ? round((float) $cost, 2) : null;
+        $extensionAttributes->setPurchasePrice(null);
+
         $dfMultiprice = $this->getProductMultiprice($product, $storeId, $price, $specialPrice);
         $dfMultipriceJson = $this->serializer->serialize($dfMultiprice);
         $extensionAttributes->setDfMultiprice($dfMultipriceJson);
