@@ -470,16 +470,24 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     }
 
     /**
-     * Gets multiprice data for a product across all allowed currencies.
+     * Gets multiprice data for a product across all allowed currencies and customer groups.
      *
-     * Returns a map where keys are currency codes and values are arrays with price information.
-     * Example: ['EUR' => ['price' => 26, 'sale_price' => 24], 'USD' => ['price' => 24, 'sale_price' => 22]]
+     * Returns a map where keys are currency codes (e.g., 'USD') or currency codes with customer group IDs
+     * (e.g., 'USD_4'), and values are arrays with price information.
+     * Example: [
+     *   'USD' => ['price' => 26, 'sale_price' => 24],
+     *   'USD_4' => ['price' => 24, 'sale_price' => 24],
+     *   'EUR' => ['price' => 24, 'sale_price' => 22]
+     * ]
+     *
+     * Only tier prices with quantity equal to 1 are considered customer group prices;
+     * tier prices with other quantities are filtered out.
      *
      * @param ProductInterface $product Product to get prices for.
      * @param int $storeId Store ID.
      * @param float $basePrice Calculated base price for the product.
      * @param float $baseSpecialPrice Calculated special price for the product.
-     * @return array Map of currency codes to price arrays with 'price' and 'sale_price' keys.
+     * @return array Map of pricenames to price arrays with 'price' and 'sale_price' keys.
      */
     private function getProductMultiprice($product, $storeId, $basePrice, $baseSpecialPrice): array
     {
@@ -495,6 +503,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $currency = $this->currencyFactory->create();
         $rates = $currency->getCurrencyRates($defaultCurrencyCode, $allowedCurrencies);
 
+        // Generate prices for each currency
         foreach ($allowedCurrencies as $currencyCode) {
             $rate = isset($rates[$currencyCode]) ? $rates[$currencyCode] : 1;
             $convertedPrice = $basePrice * $rate;
@@ -506,6 +515,30 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                 'sale_price' => round($convertedSpecialPrice, 2)
             ];
         }
+
+        // Generate prices for each currency and customer group combination
+        $tierPrices = $product->getTierPrices();
+        foreach ($tierPrices as $tierPrice) {
+            if ((float) $tierPrice['qty'] != 1) {
+                continue;
+            }
+            
+            $customerGroupId = $tierPrice['customer_group_id'];
+            $tierPriceValue = (float) $tierPrice['value'];
+
+            // Generate prices for this customer group across all currencies
+            foreach ($allowedCurrencies as $currencyCode) {
+                $rate = isset($rates[$currencyCode]) ? $rates[$currencyCode] : 1;
+                $convertedTierPrice = $tierPriceValue * $rate;
+                
+                $multiprice[$currencyCode . '_' . $customerGroupId] = [
+                    'price' => round($convertedTierPrice, 2),
+                    // Sale price is inherited from the base currency price
+                    'sale_price' => $multiprice[$currencyCode]['sale_price']
+                ];
+            }
+        }
+
         return $multiprice;
     }
 
