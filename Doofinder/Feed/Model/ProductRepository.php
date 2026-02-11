@@ -519,7 +519,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         // Generate prices for each currency and customer group combination
         $tierPrices = $product->getTierPrices();
         foreach ($tierPrices as $tierPrice) {
-            if ((float) $tierPrice['qty'] != 1) {
+            if ((float) $tierPrice['qty'] !== 1.0) {
                 continue;
             }
             
