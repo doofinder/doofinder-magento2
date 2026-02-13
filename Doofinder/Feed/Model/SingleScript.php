@@ -110,7 +110,7 @@ class SingleScript
             $websiteId = $website->getId();
             foreach ($this->storeConfig->getWebsiteStores($websiteId) as $store) {
                 $installationId = $this->getInstallationId($store);
-                $region = $this->getRegionFromApiKey();
+                $region = $this->storeConfig->getRegionFromApiKey();
                 if (empty($installationId) || empty($region)) {
                     continue;
                 }
@@ -121,9 +121,7 @@ class SingleScript
                     $installationId
                 ) . '" async></script>';
 
-                $storeGroupId = $store->getStoreGroupId();
                 $scripts[] = trim($singleScript);
-                $this->storeConfig->setDisplayLayer($singleScript, $storeGroupId);
             }
         }
 
@@ -146,27 +144,6 @@ class SingleScript
             ScopeInterface::SCOPE_GROUP,
             $storeGroupId
         );
-    }
-
-    /**
-     * Extracts the region from the API key.
-     *
-     * @return string The region or an empty string if not valid.
-     */
-    private function getRegionFromApiKey(): string
-    {
-        $apiKey = $this->storeConfig->getValueFromConfig('doofinder_config_config/doofinder_account/api_key');
-        if (empty($apiKey)) {
-            return '';
-        }
-        $apiKeyParts = explode('-', $apiKey);
-        $region = $apiKeyParts[0];
-
-        if (0 === preg_match('/^(us|eu)[0-9]+$/', $region)) {
-            return '';
-        }
-
-        return $region;
     }
 
     /**

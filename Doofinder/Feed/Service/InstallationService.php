@@ -170,7 +170,6 @@ class InstallationService
             $storeGroupId = (int)$storeGroup->getId();
 
             $this->storeConfig->setInstallation($response["installation_id"], $storeGroupId);
-            $this->storeConfig->setDisplayLayer($response["script"], $storeGroupId);
 
             // Need to store into database the relation of each store view its related search engine hashid.
             // The response config has the following format:
