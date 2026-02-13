@@ -140,4 +140,3 @@ class NotifySingleScriptMigrationPatch implements DataPatchInterface
         return [];
     }
 }
-

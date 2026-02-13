@@ -566,12 +566,10 @@ class StoreConfig extends AbstractHelper
             );
             
             $singleScript = '<script src="' . $scriptUrl . '" async></script>';
-            
             $currency = $store->getCurrentCurrency()->getCode();
             $language_country = $this->getLanguageFromStore($store);
             $lang_parts = explode('-', $language_country);
             $language = $lang_parts[0];
-            
             $customerGroupId = (int)$this->customerSession->getCustomerGroupId();
             
             // Build priceName: {CURRENCY}_{CUSTOMER_GROUP_ID} or just {CURRENCY} if NOT_LOGGED_IN
@@ -597,7 +595,6 @@ class StoreConfig extends AbstractHelper
             return null;
         }
     }
-
 
     /**
      * Get Scope store.
@@ -984,7 +981,6 @@ class StoreConfig extends AbstractHelper
         $status = json_encode($status);
         $this->configWriter->save(self::INDEXATION_STATUS, $status, ScopeInterface::SCOPE_STORES, $storeId);
     }
-
 
     /**
      * Get stores by store_group id
