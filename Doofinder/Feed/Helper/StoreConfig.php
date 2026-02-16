@@ -555,9 +555,6 @@ class StoreConfig extends AbstractHelper
             }
             
             $region = $this->getRegionFromApiKey();
-            if ($region === '') {
-                return null;
-            }
             
             $scriptUrl = sprintf(
                 Constants::DOOFINDER_SCRIPT_URL_FORMAT,
