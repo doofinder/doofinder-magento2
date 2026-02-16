@@ -18,12 +18,6 @@
             <resource ref="Magento_Catalog::categories" />
         </resources>
     </route>
-    <route url="/V1/doofinder/single-script" method="GET">
-        <service class="Doofinder\Feed\Api\SingleScriptInterface" method="replace"/>
-        <resources>
-            <resource ref="Magento_Catalog::products"/>
-        </resources>
-    </route>
     <route url="/V1/doofinder/config" method="GET">
         <service class="Doofinder\Feed\Api\ModuleDataInterface" method="get"/>
         <resources>
