@@ -61,21 +61,6 @@
                         <![CDATA[ Activating this option you are inserting the script into your store code. You can manage product visibility in Doofinder. ]]>
                     </comment>
                 </field>
-                <field id="script"
-                       translate="label"
-                       type="textarea"
-                       sortOrder="300"
-                       showInDefault="0"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <depends>
-                        <field id="doofinder_layer_enabled">1</field>
-                    </depends>
-                    <label>Script</label>
-                    <comment>
-                        <![CDATA[ Do not modify this unless you are an advanced user. ]]>
-                    </comment>
-                </field>
                 <field id="store_view_table"
                        translate="label comment"
                        type="text"

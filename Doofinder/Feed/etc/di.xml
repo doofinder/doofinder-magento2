@@ -7,5 +7,4 @@
     <preference for="Doofinder\Feed\Api\ProductRepositoryInterface" type="Doofinder\Feed\Model\ProductRepository" />
     <preference for="Doofinder\Feed\Api\CategoryListInterface" type="Doofinder\Feed\Model\CategoryListRepository" />
     <preference for="Doofinder\Feed\Api\ModuleDataInterface" type="Doofinder\Feed\Model\ModuleData" />
-    <preference for="Doofinder\Feed\Api\SingleScriptInterface" type="Doofinder\Feed\Model\SingleScript" />
 </config>

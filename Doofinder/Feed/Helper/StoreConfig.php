@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doofinder\Feed\Helper;
 
 use Doofinder\Feed\Errors\NotFound;
+use Doofinder\Feed\Helper\Constants;
 use Doofinder\Feed\Helper\Indexation;
 use GuzzleHttp\Psr7\Utils;
 use Magento\Config\Model\Config\Backend\Admin\Custom;
@@ -26,6 +27,8 @@ use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as Attrib
 use Magento\Framework\Escaper;
 use Magento\Eav\Model\Config;
 use Magento\Backend\Helper\Data;
+use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Customer\Model\Group as CustomerGroup;
 
 /**
  * Store config helper
@@ -83,8 +86,6 @@ class StoreConfig extends AbstractHelper
     public const DISPLAY_LAYER_ENABLED = 'doofinder_config_config/doofinder_layer/doofinder_layer_enabled';
 
     public const DISPLAY_LAYER_INSTALLATION_ID = 'doofinder_config_config/doofinder_layer/installation_id';
-
-    public const DISPLAY_LAYER_SCRIPT_CONFIG = 'doofinder_config_config/doofinder_layer/script';
 
     /**
      * Path to integration ID
@@ -172,6 +173,9 @@ class StoreConfig extends AbstractHelper
     /** @var \Magento\Framework\App\ResourceConnection */
     private $resource;
 
+    /** @var CustomerSession */
+    private $customerSession;
+
     /**
      * StoreConfig constructor.
      * @param Context $context
@@ -185,6 +189,7 @@ class StoreConfig extends AbstractHelper
      * @param Config $eavConfig
      * @param Data $backendHelper
      * @param ResourceConnection $resource
+     * @param CustomerSession $customerSession
      */
     public function __construct(
         Context $context,
@@ -197,7 +202,8 @@ class StoreConfig extends AbstractHelper
         Escaper $escaper,
         Config $eavConfig,
         Data $backendHelper,
-        ResourceConnection $resource
+        ResourceConnection $resource,
+        CustomerSession $customerSession
     ) {
         $this->storeManager = $storeManager;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
@@ -209,6 +215,7 @@ class StoreConfig extends AbstractHelper
         $this->eavConfig = $eavConfig;
         $this->backendHelper = $backendHelper;
         $this->resource = $resource;
+        $this->customerSession = $customerSession;
 
         parent::__construct($context);
     }
@@ -453,6 +460,27 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
+     * Extracts the region from the API key.
+     *
+     * @return string The region or an empty string if not valid.
+     */
+    public function getRegionFromApiKey(): string
+    {
+        $apiKey = $this->getApiKey();
+        if (empty($apiKey)) {
+            return '';
+        }
+        $apiKeyParts = explode('-', $apiKey);
+        $region = $apiKeyParts[0] ?? '';
+
+        if (empty($region) || 0 === preg_match('/^(us|eu)[0-9]+$/', $region)) {
+            return '';
+        }
+
+        return $region;
+    }
+
+    /**
      * Get Hash ID.
      *
      * @param int|null $storeId
@@ -518,59 +546,51 @@ class StoreConfig extends AbstractHelper
     public function getDisplayLayer(): ?string
     {
         try {
-            $storeGroupId = $this->getCurrentStore()->getStoreGroupId();
-            $displayLayerScript = $this->getValueFromConfig(
-                self::DISPLAY_LAYER_SCRIPT_CONFIG,
-                ScopeInterface::SCOPE_GROUP,
-                (int)$storeGroupId
+            $store = $this->getCurrentStore();
+            $storeGroupId = $store->getStoreGroupId();
+            
+            $installationId = $this->getInstallationId((int)$storeGroupId);
+            if ($installationId === null) {
+                return null;
+            }
+            
+            $region = $this->getRegionFromApiKey();
+            
+            $scriptUrl = sprintf(
+                Constants::DOOFINDER_SCRIPT_URL_FORMAT,
+                $region,
+                $installationId
             );
+            
+            $singleScript = '<script src="' . $scriptUrl . '" async></script>';
+            $currency = $store->getCurrentCurrency()->getCode();
+            $language_country = $this->getLanguageFromStore($store);
+            $lang_parts = explode('-', $language_country);
+            $language = $lang_parts[0];
+            $customerGroupId = (int)$this->customerSession->getCustomerGroupId();
+            
+            // Build priceName: {CURRENCY}_{CUSTOMER_GROUP_ID} or just {CURRENCY} if NOT_LOGGED_IN
+            $priceName = $currency;
+            if ($customerGroupId !== CustomerGroup::NOT_LOGGED_IN_ID) {
+                $priceName = $currency . '_' . $customerGroupId;
+            }
 
-            if (!empty($displayLayerScript) && 1 !== preg_match('/dfLayerOptions/', $displayLayerScript) &&
-            1 !== preg_match('/doofinderApp/', $displayLayerScript)) {
-                $store = $this->getCurrentStore();
-                $currency = $store->getCurrentCurrency()->getCode();
-                $language_country = $this->getLanguageFromStore($store);
-                $lang_parts = explode('-', $language_country);
-                $language = $lang_parts[0];
-
-                $singleScriptAdditionalConfig = <<<EOT
+            $singleScriptAdditionalConfig = <<<EOT
                     <script>
                         (function(w, k) {w[k] = window[k] ||
                         function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
 
                         doofinderApp("config", "language", "$language")
                         doofinderApp("config", "currency", "$currency")
+                        doofinderApp("config", "priceName", "$priceName")
                     </script>
 
                 EOT;
 
-                $displayLayerScript = $singleScriptAdditionalConfig . $displayLayerScript;
-            } elseif (!empty($displayLayerScript) && 1 === preg_match('/dfLayerOptions/', $displayLayerScript)) {
-                $locale = $this->getLanguageFromStore($this->getCurrentStore());
-                $currency = $this->getCurrentStore()->getCurrentCurrency()->getCode();
-                $displayLayerScript = $this->includeLocaleAndCurrency($displayLayerScript, $locale, $currency);
-            }
+            return $singleScriptAdditionalConfig . $singleScript;
         } catch (\Exception $e) {
-            $displayLayerScript = null;
+            return null;
         }
-
-        return $displayLayerScript;
-    }
-
-    /**
-     * Set display layer
-     *
-     * @param string $script
-     * @param int $storeGroupId
-     */
-    public function setDisplayLayer(string $script, int $storeGroupId)
-    {
-        $this->configWriter->save(
-            self::DISPLAY_LAYER_SCRIPT_CONFIG,
-            $script,
-            ScopeInterface::SCOPE_GROUP,
-            $storeGroupId
-        );
     }
 
     /**
@@ -957,67 +977,6 @@ class StoreConfig extends AbstractHelper
         $status = $this->indexationHelper->sanitizeProcessTaskStatus($status);
         $status = json_encode($status);
         $this->configWriter->save(self::INDEXATION_STATUS, $status, ScopeInterface::SCOPE_STORES, $storeId);
-    }
-
-    /**
-     * Function to include the locale and the currency into the script.
-     *
-     * IMPORTANT NOTE: Once the single script is released, this method
-     * will become deprecated and it will be removed soon.
-     *
-     * The following entries are covered:
-     *    const dfLayerOptions = {
-     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
-     *      zone: 'eu1',
-     *      currency: 'USD',
-     *      language: 'fr-FR'
-     *    };
-     *
-     *    const dfLayerOptions = {
-     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
-     *      zone: 'eu1',
-     *      //currency: 'USD',
-     *      //language: 'fr-FR'
-     *    };
-     *
-     *    const dfLayerOptions = {
-     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
-     *      zone: 'eu1'
-     *    };
-     *
-     * @param string $liveLayerScript
-     * @param string $locale
-     * @param string $currency
-     *
-     * @return string
-     *    const dfLayerOptions = {
-     *      installationId: '4aa94cbd-e2a0-44db-b1d2-f0817ad2a97d',
-     *      zone: 'eu1',
-     *      currency: 'USD',
-     *      language: 'fr-FR'
-     *    };
-     */
-    private function includeLocaleAndCurrency($liveLayerScript, $locale, $currency): string
-    {
-        if (strpos($liveLayerScript, 'language:') !== false) {
-            $liveLayerScript = preg_replace("/(\/\/\s*)?(language:)(.*?)(\n|,)/m", "$2 '$locale'$4", $liveLayerScript);
-        } else {
-            $pos = strpos($liveLayerScript, "{");
-            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tlanguage: '$locale',", $pos + 1, 0);
-        }
-
-        if (strpos($liveLayerScript, 'currency:') !== false) {
-            $liveLayerScript = preg_replace(
-                "/(\/\/\s*)?(currency:)(.*?)(\n|,)/m",
-                "$2 '$currency'$4",
-                $liveLayerScript
-            );
-        } else {
-            $pos = strpos($liveLayerScript, "{");
-            $liveLayerScript = substr_replace($liveLayerScript, "\r\n\tcurrency: '$currency',", $pos + 1, 0);
-        }
-
-        return $liveLayerScript;
     }
 
     /**
