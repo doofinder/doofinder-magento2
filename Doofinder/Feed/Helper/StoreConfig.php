@@ -29,6 +29,7 @@ use Magento\Eav\Model\Config;
 use Magento\Backend\Helper\Data;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Customer\Model\Group as CustomerGroup;
+use Magento\Csp\Helper\CspNonceProvider;
 
 /**
  * Store config helper
@@ -176,6 +177,9 @@ class StoreConfig extends AbstractHelper
     /** @var CustomerSession */
     private $customerSession;
 
+    /** @var CspNonceProvider */
+    private $cspNonceProvider;
+
     /**
      * StoreConfig constructor.
      * @param Context $context
@@ -190,6 +194,7 @@ class StoreConfig extends AbstractHelper
      * @param Data $backendHelper
      * @param ResourceConnection $resource
      * @param CustomerSession $customerSession
+     * @param CspNonceProvider $cspNonceProvider
      */
     public function __construct(
         Context $context,
@@ -203,7 +208,8 @@ class StoreConfig extends AbstractHelper
         Config $eavConfig,
         Data $backendHelper,
         ResourceConnection $resource,
-        CustomerSession $customerSession
+        CustomerSession $customerSession,
+        CspNonceProvider $cspNonceProvider
     ) {
         $this->storeManager = $storeManager;
         $this->storeWebsiteRelation = $storeWebsiteRelation;
@@ -216,6 +222,7 @@ class StoreConfig extends AbstractHelper
         $this->backendHelper = $backendHelper;
         $this->resource = $resource;
         $this->customerSession = $customerSession;
+        $this->cspNonceProvider = $cspNonceProvider;
 
         parent::__construct($context);
     }
@@ -575,8 +582,10 @@ class StoreConfig extends AbstractHelper
                 $priceName = $currency . '_' . $customerGroupId;
             }
 
+            $nonce = $this->cspNonceProvider->generateNonce();
+
             $singleScriptAdditionalConfig = <<<EOT
-                    <script>
+                    <script nonce="$nonce">
                         (function(w, k) {w[k] = window[k] ||
                         function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
 
