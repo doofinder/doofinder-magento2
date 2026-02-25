@@ -33,7 +33,6 @@ class Base64GzJson extends Json
      * @param string $string
      * @return string|int|float|bool|array|null
      */
-
     public function unserialize($string)
     {
         $decoded = base64_decode($string, true);

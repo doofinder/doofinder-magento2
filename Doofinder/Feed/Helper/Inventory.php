@@ -88,12 +88,12 @@ class Inventory extends AbstractHelper
     }
 
     /**
-     * Get stockId related with the given store.
+     * Get stock ID related to the given store.
      *
      * Note: Each website is related only with one stock but one stock can be used by several websites.
      *
-     * @param int|null $storeId
-     * @return int
+     * @param int $storeId
+     * @return int|null
      */
     public function getStockIdByStore(int $storeId): ?int
     {
@@ -168,7 +168,7 @@ class Inventory extends AbstractHelper
 
     /**
      * Get info about the availability of a product
-     * If a product is a grouped product, we consider it is available
+     * If a product is a grouped product, we consider it available
      * if any of its associated products is salable
      *
      * @param ProductModel $product
@@ -319,7 +319,7 @@ class Inventory extends AbstractHelper
     }
 
     /**
-     * Function to get the stockId related with the given store / website
+     * Get the stock ID related to the given store or website
      *
      * @param int $storeId
      * @return int|null
@@ -342,7 +342,7 @@ class Inventory extends AbstractHelper
     }
 
     /**
-     * Function to detect if MSI module is active or not.
+     * Check whether the MSI module is active.
      *
      * For the moment is enough checking those two dependencies
      * because we're working only with those.

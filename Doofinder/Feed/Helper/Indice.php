@@ -15,7 +15,7 @@ class Indice extends AbstractHelper
      *
      * @param array $searchEngine
      * @param string $name
-     * @return $indiceExists
+     * @return bool
      * @throws NotFound
      */
     public function checkIndiceExistsInSearchEngine(array $searchEngine, string $name): bool
