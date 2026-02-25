@@ -143,7 +143,7 @@ class Item extends AbstractHelper
     }
 
     /**
-     * Processes items depending on the type os processing expected
+     * Processes items depending on the type of processing expected
      *
      * @param array $items
      * @param StoreInterface $store
