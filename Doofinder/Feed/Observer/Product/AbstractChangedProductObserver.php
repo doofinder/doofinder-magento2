@@ -117,7 +117,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
     }
 
     /**
-     * Registers the item by it's type in the table doofinder_feed_changed_item, with the corresponding store
+     * Registers the item by its type in the table doofinder_feed_changed_item, with the corresponding store
      *
      * @param ProductInterface $product
      * @param int $storeId
@@ -129,7 +129,7 @@ abstract class AbstractChangedProductObserver implements ObserverInterface
         $itemsToInsert = [$itemId];
         $parentProducts = $this->configurableProductType->getParentIdsByChild($itemId);
         if (count($parentProducts) > 0 && $this->getOperationType() != ChangedItemInterface::OPERATION_TYPE_DELETE) {
-            /* When updating a product it's children are also updated, so in this case
+            /* When updating a product its children are also updated, so in this case
             we include the parentId but don't need to specify the itemId */
             $itemsToInsert = $parentProducts;
         }

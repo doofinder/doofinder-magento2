@@ -6,7 +6,7 @@ namespace Doofinder\Feed\Errors;
 class Utils
 {
     /**
-     * Function for handling errors by it's code
+     * Handle errors by HTTP status code
      *
      * @param int $statusCode
      * @param string $response
@@ -62,7 +62,7 @@ class Utils
     }
 
     /**
-     * Reads the error for it's later processing
+     * Read the error message from the response for later processing
      *
      * @param string $response
      * @return string

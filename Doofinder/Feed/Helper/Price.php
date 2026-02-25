@@ -66,7 +66,7 @@ class Price extends AbstractHelper
     }
 
     /**
-     * Gets the flat price of the product based on it's type
+     * Gets the flat price of the product based on its type
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param string $type
@@ -95,7 +95,7 @@ class Price extends AbstractHelper
     }
 
     /**
-     * Gets the price applying the taxes in case it's necessary
+     * Gets the price applying taxes when necessary
      *
      * @param \Magento\Catalog\Model\Product $product
      * @param \Magento\Framework\Pricing\Render\Amount|null $price
