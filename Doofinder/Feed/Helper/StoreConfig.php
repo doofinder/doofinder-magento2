@@ -575,8 +575,17 @@ class StoreConfig extends AbstractHelper
                 $priceName = $currency . '_' . $customerGroupId;
             }
 
+            $nonceAttr = '';
+            // To keep backwards compatibility with older versions
+            if (class_exists(\Magento\Csp\Helper\CspNonceProvider::class)) {
+                $cspNonceProvider = \Magento\Framework\App\ObjectManager::getInstance()
+                    ->get(\Magento\Csp\Helper\CspNonceProvider::class);
+                $nonce = $cspNonceProvider->generateNonce();
+                $nonceAttr = 'nonce="' . $nonce . '"';
+            }
+
             $singleScriptAdditionalConfig = <<<EOT
-                    <script>
+                    <script $nonceAttr>
                         (function(w, k) {w[k] = window[k] ||
                         function () { (window[k].q = window[k].q || []).push(arguments) }})(window, "doofinderApp")
 
