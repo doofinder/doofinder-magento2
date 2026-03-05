@@ -21,6 +21,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\GroupedProduct\Model\Product\Type\Grouped as GroupedType;
 use Magento\Store\Api\StoreConfigManagerInterface as MagentoStoreConfig;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
@@ -517,20 +518,13 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         }
 
         // Generate prices for each currency and customer group combination
-        $tierPrices = $product->getTierPrices();
-        foreach ($tierPrices as $tierPrice) {
-            if ((float) $tierPrice['qty'] !== 1.0) {
-                continue;
-            }
-            
-            $customerGroupId = $tierPrice['customer_group_id'];
-            $tierPriceValue = (float) $tierPrice['value'];
-
+        $tierPricesByCustomerGroup = $this->getTierPricesByCustomerGroup($product);
+        foreach ($tierPricesByCustomerGroup as $customerGroupId => $tierPriceValue) {
             // Generate prices for this customer group across all currencies
             foreach ($allowedCurrencies as $currencyCode) {
                 $rate = isset($rates[$currencyCode]) ? $rates[$currencyCode] : 1;
                 $convertedTierPrice = $tierPriceValue * $rate;
-                
+
                 $multiprice[$currencyCode . '_' . $customerGroupId] = [
                     'price' => round($convertedTierPrice, 2),
                     // Sale price is inherited from the base currency price
@@ -540,6 +534,65 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         }
 
         return $multiprice;
+    }
+
+    /**
+     * Gets tier prices with quantity 1 per customer group (customer group prices).
+     * For simple products: returns the product's own tier prices (qty=1).
+     * For grouped products: returns the minimum tier price (qty=1) across all enabled
+     * associated products per customer group.
+     *
+     * @param ProductInterface $product Product to get tier prices for.
+     * @return array<int, float> Map of customer_group_id => tier price value in base currency.
+     */
+    private function getTierPricesByCustomerGroup(ProductInterface $product): array
+    {
+        if ($product->getTypeId() === GroupedType::TYPE_CODE) {
+            return $this->getGroupedProductTierPricesByCustomerGroup($product);
+        }
+
+        $result = [];
+        $tierPrices = $product->getTierPrices();
+        foreach ($tierPrices as $tierPrice) {
+            if ((float) $tierPrice['qty'] !== 1.0) {
+                continue;
+            }
+            $customerGroupId = (int) $tierPrice['customer_group_id'];
+            $value = (float) $tierPrice['value'];
+            $result[$customerGroupId] = $value;
+        }
+        return $result;
+    }
+
+    /**
+     * Gets minimum tier price (qty=1) per customer group across all enabled associated products.
+     *
+     * @param ProductInterface $groupedProduct Grouped product.
+     * @return array<int, float> Map of customer_group_id => minimum tier price in base currency.
+     */
+    private function getGroupedProductTierPricesByCustomerGroup(ProductInterface $groupedProduct): array
+    {
+        $minByCustomerGroup = [];
+        $usedProds = $groupedProduct->getTypeInstance()->getAssociatedProducts($groupedProduct);
+        $usedProds = array_filter($usedProds, function ($child) {
+            return $child && (int) $child->getStatus() === Status::STATUS_ENABLED;
+        });
+
+        foreach ($usedProds as $child) {
+            $tierPrices = $child->getTierPrices();
+            foreach ($tierPrices as $tierPrice) {
+                if ((float) $tierPrice['qty'] !== 1.0) {
+                    continue;
+                }
+                $customerGroupId = (int) $tierPrice['customer_group_id'];
+                $value = (float) $tierPrice['value'];
+                if (!isset($minByCustomerGroup[$customerGroupId]) || $value < $minByCustomerGroup[$customerGroupId]) {
+                    $minByCustomerGroup[$customerGroupId] = $value;
+                }
+            }
+        }
+
+        return $minByCustomerGroup;
     }
 
     /**
