@@ -506,34 +506,40 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         // Generate prices for each currency
         foreach ($allowedCurrencies as $currencyCode) {
-            $rate = isset($rates[$currencyCode]) ? $rates[$currencyCode] : 1;
-            $convertedPrice = $basePrice * $rate;
-            $convertedSpecialPrice = $baseSpecialPrice * $rate;
-            
             $multiprice[$currencyCode] = [
-                'price' => round($convertedPrice, 2),
+                'price' => $this->convertPriceToCurrency($basePrice, $rates, $currencyCode),
                 // 'special_price' gets assigned to 'sale_price' key
-                'sale_price' => round($convertedSpecialPrice, 2)
+                'sale_price' => $this->convertPriceToCurrency($baseSpecialPrice, $rates, $currencyCode)
             ];
         }
 
         // Generate prices for each currency and customer group combination
         $tierPricesByCustomerGroup = $this->getTierPricesByCustomerGroup($product);
         foreach ($tierPricesByCustomerGroup as $customerGroupId => $tierPriceValue) {
-            // Generate prices for this customer group across all currencies
             foreach ($allowedCurrencies as $currencyCode) {
-                $rate = isset($rates[$currencyCode]) ? $rates[$currencyCode] : 1;
-                $convertedTierPrice = $tierPriceValue * $rate;
-
                 $multiprice[$currencyCode . '_' . $customerGroupId] = [
-                    'price' => round($convertedTierPrice, 2),
-                    // Sale price is inherited from the base currency price
+                    'price' => $this->convertPriceToCurrency($tierPriceValue, $rates, $currencyCode),
                     'sale_price' => $multiprice[$currencyCode]['sale_price']
                 ];
             }
         }
 
         return $multiprice;
+    }
+
+    /**
+     * Converts a base-currency price to the given currency and rounds it.
+     *
+     * @param float $price Price in base/store default currency.
+     * @param array<string, float> $rates Currency code => rate (from base).
+     * @param string $currencyCode Target currency code.
+     * @param int $precision Decimal precision for rounding (default 2).
+     * @return float Converted and rounded price.
+     */
+    private function convertPriceToCurrency(float $price, array $rates, string $currencyCode, int $precision = 2): float
+    {
+        $rate = $rates[$currencyCode] ?? 1;
+        return round($price * $rate, $precision);
     }
 
     /**
