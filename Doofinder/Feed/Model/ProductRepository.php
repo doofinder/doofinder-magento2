@@ -526,7 +526,8 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * @param float|null $salePriceValue Sale price in base currency to convert; null to reuse existing sale_price per currency (e.g. tier case).
      * @param int|string|null $priceName If set, multiprice key is "{currencyCode}_{priceName}"; otherwise key is currency code.
      */
-    private function fillMultipriceForCurrencies(&$multiprice, $allowedCurrencies, $rates, $priceValue, $salePriceValue = null, $priceName = null): void {
+    private function fillMultipriceForCurrencies(&$multiprice, $allowedCurrencies, $rates, $priceValue, $salePriceValue = null, $priceName = null): void
+    {
         foreach ($allowedCurrencies as $currencyCode) {
             $key = ($priceName !== null) ? $currencyCode . '_' . $priceName : $currencyCode;
             $multiprice[$key] = [
