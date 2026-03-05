@@ -510,7 +510,14 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         // Generate prices for each currency and customer group combination
         $tierPricesByCustomerGroup = $this->getTierPricesByCustomerGroup($product);
         foreach ($tierPricesByCustomerGroup as $customerGroupId => $tierPriceValue) {
-            $this->fillMultipriceForCurrencies($multiprice, $allowedCurrencies, $rates, $tierPriceValue, null, $customerGroupId);
+            $this->fillMultipriceForCurrencies(
+                $multiprice,
+                $allowedCurrencies,
+                $rates,
+                $tierPriceValue,
+                null,
+                $customerGroupId
+            );
         }
 
         return $multiprice;
@@ -519,15 +526,23 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     /**
      * Fills multiprice entries for all allowed currencies (converts price and sets sale_price).
      *
-     * @param array<string, array{price: float, sale_price: float}> $multiprice array to fill (by reference).
-     * @param string[] $allowedCurrencies Currency codes.
-     * @param array<string, float> $rates Currency code => rate from base.
+     * @param array $multiprice Map to fill (by reference).
+     * @param array $allowedCurrencies Currency codes.
+     * @param array $rates Currency code => rate from base.
      * @param float $priceValue Price in base currency to convert.
-     * @param float|null $salePriceValue Sale price in base currency to convert; null to reuse existing sale_price per currency (e.g. tier case).
-     * @param int|string|null $priceName If set, multiprice key is "{currencyCode}_{priceName}"; otherwise key is currency code.
+     * @param float|null $salePriceValue Sale price in base currency to convert;
+     *                   null to reuse existing sale_price per currency (e.g. tier case).
+     * @param int|string|null $priceName If set, multiprice key is "{currencyCode}_{priceName}";
+     *                        otherwise key is currency code.
      */
-    private function fillMultipriceForCurrencies(&$multiprice, $allowedCurrencies, $rates, $priceValue, $salePriceValue = null, $priceName = null): void
-    {
+    private function fillMultipriceForCurrencies(
+        array &$multiprice,
+        array $allowedCurrencies,
+        array $rates,
+        float $priceValue,
+        $salePriceValue = null,
+        $priceName = null
+    ): void {
         foreach ($allowedCurrencies as $currencyCode) {
             $key = ($priceName !== null) ? $currencyCode . '_' . $priceName : $currencyCode;
             $multiprice[$key] = [
@@ -543,7 +558,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * Converts a base-currency price to the given currency and rounds it.
      *
      * @param float $price Price in base/store default currency.
-     * @param array<string, float> $rates Currency code => rate (from base).
+     * @param array $rates Currency code => rate (from base).
      * @param string $currencyCode Target currency code.
      * @param int $precision Decimal precision for rounding (default 2).
      * @return float Converted and rounded price.
