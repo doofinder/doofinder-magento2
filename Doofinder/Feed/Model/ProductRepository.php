@@ -505,26 +505,37 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $rates = $currency->getCurrencyRates($defaultCurrencyCode, $allowedCurrencies);
 
         // Generate prices for each currency
-        foreach ($allowedCurrencies as $currencyCode) {
-            $multiprice[$currencyCode] = [
-                'price' => $this->convertPriceToCurrency($basePrice, $rates, $currencyCode),
-                // 'special_price' gets assigned to 'sale_price' key
-                'sale_price' => $this->convertPriceToCurrency($baseSpecialPrice, $rates, $currencyCode)
-            ];
-        }
+        $this->fillMultipriceForCurrencies($multiprice, $allowedCurrencies, $rates, $basePrice, $baseSpecialPrice);
 
         // Generate prices for each currency and customer group combination
         $tierPricesByCustomerGroup = $this->getTierPricesByCustomerGroup($product);
         foreach ($tierPricesByCustomerGroup as $customerGroupId => $tierPriceValue) {
-            foreach ($allowedCurrencies as $currencyCode) {
-                $multiprice[$currencyCode . '_' . $customerGroupId] = [
-                    'price' => $this->convertPriceToCurrency($tierPriceValue, $rates, $currencyCode),
-                    'sale_price' => $multiprice[$currencyCode]['sale_price']
-                ];
-            }
+            $this->fillMultipriceForCurrencies($multiprice, $allowedCurrencies, $rates, $tierPriceValue, null, $customerGroupId);
         }
 
         return $multiprice;
+    }
+
+    /**
+     * Fills multiprice entries for all allowed currencies (converts price and sets sale_price).
+     *
+     * @param array<string, array{price: float, sale_price: float}> $multiprice array to fill (by reference).
+     * @param string[] $allowedCurrencies Currency codes.
+     * @param array<string, float> $rates Currency code => rate from base.
+     * @param float $priceValue Price in base currency to convert.
+     * @param float|null $salePriceValue Sale price in base currency to convert; null to reuse existing sale_price per currency (e.g. tier case).
+     * @param int|string|null $priceName If set, multiprice key is "{currencyCode}_{priceName}"; otherwise key is currency code.
+     */
+    private function fillMultipriceForCurrencies(&$multiprice, $allowedCurrencies, $rates, $priceValue, $salePriceValue = null, $priceName = null): void {
+        foreach ($allowedCurrencies as $currencyCode) {
+            $key = ($priceName !== null) ? $currencyCode . '_' . $priceName : $currencyCode;
+            $multiprice[$key] = [
+                'price' => $this->convertPriceToCurrency($priceValue, $rates, $currencyCode),
+                'sale_price' => ($salePriceValue !== null)
+                    ? $this->convertPriceToCurrency($salePriceValue, $rates, $currencyCode)
+                    : $multiprice[$currencyCode]['sale_price']
+            ];
+        }
     }
 
     /**
