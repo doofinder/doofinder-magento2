@@ -175,8 +175,8 @@ class Price extends AbstractHelper
             return $product->getPriceInfo()->getPrice($type);
         }
 
-        $usedProds = $product->getTypeInstance()->getAssociatedProducts($product);
-        return $this->getMinimumComplexProductPrice($product, $usedProds, $type);
+        $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
+        return $this->getMinimumComplexProductPrice($product, $associatedProducts, $type);
     }
 
     /**

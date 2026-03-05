@@ -21,6 +21,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\GroupedProduct\Model\Product\Type\Grouped as GroupedType;
 use Magento\Store\Api\StoreConfigManagerInterface as MagentoStoreConfig;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
@@ -504,42 +505,127 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $rates = $currency->getCurrencyRates($defaultCurrencyCode, $allowedCurrencies);
 
         // Generate prices for each currency
-        foreach ($allowedCurrencies as $currencyCode) {
-            $rate = isset($rates[$currencyCode]) ? $rates[$currencyCode] : 1;
-            $convertedPrice = $basePrice * $rate;
-            $convertedSpecialPrice = $baseSpecialPrice * $rate;
-            
-            $multiprice[$currencyCode] = [
-                'price' => round($convertedPrice, 2),
-                // 'special_price' gets assigned to 'sale_price' key
-                'sale_price' => round($convertedSpecialPrice, 2)
-            ];
-        }
+        $this->fillMultipriceForCurrencies($multiprice, $allowedCurrencies, $rates, $basePrice, $baseSpecialPrice);
 
         // Generate prices for each currency and customer group combination
+        $tierPricesByCustomerGroup = $this->getTierPricesByCustomerGroup($product);
+        foreach ($tierPricesByCustomerGroup as $customerGroupId => $tierPriceValue) {
+            $this->fillMultipriceForCurrencies(
+                $multiprice,
+                $allowedCurrencies,
+                $rates,
+                $tierPriceValue,
+                null,
+                $customerGroupId
+            );
+        }
+
+        return $multiprice;
+    }
+
+    /**
+     * Fills multiprice entries for all allowed currencies (converts price and sets sale_price).
+     *
+     * @param array $multiprice Map to fill (by reference).
+     * @param array $allowedCurrencies Currency codes.
+     * @param array $rates Currency code => rate from base.
+     * @param float $priceValue Price in base currency to convert.
+     * @param float|null $salePriceValue Sale price in base currency to convert;
+     *                   null to reuse existing sale_price per currency (e.g. tier case).
+     * @param int|string|null $priceName If set, multiprice key is "{currencyCode}_{priceName}";
+     *                        otherwise key is currency code.
+     */
+    private function fillMultipriceForCurrencies(
+        array &$multiprice,
+        array $allowedCurrencies,
+        array $rates,
+        float $priceValue,
+        $salePriceValue = null,
+        $priceName = null
+    ): void {
+        foreach ($allowedCurrencies as $currencyCode) {
+            $key = ($priceName !== null) ? $currencyCode . '_' . $priceName : $currencyCode;
+            $multiprice[$key] = [
+                'price' => $this->convertPriceToCurrency($priceValue, $rates, $currencyCode),
+                'sale_price' => ($salePriceValue !== null)
+                    ? $this->convertPriceToCurrency($salePriceValue, $rates, $currencyCode)
+                    : $multiprice[$currencyCode]['sale_price']
+            ];
+        }
+    }
+
+    /**
+     * Converts a base-currency price to the given currency and rounds it.
+     *
+     * @param float $price Price in base/store default currency.
+     * @param array $rates Currency code => rate (from base).
+     * @param string $currencyCode Target currency code.
+     * @param int $precision Decimal precision for rounding (default 2).
+     * @return float Converted and rounded price.
+     */
+    private function convertPriceToCurrency(float $price, array $rates, string $currencyCode, int $precision = 2): float
+    {
+        $rate = $rates[$currencyCode] ?? 1;
+        return round($price * $rate, $precision);
+    }
+
+    /**
+     * Gets tier prices with quantity 1 per customer group (customer group prices).
+     * For simple products: returns the product's own tier prices (qty=1).
+     * For grouped products: returns the minimum tier price (qty=1) across all enabled
+     * associated products per customer group.
+     *
+     * @param ProductInterface $product Product to get tier prices for.
+     * @return array<int, float> Map of customer_group_id => tier price value in base currency.
+     */
+    private function getTierPricesByCustomerGroup(ProductInterface $product): array
+    {
+        if ($product->getTypeId() === GroupedType::TYPE_CODE) {
+            return $this->getGroupedProductTierPricesByCustomerGroup($product);
+        }
+
+        $result = [];
         $tierPrices = $product->getTierPrices();
         foreach ($tierPrices as $tierPrice) {
             if ((float) $tierPrice['qty'] !== 1.0) {
                 continue;
             }
-            
-            $customerGroupId = $tierPrice['customer_group_id'];
-            $tierPriceValue = (float) $tierPrice['value'];
+            $customerGroupId = (int) $tierPrice['customer_group_id'];
+            $value = (float) $tierPrice['value'];
+            $result[$customerGroupId] = $value;
+        }
+        return $result;
+    }
 
-            // Generate prices for this customer group across all currencies
-            foreach ($allowedCurrencies as $currencyCode) {
-                $rate = isset($rates[$currencyCode]) ? $rates[$currencyCode] : 1;
-                $convertedTierPrice = $tierPriceValue * $rate;
-                
-                $multiprice[$currencyCode . '_' . $customerGroupId] = [
-                    'price' => round($convertedTierPrice, 2),
-                    // Sale price is inherited from the base currency price
-                    'sale_price' => $multiprice[$currencyCode]['sale_price']
-                ];
+    /**
+     * Gets minimum tier price (qty=1) per customer group across all enabled associated products.
+     *
+     * @param ProductInterface $groupedProduct Grouped product.
+     * @return array<int, float> Map of customer_group_id => minimum tier price in base currency.
+     */
+    private function getGroupedProductTierPricesByCustomerGroup(ProductInterface $groupedProduct): array
+    {
+        $minByCustomerGroup = [];
+        $associatedProducts = $groupedProduct->getTypeInstance()->getAssociatedProducts($groupedProduct);
+        $associatedProducts = array_filter($associatedProducts, function ($child) {
+            return $child && (int) $child->getStatus() === Status::STATUS_ENABLED;
+        });
+
+        foreach ($associatedProducts as $child) {
+            $tierPrices = $child->getTierPrices();
+            foreach ($tierPrices as $tierPrice) {
+                if ((float) $tierPrice['qty'] !== 1.0) {
+                    continue;
+                }
+                $customerGroupId = (int) $tierPrice['customer_group_id'];
+                $value = (float) $tierPrice['value'];
+                if (!isset($minByCustomerGroup[$customerGroupId]) || $value < $minByCustomerGroup[$customerGroupId]) {
+                    $minByCustomerGroup[$customerGroupId] = $value;
+                }
             }
         }
 
-        return $multiprice;
+        return $minByCustomerGroup;
     }
 
     /**
