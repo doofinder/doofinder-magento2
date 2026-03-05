@@ -573,12 +573,12 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     private function getGroupedProductTierPricesByCustomerGroup(ProductInterface $groupedProduct): array
     {
         $minByCustomerGroup = [];
-        $usedProds = $groupedProduct->getTypeInstance()->getAssociatedProducts($groupedProduct);
-        $usedProds = array_filter($usedProds, function ($child) {
+        $associatedProducts = $groupedProduct->getTypeInstance()->getAssociatedProducts($groupedProduct);
+        $associatedProducts = array_filter($associatedProducts, function ($child) {
             return $child && (int) $child->getStatus() === Status::STATUS_ENABLED;
         });
 
-        foreach ($usedProds as $child) {
+        foreach ($associatedProducts as $child) {
             $tierPrices = $child->getTierPrices();
             foreach ($tierPrices as $tierPrice) {
                 if ((float) $tierPrice['qty'] !== 1.0) {
