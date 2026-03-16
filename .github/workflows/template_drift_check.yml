@@ -1,0 +1,53 @@
+# Check that generated files (from templates + envsubst) match committed files.
+# Detects drift when templates or env-substituted outputs change without updating the versioned files.
+# Uses committed .env as source of truth for DOOFINDER_* values.
+name: Template drift check
+
+on:
+  pull_request:
+    paths:
+      - 'templates/**'
+      - 'Doofinder/Feed/Helper/Constants.php'
+      - 'Doofinder/Feed/etc/config.xml'
+      - '.env'
+  push:
+    paths:
+      - 'templates/**'
+      - 'Doofinder/Feed/Helper/Constants.php'
+      - 'Doofinder/Feed/etc/config.xml'
+      - '.env'
+
+jobs:
+  drift-check:
+    name: Template vs versioned files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate from templates (canonical env from .env)
+        run: |
+          set -a
+          # shellcheck source=/dev/null
+          source .env
+          set +a
+          ENVSUBST_VARS='$DOOFINDER_ADMIN_URL,$DOOFINDER_PLUGINS_URL_FORMAT,$DOOFINDER_SEARCH_URL_FORMAT,$DOOFINDER_API_URL_FORMAT,$DOOFINDER_SCRIPT_URL_FORMAT'
+          mkdir -p .drift-out
+          envsubst "$ENVSUBST_VARS" < templates/Helper/Constants.php > .drift-out/Constants.php
+          envsubst "$ENVSUBST_VARS" < templates/etc/config.xml > .drift-out/config.xml
+
+      - name: Diff Constants.php
+        run: |
+          if ! diff -u Doofinder/Feed/Helper/Constants.php .drift-out/Constants.php; then
+            echo "::error::Drift: Doofinder/Feed/Helper/Constants.php differs from templates/Helper/Constants.php output. Run 'make doofinder-configure' with canonical env and commit."
+            exit 1
+          fi
+
+      - name: Diff config.xml
+        run: |
+          if ! diff -u Doofinder/Feed/etc/config.xml .drift-out/config.xml; then
+            echo "::error::Drift: Doofinder/Feed/etc/config.xml differs from templates/etc/config.xml output. Run 'make doofinder-configure' with canonical env and commit."
+            exit 1
+          fi
+
+      - name: No drift
+        run: 'echo "No template drift: versioned files match template output."'
