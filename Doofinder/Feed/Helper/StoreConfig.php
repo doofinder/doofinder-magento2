@@ -81,8 +81,6 @@ class StoreConfig extends AbstractHelper
      */
     public const HASH_ID_CONFIG = 'doofinder_config_config/doofinder_layer/hash_id';
 
-    public const INDICE_CALLBACK = 'doofinder_config_config/doofinder_layer/indice_callback';
-
     public const DISPLAY_LAYER_ENABLED = 'doofinder_config_config/doofinder_layer/doofinder_layer_enabled';
 
     public const DISPLAY_LAYER_INSTALLATION_ID = 'doofinder_config_config/doofinder_layer/installation_id';
@@ -820,31 +818,6 @@ class StoreConfig extends AbstractHelper
     public function setDisplayLayerEnabled(int $value)
     {
         $this->configWriter->save(self::DISPLAY_LAYER_ENABLED, $value);
-    }
-
-    /**
-     * Enable display layer if all indexes callback are true
-     *
-     * @param bool $callback
-     * @param int $storeId
-     *
-     * @throws NoSuchEntityException
-     */
-    public function setGlobalDisplayLayerEnabled(bool $callback, int $storeId)
-    {
-        $this->configWriter->save(self::INDICE_CALLBACK, ($callback ? 1 : 0), ScopeInterface::SCOPE_STORES, $storeId);
-        $enabled = 1;
-        foreach ($this->getAllStores() as $store) {
-            if ($this->getValueFromConfig(
-                self::INDICE_CALLBACK,
-                ScopeInterface::SCOPE_STORES,
-                (int)$store->getId()
-            ) == 0) {
-                $enabled = 0;
-                break;
-            }
-        }
-        $this->setDisplayLayerEnabled($enabled);
     }
 
     /**
