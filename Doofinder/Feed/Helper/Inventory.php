@@ -117,12 +117,13 @@ class Inventory extends AbstractHelper
         try {
             return $this->getStockItemConfiguration($product, $stockId)->getMaxSaleQty();
         } catch (\Exception $e) {
+            $defaultMaxQuantityValue = $this->getStockItem($product->getId())->getMaxSaleQty();
             $this->_logger->debug('Stock item data unavailable, using default max order qty', [
                 'sku' => $product->getSku(),
                 'stockId' => $stockId,
+                'defaultValue' => $defaultMaxQuantityValue,
             ]);
-            // Note: In Magento quantities, 0.0 means no limit.
-            return 0.0;
+            return $defaultMaxQuantityValue;
         }
     }
 
@@ -142,11 +143,13 @@ class Inventory extends AbstractHelper
         try {
             return $this->getStockItemConfiguration($product, $stockId)->getMinSaleQty();
         } catch (\Exception $e) {
+            $defaultMinQuantityValue = $this->getStockItem($product->getId())->getMinSaleQty();
             $this->_logger->debug('Stock item data unavailable, using default min order qty', [
                 'sku' => $product->getSku(),
                 'stockId' => $stockId,
+                'defaultValue' => $defaultMinQuantityValue,
             ]);
-            return 1.0;
+            return $defaultMinQuantityValue;
         }
     }
 
