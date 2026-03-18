@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doofinder\Feed\Helper;
 
-use Doofinder\Feed\Errors\DoofinderFeedException;
 use Magento\Catalog\Model\Product as ProductModel;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -112,9 +111,18 @@ class Inventory extends AbstractHelper
      */
     public function getMaximumOrderQuantity(ProductModel $product, ?int $stockId): float
     {
-        return $this->isMsiActive()
-            ? $this->getStockItemConfiguration($product, $stockId)->getMaxSaleQty()
-            : $this->getStockItem($product->getId())->getMaxSaleQty();
+        if (!$this->isMsiActive()) {
+            return $this->getStockItem($product->getId())->getMaxSaleQty();
+        }
+        try {
+            return $this->getStockItemConfiguration($product, $stockId)->getMaxSaleQty();
+        } catch (\Exception $e) {
+            $this->_logger->debug('Stock item data unavailable, using default max order qty', [
+                'sku' => $product->getSku(),
+                'stockId' => $stockId,
+            ]);
+            return 0.0;
+        }
     }
 
     /**
@@ -127,9 +135,18 @@ class Inventory extends AbstractHelper
      */
     public function getMinimumOrderQuantity(ProductModel $product, ?int $stockId): float
     {
-        return $this->isMsiActive()
-            ? $this->getStockItemConfiguration($product, $stockId)->getMinSaleQty()
-            : $this->getStockItem($product->getId())->getMinSaleQty();
+        if (!$this->isMsiActive()) {
+            return $this->getStockItem($product->getId())->getMinSaleQty();
+        }
+        try {
+            return $this->getStockItemConfiguration($product, $stockId)->getMinSaleQty();
+        } catch (\Exception $e) {
+            $this->_logger->debug('Stock item data unavailable, using default min order qty', [
+                'sku' => $product->getSku(),
+                'stockId' => $stockId,
+            ]);
+            return 1.0;
+        }
     }
 
     /**
@@ -239,14 +256,11 @@ class Inventory extends AbstractHelper
         try {
             $stockItemData = $getStockItemData->execute($sku, $stockId);
         } catch (\Exception $e) {
-            $errorMsg = 'Could not receive Stock Item data: ' . $e->getMessage();
-            $this->_logger->error($errorMsg, [
-                'sku' => $sku,
-                'stockId' => $stockId,
-                'exception' => $e->getMessage(),
-                'isMsiActive' => $this->isMsiActive()
-            ]);
-            throw new DoofinderFeedException($errorMsg . ' SKU: ' . $sku . ', stockId: ' . $stockId);
+            $this->_logger->debug('Stock item data unavailable', ['sku' => $sku, 'stockId' => $stockId]);
+            return [
+                GetStockItemDataInterface::QUANTITY => 0,
+                GetStockItemDataInterface::IS_SALABLE => false,
+            ];
         }
 
         return [
