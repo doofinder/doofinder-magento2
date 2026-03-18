@@ -121,6 +121,7 @@ class Inventory extends AbstractHelper
                 'sku' => $product->getSku(),
                 'stockId' => $stockId,
             ]);
+            // Note: In Magento quantities, 0.0 means no limit.
             return 0.0;
         }
     }
