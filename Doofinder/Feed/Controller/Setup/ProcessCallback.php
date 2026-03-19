@@ -89,9 +89,7 @@ class ProcessCallback extends Action implements CsrfAwareActionInterface, HttpPo
             $response = $this->sanitizeResponse($response);
             $this->logger->debug('[ProcessCallback] Status: ' . $response['status'] .
                 ' - Message: ' . $response['result']);
-            $this->logger->debug('[ProcessCallback] Display layer enabled: ' . ($response['error'] ? 0 : 1));
             $this->storeConfig->setIndexationStatus($response, (int)$store->getId());
-            $this->storeConfig->setGlobalDisplayLayerEnabled(!$response['error'], (int)$store->getId());
             $this->cleanCache();
             $result->setData('OK');
         } catch (Exception $e) {
