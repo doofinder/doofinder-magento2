@@ -473,7 +473,7 @@ class StoreConfig extends AbstractHelper
         $apiKeyParts = explode('-', $apiKey);
         $region = $apiKeyParts[0] ?? '';
 
-        if (empty($region) || 0 === preg_match('/^(us|eu)[0-9]+$/', $region)) {
+        if (empty($region) || 0 === preg_match('/^(us|eu|ap)[0-9]+$/', $region)) {
             return '';
         }
 
