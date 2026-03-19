@@ -74,4 +74,12 @@ class EnableDisplayLayerByDefaultPatch implements DataPatchInterface
     {
         return [];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getVersion(): string
+    {
+        return '1.5.5';
+    }
 }
