@@ -80,6 +80,6 @@ class EnableDisplayLayerByDefaultPatch implements DataPatchInterface
      */
     public static function getVersion(): string
     {
-        return '1.5.6';
+        return '1.5.7';
     }
 }
