@@ -65,6 +65,8 @@ class Layer extends Template
     }
 
     /**
+     * Get the Doofinder display layer script.
+     *
      * @return string|null
      */
     public function getDisplayLayer(): ?string
@@ -73,6 +75,8 @@ class Layer extends Template
     }
 
     /**
+     * Map the current request action to a Doofinder page type.
+     *
      * @return string
      */
     public function getPageType(): string
@@ -82,6 +86,8 @@ class Layer extends Template
     }
 
     /**
+     * Get the current product ID for product pages.
+     *
      * @return string
      */
     public function getDfProductId(): string
@@ -95,6 +101,8 @@ class Layer extends Template
     }
 
     /**
+     * Get the category breadcrumb for the current page context.
+     *
      * @return string
      */
     public function getDfCategoryName(): string
@@ -115,6 +123,8 @@ class Layer extends Template
     }
 
     /**
+     * Resolve a category breadcrumb by category ID.
+     *
      * @param int $categoryId
      * @return string|null
      */
@@ -132,6 +142,8 @@ class Layer extends Template
     }
 
     /**
+     * Resolve the deepest active category breadcrumb assigned to a product.
+     *
      * @param int $productId
      * @return string|null
      */
@@ -164,6 +176,8 @@ class Layer extends Template
     }
 
     /**
+     * Generate a CSP nonce attribute for inline script tags.
+     *
      * @return string
      */
     public function getNonceAttribute(): string
@@ -177,8 +191,7 @@ class Layer extends Template
     }
 
     /**
-     * Build a category breadcrumb string from a category path,
-     * using the same store-root scoping logic as the indexer.
+     * Build a store-scoped category breadcrumb string from a category path.
      *
      * @param string $categoryPath e.g. "1/2/5/12/34"
      * @return string e.g. "Electronics > Computers > Laptops"
