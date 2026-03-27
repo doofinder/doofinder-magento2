@@ -102,53 +102,65 @@ class Layer extends Template
         $pageType = $this->getPageType();
 
         if ($pageType === 'category') {
-            $categoryId = (int) $this->getRequest()->getParam('id');
-            if ($categoryId) {
-                try {
-                    $category = $this->categoryRepository->get($categoryId);
-                    return $this->buildCategoryBreadcrumb($category->getPath());
-                } catch (NoSuchEntityException $e) {
-                    return '';
-                }
-            }
+            return $this->getCategoryBreadcrumbById((int) $this->getRequest()->getParam('id')) ?? '';
         }
 
         if ($pageType === 'product') {
-            $categoryId = (int) $this->getRequest()->getParam('category');
-            if ($categoryId) {
-                try {
-                    $category = $this->categoryRepository->get($categoryId);
-                    return $this->buildCategoryBreadcrumb($category->getPath());
-                } catch (NoSuchEntityException $e) {
-                    // fall through to product-based lookup
-                }
-            }
-
-            $productId = (int) $this->getRequest()->getParam('id');
-            if ($productId) {
-                try {
-                    $product = $this->productRepository->getById($productId);
-                    $categoryIds = $product->getCategoryIds();
-                    if (!empty($categoryIds)) {
-                        $collection = $this->categoryCollectionFactory->create();
-                        $collection->addIdFilter($categoryIds)
-                            ->addAttributeToSelect('path')
-                            ->addAttributeToFilter('is_active', 1)
-                            ->addAttributeToSort('level', 'DESC')
-                            ->setPageSize(1);
-
-                        $deepestCategory = $collection->getFirstItem();
-                        if ($deepestCategory && $deepestCategory->getId()) {
-                            return $this->buildCategoryBreadcrumb($deepestCategory->getPath());
-                        }
-                    }
-                } catch (NoSuchEntityException $e) {
-                    return '';
-                }
-            }
+            return $this->getCategoryBreadcrumbById((int) $this->getRequest()->getParam('category'))
+                ?? $this->getDeepestCategoryBreadcrumbForProduct((int) $this->getRequest()->getParam('id'))
+                ?? '';
         }
 
         return '';
+    }
+
+    /**
+     * @param int $categoryId
+     * @return string|null
+     */
+    private function getCategoryBreadcrumbById(int $categoryId): ?string
+    {
+        if ($categoryId <= 0) {
+            return null;
+        }
+        try {
+            $category = $this->categoryRepository->get($categoryId);
+            return $this->buildCategoryBreadcrumb($category->getPath()) ?: null;
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param int $productId
+     * @return string|null
+     */
+    private function getDeepestCategoryBreadcrumbForProduct(int $productId): ?string
+    {
+        if ($productId <= 0) {
+            return null;
+        }
+        try {
+            $product = $this->productRepository->getById($productId);
+            $categoryIds = $product->getCategoryIds();
+            if (empty($categoryIds)) {
+                return null;
+            }
+            $collection = $this->categoryCollectionFactory->create();
+            $collection->addIdFilter($categoryIds)
+                ->addAttributeToSelect('path')
+                ->addAttributeToFilter('is_active', 1)
+                ->addAttributeToSort('level', 'DESC')
+                ->setPageSize(1);
+
+            $deepestCategory = $collection->getFirstItem();
+            if ($deepestCategory && $deepestCategory->getId()) {
+                return $this->buildCategoryBreadcrumb($deepestCategory->getPath()) ?: null;
+            }
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
+        return null;
     }
 
     /**
