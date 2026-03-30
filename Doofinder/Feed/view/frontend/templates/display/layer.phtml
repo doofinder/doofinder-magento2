@@ -1,2 +1,7 @@
 <?php /** @var \Doofinder\Feed\Block\Display\Layer $block */ ?>
+<script<?= /* @noEscape */ $block->getNonceAttribute() ?>>
+    var dfPageType = <?= /* @noEscape */ json_encode($block->getPageType()) ?>;
+    var dfProductId = <?= /* @noEscape */ json_encode($block->getDfProductId()) ?>;
+    var dfCategoryName = <?= /* @noEscape */ json_encode($block->getDfCategoryName()) ?>;
+</script>
 <?= /* @noEscape */ $block->getDisplayLayer(); ?>
