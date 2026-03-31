@@ -7,6 +7,8 @@
 
 **Transform your Magento 2 search into a conversion machine.** Join thousands of merchants using AI-powered search to increase sales and improve customer experience.
 
+![Doofinder in Action](https://github.com/user-attachments/assets/cac4ec30-02e4-4280-8ba4-8a738ab823f1)
+
 [🚀 Get Started for Free](https://www.doofinder.com/en/solutions/magento) | [🖥️ Live Demo](https://magento.doofinder.com/) | [📖 Full Documentation](https://support.doofinder.com/plugins/magento/installation-guide/installation-steps-magento)
 
 ---
@@ -55,7 +57,7 @@ Complete setup using our [step-by-step installation guide](https://support.doofi
 
 This repository is optimized for local development using a **Makefile** and **Docker**.
 
-**`.env`** sits at the repo root (committed with sensible defaults) and powers both your **Docker** stack and the **generated module files** (what `doofinder-configure` pulls from `templates/`). Create **`.env.local`** for local overrides (credentials, tunnel URL, etc.) — the Makefile loads `.env` first, then `.env.local` on top. Then run `make init`.
+**`.env`** sits at the repo root and powers both your **Docker** stack and the **generated module files** (what `doofinder-configure` pulls from `templates/`). Create **`.env.local`** for local overrides (credentials, URL, etc.) — the Makefile loads `.env` first, then `.env.local` on top. Then run `make init`.
 
 > [!NOTE]
 > `make doofinder-configure` regenerates `Doofinder/Feed/etc/config.xml` and `Doofinder/Feed/Helper/Constants.php` from `templates/`. Many other targets depend on it — do not commit those files with non-production values.
