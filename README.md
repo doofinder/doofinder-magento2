@@ -85,6 +85,7 @@ After `make init`, the storefront is at `http://BASE_URL` and the admin panel at
 | `make doofinder-uninstall` | Remove the Doofinder module. |
 | `make db-backup [prefix=_name]` | Snapshot the database. |
 | `make db-restore file=backup.sql.gz` | Restore a previous snapshot. |
+| `make consistency` | Run PHP Code Sniffer inside Docker (`Magento2` standard). |
 
 **Xdebug** is pre-configured via `XDEBUG_CONFIG` in `docker-compose.yml` — configure your IDE to listen and start debugging.
 
@@ -110,11 +111,6 @@ To enable Magento to use Varnish as cache manager, you can follow the official d
 
 * **Need Help?** Visit our [Support Portal](https://support.doofinder.com/).
 * **Found a Bug?** Please [contact Doofinder Support](https://support.doofinder.com/pages/contact-us).
-* **Want to contribute?** PRs are welcome! Before pushing, make sure PHP Code Sniffer passes (requires PHP >= 8.3):
-
-```bash
-composer install
-vendor/bin/phpcs
-```
+* **Want to contribute?** PRs are welcome! Before pushing, make sure PHP Code Sniffer passes — use `make consistency` (see targets above) or run `composer install && vendor/bin/phpcs` directly (requires PHP >= 8.3).
 
 **If you find this plugin useful, please give us a ⭐ to support the project!**
