@@ -55,7 +55,7 @@ Complete setup using our [step-by-step installation guide](https://support.doofi
 
 This repository is optimized for local development using a **Makefile** and **Docker**.
 
-**`.env`** sits at the repo root and powers both your **Docker** stack and the **generated module files** (what `doofinder-configure` pulls from `templates/`). Copy `.env.example` to `.env`, adjust the values you need, then run `make init`. Optional overrides go in **`.env.local`**, which loads on top of `.env`.
+**`.env`** sits at the repo root (committed with sensible defaults) and powers both your **Docker** stack and the **generated module files** (what `doofinder-configure` pulls from `templates/`). Create **`.env.local`** for local overrides (credentials, tunnel URL, etc.) — the Makefile loads `.env` first, then `.env.local` on top. Then run `make init`.
 
 > [!NOTE]
 > `make doofinder-configure` regenerates `Doofinder/Feed/etc/config.xml` and `Doofinder/Feed/Helper/Constants.php` from `templates/`. Many other targets depend on it — do not commit those files with non-production values.
@@ -73,8 +73,6 @@ The most common variables to set before `make init`:
 
 After `make init`, the storefront is at `http://BASE_URL` and the admin panel at `http://BASE_URL/admin` (default credentials: `admin` / `admin123`).
 
-For connecting to local Doofinder services via tunnel, see the [Magento 2 development guide](https://github.com/doofinder/development-handbook/blob/master/guides/plugin-rangers/magento.md).
-
 ### Common make targets
 
 | Target | What it does |
@@ -89,6 +87,8 @@ For connecting to local Doofinder services via tunnel, see the [Magento 2 develo
 **Xdebug** is pre-configured via `XDEBUG_CONFIG` in `docker-compose.yml` — configure your IDE to listen and start debugging.
 
 **Varnish** is included but commented out in `docker-compose.yml`. Uncomment to enable; remember to comment the `9012:80` port in the `web` container.
+
+To enable Magento to use Varnish as cache manager, you can follow the official doc from Adobe: [Configure the Commerce application to use Varnish](https://experienceleague.adobe.com/en/docs/commerce-operations/configuration-guide/cache/configure-varnish-commerce).
 
 ---
 
