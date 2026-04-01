@@ -94,14 +94,18 @@ class CategoryListRepository implements \Magento\Catalog\Api\CategoryListInterfa
     {
         $searchResult =  $this->categoryRepository->getList($searchCriteria);
         $baseUrl = $this->storeManager->getStore()->getBaseUrl();
-        $category_url_suffix = $this->scopeConfig->getValue(
+        $categoryUrlSuffix = $this->scopeConfig->getValue(
             'catalog/seo/category_url_suffix',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
 
         foreach ($searchResult->getItems() as $category) {
             $categoryData = $category->getData();
-            $fullPath = $baseUrl . $categoryData['url_path'] . $category_url_suffix;
+            $urlPath = $categoryData['url_path'] ?? '';
+            if ($categoryUrlSuffix && substr($urlPath, -strlen($categoryUrlSuffix)) != $categoryUrlSuffix) {
+                $urlPath .= $categoryUrlSuffix;
+            }
+            $fullPath = $baseUrl . $urlPath;
             $extensionAttributes = $category->getExtensionAttributes();
             $extensionAttributes->setUrlFull($fullPath);
         }
