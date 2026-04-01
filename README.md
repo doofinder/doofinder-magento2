@@ -1,170 +1,128 @@
 # Doofinder for Magento 2
 
-[![Build Status](https://travis-ci.org/doofinder/doofinder-magento2.svg?branch=master)](https://travis-ci.org/doofinder/doofinder-magento2)
+![Release](https://img.shields.io/github/v/release/doofinder/doofinder-magento2?style=flat-square)
+![Magento](https://img.shields.io/badge/Magento-2.3%20--%202.4-f46f25?style=flat-square)
+![PHP](https://img.shields.io/badge/PHP-7.3%20--%208.4-777bb4?style=flat-square)
+![License](https://img.shields.io/github/license/doofinder/doofinder-magento2?style=flat-square)
 
-**IMPORTANT:** If you are in trouble with the module, please [contact Doofinder Support](https://support.doofinder.com/pages/contact-us) from the Doofinder website.
+**Transform your Magento 2 search into a conversion machine.** Join thousands of merchants using AI-powered search to increase sales and improve customer experience.
 
-## Docker Environment
+![Doofinder in Action](https://github.com/user-attachments/assets/cac4ec30-02e4-4280-8ba4-8a738ab823f1)
 
-### Configure ngrok
+[🚀 Get Started for Free](https://www.doofinder.com/en/solutions/magento) | [🖥️ Live Demo](https://magento.doofinder.com/) | [📖 Full Documentation](https://support.doofinder.com/plugins/magento/installation-guide/installation-steps-magento)
 
-In order to be able to create an account or login to an existing Doofinder account during the module initial setup, you will have to expose your local webserver to the internet (to receive a callback).
+---
 
-To do so, you can use, for example, the utility ngrok: https://dashboard.ngrok.com/get-started/setup
+## Why Doofinder?
 
-Once the external URL is created, simply set the `BASE_URL` environment variable (see [Environment Variables](#environment-variables)).
+Doofinder turns your basic search bar into an advanced discovery engine. Using AI-powered searchandising and recommendations, we drive measurable gains in conversion and product discovery.
 
-So, when the installation process has finished, instead of accessing `http://localhost:9012` you will use your URL, for example, `http://forcibly-ethical-apple.ngrok-free.app`).
-Notice that you'll need to specify the 9012 port when executing ngrok.
+### Key Features
 
-### Get composer credentials
+* **AI Assistant** — A smart shopping guide that helps customers find products through natural conversation.
+* **AI Smart Search** — Understands intent and handles typos or synonyms effortlessly.
+* **Searchandising** — Boost, hide, or pin products to run targeted campaigns.
+* **Personalized Recommendations** — Intelligent cross-selling based on real customer behavior.
+* **Visual Search** — Let your shoppers find products using images.
+* **Auto-Indexing** — Your catalog stays in sync automatically as you scale.
 
-> [!IMPORTANT]
-> It is mandatory to obtain credentials for composer usage. These fields can be obtained by creating an access key into [your Magento marketplace account](https://marketplace.magento.com/customer/accessKeys/). The public key will be `COMPOSER_AUTH_USERNAME` and the private key will be `COMPOSER_AUTH_PASSWORD` environment variables (see [Environment Variables](#environment-variables)).
+---
 
-### Environment variables
+## 🛠 Installation & Quick Start
 
-> [!TIP]
-> You can create an `.env.local` file to override the environment variables defined in `.env` such as composer credentials or Magento installation data to fit your needs.
-
-For example, below is a base `.env.local` file:
+**From Adobe Marketplace**
+Install [Doofinder from the Adobe Commerce Marketplace](https://marketplace.magento.com/doofinder-doofinder-magento2.html) directly from your Magento admin, or via Composer:
 
 ```bash
-#Magento setup configuration data
-BASE_URL=your-url.ngrok-free.app
-
-#Tokens for the Magento composer repository
-COMPOSER_AUTH_USERNAME=YOUR_COMPOSER_PUBLIC_KEY
-COMPOSER_AUTH_PASSWORD=YOUR_COMPOSER_PRIVATE_KEY
+composer require doofinder/doofinder-magento2
+bin/magento setup:upgrade
 ```
 
-The `Makefile` automatically overrides `.env` vars with the ones found in `.env.local`.
+**From GitHub (latest release)**
+Download the [latest release zip](https://github.com/doofinder/doofinder-magento2/releases) and install it as a local Composer package, or copy directly into `app/code/Doofinder/Feed`.
 
-> [!IMPORTANT]
-> The `Makefile` internally appends `--env-file .env --env-file .env.local` to `docker compose` command for properly configuring container environment. So take it into account when interacting directly with `docker compose`.
+**Then**
+Complete setup using our [step-by-step installation guide](https://support.doofinder.com/plugins/magento/installation-guide/installation-steps-magento).
 
-### Initial setup
+**Requirements**
 
-You can set up a fresh Magento installation using the provided `Makefile` targets `init` or `init-with-data`. This command will:
+| | Supported versions |
+| -- | -- |
+| PHP | 7.3, 7.4, 8.1, 8.2, 8.3, 8.4 (8.0 not supported by Magento 2) |
+| Magento | 2.3.x, 2.4.x |
 
--   Pulls and build an image with utility scripts for downloading and installing Magento 2 with defined `PHP_VERSION` and `COMPOSER_VERSION` environment variables.
--   Runs a Magento `create-project` command inside a bind mount into `./app`.
--   Starts the containers
--   Runs a Magento installation with variables defined in the environment through `.env` or `.env.local` file.
--   Optionally: Loads sample data into Magento
+---
 
-Finally, Magento 2 with the module installed will be running at `http://BASE_URL`.
+## 👨‍💻 Development & Maintainer Guide
 
-The admin panel will be available at `http://BASE_URL/admin`. Admin credentials are defined in the `.env`; if you used the `.env.example`, they would be:
+This repository is optimized for local development using a **Makefile** and **Docker**.
 
--   User: `admin`
--   Pass: `admin123`
+**`.env`** sits at the repo root and powers both your **Docker** stack and the **generated module files** (what `doofinder-configure` pulls from `templates/`). It ships with sensible defaults — set your `BASE_URL`, Magento version, and Composer auth credentials, then `make init`. Optional overrides go in **`.env.local`**, which loads on top of `.env`.
 
-## Xdebug ready to use
+> [!NOTE]
+> `make doofinder-configure` regenerates `Doofinder/Feed/etc/config.xml` and `Doofinder/Feed/Helper/Constants.php` from `templates/`. Many other targets depend on it — do not commit those files with non-production values.
 
-If you wish to debug your new Magento installation, Xdebug is already configured and ready to use through the `XDEBUG_CONFIG` environment variable in the `docker-compose.yml` file, simply configure your IDE accordingly and have fun!
+### Environment and shop access
 
-## Varnish was added to manage cache
+The root **`.env`** lists all variables with comments. For the **dev stack**, these are the ones you usually touch first:
 
-By default Varnish is commented on docker-compose. So if you need to use it, you can uncomment and restart your containers.
-To enable Magento to use Varnish as cache manager, you can follow the official doc from Adobe: [Configure the Commerce application to use Varnish](https://experienceleague.adobe.com/en/docs/commerce-operations/configuration-guide/cache/configure-varnish-commerce).
+| Variable | Role |
+| -------- | ---- |
+| `BASE_URL` | Shop hostname as seen by Docker (no `https://`). |
+| `MAGENTO_VERSION` | Magento release to install. Adjust `PHP_VERSION` and `COMPOSER_VERSION` to match — see the compatibility matrix below. |
+| `COMPOSER_AUTH_USERNAME` | Public key from your [Magento Marketplace access key](https://marketplace.magento.com/customer/accessKeys/). |
+| `COMPOSER_AUTH_PASSWORD` | Private key from the same access key. |
+| `MYSQL_*` | Database credentials for the local shop. |
+| `MAGENTO_ADMIN_USER` / `MAGENTO_ADMIN_PASSWORD` | Admin panel login after install. |
+| `XDEBUG_HOST` | Docker bridge IP (`172.17.0.1` on Linux; use `host.docker.internal` on macOS). |
 
-If you uncomment Varnish container, remember to comment the port `9012:80` in the `web` container.
+**Default access (Docker dev stack):** After **`make init`**, the stack runs on the ports defined in `docker-compose.yml` (default mapping: **9012** → HTTP, **4012** → HTTPS). With the default `BASE_URL=localhost` from `.env`:
 
-## Uninstall the module
+| | URL |
+| -- | -- |
+| Storefront (HTTP) | `http://localhost:9012/` |
+| Storefront (HTTPS) | `https://localhost:4012/` |
+| Admin (HTTP) | `http://localhost:9012/admin` |
+| Admin (HTTPS) | `https://localhost:4012/admin` |
 
-You can remove the Doofinder module using this straightforward method:
+Admin login is **`MAGENTO_ADMIN_USER`** / **`MAGENTO_ADMIN_PASSWORD`** from `.env` (defaults: `admin` / `admin123`).
 
-```sh
-make doofinder-uninstall
-```
+**Use cases:**
 
-## Test another versions
+- **First-time setup:** Run `make init` to build images, install Magento, and start containers. Use `make init-with-data` to also load sample data.
+- **Start / stop the stack:** `make start`, `make stop`.
+- **Install or upgrade the Doofinder module:** `make doofinder-upgrade` (re-enables module and runs `setup:upgrade`).
+- **Uninstall the module:** `make doofinder-uninstall`.
+- **Reinstall the module:** `make doofinder-reinstall`.
+- **DB snapshot:** `make db-backup` (optionally `make db-backup prefix=_name`). Restore with `make db-restore file=backup.sql.gz`.
+- **Code quality check:** `make consistency` (runs PHP Code Sniffer inside Docker with the `Magento2` standard).
+- **Shell in the web container:** `make dev-console`.
+- **Start from scratch:** Run `make clean` to drop Docker volumes and `./app`; type `DELETE` when prompted, then run `make init` for a fresh Magento.
+- **Debug with Xdebug:** The stack enables Xdebug via `XDEBUG_CONFIG` in `docker-compose.yml`. Set `XDEBUG_HOST` and `XDEBUG_KEY` in `.env` or `.env.local`, configure your IDE to listen for connections, and browse the shop.
+- **Varnish:** Included but commented out in `docker-compose.yml`. Uncomment to enable; remember to comment the `9012:80` port in the `web` container. See [Configure the Commerce application to use Varnish](https://experienceleague.adobe.com/en/docs/commerce-operations/configuration-guide/cache/configure-varnish-commerce).
 
-Change your branch to the tag that you want inside package directory
+---
 
-```sh
-make doofinder-upgrade
-```
+## Compatibility Matrix
 
-## Backup and Restore Database
+| Magento | PHP |
+| ------- | --- |
+| 2.4.5 – 2.4.8 | 8.1, 8.2, 8.3, 8.4 |
+| 2.4.0 – 2.4.4 | 7.4, 8.1, 8.2 |
+| 2.3.x | 7.3, 7.4 |
 
-During development, it is sometimes useful to create a data snapshot before performing an action.
+> PHP 8.0 is not supported by Magento 2. PHP versions below 7.4 are not recommended.
 
--   To create a database dump, use:
-    ```sh
-    make db-backup [prefix=_some_state]
-    ```
--   To restore a previous state, run:
-    ```sh
-    make db-restore file=backup_file.sql.gz
-    ```
+---
 
-## Important details before pushing changes to GitHub
+## Support & Contributing
 
-In order to be able to merge a PR, the PHP Code Sniffer must pass
-without any warnings. To check the compliance of Magento 2 standards, first check that you have PHP >= 8.3 locally (it might also work with PHP 7.4, but in the Adobe Commerce Marketplace PHP 8.3 is used for the tests) and then execute at the root folder of this project `composer install` command and finally execute `vendor/bin/phpcs`.
+* **Need Help?** Visit our [Support Portal](https://support.doofinder.com/).
+* **Found a Bug?** Please [contact Doofinder Support](https://support.doofinder.com/pages/contact-us).
+* **Want to contribute?** PRs are welcome! Before pushing, make sure PHP Code Sniffer passes — use `make consistency` or run `composer install && vendor/bin/phpcs` directly (requires PHP >= 8.3).
 
-## PHP compatibility
+**If you find this plugin useful, please give us a ⭐ to support the project!**
 
-This plugin has been thoroughly tested and confirmed to be compatible with the following PHP versions:
+## Try Doofinder / Learn more
 
-✅ Supported PHP Versions:
-
--   PHP 7.3
--   PHP 7.4
--   PHP 8.1
--   PHP 8.2
--   PHP 8.3
--   PHP 8.4
-
-⚠️ Note:
-
--   PHP versions below 7.4 are not recommended.
--   PHP 8.0 is not supported by Magento 2.
-
-## Tested compatibility with the following M2 versions
-
--   Magento 2.3.0
--   Magento 2.3.5-p3
--   Magento 2.3.7-p4
--   Magento 2.4.0
--   Magento 2.4.1
--   Magento 2.4.2
--   Magento 2.4.3
--   Magento 2.4.4
--   Magento 2.4.5
--   Magento 2.4.6
--   Magento 2.4.7
--   Magento 2.4.8
-
-## Last notes
-
-Please take care when you change the environment variable `MAGENTO_VERSION`, since you will have to change probably the `PHP_VERSION` and the `COMPOSER_VERSION` ones in order to maintain the compatibility. For example, if you wish the Magento 2.4.3 version you should have:
-
-```sh
-PHP_VERSION=7.4
-COMPOSER_VERSION=2.0.14
-MAGENTO_EDITION=community
-MAGENTO_VERSION=2.4.3
-```
-
-but if you want to test, let's say, the 2.3.1 version you should have something like this:
-
-```sh
-PHP_VERSION=7.2
-COMPOSER_VERSION=1.4.3
-MAGENTO_EDITION=community
-MAGENTO_VERSION=2.3.1
-```
-
-## Troubleshooting
-
-**Redirect issues**
-If after the setup process has finished the website doesn't load you may need to change the urls in the database.
-Connect to the database in `localhost:3312` using the mysql user and password defined in the `.env` (`magentobase`).
-In the table `core_config_data` there are two configs for the base urls that Magento will redirect to, with paths:
-
--   `web/unsecure/base_url`
--   `web/secure/base_url`
-    Make sure that those urls are the ones you'll be using to connect to your site or Magento will always redirect to them.
+Ready to improve your store search? [Get started with Doofinder for Magento 2](https://www.doofinder.com/en/solutions/magento).

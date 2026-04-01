@@ -3,7 +3,7 @@
 
 # Include environment variables from .env file
 ifeq ("$(wildcard .env)","")
-	$(error Please be sure a `.env` file is present in the root directory. You can make a copy of `.env.example`)
+	$(error Please be sure a `.env` file is present in the root directory)
 endif
 
 include .env
