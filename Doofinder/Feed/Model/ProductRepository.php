@@ -696,7 +696,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         foreach ($configurableLinksIds as $productId) {
             $product = $this->productFactory->create()->load($productId);
-            if (Status::STATUS_ENABLED !== (int) $product->getStatus()) {
+            if (!isset($product) || Status::STATUS_ENABLED !== (int) $product->getStatus()) {
                 continue;
             }
 
