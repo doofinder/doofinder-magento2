@@ -90,8 +90,8 @@ Admin login is **`MAGENTO_ADMIN_USER`** / **`MAGENTO_ADMIN_PASSWORD`** from `.en
 **Use cases:**
 
 - **First-time setup:** Run `make init` to build images, install Magento, and start containers. Use `make init-with-data` to also load sample data.
+- **Install the Doofinder module:** after `make init`, follow the [installation guide](https://support.doofinder.com/plugins/magento/installation-guide/installation-steps-magento). Alternatively, use `make doofinder-upgrade` from the CLI.
 - **Start / stop the stack:** `make start`, `make stop`.
-- **Install or upgrade the Doofinder module:** `make doofinder-upgrade` (re-enables module and runs `setup:upgrade`).
 - **Uninstall the module:** `make doofinder-uninstall`.
 - **Reinstall the module:** `make doofinder-reinstall`.
 - **DB snapshot:** `make db-backup` (optionally `make db-backup prefix=_name`). Restore with `make db-restore file=backup.sql.gz`.
