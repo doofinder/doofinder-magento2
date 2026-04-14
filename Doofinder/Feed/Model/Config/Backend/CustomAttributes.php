@@ -70,6 +70,18 @@ class CustomAttributes extends ArraySerialized implements ProcessorInterface
      */
     public function beforeSave()
     {
+        $value = $this->getValue();
+        if (is_array($value)) {
+            $this->setValue(
+                array_filter(
+                    $value,
+                    static function ($row) {
+                        return is_array($row) && !empty($row['enabled']);
+                    }
+                )
+            );
+        }
+
         $this->messageManager->addNoticeMessage(
             __('To apply the changes in the custom attributes to your feed, it will be necessary to reindex it')
         );
