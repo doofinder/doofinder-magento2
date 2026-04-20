@@ -183,9 +183,13 @@ class Layer extends Template
     public function getNonceAttribute(): string
     {
         if (class_exists(\Magento\Csp\Helper\CspNonceProvider::class)) {
-            $cspNonceProvider = \Magento\Framework\App\ObjectManager::getInstance()
-                ->get(\Magento\Csp\Helper\CspNonceProvider::class);
-            return ' nonce="' . $cspNonceProvider->generateNonce() . '"';
+            try {
+                $cspNonceProvider = \Magento\Framework\App\ObjectManager::getInstance()
+                    ->get(\Magento\Csp\Helper\CspNonceProvider::class);
+                return ' nonce="' . $cspNonceProvider->generateNonce() . '"';
+            } catch (\Throwable $e) {
+                return '';
+            }
         }
         return '';
     }
