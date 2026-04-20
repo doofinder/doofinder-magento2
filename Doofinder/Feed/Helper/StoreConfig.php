@@ -599,7 +599,7 @@ class StoreConfig extends AbstractHelper
                 EOT;
 
             return $singleScriptAdditionalConfig . $singleScript;
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
