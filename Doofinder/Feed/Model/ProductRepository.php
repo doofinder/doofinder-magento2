@@ -756,9 +756,13 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         // Scope category collection with current store Root category
         $storeRootPath = '1/' . $this->storeManager->getStore()->getRootCategoryId() . '/';
 
-        // Get all category Ids (with parents Ids from paths)
+        // Keep only categories that belong to the current store root tree.
         $categoryIdsWithParents = array_reduce($categoryPaths, function ($acc, $path) use ($storeRootPath) {
-            $path = str_replace($storeRootPath, '', $path);
+            if (strpos($path, $storeRootPath) !== 0) {
+                return $acc;
+            }
+
+            $path = substr($path, strlen($storeRootPath));
             $ids = explode('/', $path);
             return array_unique(array_merge($acc, $ids));
         }, []);
