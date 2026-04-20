@@ -583,6 +583,7 @@ class StoreConfig extends AbstractHelper
                     $nonceAttr = 'nonce="' . $nonce . '"';
                 } catch (\Throwable $e) {
                     // CspNonceProvider may not be resolvable if DI is not compiled
+                    $nonceAttr = '';
                 }
             }
 
