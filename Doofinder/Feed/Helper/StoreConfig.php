@@ -576,10 +576,15 @@ class StoreConfig extends AbstractHelper
             $nonceAttr = '';
             // To keep backwards compatibility with older versions
             if (class_exists(\Magento\Csp\Helper\CspNonceProvider::class)) {
-                $cspNonceProvider = \Magento\Framework\App\ObjectManager::getInstance()
-                    ->get(\Magento\Csp\Helper\CspNonceProvider::class);
-                $nonce = $cspNonceProvider->generateNonce();
-                $nonceAttr = 'nonce="' . $nonce . '"';
+                try {
+                    $cspNonceProvider = \Magento\Framework\App\ObjectManager::getInstance()
+                        ->get(\Magento\Csp\Helper\CspNonceProvider::class);
+                    $nonce = $cspNonceProvider->generateNonce();
+                    $nonceAttr = 'nonce="' . $nonce . '"';
+                } catch (\Throwable $e) {
+                    // CspNonceProvider may not be resolvable if DI is not compiled
+                    $nonceAttr = '';
+                }
             }
 
             $singleScriptAdditionalConfig = <<<EOT
