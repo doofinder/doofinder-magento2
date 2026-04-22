@@ -21,42 +21,50 @@ $escaper = $block->getEscaper();
                             <option value="" disabled<?php if (!$sector): ?> selected<?php endif; ?>>
                                 <?= $escaper->escapeHtmlAttr(__('Choose the sector of your ecommerce')) ?>
                             </option>
-                            <option value="fashion" <?php if ($sector === "fashion"): ?> selected<?php endif; ?>>
-                                <?= $escaper->escapeHtmlAttr(__('Apparel & Accessories')) ?>
-                            </option>
                             <option value="autos" <?php if ($sector === "autos"): ?> selected<?php endif; ?>>
-                                <?= $escaper->escapeHtmlAttr(__('Auto Parts & Accessories')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Automotive')) ?>
+                            </option>
+                            <option value="beauty" <?php if ($sector === "beauty"): ?> selected<?php endif; ?>>
+                                <?= $escaper->escapeHtmlAttr(__('Beauty & Cosmetics')) ?>
                             </option>
                             <option value="childcare" <?php if ($sector === "childcare"): ?> selected<?php endif; ?>>
                                 <?= $escaper->escapeHtmlAttr(__('Childcare')) ?>
                             </option>
+                            <option value="technology" <?php if ($sector === "technology"): ?> selected<?php endif; ?>>
+                                <?= $escaper->escapeHtmlAttr(__('Electronics & Technology')) ?>
+                            </option>
+                            <option value="fashion" <?php if ($sector === "fashion"): ?> selected<?php endif; ?>>
+                                <?= $escaper->escapeHtmlAttr(__('Fashion')) ?>
+                            </option>
                             <option value="food" <?php if ($sector === "food"): ?> selected<?php endif; ?>>
-                                <?= $escaper->escapeHtmlAttr(__('Food & Beverages')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Food & Beverage')) ?>
                             </option>
                             <option value="home" <?php if ($sector === "home"): ?> selected<?php endif; ?>>
                                 <?= $escaper->escapeHtmlAttr(__('Home & Garden')) ?>
                             </option>
-                            <option value="leisure" <?php if ($sector === "leisure"): ?> selected<?php endif; ?>>
-                                <?= $escaper->escapeHtmlAttr(__('Leisure & Culture')) ?>
+                            <option value="industrial" <?php if ($sector === "industrial"): ?> selected<?php endif; ?>>
+                                <?= $escaper->escapeHtmlAttr(__('Industrial & Business Supplies')) ?>
                             </option>
-                            <option value="others" <?php if ($sector === "others"): ?> selected<?php endif; ?>>
-                                <?= $escaper->escapeHtmlAttr(__('Others')) ?>
+                            <option value="jewelry" <?php if ($sector === "jewelry"): ?> selected<?php endif; ?>>
+                                <?= $escaper->escapeHtmlAttr(__('Jewelry & Luxury')) ?>
+                            </option>
+                            <option value="media" <?php if ($sector === "media"): ?> selected<?php endif; ?>>
+                                <?= $escaper->escapeHtmlAttr(__('Media & Entertainment')) ?>
                             </option>
                             <option value="pets" <?php if ($sector === "pets"): ?> selected<?php endif; ?>>
                                 <?= $escaper->escapeHtmlAttr(__('Pets')) ?>
                             </option>
-                            <option
-                                value="parapharmacy" <?php if ($sector === "parapharmacy"): ?> selected<?php endif; ?>>
-                                <?= $escaper->escapeHtmlAttr(__('Pharma & Cosmetics')) ?>
+                            <option value="pharma" <?php if ($sector === "pharma"): ?> selected<?php endif; ?>>
+                                <?= $escaper->escapeHtmlAttr(__('Pharma')) ?>
                             </option>
                             <option value="sport" <?php if ($sector === "sport"): ?> selected<?php endif; ?>>
-                                <?= $escaper->escapeHtmlAttr(__('Sport & Fitness')) ?>
-                            </option>
-                            <option value="technology" <?php if ($sector === "technology"): ?> selected<?php endif; ?>>
-                                <?= $escaper->escapeHtmlAttr(__('Tech Products & Electronics')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Sports & Outdoor Activities')) ?>
                             </option>
                             <option value="toys" <?php if ($sector === "toys"): ?> selected<?php endif; ?>>
-                                <?= $escaper->escapeHtmlAttr(__('Toys & Hobbies')) ?>
+                                <?= $escaper->escapeHtmlAttr(__('Toys, Games & Hobbies')) ?>
+                            </option>
+                            <option value="others" <?php if ($sector === "others"): ?> selected<?php endif; ?>>
+                                <?= $escaper->escapeHtmlAttr(__('Other')) ?>
                             </option>
                         </select>
                     </div>
