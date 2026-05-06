@@ -72,14 +72,11 @@ class Utils
         $error = json_decode($response, true);
         if (!isset($error)) {
             $error = $response;
-        }
-        else if (is_array($error['errors']) && count($error['errors']) > 0) {
+        } elseif (is_array($error['errors']) && count($error['errors']) > 0) {
             $error = $error['errors'][0];
-        }
-        else if ( !isset($error['error']['message'])) {
+        } elseif (!isset($error['error']['message'])) {
             $error = $response;
-        }
-        else {
+        } else {
             $error = $error['error']['message'];
         }
 
