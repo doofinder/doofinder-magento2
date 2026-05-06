@@ -103,7 +103,7 @@ class Client
                 ]
             );
         } catch (GuzzleException $e) {
-            $errorResponse = $this->parseErrorResponse($e->getMessage());
+            $errorResponse = $this->parseErrorResponse((string) $e->getResponse()->getBody());
             $this->utils->handleErrors($e->getCode(), $errorResponse);
             throw new BadRequest($errorResponse);
         }
@@ -139,7 +139,7 @@ class Client
                 ]
             );
         } catch (GuzzleException $e) {
-            $errorResponse = $this->parseErrorResponse($e->getMessage());
+            $errorResponse = $this->parseErrorResponse((string) $e->getResponse()->getBody());
             $this->utils->handleErrors($e->getCode(), $errorResponse);
             throw new BadRequest($errorResponse);
         }
@@ -175,7 +175,7 @@ class Client
                 ]
             );
         } catch (GuzzleException $e) {
-            $errorResponse = $this->parseErrorResponse($e->getMessage());
+            $errorResponse = $this->parseErrorResponse((string) $e->getResponse()->getBody());
             $this->utils->handleErrors($e->getCode(), $errorResponse);
             throw new BadRequest($errorResponse);
         }
@@ -211,7 +211,7 @@ class Client
                 ]
             );
         } catch (GuzzleException $e) {
-            $errorResponse = $e->getResponse()->getBody()->getContents();
+            $errorResponse = $this->parseErrorResponse((string) $e->getResponse()->getBody());
             $this->utils->handleErrors($e->getCode(), $errorResponse);
             throw new BadRequest($errorResponse);
         }

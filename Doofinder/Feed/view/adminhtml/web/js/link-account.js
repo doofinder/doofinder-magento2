@@ -166,6 +166,13 @@ define([
         $('body').trigger('processStop');
         var message = 'Installation has failed. Please take a look into the logs for more information. ' +
               'Maybe you need uninstall and install again the extension following documentation instructions. ';
+        try {
+            const parsedError = JSON.parse(jqXHR.responseText);
+            if (parsedError.message) {
+                message = 'Installation has failed. ' + parsedError.message;
+            }
+        } catch (e) {}
+              
         addAjaxMessage($.mage.__(message));
         alert({
             content: $.mage.__(message)

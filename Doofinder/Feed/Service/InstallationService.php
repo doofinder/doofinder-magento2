@@ -194,10 +194,8 @@ class InstallationService
             }
             return $response;
         } catch (Exception $e) {
-            $message = 'Error creating Doofinder store for store group "' .
-                $storeGroup->getName() . '". ' . $e->getMessage();
-            $this->logger->error($message);
-            throw new StoreCreationException($message);
+            $this->logger->error($e->getMessage());
+            throw new StoreCreationException($e->getMessage());
         }
     }
 
