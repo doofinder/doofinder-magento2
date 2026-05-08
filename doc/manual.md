@@ -36,7 +36,7 @@ For up-to-date documentation, please, visit: [Doofinder Magento Installation Gui
 
 ## Support
 
-For technical support, get in touch from your [Doofinder Account](https://admin.doofinder.com/admin/support/contact-us).
+For technical support, get in touch from your [Doofinder Account](https://admin.doofinder.com/admin/support).
 
 If you’re a developer, you can file an issue or contribution request in our public code repository at Github: [https://github.com/doofinder/doofinder-magento2](https://github.com/doofinder/doofinder-magento2).
 

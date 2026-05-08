@@ -170,8 +170,8 @@ define([
             const parsedError = JSON.parse(jqXHR.responseText);
             if (parsedError.message) {
                 message = 'An error occurred during the installation process. '
-                + 'Please contact our support team on <a href="https://admin.doofinder.com/admin/support/contact-us" ' +
-                'target="_blank" rel="noopener noreferrer">https://admin.doofinder.com/admin/support/contact-us</a>' + 
+                + 'Please contact our support team on <a href="https://admin.doofinder.com/admin/support" ' +
+                'target="_blank" rel="noopener noreferrer">https://admin.doofinder.com/admin/support</a>' + 
                 '.<br>Error: ' + parsedError.message;
             }
         } catch (e) {}
