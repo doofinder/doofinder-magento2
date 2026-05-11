@@ -57,7 +57,7 @@ class Utils
         }
 
         if ($statusCode >= 400) {
-            throw new BadRequest("The client made a bad request: " . $this->readError($response));
+            throw new BadRequest($this->readError($response));
         }
     }
 
@@ -70,7 +70,11 @@ class Utils
     private function readError($response): string
     {
         $error = json_decode($response, true);
-        if ($error === null || !isset($error['error']['message'])) {
+        if (!isset($error)) {
+            $error = $response;
+        } elseif (is_array($error['errors']) && count($error['errors']) > 0) {
+            $error = $error['errors'][0];
+        } elseif (!isset($error['error']['message'])) {
             $error = $response;
         } else {
             $error = $error['error']['message'];

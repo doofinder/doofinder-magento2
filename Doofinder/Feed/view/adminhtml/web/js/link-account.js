@@ -164,8 +164,18 @@ define([
 
     function ajaxRequestFail(jqXHR, status, error) {
         $('body').trigger('processStop');
-        var message = 'Installation has failed. Please take a look into the logs for more information. ' +
+        var message = 'An error occurred during the installation process. Please take a look into the logs for more information. ' +
               'Maybe you need uninstall and install again the extension following documentation instructions. ';
+        try {
+            const parsedError = JSON.parse(jqXHR.responseText);
+            if (parsedError.message) {
+                message = 'An error occurred during the installation process. '
+                + 'Please contact our support team on <a href="https://admin.doofinder.com/admin/support" ' +
+                'target="_blank" rel="noopener noreferrer">https://admin.doofinder.com/admin/support</a>' + 
+                '.<br>Error: ' + parsedError.message;
+            }
+        } catch (e) {}
+              
         addAjaxMessage($.mage.__(message));
         alert({
             content: $.mage.__(message)
