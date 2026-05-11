@@ -25,7 +25,6 @@ use Magento\Tax\Model\Config as TaxConfig;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
-use Magento\Catalog\Model\Product\Type as ProductType;
 
 /**
  * Product helper
@@ -152,11 +151,13 @@ class Product extends AbstractHelper
         $requestPath = $product->getRequestPath();
         $productId = $product->getId();
         $parents = $this->configurable->getParentIdsByChild($product->getId());
-        if ($product->getTypeId() === ProductType::TYPE_SIMPLE
-                && count($parents) > 0
-                && !in_array($product->getVisibility(), $this->visibilityAllowed)
-            ) {
-                $productId = $parents[0];
+        $hasConfigurableParent = count($parents) > 0;
+        $isVisibleIndividually = in_array($product->getVisibility(), $this->visibilityAllowed);
+        $useParentUrl = $hasConfigurableParent && !$isVisibleIndividually;
+
+        if ($useParentUrl) {
+            $productId = $parents[0];
+            $requestPath = null;
         }
         $filterData = [
             UrlRewrite::ENTITY_ID => $productId,
@@ -173,9 +174,7 @@ class Product extends AbstractHelper
         } else {
             $routePath = 'catalog/product/view';
             // In case the product is a variant we need the ID of the configurable
-            if ($product->getTypeId() === ProductType::TYPE_SIMPLE
-                && count($parents) > 0
-            ) {
+            if ($useParentUrl) {
                 $routeParams['id'] = $parents[0];
                 $routeParams['s'] = $product->getUrlKey();
             } else {
