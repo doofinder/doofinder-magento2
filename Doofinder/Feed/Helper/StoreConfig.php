@@ -808,21 +808,30 @@ class StoreConfig extends AbstractHelper
     /**
      * Get display layer enabled
      *
+     * @param string $scope
+     * @param int|null $scopeId
      * @return int
      */
-    public function getDisplayLayerEnabled(): int
-    {
-        return (int)$this->getValueFromConfig(self::DISPLAY_LAYER_ENABLED);
+    public function getDisplayLayerEnabled(
+        ?string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+        ?int $scopeId = null
+    ): int {
+        return (int)$this->getValueFromConfig(self::DISPLAY_LAYER_ENABLED, $scope, $scopeId);
     }
 
     /**
      * Set display layer enabled
      *
      * @param int $value
+     * @param string $scope
+     * @param int $scopeId
      */
-    public function setDisplayLayerEnabled(int $value)
-    {
-        $this->configWriter->save(self::DISPLAY_LAYER_ENABLED, $value);
+    public function setDisplayLayerEnabled(
+        int $value,
+        string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+        int $scopeId = 0
+    ): void {
+        $this->configWriter->save(self::DISPLAY_LAYER_ENABLED, $value, $scope, $scopeId);
     }
 
     /**
