@@ -869,7 +869,7 @@ class StoreConfig extends AbstractHelper
         }
         if ($configCollection->count() > 0) {
             $data = $configCollection->getFirstItem()->getData();
-            $value = !empty($data['value']) ? $data['value'] : null;
+            $value = isset($data['value']) ? (string)$data['value'] : null;
         }
 
         return $value;

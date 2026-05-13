@@ -14,9 +14,21 @@ use Magento\Store\Model\ScopeInterface;
 
 class ToggleEnabled extends Action implements HttpPostActionInterface
 {
+    /**
+     * @var JsonFactory
+     */
     protected $jsonFactory;
+
+    /**
+     * @var WriterInterface
+     */
     protected $configWriter;
 
+    /**
+     * @param Context $context
+     * @param JsonFactory $jsonFactory
+     * @param WriterInterface $configWriter
+     */
     public function __construct(
         Context $context,
         JsonFactory $jsonFactory,
@@ -27,6 +39,9 @@ class ToggleEnabled extends Action implements HttpPostActionInterface
         $this->configWriter = $configWriter;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function execute()
     {
         $resultJson = $this->jsonFactory->create();
@@ -46,6 +61,9 @@ class ToggleEnabled extends Action implements HttpPostActionInterface
         return $resultJson->setData(['success' => true]);
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function _isAllowed(): bool
     {
         return $this->_authorization->isAllowed('Doofinder_Doofinder::config');
