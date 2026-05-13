@@ -118,6 +118,23 @@ class StoreViewTable extends Field
     }
 
     /**
+     * Retrieve the Doofinder script enabled state for a given store group.
+     *
+     * Returns null when no group-level override has been saved (inherits global setting).
+     *
+     * @param Group $group
+     * @return string|null
+     */
+    public function getLayerEnabled(Group $group): ?string
+    {
+        return $this->storeConfig->getValueFromConfig(
+            StoreConfig::DISPLAY_LAYER_ENABLED,
+            ScopeInterface::SCOPE_GROUP,
+            (int)$group->getId()
+        );
+    }
+
+    /**
      * Generate the AJAX URL for sync/migrate call.
      *
      * @return string
@@ -125,6 +142,16 @@ class StoreViewTable extends Field
     public function getAjaxUrl()
     {
         return $this->getUrl("doofinderfeed/integration/createStore");
+    }
+
+    /**
+     * Generate the AJAX URL for toggling the enabled state per store group.
+     *
+     * @return string
+     */
+    public function getToggleUrl(): string
+    {
+        return $this->getUrl("doofinderfeed/integration/toggleEnabled");
     }
 
     /**

@@ -21,6 +21,7 @@ $integrationId = $block->getIntegrationId();
         <thead>
             <tr>
                 <th class="data-grid-th no-link col-name"><?= $escaper->escapeHtml(__('Store Name')) ?></th>
+                <th class="data-grid-th no-link col-enabled"><?= $escaper->escapeHtml(__('Script Enabled')) ?></th>
                 <th class="data-grid-th last no-link col-action"><?= $escaper->escapeHtml(__('Action')) ?></th>
             </tr>
         </thead>
@@ -28,8 +29,8 @@ $integrationId = $block->getIntegrationId();
             <?php $evenStyle = true; ?>
             <?php foreach ($groups as $group): ?>
                 <?php
-                // Retrieve the installation id for the store configuration
                 $installationId = $block->getInstallationId($group);
+                $layerEnabled = $block->getLayerEnabled($group) ?? '1';
                 ?>
                 <tr class="<?= ($evenStyle = !$evenStyle) ? "even" : "" ?>"
                     id="store-view-installation-<?= $escaper->escapeHtml($group->getId()) ?>">
@@ -38,6 +39,18 @@ $integrationId = $block->getIntegrationId();
                         <span class="installation-id">
                             <?= $escaper->escapeHtml($installationId  ?: __('Not installed')) ?>
                         </span>
+                    </td>
+                    <td style="text-align:center;">
+                        <select name="doofinder-layer-enabled-<?= $escaper->escapeHtml($group->getId()) ?>"
+                                <?= $installationId === null ? 'disabled="disabled"' : '' ?>
+                                onchange="doofinderToggleEnabled(<?= $escaper->escapeHtml($group->getId()) ?>, this.value)">
+                            <option value="1" <?= $layerEnabled === '1' ? 'selected' : '' ?>>
+                                <?= $escaper->escapeHtml(__('Yes')) ?>
+                            </option>
+                            <option value="0" <?= $layerEnabled === '0' ? 'selected' : '' ?>>
+                                <?= $escaper->escapeHtml(__('No')) ?>
+                            </option>
+                        </select>
                     </td>
                     <td style="text-align:center;">
                         <?php if ($installationId === null): ?>
@@ -59,6 +72,55 @@ $integrationId = $block->getIntegrationId();
     <script>
         require(['jquery', 'mage/translate'], function($, _t) {
 
+            window.doofinderToggleEnabled = function(groupId, enabled) {
+                new Ajax.Request('<?= $escaper->escapeUrl($block->getToggleUrl()) ?>', {
+                    parameters: {
+                        group: groupId,
+                        enabled: enabled
+                    },
+                    loaderArea: true,
+                    asynchronous: true,
+                    onSuccess: function(transport) {
+                        if (transport?.responseJSON?.success) {
+                            $('body').notification('clear')
+                            $('body').notification('add', {
+                                message: _t("Doofinder script status updated successfully."),
+                                error: false,
+                                insertMethod: function(message) {
+                                    var $wrapper = $('<div></div>').html(message);
+                                    $('.page-main-actions').after($wrapper);
+                                }
+                            });
+                        } else {
+                            $('body').notification('clear')
+                            $('body').notification('add', {
+                                error: true,
+                                message: _t(transport?.responseJSON?.message ||
+                                    "An unknown error has occurred while updating the status. \
+                                        Please take a look into the logs for more information."),
+                                insertMethod: function(message) {
+                                    var $wrapper = $('<div></div>').html(message);
+                                    $('.page-main-actions').after($wrapper);
+                                }
+                            });
+                        }
+                    },
+                    onFailure: function(transport) {
+                        $('body').notification('clear')
+                        $('body').notification('add', {
+                            error: true,
+                            message: _t(transport?.responseJSON?.message ||
+                                "An unknown error has occurred while updating the status. \
+                                    Please take a look into the logs for more information."),
+                            insertMethod: function(message) {
+                                var $wrapper = $('<div></div>').html(message);
+                                $('.page-main-actions').after($wrapper);
+                            }
+                        });
+                    }
+                });
+            }
+
             window.doofinderSyncStore = function(groupId) {
                 new Ajax.Request('<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>', {
                     parameters: {
@@ -71,8 +133,8 @@ $integrationId = $block->getIntegrationId();
                             var groupSelector = '#store-view-installation-' + groupId;
                             var buttonSelector = groupSelector + ' button[name="doofinder-create-store"]';
                             $(`${groupSelector} .installation-id`).html(transport.responseJSON?.data.id);
-                            $(`${groupSelector}  button[name="doofinder-create-store"]`).attr('disabled', 'disabled');
-                            $(`${groupSelector} button[name="doofinder-create-store"]`).html(_t('Created'));
+                            $(`${groupSelector} button[name="doofinder-create-store"]`).attr('disabled', 'disabled').html(_t('Created'));
+                            $(`${groupSelector} select[name^="doofinder-layer-enabled-"]`).removeAttr('disabled');
                             $('body').notification('clear')
                             $('body').notification('add', {
                                 message: _t("Doofinder Store created successfully!"),

@@ -10,6 +10,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 class Layer extends Template
@@ -62,6 +63,35 @@ class Layer extends Template
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->storeManager = $storeManager;
         parent::__construct($context, $data);
+    }
+
+    /**
+     * Skip rendering when the Doofinder script is disabled at store group level.
+     *
+     * The layout ifconfig handles the global on/off at default scope. This check
+     * adds the per-store-group override stored at SCOPE_GROUP, which the standard
+     * ifconfig mechanism cannot reach.
+     *
+     * @return string
+     */
+    protected function _toHtml(): string
+    {
+        try {
+            $store = $this->storeManager->getStore();
+            $groupId = (int)$store->getStoreGroupId();
+            $groupEnabled = $this->storeConfig->getValueFromConfig(
+                StoreConfig::DISPLAY_LAYER_ENABLED,
+                ScopeInterface::SCOPE_GROUP,
+                $groupId
+            );
+            if ($groupEnabled !== null && !(bool)$groupEnabled) {
+                return '';
+            }
+        } catch (\Exception $e) {
+            return '';
+        }
+
+        return parent::_toHtml();
     }
 
     /**
