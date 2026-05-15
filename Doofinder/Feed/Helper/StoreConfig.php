@@ -81,8 +81,6 @@ class StoreConfig extends AbstractHelper
      */
     public const HASH_ID_CONFIG = 'doofinder_config_config/doofinder_layer/hash_id';
 
-    public const DISPLAY_LAYER_ENABLED = 'doofinder_config_config/doofinder_layer/doofinder_layer_enabled';
-
     public const DISPLAY_LAYER_INSTALLATION_ID = 'doofinder_config_config/doofinder_layer/installation_id';
 
     /**
@@ -803,26 +801,6 @@ class StoreConfig extends AbstractHelper
     public function setInstallingLoopStatus(int $value)
     {
         $this->configWriter->save(self::INSTALLING_LOOP_STATUS, $value);
-    }
-
-    /**
-     * Get display layer enabled
-     *
-     * @return int
-     */
-    public function getDisplayLayerEnabled(): int
-    {
-        return (int)$this->getValueFromConfig(self::DISPLAY_LAYER_ENABLED);
-    }
-
-    /**
-     * Set display layer enabled
-     *
-     * @param int $value
-     */
-    public function setDisplayLayerEnabled(int $value)
-    {
-        $this->configWriter->save(self::DISPLAY_LAYER_ENABLED, $value);
     }
 
     /**
