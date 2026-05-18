@@ -47,20 +47,6 @@
                    showInWebsite="1"
                    showInStore="1">
                 <label>Doofinder Script</label>
-                <field id="doofinder_layer_enabled"
-                       translate="label"
-                       type="select"
-                       sortOrder="100"
-                       showInDefault="1"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Magento\Framework\App\Config\Value</backend_model>
-                    <comment>
-                        <![CDATA[ Activating this option you are inserting the script into your store code. You can manage product visibility in Doofinder. ]]>
-                    </comment>
-                </field>
                 <field id="store_view_table"
                        translate="label comment"
                        type="text"

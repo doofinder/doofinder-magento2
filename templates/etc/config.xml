@@ -3,9 +3,6 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <doofinder_config_config>
-            <doofinder_layer>
-                <doofinder_layer_enabled>1</doofinder_layer_enabled>
-            </doofinder_layer>
             <update_on_save>
                 <cron_expression>0 0 * * *</cron_expression>
                 <image_size>&#x200B;</image_size>
