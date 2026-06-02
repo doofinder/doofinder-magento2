@@ -3,24 +3,36 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
 jobs:
   create-release:
     name: Build & Create Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - name: Create ZIP archive
         id: vars
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
-          tag=${GITHUB_REF#refs/*/}
-          zip_path="doofinder-magento2-${GITHUB_REF#refs/*/}.zip"
+          tag="${INPUT_TAG:-${GITHUB_REF#refs/*/}}"
+          zip_path="doofinder-magento2-${tag}.zip"
           echo "tag=$tag" >> $GITHUB_OUTPUT
           echo "zip_path=$zip_path" >> $GITHUB_OUTPUT
-          git archive --format=zip -o $zip_path $tag:Doofinder/Feed
+          git archive --format=zip -o $zip_path ${tag}:Doofinder/Feed
       - name: Create release & upload asset
         uses: softprops/action-gh-release@v3
         with:
+          tag_name: ${{ steps.vars.outputs.tag }}
           files: ${{ steps.vars.outputs.zip_path }}
           name: Doofinder for Magento 2 - ${{ steps.vars.outputs.tag }}
           generate_release_notes: true
