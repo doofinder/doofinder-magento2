@@ -418,7 +418,11 @@ class Product extends AbstractHelper
             $value = $frontend->getOption($optionId);
         } catch (\Exception $e) {
             $this->_logger->warning(
-                sprintf('Doofinder: could not resolve type for attribute "%s": %s', $attributeCode, $e->getMessage()),
+                sprintf(
+                    'Doofinder: could not resolve type for attribute "%s": %s',
+                    $attributeCode,
+                    $e->getMessage()
+                ),
                 ['product_id' => $product->getId()]
             );
             return null;
@@ -428,7 +432,11 @@ class Product extends AbstractHelper
                 $value = $frontend->getValue($product);
             } catch (\Exception $e) {
                 $this->_logger->warning(
-                    sprintf('Doofinder: could not resolve type for attribute "%s": %s', $attributeCode, $e->getMessage()),
+                    sprintf(
+                        'Doofinder: could not resolve type for attribute "%s": %s',
+                        $attributeCode,
+                        $e->getMessage()
+                    ),
                     ['product_id' => $product->getId()]
                 );
                 return null;
@@ -461,7 +469,11 @@ class Product extends AbstractHelper
             $value = $frontend->getOption($optionId);
         } catch (\Exception $e) {
             $this->_logger->warning(
-                sprintf('Doofinder: could not resolve value for attribute "%s": %s', $attributeCode, $e->getMessage()),
+                sprintf(
+                    'Doofinder: could not resolve value for attribute "%s": %s',
+                    $attributeCode,
+                    $e->getMessage()
+                ),
                 ['product_id' => $product->getId()]
             );
             return null;
@@ -471,7 +483,11 @@ class Product extends AbstractHelper
                 $value = $frontend->getValue($product);
             } catch (\Exception $e) {
                 $this->_logger->warning(
-                    sprintf('Doofinder: could not resolve value for attribute "%s": %s', $attributeCode, $e->getMessage()),
+                    sprintf(
+                        'Doofinder: could not resolve value for attribute "%s": %s',
+                        $attributeCode,
+                        $e->getMessage()
+                    ),
                     ['product_id' => $product->getId()]
                 );
                 return null;
