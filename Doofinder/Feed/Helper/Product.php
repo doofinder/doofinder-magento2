@@ -414,9 +414,17 @@ class Product extends AbstractHelper
             return null;
         }
         $frontend = $attribute->getFrontend();
-        $value = $frontend->getOption($optionId);
-        if (!$value) {
-            $value = $frontend->getValue($product);
+        try {
+            $value = $frontend->getOption($optionId);
+            if (!$value) {
+                $value = $frontend->getValue($product);
+            }
+        } catch (\Throwable $e) {
+            $this->_logger->warning(
+                sprintf('Doofinder: could not resolve type for attribute "%s": %s', $attributeCode, $e->getMessage()),
+                ['product_id' => $product->getId()]
+            );
+            return null;
         }
 
         return get_debug_type($value);
@@ -441,9 +449,17 @@ class Product extends AbstractHelper
             return null;
         }
         $frontend = $attribute->getFrontend();
-        $value = $frontend->getOption($optionId);
-        if (!$value) {
-            $value = $frontend->getValue($product);
+        try {
+            $value = $frontend->getOption($optionId);
+            if (!$value) {
+                $value = $frontend->getValue($product);
+            }
+        } catch (\Throwable $e) {
+            $this->_logger->warning(
+                sprintf('Doofinder: could not resolve value for attribute "%s": %s', $attributeCode, $e->getMessage()),
+                ['product_id' => $product->getId()]
+            );
+            return null;
         }
         if (is_a($value, Phrase::class)) {
             $value = $value->render();
