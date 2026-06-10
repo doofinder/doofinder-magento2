@@ -14,6 +14,7 @@ use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ProductRepository as ProductRepositoryBase;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\App\Area;
@@ -66,6 +67,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     /** @var \Magento\Catalog\Model\ProductFactory */
     protected $productFactory;
 
+    /** @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory */
+    protected $productCollectionFactory;
+
     /** @var \Magento\Framework\Api\SearchCriteriaBuilder */
     protected $searchCriteriaBuilder;
 
@@ -107,6 +111,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * @param MagentoStoreConfig $magentoStoreConfig Magento core store config.
      * @param ScopeConfigInterface $scopeConfig Magento core scope config.
      * @param ProductFactory $productFactory Product factory instance.
+     * @param ProductCollectionFactory $productCollectionFactory Product collection factory instance.
      * @param SearchCriteriaBuilder $searchCriteriaBuilder Search criteria builder.
      * @param ProductResourceModel $resourceModel Product resource model.
      * @param StoreManagerInterface $storeManager Store manager interface.
@@ -126,6 +131,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         MagentoStoreConfig $magentoStoreConfig,
         ScopeConfigInterface $scopeConfig,
         ProductFactory $productFactory,
+        ProductCollectionFactory $productCollectionFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductResourceModel $resourceModel,
         StoreManagerInterface $storeManager,
@@ -143,6 +149,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $this->magentoStoreConfig = $magentoStoreConfig;
         $this->scopeConfig = $scopeConfig;
         $this->productFactory = $productFactory;
+        $this->productCollectionFactory = $productCollectionFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->resourceModel = $resourceModel;
         $this->storeManager = $storeManager;
@@ -688,20 +695,29 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      */
     private function getEnabledConfigurableLinks($configurableLinksIds)
     {
-        $enabledProductIds = [];
-
-        if (null === $configurableLinksIds) {
-            return $enabledProductIds;
+        if (empty($configurableLinksIds)) {
+            return [];
         }
 
+        /* Resolve the enabled status of every linked product in a single query
+         * instead of loading each product individually (N+1), which is
+         * prohibitively slow for configurables with many variants.
+         * Status is read at the current (emulated) store scope so that
+         * store-view level overrides are respected, matching the previous
+         * getById() behaviour.
+         */
+        $collection = $this->productCollectionFactory->create();
+        $collection->setStoreId((int) $this->storeManager->getStore()->getId());
+        $collection->addIdFilter($configurableLinksIds);
+        $collection->addAttributeToFilter('status', Status::STATUS_ENABLED);
+        $enabledIds = array_flip(array_map('intval', $collection->getAllIds()));
+
+        // Keep the original order of the configurable links.
+        $enabledProductIds = [];
         foreach ($configurableLinksIds as $productId) {
-            $product = $this->getById($productId);
-
-            if (Status::STATUS_ENABLED !== (int) $product->getStatus()) {
-                continue;
+            if (isset($enabledIds[(int) $productId])) {
+                $enabledProductIds[] = $productId;
             }
-
-            $enabledProductIds[] = $productId;
         }
 
         return $enabledProductIds;
