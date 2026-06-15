@@ -25,6 +25,7 @@ use Magento\Tax\Model\Config as TaxConfig;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
+use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
 
 /**
  * Product helper
@@ -79,6 +80,11 @@ class Product extends AbstractHelper
     protected $configurable;
 
     /**
+     * @var ProductResourceModel
+     */
+    private $productResource;
+
+    /**
      * @see /Doofinder/Feed/Observer/Product/AbstractChangedProductObserver.php
      *
      * @var []
@@ -96,6 +102,7 @@ class Product extends AbstractHelper
      * @param EavConfig $eavConfig
      * @param Configurable $configurable
      * @param InventoryHelper $inventoryHelper
+     * @param ProductResourceModel $productResource
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -108,7 +115,8 @@ class Product extends AbstractHelper
         UrlFinderInterface $urlFinder,
         EavConfig $eavConfig,
         Configurable $configurable,
-        InventoryHelper $inventoryHelper
+        InventoryHelper $inventoryHelper,
+        ProductResourceModel $productResource
     ) {
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->imageHelper = $imageHelper;
@@ -119,6 +127,7 @@ class Product extends AbstractHelper
         $this->eavConfig = $eavConfig;
         $this->configurable = $configurable;
         $this->inventoryHelper = $inventoryHelper;
+        $this->productResource = $productResource;
         $this->visibilityAllowed = [Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH];
         parent::__construct($context);
     }
@@ -173,10 +182,17 @@ class Product extends AbstractHelper
             $routeParams['_direct'] = $requestPath;
         } else {
             $routePath = 'catalog/product/view';
-            // In case the product is a variant we need the ID of the configurable
+            // In case the product is a variant we need the ID and url_key of the configurable
             if ($useParentUrl) {
                 $routeParams['id'] = $parents[0];
-                $routeParams['s'] = $product->getUrlKey();
+                $parentUrlKey = $this->productResource->getAttributeRawValue(
+                    $parents[0],
+                    'url_key',
+                    $storeId
+                );
+                $routeParams['s'] = is_string($parentUrlKey) && $parentUrlKey !== ''
+                    ? $parentUrlKey
+                    : $product->getUrlKey();
             } else {
                 $routeParams['id'] = $product->getId();
                 $routeParams['s'] = $product->getUrlKey();
