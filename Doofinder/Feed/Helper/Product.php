@@ -80,6 +80,11 @@ class Product extends AbstractHelper
     protected $configurable;
 
     /**
+     * @var ProductResourceModel
+     */
+    private $productResource;
+
+    /**
      * @see /Doofinder/Feed/Observer/Product/AbstractChangedProductObserver.php
      *
      * @var []
@@ -97,6 +102,7 @@ class Product extends AbstractHelper
      * @param EavConfig $eavConfig
      * @param Configurable $configurable
      * @param InventoryHelper $inventoryHelper
+     * @param ProductResourceModel $productResource
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -109,7 +115,8 @@ class Product extends AbstractHelper
         UrlFinderInterface $urlFinder,
         EavConfig $eavConfig,
         Configurable $configurable,
-        InventoryHelper $inventoryHelper
+        InventoryHelper $inventoryHelper,
+        ProductResourceModel $productResource
     ) {
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->imageHelper = $imageHelper;
@@ -120,6 +127,7 @@ class Product extends AbstractHelper
         $this->eavConfig = $eavConfig;
         $this->configurable = $configurable;
         $this->inventoryHelper = $inventoryHelper;
+        $this->productResource = $productResource;
         $this->visibilityAllowed = [Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH];
         parent::__construct($context);
     }
@@ -142,11 +150,10 @@ class Product extends AbstractHelper
      * This method is based on the \Magento\Catalog\Model\Product\Url::getUrl() method.
      *
      * @param ProductModel $product
-     * @param ProductResourceModel|null $resourceModel Used to read the parent url_key when the URL rewrite is missing.
      *
      * @return string
      */
-    public function getProductUrl(ProductModel $product, ?ProductResourceModel $resourceModel = null): string
+    public function getProductUrl(ProductModel $product): string
     {
         $storeId = $product->getStoreId();
         $routePath = '';
@@ -178,15 +185,13 @@ class Product extends AbstractHelper
             // In case the product is a variant we need the ID and url_key of the configurable
             if ($useParentUrl) {
                 $routeParams['id'] = $parents[0];
-                if ($resourceModel !== null) {
-                    $parentUrlKey = $resourceModel->getAttributeRawValue(
-                        $parents[0],
-                        'url_key',
-                        $storeId
-                    );
-                    if (!empty($parentUrlKey)) {
-                        $routeParams['s'] = $parentUrlKey;
-                    }
+                $parentUrlKey = $this->productResource->getAttributeRawValue(
+                    $parents[0],
+                    'url_key',
+                    $storeId
+                );
+                if (!empty($parentUrlKey)) {
+                    $routeParams['s'] = $parentUrlKey;
                 }
             } else {
                 $routeParams['id'] = $product->getId();

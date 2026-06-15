@@ -311,7 +311,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      */
     private function getProductUrl(Product $product): string
     {
-        return $this->productHelperFactory->create()->getProductUrl($product, $this->resourceModel);
+        return $this->productHelperFactory->create()->getProductUrl($product);
     }
 
     /**
