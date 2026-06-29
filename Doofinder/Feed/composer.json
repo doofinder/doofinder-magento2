@@ -1,6 +1,6 @@
 {
   "name": "doofinder/doofinder-magento2",
-  "version": "1.7.7",
+  "version": "1.7.8",
   "description": "Doofinder module for Magento 2",
   "type": "magento2-module",
   "require": {
