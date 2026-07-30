@@ -6,7 +6,7 @@ ARG COMPOSER_VERSION
 
 RUN composer self-update "$COMPOSER_VERSION"
 
-RUN mkdir -p /app
+RUN mkdir -p /app/generated
 
 RUN chown -R application:application /app
 
