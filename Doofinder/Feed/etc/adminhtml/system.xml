@@ -175,28 +175,6 @@
                     <frontend_model>Doofinder\Feed\Block\System\Config\UpdateOnClick</frontend_model>
                 </field>
             </group>
-            <group id="doofinder_custom_attributes"
-                   translate="label"
-                   type="text"
-                   sortOrder="400"
-                   showInDefault="1"
-                   showInWebsite="1"
-                   showInStore="1">
-                <label>Custom attributes</label>
-                <field id="custom_attributes"
-                       translate="label"
-                       sortOrder="200"
-                       showInDefault="1"
-                       showInWebsite="1"
-                       showInStore="0">
-                    <label>Custom attributes to be indexed</label>
-                    <frontend_model>Doofinder\Feed\Block\Adminhtml\Form\Field\CustomAttributes</frontend_model>
-                    <backend_model>Doofinder\Feed\Model\Config\Backend\CustomAttributes</backend_model>
-                    <comment>
-                        <![CDATA[ Attributes selected as 'Enabled' will be included in the feed indexation. ]]>
-                    </comment>
-                </field>
-            </group>
             <group id="doofinder_integration"
                    translate="label"
                    type="text"

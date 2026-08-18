@@ -9,7 +9,6 @@ use Doofinder\Feed\Helper\Constants;
 use Doofinder\Feed\Helper\Indexation;
 use GuzzleHttp\Psr7\Utils;
 use Magento\Config\Model\Config\Backend\Admin\Custom;
-use Magento\Catalog\Model\Product;
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigCollectionFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
@@ -24,8 +23,6 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
-use Magento\Framework\Escaper;
-use Magento\Eav\Model\Config;
 use Magento\Backend\Helper\Data;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Customer\Model\Group as CustomerGroup;
@@ -120,11 +117,6 @@ class StoreConfig extends AbstractHelper
     public const ADMIN_EMAIL_CONFIG = 'trans_email/ident_support/email';
 
     /**
-     * Path to custom attributes to be indexed
-     */
-    public const CUSTOM_ATTRIBUTES = 'doofinder_config_config/doofinder_custom_attributes/custom_attributes';
-
-    /**
      * Path to search engine indexation status
      */
     public const INDEXATION_STATUS = 'doofinder_config_config/doofinder_search_engines/indexation_status';
@@ -157,12 +149,6 @@ class StoreConfig extends AbstractHelper
     /** @var Indexation  */
     protected $indexationHelper;
 
-    /** @var \Magento\Framework\Escaper */
-    protected $escaper;
-
-    /** @var Config */
-    private $eavConfig;
-
     /** @var Data */
     private $backendHelper;
 
@@ -181,8 +167,6 @@ class StoreConfig extends AbstractHelper
      * @param ConfigCollectionFactory $configCollectionFactory
      * @param AttributeCollectionFactory $attributeCollectionFactory
      * @param Indexation $indexationHelper
-     * @param Escaper $escaper
-     * @param Config $eavConfig
      * @param Data $backendHelper
      * @param ResourceConnection $resource
      * @param CustomerSession $customerSession
@@ -195,8 +179,6 @@ class StoreConfig extends AbstractHelper
         ConfigCollectionFactory $configCollectionFactory,
         AttributeCollectionFactory $attributeCollectionFactory,
         Indexation $indexationHelper,
-        Escaper $escaper,
-        Config $eavConfig,
         Data $backendHelper,
         ResourceConnection $resource,
         CustomerSession $customerSession
@@ -207,8 +189,6 @@ class StoreConfig extends AbstractHelper
         $this->configCollectionFactory = $configCollectionFactory;
         $this->attributeCollectionFactory = $attributeCollectionFactory;
         $this->indexationHelper = $indexationHelper;
-        $this->escaper = $escaper;
-        $this->eavConfig = $eavConfig;
         $this->backendHelper = $backendHelper;
         $this->resource = $resource;
         $this->customerSession = $customerSession;
@@ -845,29 +825,15 @@ class StoreConfig extends AbstractHelper
     }
 
     /**
-     * Return array of custom attributes
+     * Return the attribute codes sent to Doofinder as custom attributes.
      *
-     * @param int|null $id
-     * @param string|null $scope
-     * @return mixed[]
+     * These are the attributes defined by the merchant, plus the forced ones, which are native but
+     * return internal ids instead of human-readable labels.
+     *
+     * @return string[]
      */
-    public function getCustomAttributes(?int $id = null, ?string $scope = ScopeInterface::SCOPE_STORES): array
+    public function getIndexableAttributeCodes(): array
     {
-        if ($id === null) {
-            list($scope, $id) = $this->getCurrentScope();
-        }
-
-        $customAttributes = $this->scopeConfig->getValue(self::CUSTOM_ATTRIBUTES, $scope, $id);
-
-        $saved = [];
-        if ($customAttributes && is_array($customAttributes)) {
-            foreach ($customAttributes as $rowId => $row) {
-                if (!isset($saved[$rowId])) {
-                    $saved[$rowId] = $row;
-                }
-            }
-        }
-
         $attributeCollection = $this->attributeCollectionFactory->create();
         /*
             Only index user-defined attributes.
@@ -883,36 +849,11 @@ class StoreConfig extends AbstractHelper
         ->join(
             ['cea' => $attributeCollection->getTable('catalog_eav_attribute')],
             'main_table.attribute_id = cea.attribute_id',
-            ['is_visible']
+            []
         )
         ->where('cea.is_visible = ?', 1);
 
-        $attributes = [];
-        foreach ($attributeCollection as $attributeTmp) {
-            $attribute = $this->eavConfig->getAttribute(Product::ENTITY, $attributeTmp->getAttributeId());
-            $attribute_id = $attribute->getAttributeId();
-            $attributes[$attribute_id] = [
-                'code'    => $attribute->getAttributeCode(),
-                'label'   => $this->escaper->escapeHtml($attribute->getFrontendLabel())
-            ];
-
-            $enabled = isset($saved[$attribute_id]['enabled']) && $saved[$attribute_id]['enabled'];
-            $attributes[$attribute_id]['enabled'] = $enabled;
-        }
-        $attribute_keys = array_keys($attributes);
-        array_multisort(array_column($attributes, 'label'), SORT_ASC, $attributes, $attribute_keys);
-        $attributes = array_combine($attribute_keys, $attributes);
-        return $attributes;
-    }
-
-    /**
-     * Function to set custom attributes
-     *
-     * @param string $customAttributes
-     */
-    public function setCustomAttributes(string $customAttributes)
-    {
-        $this->configWriter->save(self::CUSTOM_ATTRIBUTES, $customAttributes);
+        return $attributeCollection->getColumnValues('attribute_code');
     }
 
     /**

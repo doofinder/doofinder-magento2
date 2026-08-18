@@ -94,6 +94,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     /** @var string[] */
     protected $excludedCustomAttributes = [];
 
+    /** @var string[]|null */
+    private $indexableAttributeCodes = null;
+
     /** @var \Magento\Framework\Serialize\Serializer\Json|null */
     private $serializer;
 
@@ -372,8 +375,8 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     }
 
     /**
-     * Function to update the custom attributes of a product depending on the custom attributes selection stored
-     * in the config table.
+     * Function to send every indexable attribute of a product as a custom attribute.
+     *
      * Here we will update also the value of the custom attribute (id of the option selected) by the option text.
      *
      * @param ProductInterface $product
@@ -382,18 +385,10 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     private function setCustomAttributes($product): void
     {
         $productHelper = $this->productHelperFactory->create();
-        $customAttributes = $this->storeConfig->getCustomAttributes($product->getStoreId());
 
-        foreach ($customAttributes as $customAttribute) {
-            $code = $customAttribute['code'];
-            if ($customAttribute['enabled'] && isset($product[$code])) {
-                ("array" === $productHelper->getAttributeType($product, $code)) ?
-                    $value = $productHelper->getAttributeArray($product, $code) :
-                    $value = $productHelper->getAttributeText($product, $code);
-
-                $product->setCustomAttribute($code, $value);
-            } else {
-                unset($product[$code]);
+        foreach ($this->getIndexableAttributeCodes() as $code) {
+            if (isset($product[$code])) {
+                $product->setCustomAttribute($code, $productHelper->getAttribute($product, $code));
             }
         }
 
@@ -403,6 +398,20 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
         $this->removeExcludedCustomAttributes($product);
+    }
+
+    /**
+     * Function to get the indexable attribute codes, memoized because getList() resolves them per product.
+     *
+     * @return string[]
+     */
+    private function getIndexableAttributeCodes(): array
+    {
+        if ($this->indexableAttributeCodes === null) {
+            $this->indexableAttributeCodes = $this->storeConfig->getIndexableAttributeCodes();
+        }
+
+        return $this->indexableAttributeCodes;
     }
 
     /**
