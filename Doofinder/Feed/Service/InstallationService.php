@@ -10,20 +10,16 @@ use Doofinder\Feed\Model\Data\InstallationOptionsStruct;
 use Doofinder\Feed\Model\Data\SearchEngineStruct;
 use Doofinder\Feed\Model\InstallationRepository;
 use Exception;
-use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Integration\Block\Adminhtml\Integration\Tokens as IntegrationTokens;
 use Magento\Integration\Model\IntegrationService;
 use Magento\Store\Model\Group;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Escaper;
 use Psr\Log\LoggerInterface;
 
 use Magento\Framework\App\Cache\Frontend\Pool as CacheFrontendPool;
 
 class InstallationService
 {
-    private const CUSTOM_ATTRIBUTES_ENABLED_DEFAULT = ['manufacturer'];
-
     /** @var StoreConfig */
     private StoreConfig $storeConfig;
 
@@ -39,12 +35,6 @@ class InstallationService
     /** @var ManagementClientFactory */
     private ManagementClientFactory $managementClientFactory;
 
-    /** @var AttributeCollectionFactory */
-    private AttributeCollectionFactory $attributeCollectionFactory;
-
-    /** @var Escaper */
-    private Escaper $escaper;
-
     /** @var LoggerInterface */
     private LoggerInterface $logger;
 
@@ -59,8 +49,6 @@ class InstallationService
      * @param StoreConfig $storeConfig
      * @param InstallationRepository $installationRepository
      * @param IntegrationService $integrationService
-     * @param AttributeCollectionFactory $attributeCollectionFactory
-     * @param Escaper $escaper
      * @param LoggerInterface $logger
      * @param CacheFrontendPool $cacheFrontendPool
      */
@@ -70,8 +58,6 @@ class InstallationService
         StoreConfig $storeConfig,
         InstallationRepository $installationRepository,
         IntegrationService $integrationService,
-        AttributeCollectionFactory $attributeCollectionFactory,
-        Escaper $escaper,
         LoggerInterface $logger,
         CacheFrontendPool $cacheFrontendPool
     ) {
@@ -80,8 +66,6 @@ class InstallationService
         $this->storeConfig = $storeConfig;
         $this->installationRepository = $installationRepository;
         $this->integrationService = $integrationService;
-        $this->attributeCollectionFactory = $attributeCollectionFactory;
-        $this->escaper = $escaper;
         $this->logger = $logger;
         $this->cacheFrontendPool = $cacheFrontendPool;
     }
@@ -107,7 +91,6 @@ class InstallationService
                 $installationResults[$storeGroup->getId()] = $e->getMessage();
             }
         }
-        $this->setCustomAttributes();
         $this->cleanCache();
 
         return $installationResults;
@@ -200,29 +183,7 @@ class InstallationService
     }
 
     /**
-     * Function to set some custom attributes to enabled by default
-     */
-    private function setCustomAttributes()
-    {
-        $attributeCollection = $this->attributeCollectionFactory->create();
-        $attributeCollection->addFieldToFilter('is_user_defined', ['eq' => 1]);
-        $attributeCollection->addFieldToFilter('attribute_code', ['in' => self::CUSTOM_ATTRIBUTES_ENABLED_DEFAULT]);
-        $attributes = [];
-        foreach ($attributeCollection as $attribute) {
-            $attribute_id = $attribute->getAttributeId();
-            $attributes[$attribute_id] = [
-                'label' => $this->escaper->escapeHtml($attribute->getFrontendLabel()),
-                'code' => $attribute->getAttributeCode(),
-                'enabled' => 'on'
-            ];
-        }
-
-        $customAttributes = base64_encode(gzcompress(json_encode($attributes)));
-        $this->storeConfig->setCustomAttributes($customAttributes);
-    }
-
-    /**
-     * As we are adding some custom attributes we need to clean the cache to see them into the config panel.
+     * Cleans the cache so the new stores show up in the config panel.
      */
     private function cleanCache()
     {

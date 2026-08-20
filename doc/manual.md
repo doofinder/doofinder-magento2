@@ -132,7 +132,6 @@ Click on the Doofinder icon under Stores to display the option's menu and select
 - **Image Configuration**: Select the size of the image to display on the layer. Once the size has been chosen, you must reindex the products in Doofinder.
 - **Automatic Indexing**: you can configure when registered product changes are sent to Doofinder and whether to export only categories present in navigation menus.
 - **Manual Indexing**: Advanced option for indexing.
-- **Custom Attributes**: Attributes selected as 'Enabled' will be included in the feed indexation.
 - **Doofinder Integration Configuration (Advanced)**: you will be able to reset the integration, in order to re-launch the setup wizard if necessary.
 
 ## Layer
@@ -177,12 +176,6 @@ Verify this module is no longer in your installed modules list. To check this ou
 `bin/magento module:status Doofinder_Feed Doofinder_FeedCompatibility`
 
 and check the response.
-
-# Custom Fields - Magento
-
-You can configure the custom attributes you want to display by enabling them in your plugin under **Doofinder > Configuration > Custom Attributes:**
-
-![enable magento attributes](https://support.doofinder.com/images/magento-ca.png)
 
 # Recommendations - Magento 2
 
@@ -288,10 +281,6 @@ If preferred, you can always update your changes manually within Magento using _
 ::: note
 Manual Indexing and Update on save options are compatible and available to use simultaneously with Doofinder indexing.
 :::
-
-## Indexation of Custom Attributes
-
-You can configure the custom attributes you want to display. Find [_this_](https://support.doofinder.com/plugins/magento/installation-guide/custom-fields-magento.html) helpful documentation about Custom Fields on Magento and how to manage them.
 
 # Troubleshooting
 
