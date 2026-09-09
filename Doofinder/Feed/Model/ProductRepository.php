@@ -387,6 +387,10 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $productHelper = $this->productHelperFactory->create();
 
         foreach ($this->getIndexableAttributeCodes() as $code) {
+            if (!isset($product[$code])) {
+                $this->backfillMissingCustomAttribute($product, $code);
+            }
+
             if (isset($product[$code])) {
                 $product->setCustomAttribute($code, $productHelper->getAttribute($product, $code));
             }
@@ -398,6 +402,30 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
         $this->removeExcludedCustomAttributes($product);
+    }
+
+    /**
+     * getList() hydrates products from a collection that does not always select every
+     * EAV attribute for every item (unlike get(), which does a full model load and
+     * therefore always has them). When an indexable attribute is missing here, fetch
+     * its raw value directly from the resource model so that getList() and get()
+     * return consistent data for the same product/attribute.
+     *
+     * @param ProductInterface $product
+     * @param string $code
+     * @return void
+     */
+    private function backfillMissingCustomAttribute($product, string $code): void
+    {
+        $value = $this->resourceModel->getAttributeRawValue(
+            $product->getId(),
+            $code,
+            $product->getStoreId()
+        );
+
+        if ($value !== false) {
+            $product->setData($code, $value);
+        }
     }
 
     /**
