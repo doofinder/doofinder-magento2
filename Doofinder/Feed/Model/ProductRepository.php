@@ -405,6 +405,8 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     }
 
     /**
+     * Backfill an indexable attribute that the product collection did not select
+     *
      * getList() hydrates products from a collection that does not always select every
      * EAV attribute for every item (unlike get(), which does a full model load and
      * therefore always has them). When an indexable attribute is missing here, fetch
