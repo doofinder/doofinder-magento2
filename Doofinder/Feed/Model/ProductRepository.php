@@ -431,7 +431,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                     continue;
                 }
                 $productsMissingAttributesByLink[$linkId] = $product;
-                $missingCodes[$code] = true;
+                $missingCodes[] = $code;
             }
         }
 
@@ -442,7 +442,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $storeId = (int) reset($productsMissingAttributesByLink)->getStoreId();
         $values = $this->fetchRawAttributeValues(
             array_keys($productsMissingAttributesByLink),
-            array_keys($missingCodes),
+            $missingCodes,
             $storeId,
             $linkField
         );
