@@ -25,12 +25,14 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\GroupedProduct\Model\Product\Type\Grouped as GroupedType;
 use Magento\Store\Api\StoreConfigManagerInterface as MagentoStoreConfig;
 use Magento\Store\Model\App\Emulation;
+use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Directory\Model\CurrencyFactory;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\PriceFactory as PriceHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
+use Psr\Log\LoggerInterface;
 
 class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterface
 {
@@ -100,6 +102,9 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     /** @var \Magento\Framework\Serialize\Serializer\Json|null */
     private $serializer;
 
+    /** @var \Psr\Log\LoggerInterface|null */
+    private $logger;
+
     /**
      * ProductRepository constructor.
      *
@@ -121,6 +126,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * @param ProductRepositoryBase $productRepositoryBase Base product repository.
      * @param int $cacheLimit Product cache size limit (default: 1000).
      * @param Json|null $serializer JSON serializer (optional).
+     * @param LoggerInterface|null $logger Logger (optional).
      */
     public function __construct(
         ImageFactory $imageHelperFactory,
@@ -140,7 +146,8 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         StoreManagerInterface $storeManager,
         ProductRepositoryBase $productRepositoryBase,
         $cacheLimit = 1000,
-        ?Json $serializer = null
+        ?Json $serializer = null,
+        ?LoggerInterface $logger = null
     ) {
         $this->imageHelperFactory = $imageHelperFactory;
         $this->appEmulation = $appEmulation;
@@ -164,6 +171,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         //Add here any custom attributes we want to exclude from indexation
         $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
         $this->serializer = $serializer ?: ObjectManager::getInstance()->get(Json::class);
+        $this->logger = $logger ?: ObjectManager::getInstance()->get(LoggerInterface::class);
     }
 
     /**
@@ -209,6 +217,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     public function getList(SearchCriteriaInterface $searchCriteria)
     {
         $searchResult = $this->productRepositoryBase->getList($searchCriteria);
+        $this->backfillMissingAttributes($searchResult->getItems());
         $storeId = null;
 
         foreach ($searchResult->getItems() as $product) {
@@ -398,6 +407,109 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
         $this->removeExcludedCustomAttributes($product);
+    }
+
+    /**
+     * Fill in the indexable attributes that the product collection did not hydrate
+     *
+     * Products coming from getList() are hydrated by a collection whose attribute load resolves
+     * values through the entity id, while get() reads them through the link field of the loaded
+     * row. On some installations both do not agree and a value present in the database is missing
+     * from the collection item, so it never reaches the feed. Read those values once per page,
+     * keyed by the same link field get() uses, and fill in only the keys that are missing.
+     *
+     * @param ProductInterface[] $products
+     * @return void
+     */
+    private function backfillMissingAttributes(array $products): void
+    {
+        $linkField = $this->resourceModel->getLinkField();
+        $productsByLink = [];
+        $missingCodes = [];
+
+        foreach ($products as $product) {
+            foreach ($this->getIndexableAttributeCodes() as $code) {
+                if (isset($product[$code])) {
+                    continue;
+                }
+                $productsByLink[(int) $product->getData($linkField)] = $product;
+                $missingCodes[$code] = $code;
+            }
+        }
+
+        if (!$productsByLink) {
+            return;
+        }
+
+        $storeId = (int) reset($productsByLink)->getStoreId();
+        $values = $this->fetchRawAttributeValues(array_keys($productsByLink), $missingCodes, $storeId, $linkField);
+        $backfilled = [];
+
+        foreach ($values as $linkId => $attributeValues) {
+            $product = $productsByLink[$linkId];
+            foreach ($attributeValues as $code => $value) {
+                if (isset($product[$code]) || $value === null || $value === '') {
+                    continue;
+                }
+                $product->setData($code, $value);
+                $backfilled[$code] = $code;
+            }
+        }
+
+        if ($backfilled) {
+            $this->logger->warning(
+                'Doofinder: indexable attributes missing from the product collection',
+                [
+                    'store_id' => $storeId,
+                    'link_field' => $linkField,
+                    'products' => count($values),
+                    'attributes' => array_values($backfilled),
+                ]
+            );
+        }
+    }
+
+    /**
+     * Read attribute values straight from the EAV tables, one query per backend table
+     *
+     * Values are ordered by store id so that a store scoped value overwrites the default one,
+     * which is how the product model resolves them when it is loaded by get().
+     *
+     * @param int[] $linkIds
+     * @param string[] $codes
+     * @param int $storeId
+     * @param string $linkField
+     * @return array<int, array<string, mixed>>
+     */
+    private function fetchRawAttributeValues(array $linkIds, array $codes, int $storeId, string $linkField): array
+    {
+        $attributesByTable = [];
+
+        foreach ($codes as $code) {
+            $attribute = $this->resourceModel->getAttribute($code);
+            if (!$attribute || !$attribute->getId() || $attribute->getBackend()->isStatic()) {
+                continue;
+            }
+            $attributesByTable[$attribute->getBackend()->getTable()][(int) $attribute->getId()] = $code;
+        }
+
+        $connection = $this->resourceModel->getConnection();
+        $values = [];
+
+        foreach ($attributesByTable as $table => $attributes) {
+            $select = $connection->select()
+                ->from(['v' => $table], [$linkField, 'attribute_id', 'value'])
+                ->where("v.$linkField IN (?)", $linkIds)
+                ->where('v.attribute_id IN (?)', array_keys($attributes))
+                ->where('v.store_id IN (?)', [Store::DEFAULT_STORE_ID, $storeId])
+                ->order('v.store_id ASC');
+
+            foreach ($connection->fetchAll($select) as $row) {
+                $values[(int) $row[$linkField]][$attributes[(int) $row['attribute_id']]] = $row['value'];
+            }
+        }
+
+        return $values;
     }
 
     /**
