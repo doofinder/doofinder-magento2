@@ -447,9 +447,8 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
             $linkField
         );
 
-        foreach ($values as $linkId => $attributeValues) {
-            $product = $productsMissingAttributesByLink[$linkId];
-            foreach ($attributeValues as $code => $value) {
+        foreach ($productsMissingAttributesByLink as $linkId => $product) {
+            foreach ($values[$linkId] ?? [] as $code => $value) {
                 if (isset($product[$code]) || $value === null || $value === '') {
                     continue;
                 }
