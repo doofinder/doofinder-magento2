@@ -417,7 +417,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     private function backfillMissingAttributes(array $products): void
     {
         $linkField = $this->resourceModel->getLinkField();
-        $productsByLink = [];
+        $productsMissingAttributesByLink = [];
         $missingCodes = [];
 
         foreach ($products as $product) {
@@ -430,20 +430,25 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                 if (isset($product[$code])) {
                     continue;
                 }
-                $productsByLink[$linkId] = $product;
+                $productsMissingAttributesByLink[$linkId] = $product;
                 $missingCodes[$code] = $code;
             }
         }
 
-        if (!$productsByLink) {
+        if (!$productsMissingAttributesByLink) {
             return;
         }
 
-        $storeId = (int) reset($productsByLink)->getStoreId();
-        $values = $this->fetchRawAttributeValues(array_keys($productsByLink), $missingCodes, $storeId, $linkField);
+        $storeId = (int) reset($productsMissingAttributesByLink)->getStoreId();
+        $values = $this->fetchRawAttributeValues(
+            array_keys($productsMissingAttributesByLink),
+            $missingCodes,
+            $storeId,
+            $linkField
+        );
 
         foreach ($values as $linkId => $attributeValues) {
-            $product = $productsByLink[$linkId];
+            $product = $productsMissingAttributesByLink[$linkId];
             foreach ($attributeValues as $code => $value) {
                 if (isset($product[$code]) || $value === null || $value === '') {
                     continue;
