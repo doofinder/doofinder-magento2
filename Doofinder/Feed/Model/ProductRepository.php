@@ -32,7 +32,6 @@ use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
 use Doofinder\Feed\Helper\PriceFactory as PriceHelperFactory;
 use Doofinder\Feed\Helper\InventoryFactory as InventoryHelperFactory;
 use Doofinder\Feed\Helper\StoreConfig;
-use Psr\Log\LoggerInterface;
 
 class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterface
 {
@@ -102,9 +101,6 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     /** @var \Magento\Framework\Serialize\Serializer\Json|null */
     private $serializer;
 
-    /** @var \Psr\Log\LoggerInterface|null */
-    private $logger;
-
     /**
      * ProductRepository constructor.
      *
@@ -126,7 +122,6 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
      * @param ProductRepositoryBase $productRepositoryBase Base product repository.
      * @param int $cacheLimit Product cache size limit (default: 1000).
      * @param Json|null $serializer JSON serializer (optional).
-     * @param LoggerInterface|null $logger Logger (optional).
      */
     public function __construct(
         ImageFactory $imageHelperFactory,
@@ -146,8 +141,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         StoreManagerInterface $storeManager,
         ProductRepositoryBase $productRepositoryBase,
         $cacheLimit = 1000,
-        ?Json $serializer = null,
-        ?LoggerInterface $logger = null
+        ?Json $serializer = null
     ) {
         $this->imageHelperFactory = $imageHelperFactory;
         $this->appEmulation = $appEmulation;
@@ -171,7 +165,6 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         //Add here any custom attributes we want to exclude from indexation
         $this->excludedCustomAttributes = ['special_price', 'special_from_date', 'special_to_date'];
         $this->serializer = $serializer ?: ObjectManager::getInstance()->get(Json::class);
-        $this->logger = $logger ?: ObjectManager::getInstance()->get(LoggerInterface::class);
     }
 
     /**
@@ -448,7 +441,6 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         $storeId = (int) reset($productsByLink)->getStoreId();
         $values = $this->fetchRawAttributeValues(array_keys($productsByLink), $missingCodes, $storeId, $linkField);
-        $backfilled = [];
 
         foreach ($values as $linkId => $attributeValues) {
             $product = $productsByLink[$linkId];
@@ -457,20 +449,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                     continue;
                 }
                 $product->setData($code, $value);
-                $backfilled[$code] = $code;
             }
-        }
-
-        if ($backfilled) {
-            $this->logger->warning(
-                'Doofinder: indexable attributes missing from the product collection',
-                [
-                    'store_id' => $storeId,
-                    'link_field' => $linkField,
-                    'products' => count($values),
-                    'attributes' => array_values($backfilled),
-                ]
-            );
         }
     }
 
