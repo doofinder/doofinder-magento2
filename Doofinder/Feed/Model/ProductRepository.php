@@ -428,11 +428,16 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $missingCodes = [];
 
         foreach ($products as $product) {
+            $linkId = $this->getLinkId($product, $linkField);
+            if (!$linkId) {
+                continue;
+            }
+
             foreach ($this->getIndexableAttributeCodes() as $code) {
                 if (isset($product[$code])) {
                     continue;
                 }
-                $productsByLink[(int) $product->getData($linkField)] = $product;
+                $productsByLink[$linkId] = $product;
                 $missingCodes[$code] = $code;
             }
         }
@@ -467,6 +472,29 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                 ]
             );
         }
+    }
+
+    /**
+     * Resolve the row the attribute values of a product hang from
+     *
+     * The collection selects the whole entity table, so items carry the link field. When they do
+     * not, the entity id is only a valid substitute where both are the same column: on an
+     * installation where they differ, a row id taken from an entity id points at another product's
+     * row, so the product is left alone instead.
+     *
+     * @param ProductInterface $product
+     * @param string $linkField
+     * @return int
+     */
+    private function getLinkId($product, string $linkField): int
+    {
+        $linkId = (int) $product->getData($linkField);
+
+        if (!$linkId && $linkField === $this->resourceModel->getEntityIdField()) {
+            $linkId = (int) $product->getId();
+        }
+
+        return $linkId;
     }
 
     /**
