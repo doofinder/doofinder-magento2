@@ -25,6 +25,7 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\GroupedProduct\Model\Product\Type\Grouped as GroupedType;
 use Magento\Store\Api\StoreConfigManagerInterface as MagentoStoreConfig;
 use Magento\Store\Model\App\Emulation;
+use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Directory\Model\CurrencyFactory;
 use Doofinder\Feed\Helper\ProductFactory as ProductHelperFactory;
@@ -209,6 +210,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
     public function getList(SearchCriteriaInterface $searchCriteria)
     {
         $searchResult = $this->productRepositoryBase->getList($searchCriteria);
+        $this->backfillMissingAttributes($searchResult->getItems());
         $storeId = null;
 
         foreach ($searchResult->getItems() as $product) {
@@ -398,6 +400,127 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
         $smallImageUrl = $this->getImage($product, 'product_small_image')->getUrl();
         $product->setCustomAttribute('small_image', $smallImageUrl);
         $this->removeExcludedCustomAttributes($product);
+    }
+
+    /**
+     * Fill in the indexable attributes that the product collection did not hydrate
+     *
+     * Products coming from getList() are hydrated by a collection whose attribute load resolves
+     * values through the entity id, while get() reads them through the link field of the loaded
+     * row. On some installations both do not agree and a value present in the database is missing
+     * from the collection item, so it never reaches the feed. Read those values once per page,
+     * keyed by the same link field get() uses, and fill in only the keys that are missing.
+     *
+     * @param ProductInterface[] $products
+     * @return void
+     */
+    private function backfillMissingAttributes(array $products): void
+    {
+        $linkField = $this->resourceModel->getLinkField();
+        $productsMissingAttributesByLink = [];
+        $missingAttributeCodes = [];
+
+        foreach ($products as $product) {
+            $linkId = $this->getLinkId($product, $linkField);
+            if (!$linkId) {
+                continue;
+            }
+
+            foreach ($this->getIndexableAttributeCodes() as $code) {
+                if (isset($product[$code])) {
+                    continue;
+                }
+                $productsMissingAttributesByLink[$linkId] = $product;
+                $missingAttributeCodes[] = $code;
+            }
+        }
+
+        if (!$productsMissingAttributesByLink) {
+            return;
+        }
+
+        $storeId = (int) reset($productsMissingAttributesByLink)->getStoreId();
+        $values = $this->fetchRawAttributeValues(
+            array_keys($productsMissingAttributesByLink),
+            $missingAttributeCodes,
+            $storeId,
+            $linkField
+        );
+
+        foreach ($productsMissingAttributesByLink as $linkId => $product) {
+            foreach ($values[$linkId] ?? [] as $code => $value) {
+                if (isset($product[$code]) || $value === null || $value === '') {
+                    continue;
+                }
+                $product->setData($code, $value);
+            }
+        }
+    }
+
+    /**
+     * Resolve the row the attribute values of a product hang from
+     *
+     * The collection selects the whole entity table, so items carry the link field. When they do
+     * not, the entity id is only a valid substitute where both are the same column: on an
+     * installation where they differ, a row id taken from an entity id points at another product's
+     * row, so the product is left alone instead.
+     *
+     * @param ProductInterface $product
+     * @param string $linkField
+     * @return int
+     */
+    private function getLinkId($product, string $linkField): int
+    {
+        $linkId = (int) $product->getData($linkField);
+
+        if (!$linkId && $linkField === $this->resourceModel->getEntityIdField()) {
+            $linkId = (int) $product->getId();
+        }
+
+        return $linkId;
+    }
+
+    /**
+     * Read attribute values straight from the EAV tables, one query per backend table
+     *
+     * Values are ordered by store id so that a store scoped value overwrites the default one,
+     * which is how the product model resolves them when it is loaded by get().
+     *
+     * @param int[] $linkIds
+     * @param string[] $codes
+     * @param int $storeId
+     * @param string $linkField
+     * @return array<int, array<string, mixed>>
+     */
+    private function fetchRawAttributeValues(array $linkIds, array $codes, int $storeId, string $linkField): array
+    {
+        $attributesByTable = [];
+
+        foreach ($codes as $code) {
+            $attribute = $this->resourceModel->getAttribute($code);
+            if (!$attribute || !$attribute->getId() || $attribute->getBackend()->isStatic()) {
+                continue;
+            }
+            $attributesByTable[$attribute->getBackend()->getTable()][(int) $attribute->getId()] = $code;
+        }
+
+        $connection = $this->resourceModel->getConnection();
+        $values = [];
+
+        foreach ($attributesByTable as $table => $attributes) {
+            $select = $connection->select()
+                ->from(['v' => $table], [$linkField, 'attribute_id', 'value'])
+                ->where("v.$linkField IN (?)", $linkIds)
+                ->where('v.attribute_id IN (?)', array_keys($attributes))
+                ->where('v.store_id IN (?)', [Store::DEFAULT_STORE_ID, $storeId])
+                ->order('v.store_id ASC');
+
+            foreach ($connection->fetchAll($select) as $row) {
+                $values[(int) $row[$linkField]][$attributes[(int) $row['attribute_id']]] = $row['value'];
+            }
+        }
+
+        return $values;
     }
 
     /**
