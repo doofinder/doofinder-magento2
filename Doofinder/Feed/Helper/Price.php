@@ -121,7 +121,9 @@ class Price extends AbstractHelper
 
     /**
      * Function that returns the price with the corresponding tax value.
-     * The first case contemplates the scenario of the tax already applied to the price
+     * The first case contemplates the scenario of the tax already applied to the price,
+     * as well as bundle products, whose amount already includes the taxes of each selection
+     * (dynamic bundles have no tax class of their own, so the adjustment would add nothing).
      * The second scenario needs this adjustment to be applied.
      *
      * @param \Magento\Catalog\Model\Product $product
@@ -129,14 +131,14 @@ class Price extends AbstractHelper
      */
     private function getPriceWithTaxes($product, $amount)
     {
-        $this->taxConfig->priceIncludesTax() ?
-            $value = $amount->getValue():
-            $value = $product
-                ->getPriceInfo()
-                ->getAdjustment('tax')
-                ->applyAdjustment($amount->getBaseAmount(), $product);
+        if ($this->taxConfig->priceIncludesTax() || $product->getTypeId() === ProductType::TYPE_BUNDLE) {
+            return $amount->getValue();
+        }
 
-        return $value;
+        return $product
+            ->getPriceInfo()
+            ->getAdjustment('tax')
+            ->applyAdjustment($amount->getBaseAmount(), $product);
     }
 
     /**
