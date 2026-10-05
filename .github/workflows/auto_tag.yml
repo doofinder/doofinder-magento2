@@ -16,7 +16,7 @@ jobs:
       tag_created: ${{ steps.tag_check.outputs.created }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
