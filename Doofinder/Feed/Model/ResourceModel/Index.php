@@ -23,6 +23,12 @@ class Index extends AbstractDb
      */
     protected $metadataPool;
 
+    /** @var TableResolver */
+    protected $tableResolver;
+
+    /** @var DimensionCollectionFactory */
+    protected $dimensionCollectionFactory;
+
     /**
      * Index constructor.
      * @param Context $context

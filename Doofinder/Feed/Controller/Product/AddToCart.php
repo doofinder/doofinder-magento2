@@ -8,6 +8,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Quote\Model\Quote\Item as QuoteItem;
 use Magento\Framework\DataObject;
+use Magento\Quote\Model\ResourceModel\Quote as QuoteResource;
 
 /**
  * Class AddToCart. This class aims at opening a way for adding to cart from the layer
@@ -29,6 +30,9 @@ class AddToCart extends Action implements HttpPostActionInterface
     /** @var \Magento\Framework\Controller\Result\JsonFactory */
     private $resultJsonFactory;
 
+    /** @var QuoteResource */
+    private $quoteResource;
+
     /**
      * AddToCart constructor.
      * @param Context $context
@@ -37,6 +41,7 @@ class AddToCart extends Action implements HttpPostActionInterface
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @param QuoteResource $quoteResource
      */
     public function __construct(
         Context $context,
@@ -44,8 +49,10 @@ class AddToCart extends Action implements HttpPostActionInterface
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Psr\Log\LoggerInterface $logger,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        QuoteResource $quoteResource
     ) {
+        $this->quoteResource = $quoteResource;
         $this->checkoutSession = $checkoutSession;
         $this->cartRepository = $cartRepository;
         $this->productRepository = $productRepository;
@@ -87,7 +94,8 @@ class AddToCart extends Action implements HttpPostActionInterface
         if (is_a($result, QuoteItem::class)) {
             //Update totals
             $quote->setIsActive(true);
-            $quote->collectTotals()->save();
+            $quote->collectTotals();
+            $this->quoteResource->save($quote);
             $session->replaceQuote($quote)->unsLastRealOrderId();
             $cart = $this->cartRepository->get($quote->getId());
             $this->cartRepository->save($cart);

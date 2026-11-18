@@ -10,6 +10,7 @@ use Magento\Framework\Escaper;
 use Magento\Store\Model\Group;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Website;
+use Magento\Store\Model\ResourceModel\Website as WebsiteResource;
 
 class StoreViewTable extends Field
 {
@@ -35,6 +36,9 @@ class StoreViewTable extends Field
      */
     protected $escaper;
 
+    /** @var WebsiteResource */
+    private $websiteResource;
+
     /**
      * StoreViewTable constructor.
      *
@@ -42,6 +46,7 @@ class StoreViewTable extends Field
      * @param Website $website
      * @param StoreConfig $storeConfig
      * @param Escaper $escaper
+     * @param WebsiteResource $websiteResource
      * @param array $data
      */
     public function __construct(
@@ -49,8 +54,10 @@ class StoreViewTable extends Field
         Website $website,
         StoreConfig $storeConfig,
         Escaper $escaper,
+        WebsiteResource $websiteResource,
         array $data = []
     ) {
+        $this->websiteResource = $websiteResource;
         $this->website = $website;
         $this->storeConfig = $storeConfig;
         $this->escaper = $escaper;
@@ -87,7 +94,8 @@ class StoreViewTable extends Field
     public function getGroups()
     {
         $websiteId = (int)$this->getRequest()->getParam('website');
-        return $this->website->load($websiteId)->getGroupCollection()->setOrder('group_id', 'ASC');
+        $this->websiteResource->load($this->website, $websiteId);
+        return $this->website->getGroupCollection()->setOrder('group_id', 'ASC');
     }
 
     /**

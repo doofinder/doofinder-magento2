@@ -35,5 +35,6 @@ class UpdateOnClick extends Action
     public function execute()
     {
         $this->processor->execute();
+        return $this->getResponse();
     }
 }
