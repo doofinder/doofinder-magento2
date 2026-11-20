@@ -33,7 +33,7 @@ class CleanIntegration extends Action
     /**
      * CleanIntegration constructor.
      *
-     * @param ClientFactory $resourceConnection
+     * @param ResourceConnection $resourceConnection
      * @param TypeListInterface $cacheTypeList
      * @param CacheFrontendPool $cacheFrontendPool
      * @param LoggerInterface $logger
@@ -68,6 +68,7 @@ class CleanIntegration extends Action
             $this->logger->error('There was a problem cleaning the database from Doofinder entries: ' .
                 $e->getMessage());
         }
+        return $this->getResponse();
     }
 
     /**

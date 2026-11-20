@@ -10,6 +10,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Escaper;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Psr\Log\LoggerInterface;
@@ -25,6 +26,9 @@ class SaveSector extends Action implements HttpPostActionInterface
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var Escaper */
+    private $escaper;
+
     /**
      * SaveSector constructor.
      *
@@ -32,13 +36,16 @@ class SaveSector extends Action implements HttpPostActionInterface
      * @param JsonFactory $resultJsonFactory
      * @param LoggerInterface $logger
      * @param Context $context
+     * @param Escaper $escaper
      */
     public function __construct(
         WriterInterface $configWriter,
         JsonFactory $resultJsonFactory,
         LoggerInterface $logger,
-        Context $context
+        Context $context,
+        Escaper $escaper
     ) {
+        $this->escaper = $escaper;
         $this->configWriter = $configWriter;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->logger = $logger;

@@ -192,7 +192,7 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
                 // Start Custom code here
                 $storeId = $this->storeManager->getStore()->getId();
             }
-            $product->load($productId);
+            $this->resourceModel->load($product, $productId);
             $this->appEmulation->startEnvironmentEmulation($storeId, Area::AREA_FRONTEND, true);
             $this->setExtensionAttributes($product, $storeId);
             $this->setCustomAttributes($product);
