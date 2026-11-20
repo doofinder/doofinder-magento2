@@ -116,6 +116,7 @@ class Client
      *
      * @param string $path
      * @param mixed $body
+     * @param float|null $timeout Seconds to give up after, if the request mustn't wait for long
      * @return string
      * @throws BadRequest
      * @throws IndexingInProgress
@@ -126,18 +127,21 @@ class Client
      * @throws TypeAlreadyExists
      * @throws WrongResponse
      */
-    public function post(string $path, $body): string
+    public function post(string $path, $body, ?float $timeout = null): string
     {
+        $options = [
+            RequestOptions::VERIFY  => false,
+            RequestOptions::HEADERS => $this->getHeaders(),
+            RequestOptions::JSON    => $body,
+            RequestOptions::EXPECT  => '',
+        ];
+        if ($timeout !== null) {
+            $options[RequestOptions::CONNECT_TIMEOUT] = $timeout;
+            $options[RequestOptions::TIMEOUT] = $timeout;
+        }
+
         try {
-            $this->response = $this->guzzleClient->post(
-                $this->getApiBaseURL() . $path,
-                [
-                    RequestOptions::VERIFY  => false,
-                    RequestOptions::HEADERS => $this->getHeaders(),
-                    RequestOptions::JSON    => $body,
-                    RequestOptions::EXPECT  => '',
-                ]
-            );
+            $this->response = $this->guzzleClient->post($this->getApiBaseURL() . $path, $options);
         } catch (GuzzleException $e) {
             $errorResponse = $this->parseErrorResponse((string) $e->getResponse()->getBody());
             $this->utils->handleErrors($e->getCode(), $errorResponse);

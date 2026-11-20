@@ -19,6 +19,8 @@ class ManagementClient
 {
     private const ENDPOINT_SEARCH_ENGINES = '/api/v2/search_engines';
     private const ENDPOINT_UPDATE_ON_SAVE = '/item';
+    private const ENDPOINT_MAGENTO = '/magento';
+    private const SALE_TIMEOUT_IN_SECONDS = 3.0;
 
     /** @var Client */
     private $client;
@@ -146,6 +148,22 @@ class ManagementClient
         $url = $this->getSearchEnginePath($hashid);
         $response = $this->client->get($url);
         return json_decode($response, true);
+    }
+
+    /**
+     * Sends a sale to Doofinder.
+     *
+     * Doofinder registers it only for the stores it takes the sales from the module for. It gives up
+     * after a few seconds, as the shopper is loading the order success page.
+     *
+     * @param array $sale
+     * @param string $hashId
+     * @return void
+     * @throws BadRequest
+     */
+    public function sendSale(array $sale, string $hashId)
+    {
+        $this->client->post(self::ENDPOINT_MAGENTO . "/{$hashId}/sales", $sale, self::SALE_TIMEOUT_IN_SECONDS);
     }
 
     /**
