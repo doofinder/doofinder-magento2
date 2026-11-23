@@ -85,6 +85,16 @@ The root **`.env`** lists all variables with comments. For the **dev stack**, th
 | Admin (HTTP) | `http://localhost:9012/admin` |
 | Admin (HTTPS) | `https://localhost:4012/admin` |
 
+> [!NOTE]
+> **Using FRP tunnel :** The FRP tunnel uses `https2http` to terminate SSL externally, so `localAddr` must point to the HTTP port (`9012`), not the HTTPS port (`4012`). Using `4012` causes a "You're speaking plain HTTP to an SSL-enabled server port" error.
+> 
+> ```toml
+> [proxies.plugin]
+> type = "https2http"
+> localAddr = "127.0.0.1:9012"  # ✅ correct — HTTP port
+> # localAddr = "127.0.0.1:4012"  # ❌ wrong — SSL port
+> ```
+
 Admin login is **`MAGENTO_ADMIN_USER`** / **`MAGENTO_ADMIN_PASSWORD`** from `.env` (defaults: `admin` / `admin123`).
 
 **Use cases:**
