@@ -13,6 +13,7 @@ use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\Config\Model\ResourceModel\Config as ConfigResource;
 
 class Cron extends ConfigValue
 {
@@ -23,6 +24,9 @@ class Cron extends ConfigValue
      */
     protected $storeConfigFactory;
 
+    /** @var ConfigResource */
+    private $configResource;
+
     /**
      * Cron constructor.
      *
@@ -31,6 +35,7 @@ class Cron extends ConfigValue
      * @param ScopeConfigInterface $config
      * @param StoreConfigFactory $storeConfigFactory
      * @param TypeListInterface $cacheTypeList
+     * @param ConfigResource $configResource
      * @param array $data
      * @param AbstractResource $resource
      * @param AbstractDb $resourceCollection
@@ -41,10 +46,12 @@ class Cron extends ConfigValue
         ScopeConfigInterface $config,
         StoreConfigFactory $storeConfigFactory,
         TypeListInterface $cacheTypeList,
+        ConfigResource $configResource,
         array $data = [],
         ?AbstractResource $resource = null,
         ?AbstractDb $resourceCollection = null
     ) {
+        $this->configResource = $configResource;
         $this->storeConfigFactory = $storeConfigFactory;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
@@ -60,14 +67,9 @@ class Cron extends ConfigValue
         if ($this->storeConfigFactory->create()->isUpdateOnSave()) {
             $cronExpression = $this->getData('groups/update_on_save/fields/cron_expression/value');
             try {
-                $this->load(
-                    self::CRON_STRING_PATH,
-                    'path'
-                )->setValue(
-                    $cronExpression
-                )->setPath(
-                    self::CRON_STRING_PATH
-                )->save();
+                $this->configResource->load($this, self::CRON_STRING_PATH, 'path');
+                $this->setValue($cronExpression)->setPath(self::CRON_STRING_PATH);
+                $this->configResource->save($this);
             } catch (\Exception $e) {
                 throw new DoofinderFeedException(__('We can\'t save the cron expression.'));
             }

@@ -55,7 +55,7 @@ db-restore:
 # Configures extension static files
 doofinder-configure:
 	@envsubst < templates/etc/config.xml > Doofinder/Feed/etc/config.xml
-	@envsubst < templates/Helper/Constants.php > Doofinder/Feed/Helper/Constants.php
+	@envsubst < templates/Helper/Constants.php.template > Doofinder/Feed/Helper/Constants.php
 
 # Enable the Doofinder module, upgrade Magento, and clean the cache
 doofinder-upgrade: doofinder-configure
