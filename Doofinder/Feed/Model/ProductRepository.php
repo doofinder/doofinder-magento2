@@ -11,6 +11,7 @@ use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ProductRepository as ProductRepositoryBase;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
@@ -555,6 +556,10 @@ class ProductRepository implements \Magento\Catalog\Api\ProductRepositoryInterfa
 
         $stockId = $inventoryHelper->getStockIdByStore((int) $storeId);
         $stockAndStatus = $inventoryHelper->getQuantityAndAvailability($product, $stockId);
+        if ($product->getTypeId() === ProductType::TYPE_BUNDLE) {
+            $product->setData('is_salable', $stockAndStatus[1]);
+            $product->unsetData('salable');
+        }
 
         $extensionAttributes->setUrlFull($this->getProductUrl($product));
         $extensionAttributes->setIsInStock($stockAndStatus[1]);
