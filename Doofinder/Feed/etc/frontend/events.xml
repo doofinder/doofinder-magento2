@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- The order success page, once per order placed in the storefront -->
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="DoofinderFeedSendSaleObserver" instance="Doofinder\Feed\Observer\Sales\SendSaleObserver" />
+    </event>
+    <event name="multishipping_checkout_controller_success_action">
+        <observer name="DoofinderFeedSendSaleObserver" instance="Doofinder\Feed\Observer\Sales\SendSaleObserver" />
+    </event>
+</config>
