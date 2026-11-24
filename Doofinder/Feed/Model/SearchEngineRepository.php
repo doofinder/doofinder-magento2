@@ -19,14 +19,22 @@ class SearchEngineRepository
     private StoreConfig $storeConfig;
 
     /**
+     * @var ProcessCallbackToken
+     */
+    private ProcessCallbackToken $processCallbackToken;
+
+    /**
      * SearchEngineRepository constructor.
      *
      * @param StoreConfig $storeConfig
+     * @param ProcessCallbackToken $processCallbackToken
      */
     public function __construct(
-        StoreConfig $storeConfig
+        StoreConfig $storeConfig,
+        ProcessCallbackToken $processCallbackToken
     ) {
         $this->storeConfig = $storeConfig;
+        $this->processCallbackToken = $processCallbackToken;
     }
 
     /**
@@ -95,11 +103,17 @@ class SearchEngineRepository
 
         $installationId = $this->storeConfig->getInstallationId($store->getStoreGroupId());
 
+        // Doofinder calls this URL as it is, so the token in it proves the callback comes from Doofinder
+        $callbackUrl = $baseUrl . self::PROCESS_CALLBACK_PATH . '?' . http_build_query([
+            'storeId' => $storeId,
+            ProcessCallbackToken::PARAM_NAME => $this->processCallbackToken->generate((int)$storeId),
+        ]);
+
         return  new SearchEngineStruct(
             $store->getGroup()->getName() . ' - ' . $store->getName(),
             $language,
             $currency,
-            $baseUrl . self::PROCESS_CALLBACK_PATH . '?storeId=' . $storeId,
+            $callbackUrl,
             new SearchEngineOptionsStruct(
                 (string)$storeId,
                 $baseUrl . sprintf(self::INDEX_URL_FORMAT, $storeCode),
