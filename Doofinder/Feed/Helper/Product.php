@@ -8,7 +8,9 @@ use Doofinder\Feed\Helper\Inventory as InventoryHelper;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Model\Category as CategoryModel;
 use Magento\Catalog\Model\Product as ProductModel;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Visibility;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator;
 use Magento\Eav\Model\Config as EavConfig;
@@ -85,6 +87,11 @@ class Product extends AbstractHelper
     private $productResource;
 
     /**
+     * @var ProductCollectionFactory
+     */
+    private $productCollectionFactory;
+
+    /**
      * @see /Doofinder/Feed/Observer/Product/AbstractChangedProductObserver.php
      *
      * @var []
@@ -103,6 +110,7 @@ class Product extends AbstractHelper
      * @param Configurable $configurable
      * @param InventoryHelper $inventoryHelper
      * @param ProductResourceModel $productResource
+     * @param ProductCollectionFactory $productCollectionFactory
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -116,7 +124,8 @@ class Product extends AbstractHelper
         EavConfig $eavConfig,
         Configurable $configurable,
         InventoryHelper $inventoryHelper,
-        ProductResourceModel $productResource
+        ProductResourceModel $productResource,
+        ProductCollectionFactory $productCollectionFactory
     ) {
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->imageHelper = $imageHelper;
@@ -128,6 +137,7 @@ class Product extends AbstractHelper
         $this->configurable = $configurable;
         $this->inventoryHelper = $inventoryHelper;
         $this->productResource = $productResource;
+        $this->productCollectionFactory = $productCollectionFactory;
         $this->visibilityAllowed = [Visibility::VISIBILITY_IN_SEARCH, Visibility::VISIBILITY_BOTH];
         parent::__construct($context);
     }
@@ -159,7 +169,7 @@ class Product extends AbstractHelper
         $routePath = '';
         $requestPath = $product->getRequestPath();
         $productId = $product->getId();
-        $parents = $this->configurable->getParentIdsByChild($product->getId());
+        $parents = $this->getEligibleParentIds((int)$product->getId(), (int)$storeId);
         $hasConfigurableParent = count($parents) > 0;
         $isVisibleIndividually = in_array($product->getVisibility(), $this->visibilityAllowed);
         $useParentUrl = $hasConfigurableParent && !$isVisibleIndividually;
@@ -211,6 +221,33 @@ class Product extends AbstractHelper
             $routePath,
             $routeParams
         );
+    }
+
+    /**
+     * Get the ids of the configurable parents of a variant that can serve as its URL
+     *
+     * Only parents that are enabled and assigned to the website of the store are returned.
+     *
+     * @param int $productId
+     * @param int $storeId
+     *
+     * @return int[]
+     */
+    private function getEligibleParentIds(int $productId, int $storeId): array
+    {
+        $parentIds = array_map('intval', $this->configurable->getParentIdsByChild($productId));
+        if (empty($parentIds)) {
+            return [];
+        }
+
+        $eligibleIds = $this->productCollectionFactory->create()
+            ->setStoreId($storeId)
+            ->addIdFilter($parentIds)
+            ->addStoreFilter($storeId)
+            ->addAttributeToFilter('status', Status::STATUS_ENABLED)
+            ->getAllIds();
+
+        return array_values(array_intersect($parentIds, array_map('intval', $eligibleIds)));
     }
 
     /**
