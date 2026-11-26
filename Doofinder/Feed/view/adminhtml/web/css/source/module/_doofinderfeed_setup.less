@@ -1,22 +1,23 @@
 & when (@media-common = true) {
-  .doofinderfeed-setup-index {
-    .doofinder-button {
-      padding: 12px 15px;
-      border: none;
-      border-radius: 22px;
-      background-color: @color-gray-middle1;
-      color: @color-gray-darken4;
-      font-weight: @font-weight__bold;
+    .doofinderfeed-setup-index {
+        .doofinder-button {
+            background-color: @color-gray-middle1;
+            border: none;
+            border-radius: 22px;
+            color: @color-gray-darken4;
+            font-weight: @font-weight__bold;
+            padding: 12px 15px;
+        }
+
+        .setup-finish-buttons {
+            margin: 40px 0;
+        }
     }
-    .setup-finish-buttons {
-      margin: 40px 0;
-    }
-  }
 }
 
 //
 //  Desktop Min 768px
 //  _____________________________________________
-.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
 
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
 }
